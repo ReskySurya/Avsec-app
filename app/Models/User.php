@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -59,4 +60,15 @@ class User extends Authenticatable
     {
         return $this->role->name === $role;
     }
+
+    // Di dalam class User, tambahkan:
+    public function equipments(): HasMany
+    {
+        return $this->hasMany(Equipment::class, 'creationID');
+    }
+
+    public function locations(): HasMany
+    {
+        return $this->hasMany(Location::class, 'creationID');
+    }   
 }
