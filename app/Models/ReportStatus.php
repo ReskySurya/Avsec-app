@@ -10,7 +10,7 @@ class ReportStatus extends Model
     //
     protected $table = 'report_status';
 
-    protected $primaryKey = 'statusID';
+    protected $primaryKey = 'id';
     protected $fillable = [
         'id',
         'name',
@@ -18,6 +18,11 @@ class ReportStatus extends Model
         'isDefault',
         'label'
     ];
+
+    public static function getStatusNames(): array
+    {
+        return ['accept', 'pending', 'reject'];
+    }
  
     public function reports(): HasMany
     {

@@ -11,10 +11,32 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('report_status', function (Blueprint $table) {
-            $table->id();
+        Schema::create('reportStatus', function (Blueprint $table) {
+            $table->id('id')->comment('Primary key for status');
+            
+            // Basic status information
+            $table->string('name', 255)->unique()->comment('Unique status name (lowercase_with_underscores)');
+            $table->string('label', 255)->comment('Display label for the status');
+            $table->text('description')->nullable()->comment('Detailed description of the status');
+            
+            
+            // Behavior settings
+            $table->boolean('isDefault')->default(false)->comment('Whether this is the default status');
+
+            
+            // Timestamps and soft deletes
             $table->timestamps();
+            
+            // Indexes for better performance
+            $table->index('name');
+            $table->index('isDefault');
+            
+            // Unique constraint to ensure only one default status
+            $table->unique(['isDefault'], 'unique_default_status');
         });
+        
+        // Insert default statuses
+        // $this->insertDefaultStatuses();
     }
 
     /**
@@ -22,6 +44,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('report_statuses');
+        Schema::dropIfExists('report_status');
     }
 };
