@@ -12,23 +12,21 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('report', function (Blueprint $table) {
-            $table->id();
-            
             // Report identification
-            $table->string('reportID', 50)->unique()->comment('Format: R-xxxxxx1');
+            $table->string('reportID', 255)->unique()->comment('Format: R-xxxxxx1');
             
             // Test information
-            $table->date('testDate')->comment('Date when test was conducted');
+            $table->dateTime('testDate')->comment('Date when test was conducted');
             
             // Equipment and location
-            $table->unsignedBigInteger('equipmentLocationID')->comment('Foreign key to equipment_locations table');
+            $table->integer('equipmentLocationID')->comment('Foreign key to equipment_locations table');
             
             // Device and certificate information (stored as JSON)
-            $table->json('deviceInfo')->nullable()->comment('Device information in JSON format');
-            $table->json('certificateInfo')->nullable()->comment('Certificate information in JSON format');
+            $table->string('deviceInfo',255)->nullable()->comment('Device information ');
+            $table->string('certificateInfo',255)->nullable()->comment('Certificate information ');
             
             // Test results
-            $table->enum('result', ['pass', 'fail', 'pending', 'n/a'])->default('pending')->comment('Test result status');
+            $table->enum('result', ['pass', 'fail'])->default('fail')->comment('Test result status');
             $table->text('note')->nullable()->comment('Additional notes for the report');
             
             // Status tracking
