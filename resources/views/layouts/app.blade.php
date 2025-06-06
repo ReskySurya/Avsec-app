@@ -3,24 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Laravel App')</title>
+    <title>@yield('title', 'AVSEC App')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-100">
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <a href="{{ url('/') }}" class="text-xl font-bold text-gray-800">
-                        Laravel App
-                    </a>
-                </div>
-            </div>
+    @auth
+        @include('layouts.navbar')
+        <div class="flex">
+            @include('layouts.sidebar')
+            <main class="ml-64 flex-1 p-6 min-h-screen">
+                @yield('content')
+            </main>
         </div>
-    </nav>
-
-    <main class="py-4">
-        @yield('content')
-    </main>
+    @else
+        <main class="py-4">
+            @yield('content')
+        </main>
+    @endauth
 </body>
 </html>
