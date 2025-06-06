@@ -11,94 +11,49 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('report', function (Blueprint $table) {
-            // Report identification
-            $table->string('reportID', 255)->unique()->comment('Format: R-xxxxxx1');
+        Schema::create('reports', function (Blueprint $table) {
+            $table->string('reportID', 20)->primary();
+            $table->datetime('testDate');
             
-            // Test information
-            $table->dateTime('testDate')->comment('Date when test was conducted');
+            // Foreign key to equipment_locations table
+            $table->unsignedBigInteger('equipmentLocationID');
+            $table->foreign('equipmentLocationID')->references('id')->on('equipment_locations')->onDelete('cascade');
             
-            // Equipment and location
-            $table->integer('equipmentLocationID')->comment('Foreign key to equipment_locations table');
+            $table->text('deviceInfo')->nullable();
+            $table->text('certificateInfo')->nullable();
+            $table->boolean('isFullFilled')->default(false);
+            $table->text('result')->nullable();
+            $table->text('note')->nullable();
             
-            // Device and certificate information (stored as JSON)
-            $table->string('deviceInfo',255)->nullable()->comment('Device information ');
-            $table->string('certificateInfo',255)->nullable()->comment('Certificate information ');
+            // Foreign key to report_statuses table
+            $table->unsignedBigInteger('statusID');
+            $table->foreign('statusID')->references('id')->on('report_statuses')->onDelete('cascade');
             
-            // Test results
-            $table->enum('result', ['pass', 'fail'])->default('fail')->comment('Test result status');
-            $table->text('note')->nullable()->comment('Additional notes for the report');
+            // Submitted by (Foreign key to users table)
+            $table->unsignedBigInteger('submittedByID');
+            $table->foreign('submittedByID')->references('id')->on('users')->onDelete('cascade');
+            $table->text('submitterSignature')->nullable();
             
-            // Status tracking
-            $table->unsignedBigInteger('statusID')->comment('Foreign key to statuses table');
+            // Approved by (Foreign key to users table)
+            $table->unsignedBigInteger('approvedByID')->nullable();
+            $table->foreign('approvedByID')->references('id')->on('users')->onDelete('set null');
+            $table->text('approverSignature')->nullable();
+            $table->text('approvalNote')->nullable();
             
-            // Submission information
-            $table->unsignedBigInteger('submittedByID')->comment('Foreign key to users table - who submitted');
-            $table->text('submitterSignature')->nullable()->comment('Digital signature of submitter');
+            // Reviewed by (Foreign key to users table)
+            $table->unsignedBigInteger('reviewedByID')->nullable();
+            $table->foreign('reviewedByID')->references('id')->on('users')->onDelete('set null');
+            $table->timestamp('reviewed_at')->nullable();
             
-            // Approval information
-            $table->unsignedBigInteger('approvedByID')->nullable()->comment('Foreign key to users table - who approved');
-            $table->text('approverSignature')->nullable()->comment('Digital signature of approver');
-            $table->text('approvalNote')->nullable()->comment('Notes from approver');
-            
-            // Review information
-            $table->unsignedBigInteger('reviewedByID')->nullable()->comment('Foreign key to users table - who reviewed');
-            $table->timestamp('reviewed_at')->nullable()->comment('When the report was reviewed');
-            
-            // Timestamps and soft deletes
             $table->timestamps();
             $table->softDeletes();
             
             // Indexes for better performance
-            $table->index('reportID');
-            $table->index('testDate');
-            $table->index('equipmentLocationID');
-            $table->index('statusID');
-            $table->index('submittedByID');
-            $table->index('approvedByID');
-            $table->index('reviewedByID');
-            $table->index('result');
-            $table->index('created_at');
-            $table->index('deleted_at');
-            
-            // Composite indexes for common queries
-            $table->index(['statusID', 'testDate']);
-            $table->index(['submittedByID', 'created_at']);
-            $table->index(['result', 'testDate']);
-            
-            // Foreign key constraints (uncomment if you want to enforce referential integrity)
-            // Note: Make sure the referenced tables exist before uncommenting these
-            /*
-            $table->foreign('equipmentLocationID')
-                  ->references('id')
-                  ->on('equipment_locations')
-                  ->onDelete('restrict')
-                  ->onUpdate('cascade');
-                  
-            $table->foreign('statusID')
-                  ->references('id')
-                  ->on('statuses')
-                  ->onDelete('restrict')
-                  ->onUpdate('cascade');
-                  
-            $table->foreign('submittedByID')
-                  ->references('id')
-                  ->on('users')
-                  ->onDelete('restrict')
-                  ->onUpdate('cascade');
-                  
-            $table->foreign('approvedByID')
-                  ->references('id')
-                  ->on('users')
-                  ->onDelete('restrict')
-                  ->onUpdate('cascade');
-                  
-            $table->foreign('reviewedByID')
-                  ->references('id')
-                  ->on('users')
-                  ->onDelete('restrict')
-                  ->onUpdate('cascade');
-            */
+            $table->index(['testDate']);
+            $table->index(['statusID']);
+            $table->index(['submittedByID']);
+            $table->index(['created_at']);
+            $table->index(['equipmentLocationID']);
         });
     }
 

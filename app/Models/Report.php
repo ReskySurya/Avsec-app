@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Report extends Model
 {
@@ -14,7 +15,7 @@ class Report extends Model
     /**
      * The table associated with the model.
      */
-    protected $table = 'report';
+    protected $table = 'reports';
 
     /**
      * The primary key associated with the table.
@@ -22,10 +23,19 @@ class Report extends Model
     protected $primaryKey = 'reportID';
 
     /**
+     * Indicates if the primary key is auto-incrementing.
+     */
+    public $incrementing = false;
+
+    /**
+     * The data type of the primary key.
+     */
+    protected $keyType = 'string';
+
+    /**
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-        'reportID',
         'testDate',
         'equipmentLocationID',
         'deviceInfo',
@@ -57,21 +67,7 @@ class Report extends Model
     protected $casts = [
         'testDate' => 'datetime',
         'reviewed_at' => 'datetime',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
         'isFullFilled' => 'boolean',
-    ];
-
-    /**
-     * The attributes that should be mutated to dates.
-     */
-    protected $dates = [
-        'testDate',
-        'reviewed_at',
-        'created_at',
-        'updated_at',
-        'deleted_at',
     ];
 
     /**
@@ -114,7 +110,6 @@ class Report extends Model
         return $prefix . $date . $sequence;
     }
 
-
     /**
      * Relationship: Report belongs to Equipment Location
      */
@@ -153,6 +148,14 @@ class Report extends Model
     public function reviewedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reviewedByID');
+    }
+
+    /**
+     * Relationship: Report has many Report Details
+     */
+    public function reportDetails(): HasMany
+    {
+        return $this->hasMany(ReportDetail::class, 'reportID', 'reportID');
     }
 
     /**
@@ -199,7 +202,6 @@ class Report extends Model
         });
     }
 
-    
     /**
      * Scope: Get rejected reports
      */
@@ -209,7 +211,6 @@ class Report extends Model
             $q->where('name', 'rejected');
         });
     }
-
 
     /**
      * Accessor: Get formatted test date
@@ -252,14 +253,6 @@ class Report extends Model
     }
 
     /**
-     * Mutator: Set test date
-     */
-    // public function setTestDateAttribute($value)
-    // {
-    //     $this->attributes['testDate'] = $value ? Carbon::parse($value) : null;
-    // }
-
-    /**
      * Method: Mark as approved
      */
     public function markAsApproved(int $approvedById, string $signature, string $note = null): bool
@@ -292,7 +285,8 @@ class Report extends Model
             'status',
             'submittedBy',
             'approvedBy',
-            'reviewedBy'
+            'reviewedBy',
+            'reportDetails'
         ])->toArray();
     }
 
@@ -310,18 +304,4 @@ class Report extends Model
               });
         });
     }
-
-    /**
-     * Get reports summary
-     */
-    // public static function getSummary(): array
-    // {
-    //     return [
-    //         'total' => static::count(),
-    //         'pending' => static::pending()->count(),
-    //         'approved' => static::approved()->count(),
-    //         'today' => static::whereDate('created_at', today())->count(),
-    //         'this_month' => static::whereMonth('created_at', now()->month)->count(),
-    //     ];
-    // }
 }
