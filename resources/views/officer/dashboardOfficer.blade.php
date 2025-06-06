@@ -3,7 +3,7 @@
 @section('title', 'Dashboard')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 py-6">
+<div class="max-w-7xl mx-auto px-4 py-6 lg:mt-20">
     <div class="bg-white rounded-lg shadow-md p-6">
         <h1 class="text-3xl font-bold text-gray-900 mb-4">
             Dashboard
