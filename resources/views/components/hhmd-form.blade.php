@@ -6,8 +6,10 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endpush
 
-<div class="bg-white p-4 w-full max-w-full">
-    <div id="format" class="mx-auto w-full">
+<div class="bg-white p-4 mt-20 w-full max-w-full">
+
+    <p>INI FORM HHMD</p>
+    {{-- <div id="format" class="mx-auto w-full">
         <div class="border-t-2 border-x-2 border-black bg-white shadow-md p-4">
             <div class="flex flex-col sm:flex-row items-center justify-between">
                 <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo" class="w-20 h-20 mb-2 sm:mb-0">
@@ -241,5 +243,5 @@
                 </div>
             </div>
         </form>
-    </div>
+    </div> --}}
 </div>

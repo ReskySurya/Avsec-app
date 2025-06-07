@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DailyTestController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -32,4 +33,12 @@ Route::middleware(['auth', 'role:officer'])->group(function () {
     Route::get('/dashboard/officer', function () {
         return view('officer.dashboardOfficer');
     })->name('dashboard.officer');
+});
+
+// Daily Test Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/daily-test/hhmd', [DailyTestController::class, 'hhmdLayout'])->name('daily-test.hhmd');
+    Route::get('/daily-test/wtmd', [DailyTestController::class, 'wtmdLayout'])->name('daily-test.wtmd');
+    Route::get('/daily-test/xraycabin', [DailyTestController::class,'xrayCabinLayout'])->name('daily-test.xraycabin');
+    Route::get('/daily-test/xraybagasi', [DailyTestController::class,'xrayBagasiLayout'])->name('daily-test.xraybagasi');
 });

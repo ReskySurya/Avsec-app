@@ -38,14 +38,14 @@
             <!-- Common Menu Items for All Roles -->
             <li x-data="{ open: false }">
                 <button @click="open = !open"
-                    class="flex items-center justify-between w-full py-2 px-4 rounded hover:bg-gray-700">
+                    class="flex items-center justify-between w-full py-2 px-2 rounded hover:bg-gray-700">
                     <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                         </svg>
-                        <span x-show="sidebarOpen" class="ml-3">Daily Test</span>
+                        <span class="text-white">Daily Test</span>
                     </div>
                     <svg x-show="sidebarOpen" class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }"
                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -55,6 +55,19 @@
                     </svg>
                 </button>
                 <ul x-show="open" class="pl-4 mt-2 space-y-2">
+
+                    <li>
+                        <a href="{{ route('daily-test.hhmd') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                            <span>HHMD</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ route('daily-test.wtmd') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                            <span>WTMD</span>
+                        </a>
+                    </li>
+
                     <li x-data="{ openXray: false }">
                         <button @click="openXray = !openXray"
                             class="flex items-center justify-between w-full py-2 px-4 rounded hover:bg-gray-700">
@@ -68,29 +81,18 @@
                         </button>
                         <ul x-show="openXray" class="pl-4 mt-2 space-y-2">
                             <li>
-                                <a href="#" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                                <a href="{{ route('daily-test.xraycabin') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
                                     <span>XRAY CABIN</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="#" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                                <a href="{{ route('daily-test.xraybagasi') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
                                     <span>XRAY BAGASI</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
 
-                    <li>
-                        <a href="#" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
-                            <span>WTMD</span>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
-                            <span>HHMD</span>
-                        </a>
-                    </li>
                 </ul>
             </li>
 
