@@ -8,8 +8,8 @@
 
 <div class="bg-white p-4 mt-20 w-full max-w-full">
 
-    <p>INI FORM HHMD</p>
-    {{-- <div id="format" class="mx-auto w-full">
+    <!-- <p>INI FORM HHMD</p> -->
+    <div id="format" class="mx-auto w-full">
         <div class="border-t-2 border-x-2 border-black bg-white shadow-md p-4">
             <div class="flex flex-col sm:flex-row items-center justify-between">
                 <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo" class="w-20 h-20 mb-2 sm:mb-0">
@@ -23,7 +23,7 @@
             </div>
         </div>
 
-        <form id="hhmdForm" action="{{ route('submit.hhmd') }}" method="POST" enctype="multipart/form-data"
+        <form id="hhmdForm" method="POST" enctype="multipart/form-data"
             onsubmit="onFormSubmit(event)" class="mt-0">
             @csrf
             <div class="border-2 border-black bg-white shadow">
@@ -157,6 +157,8 @@
                             rows="2"></textarea>
                     </div>
                 </div>
+
+                {{-- 
 
                 <input type="hidden" id="result" name="result" value="">
 

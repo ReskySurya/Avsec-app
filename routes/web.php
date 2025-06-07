@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\EquipmentLocationController;
+use App\Http\Controllers\MasterDataController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DailyTestController;
@@ -41,4 +43,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/daily-test/wtmd', [DailyTestController::class, 'wtmdLayout'])->name('daily-test.wtmd');
     Route::get('/daily-test/xraycabin', [DailyTestController::class,'xrayCabinLayout'])->name('daily-test.xraycabin');
     Route::get('/daily-test/xraybagasi', [DailyTestController::class,'xrayBagasiLayout'])->name('daily-test.xraybagasi');
+});
+
+// Master Data Routes
+Route::middleware(['auth', 'role:superadmin'])->group(function () {
+    Route::get('/master-data/equipment-locations', [MasterDataController::class, 'index'])->name('equipment-locations.index');
+    // Route::get('/master-data/equipment-locations/create', [MasterDataController::class, 'create'])->name('equipment-locations.create');
+    // Route::post('/master-data/equipment-locations', [MasterDataController::class, 'store'])->name('equipment-locations.store');
+    // Route::get('/master-data/equipment-locations/{id}', [MasterDataController::class, 'showEquipment'])->name('equipment-locations.show-equipment');
+    // Route::get('/master-data/locations/{id}', [MasterDataController::class, 'showLocation'])->name('equipment-locations.show-location');
+    // Route::get('/master-data/equipment-locations/{id}/edit', [MasterDataController::class, 'edit'])->name('equipment-locations.edit');
+    // Route::put('/master-data/equipment-locations/{id}', [MasterDataController::class, 'update'])->name('equipment-locations.update');
+    // Route::delete('/master-data/equipment-locations/{id}', [MasterDataController::class, 'destroy'])->name('equipment-locations.destroy');
+    // Route::get('/master-data/search', [MasterDataController::class, 'search'])->name('equipment-locations.search');
 });
