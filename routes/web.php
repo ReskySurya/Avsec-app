@@ -47,6 +47,7 @@ Route::middleware(['auth'])->group(function () {
 
 // Master Data Routes
 Route::middleware(['auth', 'role:superadmin'])->group(function () {
+    // Equipment Locations
     Route::get('/master-data/equipment-locations', [MasterDataController::class, 'index'])->name('equipment-locations.index');
     // Route::get('/master-data/equipment-locations/create', [MasterDataController::class, 'create'])->name('equipment-locations.create');
     // Route::post('/master-data/equipment-locations', [MasterDataController::class, 'store'])->name('equipment-locations.store');
@@ -56,4 +57,10 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     // Route::put('/master-data/equipment-locations/{id}', [MasterDataController::class, 'update'])->name('equipment-locations.update');
     // Route::delete('/master-data/equipment-locations/{id}', [MasterDataController::class, 'destroy'])->name('equipment-locations.destroy');
     // Route::get('/master-data/search', [MasterDataController::class, 'search'])->name('equipment-locations.search');
+
+    // User Management
+    Route::get('/users-management', [MasterDataController::class, 'indexUserManagement'])->name('users-management.index');
+    Route::post('/users-management/tambah', [MasterDataController::class, 'storeUserManagement'])->name('users-management.store');
+    Route::get('/users-management/update/{id}', [MasterDataController::class, 'getUserManagement'])->name('users-management.get');
+    Route::put('/users-management/update/{id}', [MasterDataController::class,'updateUserManagement'])->name('users-management.update');
 });
