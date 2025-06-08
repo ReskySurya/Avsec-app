@@ -6,6 +6,8 @@ use App\Models\Equipment;
 use App\Models\Location;
 use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class MasterDataController extends Controller
 {
