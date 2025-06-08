@@ -16,15 +16,19 @@
         <!-- Mobile Sidebar Overlay -->
         <div id="mobile-sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden lg:hidden"></div>
         
-        <div class="flex">
+        <div class="flex h-full"></div>
             @include('layouts.sidebar')
-            <main class="flex-1 min-h-screen pt-16 lg:pt-0 lg:ml-64">
-                @yield('content')
+            <main class="flex-1 min-h-screen pt-16 px-4 lg:pt-0 lg:ml-64 lg:px-8">
+                <div class="max-w-7xl mx-auto">
+                    @yield('content')
+                </div>
             </main>
         </div>
     @else
-        <main class="py-4">
-            @yield('content')
+        <main class="py-4 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto">
+                @yield('content')
+            </div>
         </main>
     @endauth
 

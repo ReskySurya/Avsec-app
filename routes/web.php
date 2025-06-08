@@ -41,19 +41,25 @@ Route::middleware(['auth', 'role:officer'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/daily-test/hhmd', [DailyTestController::class, 'hhmdLayout'])->name('daily-test.hhmd');
     Route::get('/daily-test/wtmd', [DailyTestController::class, 'wtmdLayout'])->name('daily-test.wtmd');
-    Route::get('/daily-test/xraycabin', [DailyTestController::class,'xrayCabinLayout'])->name('daily-test.xraycabin');
-    Route::get('/daily-test/xraybagasi', [DailyTestController::class,'xrayBagasiLayout'])->name('daily-test.xraybagasi');
+    Route::get('/daily-test/xraycabin', [DailyTestController::class, 'xrayCabinLayout'])->name('daily-test.xraycabin');
+    Route::get('/daily-test/xraybagasi', [DailyTestController::class, 'xrayBagasiLayout'])->name('daily-test.xraybagasi');
 });
 
 // Master Data Routes
 Route::middleware(['auth', 'role:superadmin'])->group(function () {
-    Route::get('/master-data/equipment-locations', [MasterDataController::class, 'index'])->name('equipment-locations.index');
-    // Route::get('/master-data/equipment-locations/create', [MasterDataController::class, 'create'])->name('equipment-locations.create');
-    // Route::post('/master-data/equipment-locations', [MasterDataController::class, 'store'])->name('equipment-locations.store');
-    // Route::get('/master-data/equipment-locations/{id}', [MasterDataController::class, 'showEquipment'])->name('equipment-locations.show-equipment');
-    // Route::get('/master-data/locations/{id}', [MasterDataController::class, 'showLocation'])->name('equipment-locations.show-location');
-    // Route::get('/master-data/equipment-locations/{id}/edit', [MasterDataController::class, 'edit'])->name('equipment-locations.edit');
-    // Route::put('/master-data/equipment-locations/{id}', [MasterDataController::class, 'update'])->name('equipment-locations.update');
-    // Route::delete('/master-data/equipment-locations/{id}', [MasterDataController::class, 'destroy'])->name('equipment-locations.destroy');
-    // Route::get('/master-data/search', [MasterDataController::class, 'search'])->name('equipment-locations.search');
+    Route::get('/master-data/equipment-locations', [MasterDataController::class, 'indexEquipment'])->name('equipment-locations.index-equipment');
+    // Route untuk menyimpan equipment location relationship
+    Route::post('/equipment/store', [MasterDataController::class, 'storeEquipment'])->name('equipment.store');
+    Route::post('/location/store', [MasterDataController::class, 'storeLocation'])->name('location.store');
+    Route::post('/equipment-location/store', [MasterDataController::class, 'storeEquipmentLocation'])->name('equipment-location.store');
+
+    // Route untuk mengedit equipment
+    Route::post('/equipment/update/{id}', [MasterDataController::class, 'updateEquipment'])->name('equipment.update');
+    Route::post('/location/update/{id}', [MasterDataController::class, 'updateLocation'])->name('location.update');
+
+    // Route untuk menghapus equipment location relationship
+    Route::delete('/equipment/{id}/destroy', [MasterDataController::class, 'destroyEquipment'])->name('equipment.destroy');
+    Route::delete('/location/{id}/destroy', [MasterDataController::class, 'destroyLocation'])->name('location.destroy');
+    Route::delete('/equipment-location/{equipmentId}/{locationId}', [MasterDataController::class, 'destroyEquipmentLocation'])->name('equipment-location.destroy');
+
 });

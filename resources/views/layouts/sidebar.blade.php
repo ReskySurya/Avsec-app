@@ -43,13 +43,13 @@
                 <ul x-show="open" class="pl-4 mt-2 space-y-2">
 
                     <li>
-                        <a href="{{ route('equipment-locations.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                        <a href="{{ route('equipment-locations.index-equipment') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
                             <span>User Management</span>
                         </a>
                     </li>
 
                     <li>
-                        <a href="{{ route('equipment-locations.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                        <a href="{{ route('equipment-locations.index-equipment') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
                             <span>Equipment location</span>
                         </a>
                     </li>
