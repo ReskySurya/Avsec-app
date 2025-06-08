@@ -62,4 +62,12 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::delete('/location/{id}/destroy', [MasterDataController::class, 'destroyLocation'])->name('location.destroy');
     Route::delete('/equipment-location/{equipmentId}/{locationId}', [MasterDataController::class, 'destroyEquipmentLocation'])->name('equipment-location.destroy');
 
+    //Route untuk UserManagement
+    // User ManagementAdd commentMore actions
+    Route::get('/users-management', [MasterDataController::class, 'indexUserManagement'])->name('users-management.index');
+    Route::post('/users-management/tambah', [MasterDataController::class, 'storeUserManagement'])->name('users-management.store');
+    Route::get('/users-management/update/{id}', [MasterDataController::class, 'getUserManagement'])->name('users-management.get');
+    Route::put('/users-management/update/{id}', [MasterDataController::class,'updateUserManagement'])->name('users-management.update');
+    Route::delete('/users-management/hapus/{id}', [MasterDataController::class, 'destroyUserManagement'])->name('users-management.destroy');
+
 });
