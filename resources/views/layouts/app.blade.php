@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>@yield('title', 'AVSEC App')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.5.3/signature_pad.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -12,10 +15,10 @@
 <body class="bg-gray-100">
     @auth
         @include('layouts.navbar')
-        
+
         <!-- Mobile Sidebar Overlay -->
         <div id="mobile-sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden lg:hidden"></div>
-        
+
         <div class="flex h-full"></div>
             @include('layouts.sidebar')
             <main class="flex-1 min-h-screen pt-16 px-4 lg:pt-0 lg:ml-64 lg:px-8">
@@ -44,7 +47,7 @@
             if (mobileMenuButton && sidebar && overlay) {
                 function toggleMobileMenu() {
                     const isOpen = !sidebar.classList.contains('-translate-x-full');
-                    
+
                     if (isOpen) {
                         // Close menu
                         sidebar.classList.add('-translate-x-full');

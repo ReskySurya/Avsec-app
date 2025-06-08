@@ -11,10 +11,6 @@ class DailyTestController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function hhmdLayout()
-    {
-        return view('daily-test.hhmdLayout');
-    }
 
     public function wtmdLayout()
     {

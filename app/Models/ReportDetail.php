@@ -11,7 +11,7 @@ class ReportDetail extends Model
     /**
      * The table associated with the model.
      */
-    protected $table = 'report_detail';
+    protected $table = 'report_details';
     //
     protected $primaryKey = 'id';
     protected $fillable = [
@@ -19,7 +19,7 @@ class ReportDetail extends Model
         'reportID',
         'terpenuhi',
         'tidakTerpenuhi',
-        
+
         //wtmd
         'test1_in_depan',
         'test1_out_depan',
@@ -30,10 +30,8 @@ class ReportDetail extends Model
         'test4_in_depan',
         'test4_out_depan',
 
-        //whmd
+        //hhmd
         'test1',
-        'test2',
-        'test3',
         'testCondition1',
         'testCondition2',
 
@@ -43,7 +41,7 @@ class ReportDetail extends Model
         'test1ab_30',
         'test1ab_24',
         'test1bb_36_1',
-        'test1bb_32_1', 
+        'test1bb_32_1',
         'test1bb_30_1',
         'test1bb_24_1',
         'test1bb_36_2',
@@ -95,6 +93,6 @@ class ReportDetail extends Model
     ];
     /**
      * The primary key associated with the table.
-     */ 
-    
+     */
+
 }

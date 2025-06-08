@@ -23,8 +23,7 @@
             </div>
         </div>
 
-        <form id="hhmdForm" method="POST" enctype="multipart/form-data"
-            onsubmit="onFormSubmit(event)" class="mt-0">
+        <form id="hhmdForm" method="POST" enctype="multipart/form-data" onsubmit="onFormSubmit(event)" class="mt-0">
             @csrf
             <div class="border-2 border-black bg-white shadow">
                 <table class="w-full text-xs sm:text-sm">
@@ -62,12 +61,11 @@
                                 <select id="location" name="location"
                                     class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base">
                                     <option value="">Pilih Lokasi</option>
-                                    <option value="HBSCP">HBSCP</option>
-                                    <option value="Pos Timur">Pos Timur</option>
-                                    <option value="Pos Barat">Pos Barat</option>
-                                    <option value="PSCP Utara">PSCP Utara</option>
-                                    <option value="PSCP Selatan">PSCP Selatan</option>
-                                    <option value="Pos Kedatangan">Pos Kedatangan</option>
+                                    @if(isset($hhmdLocations))
+                                    @foreach($hhmdLocations as $location)
+                                    <option value="{{ $location->id }}">{{ $location->name }}</option>
+                                    @endforeach
+                                    @endif
                                 </select>
                             </td>
                         </tr>
@@ -114,7 +112,7 @@
                         <div>
                             <h2 class="font-bold mb-2">TEST 1</h2>
                             <div class="w-20 h-20 mx-auto border-2 border-black flex items-center justify-center">
-                                <input type="checkbox" id="test2" name="test2" class="form-checkbox h-5 w-5"
+                                <input type="checkbox" id="test1" name="test1" class="form-checkbox h-5 w-5"
                                     onchange="updateResult()" value="1">
                             </div>
                         </div>
@@ -158,8 +156,6 @@
                     </div>
                 </div>
 
-                {{-- 
-
                 <input type="hidden" id="result" name="result" value="">
 
                 <div class="border-t-2 border-black p-2 sm:p-4">
@@ -169,14 +165,9 @@
                             <!-- Kolom Kiri (Label 1) -->
                             <div class="text-center self-end">
                                 <h4 class="font-bold">
-                                    @if(Auth::guard('officer')->check())
-                                    {{ Auth::guard('officer')->user()->name }}
-                                    @else
                                     {{ Auth::user()->name }}
-                                    @endif
                                 </h4>
-                                <input type="hidden" name="officerName"
-                                    value="{{ Auth::guard('officer')->check() ? Auth::guard('officer')->user()->name : Auth::user()->name }}">
+                                <input type="hidden" name="submittedByID" value="{{ Auth::user()->id }}">
                                 <label for="securityOfficerSignature" class="text-gray-700 font-normal">1. Airport
                                     Security Officer</label>
                             </div>
@@ -190,19 +181,19 @@
                             <div class="signature-section mt-4">
                                 <h3 class="text-lg font-semibold mb-2">Tanda Tangan Officer</h3>
                                 <div class="border p-4 rounded">
-                                    <canvas id="signatureCanvas" class="border border-gray-300 rounded" width="400"
+                                    <canvas id="signatureCanvas" class="border border-gray-300 rounded" width="300"
                                         height="200"></canvas>
                                     <div class="mt-2 flex space-x-2">
                                         <button type="button" id="clearSignature"
                                             class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
                                             Clear
                                         </button>
-                                        <button type="button" id="saveOfficerSignature"
+                                        <button type="button" id="saveSubmitterSignature"
                                             class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
                                             Save Signature
                                         </button>
                                     </div>
-                                    <input type="hidden" name="officer_signature_data" id="officerSignatureData">
+                                    <input type="hidden" name="submitterSignature" id="submitterSignatureData">
                                 </div>
                             </div>
                         </div>
@@ -210,17 +201,22 @@
                 </div>
             </div>
 
-            <input type="hidden" name="status" value="pending_supervisor">
-
             <div class="mt-2 sm:mt-4 px-2 sm:px-0">
                 <div class="mb-2 sm:mb-4">
-                    <label for="supervisor_id"
+                    <label for="approvedByID"
                         class="block text-gray-700 font-bold text-xs sm:text-base mb-1 sm:mb-2">Pilih
                         Supervisor:</label>
-                    <select name="supervisor_id" id="supervisor_id"
+
+                    @php
+                        $supervisors = \App\Models\User::whereHas('role', function($query) {
+                        $query->where('name', \App\Models\Role::SUPERVISOR);
+                        })->get();
+                    @endphp
+
+                    <select name="approvedByID" id="approvedByID"
                         class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base" required>
                         <option value="">Pilih Supervisor</option>
-                        @foreach(\App\Models\User::where('role', 'supervisor')->get() as $supervisor)
+                        @foreach($supervisors as $supervisor)
                         <option value="{{ $supervisor->id }}">{{ $supervisor->name }}</option>
                         @endforeach
                     </select>
@@ -245,5 +241,5 @@
                 </div>
             </div>
         </form>
-    </div> --}}
+    </div>
 </div>

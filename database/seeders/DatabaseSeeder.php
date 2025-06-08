@@ -18,7 +18,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             LocationSeeder::class,
             EquipmentSeeder::class,
-            EquipmentLocationSeeder::class
+            EquipmentLocationSeeder::class,
+            ReportStatusSeeder::class
         ]);
     }
 }

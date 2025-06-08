@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\EquipmentLocationController;
+use App\Http\Controllers\DailyTest\HhmdController;
 use App\Http\Controllers\MasterDataController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -39,7 +39,12 @@ Route::middleware(['auth', 'role:officer'])->group(function () {
 
 // Daily Test Routes
 Route::middleware(['auth'])->group(function () {
-    Route::get('/daily-test/hhmd', [DailyTestController::class, 'hhmdLayout'])->name('daily-test.hhmd');
+    // Daily Test HHMD Routes
+    Route::get('/daily-test/hhmd', [HhmdController::class, 'hhmdLayout'])->name('daily-test.hhmd');
+    Route::post('/daily-test/hhmd/check-location', [HhmdController::class, 'checkLocation'])->name('daily-test.hhmd.check-location');
+    Route::post('/daily-test/hhmd/store', [HhmdController::class, 'store'])->name('daily-test.hhmd.store');
+    
+    // Daily Test WTMD Routes
     Route::get('/daily-test/wtmd', [DailyTestController::class, 'wtmdLayout'])->name('daily-test.wtmd');
     Route::get('/daily-test/xraycabin', [DailyTestController::class, 'xrayCabinLayout'])->name('daily-test.xraycabin');
     Route::get('/daily-test/xraybagasi', [DailyTestController::class, 'xrayBagasiLayout'])->name('daily-test.xraybagasi');
@@ -63,7 +68,6 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::delete('/equipment-location/{equipmentId}/{locationId}', [MasterDataController::class, 'destroyEquipmentLocation'])->name('equipment-location.destroy');
 
     //Route untuk UserManagement
-    // User ManagementAdd commentMore actions
     Route::get('/users-management', [MasterDataController::class, 'indexUserManagement'])->name('users-management.index');
     Route::post('/users-management/tambah', [MasterDataController::class, 'storeUserManagement'])->name('users-management.store');
     Route::get('/users-management/update/{id}', [MasterDataController::class, 'getUserManagement'])->name('users-management.get');

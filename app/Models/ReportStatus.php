@@ -144,21 +144,21 @@ class ReportStatus extends Model
             [
                 'name' => 'pending',
                 'label' => 'Pending',
-                'description' => 'Report is waiting for review',
+                'description' => 'Report menunggu review dari supervisor',
                 'isDefault' => true,
                 'color' => 'warning'
             ],
             [
                 'name' => 'approved',
                 'label' => 'Approved',
-                'description' => 'Report has been approved',
+                'description' => 'Report telah sudah disetujui oleh supervisor',
                 'isDefault' => false,
                 'color' => 'success'
             ],
             [
                 'name' => 'rejected',
                 'label' => 'Rejected',
-                'description' => 'Report has been rejected',
+                'description' => 'Report ditolak oleh supervisor',
                 'isDefault' => false,
                 'color' => 'danger'
             ]
@@ -166,7 +166,7 @@ class ReportStatus extends Model
 
         foreach ($statuses as $status) {
             static::firstOrCreate(
-                ['name' => $status['name']], 
+                ['name' => $status['name']],
                 $status
             );
         }
