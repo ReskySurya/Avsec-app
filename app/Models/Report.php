@@ -92,13 +92,13 @@ class Report extends Model
     {
         $prefix = 'R-';
         $date = now()->format('ymd'); // 6 digit date (YYMMDD)
-        
+
         // Get the last report for today to determine sequence
         $lastReport = static::whereDate('created_at', today())
                            ->where('reportID', 'like', $prefix . $date . '%')
                            ->orderBy('reportID', 'desc')
                            ->first();
-        
+
         if ($lastReport) {
             // Extract the sequence number from the last report ID
             $lastSequence = (int)substr($lastReport->reportID, -1);
@@ -106,16 +106,8 @@ class Report extends Model
         } else {
             $sequence = 1;
         }
-        
-        return $prefix . $date . $sequence;
-    }
 
-    /**
-     * Relationship: Report belongs to Equipment Location
-     */
-    public function equipmentLocation(): BelongsTo
-    {
-        return $this->belongsTo(EquipmentLocation::class, 'equipmentLocationID');
+        return $prefix . $date . $sequence;
     }
 
     /**

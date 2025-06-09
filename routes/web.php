@@ -28,6 +28,8 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
     Route::get('/dashboard/supervisor', function () {
         return view('supervisor.dashboardSupervisor');
     })->name('dashboard.supervisor');
+
+    Route::get('/dashboard/supervisor/dailytest-form',  [HhmdController::class, 'showData'])->name('supervisor.dailytest-form');
 });
 
 // Officer Routes
@@ -43,7 +45,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/daily-test/hhmd', [HhmdController::class, 'hhmdLayout'])->name('daily-test.hhmd');
     Route::post('/daily-test/hhmd/check-location', [HhmdController::class, 'checkLocation'])->name('daily-test.hhmd.check-location');
     Route::post('/daily-test/hhmd/store', [HhmdController::class, 'store'])->name('daily-test.hhmd.store');
-    
+
     // Daily Test WTMD Routes
     Route::get('/daily-test/wtmd', [DailyTestController::class, 'wtmdLayout'])->name('daily-test.wtmd');
     Route::get('/daily-test/xraycabin', [DailyTestController::class, 'xrayCabinLayout'])->name('daily-test.xraycabin');

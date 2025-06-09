@@ -89,7 +89,7 @@ class HhmdController extends Controller
             'notes' => 'nullable|string',
             'submittedByID' => 'nullable|exists:users,id',
             'submitterSignature' => 'required|string',
-            'approvedByID '=>'nullable|exists:users,id',
+            'approvedByID ' => 'nullable|exists:users,id',
         ]);
 
         if ($validator->fails()) {
@@ -111,7 +111,7 @@ class HhmdController extends Controller
                 ], 404);
             }
 
-            // Ambil equipment_location_id
+            // Ambil equipment_locations_id
             $equipmentLocation = $hhmdEquipment->locations()
                 ->where('locations.id', $request->location)
                 ->first();
@@ -165,12 +165,69 @@ class HhmdController extends Controller
                 'message' => 'Report berhasil disimpan',
                 'report' => $report
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    // File: app/Http/Controllers/DailyTest/HhmdController.php
+
+    public function showData()
+    {
+        // Ambil equipment HHMD
+        $hhmdEquipment = Equipment::where('name', 'hhmd')->first();
+
+        if (!$hhmdEquipment) {
+            return view('supervisor.dailyTestForm', [
+                'reports' => collect(),
+                'error' => 'Equipment HHMD tidak ditemukan'
+            ]);
+        }
+
+        // Ambil ID dari tabel pivot equipment_locations yang terkait dengan HHMD
+        // Ini adalah cara yang benar untuk mendapatkan ID dari tabel pivot.
+        $equipmentLocationIds = $hhmdEquipment->locations()->pluck('equipment_locations.id')->toArray();
+
+        // Ambil laporan HHMD menggunakan JOIN untuk mendapatkan nama lokasi
+        $reports = Report::query()
+            // Gabungkan dengan tabel pivot equipment_locations
+            ->join('equipment_locations', 'reports.equipmentLocationID', '=', 'equipment_locations.id')
+            // Gabungkan dengan tabel locations untuk mendapatkan nama lokasi
+            ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
+            // Filter laporan berdasarkan equipment HHMD
+            ->whereIn('reports.equipmentLocationID', $equipmentLocationIds)
+            // Filter laporan untuk supervisor yang sedang login
+            ->where('reports.approvedByID', Auth::id())
+            // Eager load relasi yang valid (submittedBy dan status)
+            ->with(['submittedBy', 'status'])
+            // Tentukan kolom yang akan dipilih untuk menghindari ambiguitas
+            ->select(
+                'reports.reportID as id',
+                'reports.testDate',
+                'reports.submittedByID', // Kita butuh objek untuk mengambil nama
+                'reports.statusID',      // Kita butuh objek untuk mengambil nama
+                'locations.name as location_name' // Ambil nama lokasi dengan alias
+            )
+            ->orderBy('reports.created_at', 'desc')
+            ->get()
+            ->map(function ($report) {
+                // Transformasi data untuk tampilan agar lebih bersih
+                return [
+                    'id' => $report->id,
+                    // Format tanggal langsung di sini
+                    'date' => $report->testDate->format('d/m/Y'),
+                    'test_type' => 'HHMD', // Hardcoded sesuai konteks
+                    'location' => $report->location_name, // Gunakan alias dari query
+                    'status' => $report->status->name ?? 'pending',
+                    'operator' => $report->submittedBy->name ?? 'Unknown',
+                ];
+            });
+
+        return view('supervisor.dailyTestForm', [
+            'reports' => $reports
+        ]);
     }
 }

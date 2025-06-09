@@ -40,22 +40,22 @@
         <div class="bg-green-50 p-4 rounded-lg mb-6">
             <h3 class="text-lg font-semibold text-green-800 mb-2">Menu Supervisor</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <a href="#" class="bg-white p-3 rounded shadow hover:shadow-md transition-shadow">
-                    <h4 class="font-semibold text-green-700">Manajemen Tim</h4>
-                    <p class="text-sm text-green-600">Lihat dan atur anggota tim</p>
+                <a href="{{ route('supervisor.dailytest-form') }}" class="bg-white p-3 rounded shadow hover:shadow-md transition-shadow">
+                    <h4 class="font-semibold text-green-700">Daily Test Formulir</h4>
+                    <p class="text-sm text-green-600">Lihat dan verifikasi laporan</p>
                 </a>
                 <a href="#" class="bg-white p-3 rounded shadow hover:shadow-md transition-shadow">
-                    <h4 class="font-semibold text-green-700">Verifikasi Laporan</h4>
-                    <p class="text-sm text-green-600">Periksa dan verifikasi laporan</p>
+                    <h4 class="font-semibold text-green-700">Logbook Pos Jaga</h4>
+                    <p class="text-sm text-green-600">Lihat dan verifikasi laporan</p>
                 </a>
                 <a href="#" class="bg-white p-3 rounded shadow hover:shadow-md transition-shadow">
-                    <h4 class="font-semibold text-green-700">Jadwal Pemeliharaan</h4>
-                    <p class="text-sm text-green-600">Atur jadwal pemeliharaan</p>
+                    <h4 class="font-semibold text-green-700">Check List CCTV</h4>
+                    <p class="text-sm text-green-600">Lihat dan verifikasi laporan</p>
                 </a>
             </div>
         </div>
 
-        <div class="bg-yellow-50 p-4 rounded-lg">
+        {{-- <div class="bg-yellow-50 p-4 rounded-lg">
             <h3 class="text-lg font-semibold text-yellow-800 mb-2">Laporan Tim Terbaru</h3>
             <table class="min-w-full bg-white">
                 <thead>
@@ -92,7 +92,7 @@
                     </tr>
                 </tbody>
             </table>
-        </div>
+        </div> --}}
     </div>
 </div>
 @endsection
