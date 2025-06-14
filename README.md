@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://laravel.com/img/logomark.min.svg" width="100" alt="Laravel Logo">
+  <img src="public/images/airport-security-logo.png" width="100" alt="Laravel Logo">
 </p>
 
 <h1 align="center">AVSEC - Aviation Security System</h1>
@@ -59,7 +59,7 @@ AVSEC dirancang dengan fokus pada **keamanan**, **kecepatan**, dan **aksesibilit
 
 1. **Clone Repository**
    ```bash
-   git clone https://github.com/namakamu/avsec.git
+   git clone https://github.com/ReskySurya/Avsec-app/avsec.git
    cd avsec
    ```
 
