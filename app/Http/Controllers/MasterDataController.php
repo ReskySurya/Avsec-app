@@ -13,14 +13,63 @@ use Illuminate\Support\Facades\Log;
 
 class MasterDataController extends Controller
 {
-    public function indexEquipment()
+    // public function indexEquipment()
+    // {
+    //     // $equipments = Equipment::with('creator')->get();
+    //     // $locations = Location::with('creator')->get();
+    //     $equipments = Equipment::with(['locations', 'creator'])->get();
+    //     $locations = Location::with(['equipments', 'creator'])->get();
+    //     return view('master-data.equipment-locations.index', compact('equipments', 'locations'));
+    // }
+
+    public function indexEquipment(Request $request)
     {
-        // $equipments = Equipment::with('creator')->get();
-        // $locations = Location::with('creator')->get();
-        $equipments = Equipment::with(['locations', 'creator'])->get();
-        $locations = Location::with(['equipments', 'creator'])->get();
-        return view('master-data.equipment-locations.index-equipment', compact('equipments', 'locations'));
+        // Search untuk tabel (equipment + location)
+        $searchTable = $request->input('search_table');
+
+
+        $equipmentLocations = Equipment::with(['locations', 'creator'])
+            ->when(
+                $searchTable,
+                fn($query) =>
+                $query->where('name', 'like', "%{$searchTable}%")
+            )
+            ->get();
+
+        // Search untuk card
+        $searchEquipment = $request->input('search_equipment');
+        $equipmentList = Equipment::with('creator')
+            ->when(
+                $searchEquipment,
+                fn($query) =>
+                $query->where('name', 'like', "%{$searchEquipment}%")
+            )
+            ->get();
+            // ->paginate(5)
+            // ->appends(['search_equipment' => $searchEquipment]);
+        $searchLocation = $request->input('search_location');
+        $locationList = Location::with('creator')
+            ->when(
+                $searchLocation,
+                fn($query) =>
+                $query->where('name', 'like', "%{$searchLocation}%")
+            )
+            ->get();
+            // ->paginate(5)
+            // ->appends(['search_location' => $searchLocation]);
+
+
+        return view('master-data.equipment-locations.index', compact(
+            'equipmentLocations',
+            'equipmentList',
+            'locationList',
+            'searchTable',
+            'searchLocation',
+            'searchEquipment',
+        ));
     }
+
+
 
     /**
      * Store a new equipment

@@ -9,19 +9,17 @@ use Illuminate\View\Component;
 class FormWTMD extends Component
 {
 
-    /**
-     * Create a new component instance.
-     */
-    public function __construct()
+    public $wtmdLocations;
+
+    public function __construct($wtmdLocations = null)
     {
-        // Constructor kosong karena tidak ada parameter yang diperlukan
+        $this->wtmdLocations = $wtmdLocations;
     }
 
-    /**
-     * Get the view / contents that represent the component.
-     */
     public function render(): View|Closure|string
     {
-        return view('components.wtmd-form');
+        return view('components.wtmd-form', [
+            'wtmdLocations' => $this->wtmdLocations
+        ]);
     }
 }

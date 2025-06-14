@@ -26,8 +26,8 @@ return new class extends Migration
             $table->tinyInteger('test1_out_depan')->nullable();
             $table->tinyInteger('test2_in_depan')->nullable();
             $table->tinyInteger('test2_out_depan')->nullable();
-            $table->tinyInteger('test3_in_depan')->nullable();
-            $table->tinyInteger('test3_out_depan')->nullable();
+            $table->tinyInteger('test3_in_belakang')->nullable();
+            $table->tinyInteger('test3_out_belakang')->nullable();
             $table->tinyInteger('test4_in_depan')->nullable();
             $table->tinyInteger('test4_out_depan')->nullable();
 

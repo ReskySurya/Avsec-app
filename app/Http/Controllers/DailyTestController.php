@@ -12,11 +12,6 @@ class DailyTestController extends Controller
      * @return \Illuminate\View\View
      */
 
-    public function wtmdLayout()
-    {
-        return view('daily-test.wtmdLayout');
-    }
-
     public function xrayBagasiLayout()
     {
         return view('daily-test.xrayBagasiLayout');
