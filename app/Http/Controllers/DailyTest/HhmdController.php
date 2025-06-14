@@ -401,4 +401,66 @@ class HhmdController extends Controller
             ], 500);
         }
     }
+    public function show($id)
+    {
+        try {
+            // Load report dengan relasi yang diperlukan
+            $report = Report::with([
+                'submittedBy',
+                'approvedBy',
+                'reviewedBy',
+                'status',
+                'reportDetails'
+            ])->findOrFail($id);
+
+            // Get equipment and location data manually
+            $equipmentLocationData = DB::table('equipment_locations')
+                ->select(
+                    'equipment_locations.id',
+                    'equipment.id as equipment_id',
+                    'equipment.name as equipment_name',
+                    'locations.id as location_id',
+                    'locations.name as location_name'
+                )
+                ->join('equipment', 'equipment_locations.equipment_id', '=', 'equipment.id')
+                ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
+                ->where('equipment_locations.id', $report->equipmentLocationID)
+                ->first();
+
+            if (!$equipmentLocationData) {
+                Log::error("Equipment location data not found for reportID: $id");
+                return redirect()->back()->with('error', 'Equipment location not found');
+            }
+
+            // Create objects for backward compatibility
+            $equipment = (object) [
+                'id' => $equipmentLocationData->equipment_id,
+                'name' => $equipmentLocationData->equipment_name
+            ];
+
+            $location = (object) [
+                'id' => $equipmentLocationData->location_id,
+                'name' => $equipmentLocationData->location_name
+            ];
+
+            // Tentukan view berdasarkan jenis equipment
+            $viewName = 'daily-test.show';
+            if ($equipmentLocationData->equipment_name === 'hhmd') {
+                $viewName = 'daily-test.show-hhmd';
+            }
+
+            return view($viewName, [
+                'report' => $report,
+                'location' => $location,
+                'equipment' => $equipment
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::error("Report not found with reportID: $id");
+            return redirect()->back()->with('error', 'Report tidak ditemukan');
+        } catch (\Exception $e) {
+            Log::error('Error in show report: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
 }

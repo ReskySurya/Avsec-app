@@ -20,7 +20,7 @@
                 <li><strong>Email:</strong> {{ Auth::user()->email }}</li>
                 <li><strong>Role:</strong> {{ Auth::user()->role->name }}</li>
                 @if(Auth::user()->lisensi)
-                    <li><strong>Lisensi:</strong> {{ Auth::user()->lisensi }}</li>
+                <li><strong>Lisensi:</strong> {{ Auth::user()->lisensi }}</li>
                 @endif
             </ul>
         </div>
@@ -44,7 +44,40 @@
         </div>
 
         <div class="bg-red-50 p-4 rounded-lg mb-6">
-            <h3 class="text-lg font-semibold text-red-800 mb-2">List Laporan di Tolak </h3>
+            <h3 class="text-lg font-semibold text-red-800 mb-2">List Laporan di Tolak</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white">
+                    <thead>
+                        <tr class="bg-red-100">
+                            <th class="px-4 py-2 text-left text-red-700">Tanggal</th>
+                            <th class="px-4 py-2 text-left text-red-700">Jenis Laporan</th>
+                            <th class="px-4 py-2 text-left text-red-700">Alasan Penolakan</th>
+                            <th class="px-4 py-2 text-left text-red-700">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($rejectedReports as $report)
+                        <tr class="border-b hover:bg-red-50">
+                            <td class="px-4 py-2">{{ $report->created_at->format('d/m/Y') }}</td>
+                            <td class="px-4 py-2">{{ $report->equipment_name }} ({{ $report->location_name }})</td>
+                            <td class="px-4 py-2">{{ $report->approvalNote }}</td>
+                            <td class="px-4 py-2">
+                                <a href="{{ route('reports.show', $report->reportID) }}"
+                                    class="text-blue-600 hover:text-blue-800">
+                                    Lihat Detail
+                                </a>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="4" class="px-4 py-2 text-center text-gray-500">
+                                Tidak ada laporan yang ditolak
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

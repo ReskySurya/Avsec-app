@@ -36,7 +36,17 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
 // Officer Routes
 Route::middleware(['auth', 'role:officer'])->group(function () {
     Route::get('/dashboard/officer', function () {
-        return view('officer.dashboardOfficer');
+        $rejectedReports = \App\Models\Report::rejected()
+            ->where('submittedByID', auth()->user()->id)
+            ->select('reports.*', 'equipment.name as equipment_name', 'locations.name as location_name')
+            ->join('equipment_locations', 'reports.equipmentLocationID', '=', 'equipment_locations.id')
+            ->join('equipment', 'equipment_locations.equipment_id', '=', 'equipment.id')
+            ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
+            ->with(['status'])
+            ->orderBy('reports.created_at', 'desc')
+            ->get();
+
+        return view('officer.dashboardOfficer', compact('rejectedReports'));
     })->name('dashboard.officer');
 });
 
@@ -54,6 +64,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/daily-test/wtmd', [DailyTestController::class, 'wtmdLayout'])->name('daily-test.wtmd');
     Route::get('/daily-test/xraycabin', [DailyTestController::class, 'xrayCabinLayout'])->name('daily-test.xraycabin');
     Route::get('/daily-test/xraybagasi', [DailyTestController::class, 'xrayBagasiLayout'])->name('daily-test.xraybagasi');
+
+    // Reports Routes
+    Route::get('/reports/{id}', [HhmdController::class, 'show'])->name('reports.show');
 });
 
 // Master Data Routes

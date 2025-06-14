@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 class Report extends Model
 {
@@ -135,11 +136,10 @@ class Report extends Model
      */
     public function equipmentLocationData()
     {
-        return $this->hasOne('App\Models\Equipment', 'id', 'equipmentLocationID')
-                    ->select('equipment_locations.id', 'equipment.name as equipment_name', 'equipment.id as equipment_id', 'locations.name as location_name', 'locations.id as location_id')
+        return $this->belongsTo(Equipment::class, 'equipmentLocationID', 'equipment_locations.id')
+                    ->select(['equipment.*', 'equipment_locations.id as pivot_id', 'locations.name as location_name'])
                     ->join('equipment_locations', 'equipment.id', '=', 'equipment_locations.equipment_id')
-                    ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
-                    ->where('equipment_locations.id', $this->equipmentLocationID);
+                    ->join('locations', 'equipment_locations.location_id', '=', 'locations.id');
     }
 
     /**
