@@ -111,6 +111,38 @@ class Report extends Model
     }
 
     /**
+     * Get equipment through pivot table
+     */
+    public function equipment(): BelongsTo
+    {
+        return $this->belongsTo(Equipment::class, 'equipmentLocationID', 'id')
+                    ->join('equipment_locations', 'equipment.id', '=', 'equipment_locations.equipment_id')
+                    ->where('equipment_locations.id', $this->equipmentLocationID);
+    }
+
+    /**
+     * Get location through pivot table
+     */
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class, 'equipmentLocationID', 'id')
+                    ->join('equipment_locations', 'locations.id', '=', 'equipment_locations.location_id')
+                    ->where('equipment_locations.id', $this->equipmentLocationID);
+    }
+
+    /**
+     * Alternative: Raw relationship to equipment location data
+     */
+    public function equipmentLocationData()
+    {
+        return $this->hasOne('App\Models\Equipment', 'id', 'equipmentLocationID')
+                    ->select('equipment_locations.id', 'equipment.name as equipment_name', 'equipment.id as equipment_id', 'locations.name as location_name', 'locations.id as location_id')
+                    ->join('equipment_locations', 'equipment.id', '=', 'equipment_locations.equipment_id')
+                    ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
+                    ->where('equipment_locations.id', $this->equipmentLocationID);
+    }
+
+    /**
      * Relationship: Report belongs to Status
      */
     public function status(): BelongsTo
@@ -295,5 +327,13 @@ class Report extends Model
                   $subQ->where('name', 'like', "%{$search}%");
               });
         });
+    }
+
+    /**
+     * Method: Check if report is rejected
+     */
+    public function isRejected(): bool
+    {
+        return $this->status && $this->status->name === 'rejected';
     }
 }

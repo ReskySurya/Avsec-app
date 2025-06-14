@@ -4,6 +4,7 @@ use App\Http\Controllers\DailyTest\HhmdController;
 use App\Http\Controllers\MasterDataController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DailyTest\WtmdController;
 use App\Http\Controllers\DailyTestController;
 
 Route::get('/', function () {
@@ -45,6 +46,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/daily-test/hhmd', [HhmdController::class, 'hhmdLayout'])->name('daily-test.hhmd');
     Route::post('/daily-test/hhmd/check-location', [HhmdController::class, 'checkLocation'])->name('daily-test.hhmd.check-location');
     Route::post('/daily-test/hhmd/store', [HhmdController::class, 'store'])->name('daily-test.hhmd.store');
+    Route::get('/daily-test/hhmd/review/{id}', [HhmdController::class, 'reviewForm'])->name('hhmd.reviewForm');
+    Route::patch('/daily-test/hhmd/update-status/{id}', [HhmdController::class, 'updateStatus'])->name('hhmd.updateStatus');
+    Route::post('/daily-test/hhmd/save-supervisor-signature/{id}', [HhmdController::class, 'saveSupervisorSignature'])->name('hhmd.saveSupervisorSignature');
 
     // Daily Test WTMD Routes
     Route::get('/daily-test/wtmd', [DailyTestController::class, 'wtmdLayout'])->name('daily-test.wtmd');
