@@ -31,6 +31,7 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
     })->name('dashboard.supervisor');
 
     Route::get('/dashboard/supervisor/dailytest-form',  [HhmdController::class, 'showData'])->name('supervisor.dailytest-form');
+    Route::get('/dashboard/supervisor/dailytest-form',  [WtmdController::class, 'showDataWtmd'])->name('supervisor.dailytest-form');
 });
 
 // Officer Routes
@@ -51,7 +52,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/daily-test/hhmd/save-supervisor-signature/{id}', [HhmdController::class, 'saveSupervisorSignature'])->name('hhmd.saveSupervisorSignature');
 
     // Daily Test WTMD Routes
-    Route::get('/daily-test/wtmd', [DailyTestController::class, 'wtmdLayout'])->name('daily-test.wtmd');
+    Route::get('/daily-test/wtmd', [WtmdController::class, 'wtmdLayout'])->name('daily-test.wtmd');
+    Route::post('/daily-test/wtmd/check-location', [WtmdController::class, 'checkLocation'])->name('daily-test.wtmd.check-location');
+    Route::post('/daily-test/wtmd/store', [WtmdController::class, 'store'])->name('daily-test.wtmd.store');
+    Route::get('/daily-test/wtmd/review/{id}', [WtmdController::class, 'reviewForm'])->name('wtmd.reviewForm');
+    Route::patch('/daily-test/wtmd/update-status/{id}', [WtmdController::class, 'updateStatus'])->name('wtmd.updateStatus');
+    Route::post('/daily-test/wtmd/save-supervisor-signature/{id}', [WtmdController::class, 'saveSupervisorSignature'])->name('wtmd.saveSupervisorSignature');
+
+
+
     Route::get('/daily-test/xraycabin', [DailyTestController::class, 'xrayCabinLayout'])->name('daily-test.xraycabin');
     Route::get('/daily-test/xraybagasi', [DailyTestController::class, 'xrayBagasiLayout'])->name('daily-test.xraybagasi');
 });

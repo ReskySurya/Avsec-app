@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-2 py-4">
+<div class="container mx-auto px-2 py-4 lg:mt-20">
     <div class="bg-white shadow-md rounded px-4 sm:px-8 pt-6 pb-8 mb-4 w-full max-w-full">
         <h1 class="text-xl sm:text-2xl font-bold mb-4">Tinjau Formulir HHMD</h1>
 
@@ -37,7 +37,7 @@
                             </tr>
                             <tr class="border-b border-black">
                                 <th class="w-1/3 text-left p-2">Lokasi Penempatan:</th>
-                                <td class="w-2/3 p-2">{{ $form->location->name }}</td>
+                                <td class="w-2/3 p-2">{{ $location->name }}</td>
                             </tr>
                             <tr class="border-b border-black">
                                 <th class="w-1/3 text-left p-2">Merk/Tipe/Nomor Seri:</th>
@@ -120,8 +120,7 @@
                                     <h4 class="font-bold">
                                         {{ Auth::user()->name }}
                                     </h4>
-                                    <label class="text-gray-700 font-normal text-xs sm:text-sm">2. Airport Security
-                                        Supervisor</label>
+                                    <label class="text-gray-700 font-normal text-xs sm:text-sm">2. Airport Security Supervisor</label>
                                 </div>
                             </div>
                             <div>
@@ -207,7 +206,7 @@
                     type="submit" title="Harap simpan tanda tangan terlebih dahulu">
                     Perbarui Status
                 </button>
-                <a href="#"
+                <a href="{{ route('supervisor.dailytest-form') }}"
                     class="text-xs sm:text-sm font-bold text-blue-500 hover:text-blue-800">
                     Kembali ke Dashboard
                 </a>

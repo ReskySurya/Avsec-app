@@ -25,8 +25,8 @@ class ReportDetail extends Model
         'test1_out_depan',
         'test2_in_depan',
         'test2_out_depan',
-        'test3_in_depan',
-        'test3_out_depan',
+        'test3_in_belakang',
+        'test3_out_belakang',
         'test4_in_depan',
         'test4_out_depan',
 
