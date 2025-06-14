@@ -49,7 +49,7 @@
                     </li>
 
                     <li>
-                        <a href="{{ route('equipment-locations.index-equipment') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                        <a href="{{ route('equipment-locations.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
                             <span>Equipment location</span>
                         </a>
                     </li>
@@ -59,8 +59,8 @@
             @endif
 
             <!-- Common Menu Items for All Roles -->
-            <li x-data="{ open: false }">
-                <button @click="open = !open"
+            <li x-data="{ open: false }" @click.away="$store.sidebar.open = true">
+                <button @click="open = !open; $store.sidebar.open = true"
                     class="flex items-center justify-between w-full py-2 px-2 rounded hover:bg-gray-700">
                     <div class="flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24"
@@ -78,9 +78,8 @@
                     </svg>
                 </button>
                 <ul x-show="open" class="pl-4 mt-2 space-y-2">
-
                     <li>
-                        <a href="{{ route('daily-test.hhmd') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                        <a href="{{ route('daily-test.hhmd') }}" @click="$store.sidebar.open = false" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
                             <span>HHMD</span>
                         </a>
                     </li>

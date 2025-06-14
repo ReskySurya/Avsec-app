@@ -1,5 +1,5 @@
 <nav class="bg-blue-800 text-white shadow-md fixed top-0 left-0 right-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class=" mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
                 <!-- Mobile menu button - moved to left -->
@@ -21,7 +21,8 @@
                 <div class="flex-shrink-0 flex items-center">
                     <a href="#" class="text-white font-bold text-xl">AVSEC App</a>
                 </div>
-                
+
+               
                 <!-- Navigation Links - Hidden on mobile and tablet, shown on desktop -->
                 <!-- <div class="hidden xl:ml-6 xl:flex xl:space-x-8">
                     <a href="{{ url('/dashboard/' . auth()->user()->role->name) }}" class="border-transparent text-white hover:border-white hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {{ request()->is('dashboard/*') ? 'border-white' : '' }}">

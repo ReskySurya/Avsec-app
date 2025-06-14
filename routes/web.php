@@ -54,16 +54,14 @@ Route::middleware(['auth'])->group(function () {
 
 // Master Data Routes
 Route::middleware(['auth', 'role:superadmin'])->group(function () {
-    Route::get('/master-data/equipment-locations', [MasterDataController::class, 'indexEquipment'])->name('equipment-locations.index-equipment');
+    Route::get('/master-data/equipment-locations', [MasterDataController::class, 'indexEquipment'])->name('equipment-locations.index');
     // Route untuk menyimpan equipment location relationship
     Route::post('/equipment/store', [MasterDataController::class, 'storeEquipment'])->name('equipment.store');
     Route::post('/location/store', [MasterDataController::class, 'storeLocation'])->name('location.store');
     Route::post('/equipment-location/store', [MasterDataController::class, 'storeEquipmentLocation'])->name('equipment-location.store');
-
     // Route untuk mengedit equipment
     Route::post('/equipment/update/{id}', [MasterDataController::class, 'updateEquipment'])->name('equipment.update');
     Route::post('/location/update/{id}', [MasterDataController::class, 'updateLocation'])->name('location.update');
-
     // Route untuk menghapus equipment location relationship
     Route::delete('/equipment/{id}/destroy', [MasterDataController::class, 'destroyEquipment'])->name('equipment.destroy');
     Route::delete('/location/{id}/destroy', [MasterDataController::class, 'destroyLocation'])->name('location.destroy');
