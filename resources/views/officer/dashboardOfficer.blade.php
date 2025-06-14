@@ -25,12 +25,26 @@
             </ul>
         </div>
 
-        <div class="bg-green-50 p-4 rounded-lg">
-            <h3 class="text-lg font-semibold text-green-800 mb-2">Menu</h3>
-            <ul class="text-green-600">
-                <li><a href="#" class="underline">Lihat Laporan</a></li>
-                <li><a href="#" class="underline">Buat Laporan Baru</a></li>
-            </ul>
+        <div class="bg-green-50 p-4 rounded-lg mb-6">
+            <h3 class="text-lg font-semibold text-green-800 mb-2">Menu Officer</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <a href="#" class="bg-white p-3 rounded shadow hover:shadow-md transition-shadow">
+                    <h4 class="font-semibold text-green-700">Daily Test Formulir</h4>
+                    <p class="text-sm text-green-600">Lihat dan verifikasi laporan</p>
+                </a>
+                <a href="#" class="bg-white p-3 rounded shadow hover:shadow-md transition-shadow">
+                    <h4 class="font-semibold text-green-700">Logbook Pos Jaga</h4>
+                    <p class="text-sm text-green-600">Lihat dan verifikasi laporan</p>
+                </a>
+                <a href="#" class="bg-white p-3 rounded shadow hover:shadow-md transition-shadow">
+                    <h4 class="font-semibold text-green-700">Check List CCTV</h4>
+                    <p class="text-sm text-green-600">Lihat dan verifikasi laporan</p>
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-red-50 p-4 rounded-lg mb-6">
+            <h3 class="text-lg font-semibold text-red-800 mb-2">List Laporan di Tolak </h3>
         </div>
     </div>
 </div>

@@ -205,7 +205,8 @@
                 <div class="mb-2 sm:mb-4">
                     <label for="approvedByID"
                         class="block text-gray-700 font-bold text-xs sm:text-base mb-1 sm:mb-2">Pilih
-                        Supervisor:</label>
+                        Supervisor:
+                    </label>
 
                     @php
                         $supervisors = \App\Models\User::whereHas('role', function($query) {
