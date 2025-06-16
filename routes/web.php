@@ -5,6 +5,7 @@ use App\Http\Controllers\MasterDataController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DailyTest\WtmdController;
+use App\Http\Controllers\DailyTest\XrayController;
 use App\Http\Controllers\DailyTestController;
 
 Route::get('/', function () {
@@ -70,9 +71,13 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/daily-test/wtmd/save-supervisor-signature/{id}', [WtmdController::class, 'saveSupervisorSignature'])->name('wtmd.saveSupervisorSignature');
 
 
+    // Daily Test XRAY Cabin Routes
+    Route::get('/daily-test/xraycabin', [XrayController::class, 'xrayCabinLayout'])->name('daily-test.xraycabin');
+    Route::post('/daily-test/xraycabin/check-location', [XrayController::class, 'checkLocation'])->name('daily-test.xrayCabin.check-location');
+    Route::post('/daily-test/xraycabin/store', [XrayController::class, 'storeXrayCabin'])->name('daily-test.xrayCabin.store');
 
-    Route::get('/daily-test/xraycabin', [DailyTestController::class, 'xrayCabinLayout'])->name('daily-test.xraycabin');
-    Route::get('/daily-test/xraybagasi', [DailyTestController::class, 'xrayBagasiLayout'])->name('daily-test.xraybagasi');
+    //Daily Test XRAY Bagasi Routes
+    Route::get('/daily-test/xraybagasi', [XrayController::class, 'xrayBagasiLayout'])->name('daily-test.xraybagasi');
 
     // Reports Routes
     Route::get('/reports/{id}', [HhmdController::class, 'show'])->name('reports.show');

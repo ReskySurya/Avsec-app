@@ -9,11 +9,11 @@ use App\Models\Report;
 use App\Models\ReportDetail;
 use App\Models\ReportStatus;
 use App\Models\User;
-use Auth;
-use DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use Log;
-use Validator;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class WtmdController extends Controller
 {
