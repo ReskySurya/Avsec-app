@@ -260,19 +260,19 @@ class HhmdController extends Controller
     public function showData()
     {
         // Ambil equipment HHMD
-        $equipment = Equipment::whereIn('name', ['hhmd', 'wtmd'])->get()->keyBy('name');
-        
+        $equipment = Equipment::whereIn('name', ['hhmd', 'wtmd', 'xraycabin', 'xraybagasi'])->get()->keyBy('name');
+
         $allReports = collect();
-        
+
         foreach ($equipment as $equipmentType => $equipmentData) {
             $equipmentLocationIds = $equipmentData->locations()
                 ->pluck('equipment_locations.id')
                 ->toArray();
-            
+
             if (empty($equipmentLocationIds)) {
                 continue;
             }
-            
+
             $reports = Report::query()
                 ->join('equipment_locations', 'reports.equipmentLocationID', '=', 'equipment_locations.id')
                 ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
@@ -298,15 +298,15 @@ class HhmdController extends Controller
                         'operator' => $report->submittedBy->name ?? 'Unknown',
                     ];
                 });
-            
+
             $allReports = $allReports->merge($reports);
         }
-        
+
         // Urutkan berdasarkan tanggal
         $sortedReports = $allReports->sortByDesc(function ($report) {
             return \Carbon\Carbon::createFromFormat('d/m/Y', $report['date']);
         })->values();
-        
+
         return view('supervisor.dailyTestForm', [
             'reports' => $sortedReports,
         ]);
