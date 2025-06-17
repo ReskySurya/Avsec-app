@@ -34,10 +34,9 @@ class XrayController extends Controller
                 ->withPivot('description', 'id')
                 ->get();
         }
-        return view(
-            'daily-test.xrayBagasiLayout',
-            [
-                'xrayBagasiLocations' => $xrayBagasiLocations
+        return view('daily-test.xrayBagasiLayout',[
+                'xrayBagasiLocations' => $xrayBagasiLocations,
+                'type' => 'xrayBagasi'
             ]
         );
     }
@@ -47,25 +46,6 @@ class XrayController extends Controller
      *
      * @return \Illuminate\View\View
      */
-
-    public function xrayCabinLayout()
-    {
-        // Ambil equipment X-Ray Cabin
-        $xrayCabinEquipment = Equipment::where('name', 'xraycabin')->first();
-
-        // Ambil lokasi yang terhubung dengan X-Ray Bagasi
-        $xrayCabinLocations = [];
-        if ($xrayCabinEquipment) {
-            $xrayCabinLocations = $xrayCabinEquipment->locations()
-                ->wherePivot('equipment_id', $xrayCabinEquipment->id)
-                ->withPivot('description', 'id')
-                ->get();
-        }
-        return view('daily-test.xrayCabinLayout', [
-            'xrayCabinLocations' => $xrayCabinLocations,
-            'type' => 'xrayCabin'
-        ]);
-    }
 
     public function storeXrayCabin(Request $request)
     {
@@ -98,7 +78,7 @@ class XrayController extends Controller
             if (!$xrayCabinEquipment) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Equipment HHMD tidak ditemukan'
+                    'message' => 'Equipment Xray tidak ditemukan'
                 ], 404);
             }
 
@@ -282,4 +262,153 @@ class XrayController extends Controller
             'equipment' => $type
         ]);
     }
+
+
+    public function xrayCabinLayout()
+    {
+        // Ambil equipment X-Ray Cabin
+        $xrayCabinEquipment = Equipment::where('name', 'xraycabin')->first();
+
+        // Ambil lokasi yang terhubung dengan X-Ray Bagasi
+        $xrayCabinLocations = [];
+        if ($xrayCabinEquipment) {
+            $xrayCabinLocations = $xrayCabinEquipment->locations()
+                ->wherePivot('equipment_id', $xrayCabinEquipment->id)
+                ->withPivot('description', 'id')
+                ->get();
+        }
+        return view('daily-test.xrayCabinLayout', [
+            'xrayCabinLocations' => $xrayCabinLocations,
+            'type' => 'xrayCabin'
+        ]);
+    }
+
+
+    public function storeXrayBagasi(Request $request)
+    {
+        // Validasi input
+        $validator = Validator::make($request->all(), [
+            'operatorName' => 'required|string|max:255',
+            'testDateTime' => 'required|date',
+            'location' => 'required|exists:locations,id',
+            'deviceInfo' => 'required|string|max:255',
+            'certificateInfo' => 'required|string|max:255',
+            'result' => 'required|in:pass,fail',
+            'notes' => 'nullable|string',
+            'submittedByID' => 'nullable|exists:users,id',
+            'submitterSignature' => 'required|string',
+            'approvedByID ' => 'nullable|exists:users,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            // Ambil equipment Xray Cabin
+            $xrayBagasiEquipment = Equipment::where('name', 'xraybagasi')->first();
+
+            if (!$xrayBagasiEquipment) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Equipment XRay tidak ditemukan'
+                ], 404);
+            }
+
+            // Ambil equipment_locations_id
+            $equipmentLocation = $xrayBagasiEquipment->locations()
+                ->where('locations.id', $request->location)
+                ->first();
+
+            if (!$equipmentLocation) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Relasi equipment dan lokasi tidak ditemukan'
+                ], 404);
+            }
+
+            $equipmentLocationId = $equipmentLocation->pivot->id;
+
+            // Ambil status 'pending_supervisor'
+            $pendingStatus = ReportStatus::where('name', 'pending')->first();
+
+            if (!$pendingStatus) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Status report tidak ditemukan'
+                ], 404);
+            }
+
+            // Buat report baru
+            $report = new Report();
+            $report->testDate = $request->testDateTime;
+            $report->equipmentLocationID = $equipmentLocationId;
+            $report->deviceInfo = $request->deviceInfo;
+            $report->certificateInfo = $request->certificateInfo;
+            $report->isFullFilled = $request->terpenuhi ? true : false;
+            $report->result = $request->result;
+            $report->note = $request->notes;
+            $report->statusID = $pendingStatus->id;
+            $report->submittedByID = $request->submittedByID ?? Auth::id();
+            $report->submitterSignature = $request->submitterSignature;
+            $report->approvedByID = $request->approvedByID;
+            $report->save();
+
+            // Buat report detail
+            $reportDetail = new ReportDetail();
+            $reportDetail->reportID = $report->reportID;
+            $reportDetail->terpenuhi = $request->terpenuhi ? true : false;
+            $reportDetail->tidakTerpenuhi = $request->tidakterpenuhi ? true : false; 
+            $reportDetail->test1aab_30 = $request->test1aab_30 ? true : false; //
+            $reportDetail->test1aab_24 = $request->test1aab_24 ? true : false; //
+            $reportDetail->test1bab_30_1 = $request->test1bab_30_1 ? true : false; //
+            $reportDetail->test1bab_24_1 = $request->test1bab_24_1 ? true : false; //
+            $reportDetail->test1bab_24_2 = $request->test1bab_24_2 ? true : false; // 
+            $reportDetail->test1bab_24_3 = $request->test1bab_24_3 ? true : false; //
+            $reportDetail->test1ab_30 = $request->test1ab_30 ? true : false; //
+            $reportDetail->test1ab_24 = $request->test1ab_24 ? true : false; //
+            $reportDetail->test1bb_30_1 = $request->test1bb_30_1 ? true : false; //
+            $reportDetail->test1bb_24_1 = $request->test1bb_24_1 ? true : false; //
+            $reportDetail->test1bb_24_2 = $request->test1bb_24_2 ? true : false; // 
+            $reportDetail->test1bb_24_3 = $request->test1bb_24_3 ? true : false; //
+            $reportDetail->test2aab = $request->test2aab ? true : false; //
+            $reportDetail->test2bab = $request->test2bab ? true : false; //
+            $reportDetail->test2ab = $request->test2ab ? true : false; //
+            $reportDetail->test2bb = $request->test2bb ? true : false; //
+            $reportDetail->test3ab_14 = $request->test3ab_14 ? true : false; //
+            $reportDetail->test3ab_16 = $request->test3ab_16 ? true : false; //
+            $reportDetail->test3ab_18 = $request->test3ab_18 ? true : false; //
+            $reportDetail->test3ab_20 = $request->test3ab_20 ? true : false; //
+            $reportDetail->test3ab_22 = $request->test3ab_22 ? true : false; //
+            $reportDetail->test3b_14 = $request->test3b_14 ? true : false; //
+            $reportDetail->test3b_16 = $request->test3b_16 ? true : false; //
+            $reportDetail->test3b_18 = $request->test3b_18 ? true : false; //
+            $reportDetail->test3b_20 = $request->test3b_20 ? true : false; //
+            $reportDetail->test3b_22 = $request->test3b_22 ? true : false; //
+            $reportDetail->test4ab_h20mm = $request->test4ab_h20mm ? true : false; //
+            $reportDetail->test4ab_v20mm = $request->test4ab_v20mm ? true : false; //
+            $reportDetail->test4b_h20mm = $request->test4b_h20mm ? true : false; //
+            $reportDetail->test4b_v20mm = $request->test4b_v20mm ? true : false; //
+            $reportDetail->test5ab_10mm = $request->test5ab_10mm ? true : false; //
+            $reportDetail->test5b_10mm = $request->test5b_10mm ? true : false; //
+            $reportDetail->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Report berhasil disimpan',
+                'report' => $report
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    
 }

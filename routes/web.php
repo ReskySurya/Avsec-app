@@ -78,6 +78,8 @@ Route::middleware(['auth'])->group(function () {
 
     //Daily Test XRAY Bagasi Routes
     Route::get('/daily-test/xraybagasi', [XrayController::class, 'xrayBagasiLayout'])->name('daily-test.xraybagasi');
+    Route::post('/daily-test/xraybagasi/check-location', [XrayController::class, 'checkLocation'])->name('daily-test.xrayBagasi.check-location');
+    Route::post('/daily-test/xraybagasi/store', [XrayController::class, 'storeXrayBagasi'])->name('daily-test.xrayBagasi.store');
 
     // Reports Routes
     Route::get('/reports/{id}', [HhmdController::class, 'show'])->name('reports.show');
