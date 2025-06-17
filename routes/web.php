@@ -32,7 +32,6 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
     })->name('dashboard.supervisor');
 
     Route::get('/dashboard/supervisor/dailytest-form',  [HhmdController::class, 'showData'])->name('supervisor.dailytest-form');
-    Route::get('/dashboard/supervisor/dailytest-form',  [WtmdController::class, 'showDataWtmd'])->name('supervisor.dailytest-form');
 });
 
 // Officer Routes
@@ -71,13 +70,18 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/daily-test/wtmd/save-supervisor-signature/{id}', [WtmdController::class, 'saveSupervisorSignature'])->name('wtmd.saveSupervisorSignature');
 
 
-    // Daily Test XRAY Cabin Routes
+    // Daily Test XRAY Routes
     Route::get('/daily-test/xraycabin', [XrayController::class, 'xrayCabinLayout'])->name('daily-test.xraycabin');
     Route::post('/daily-test/xraycabin/check-location', [XrayController::class, 'checkLocation'])->name('daily-test.xrayCabin.check-location');
     Route::post('/daily-test/xraycabin/store', [XrayController::class, 'storeXrayCabin'])->name('daily-test.xrayCabin.store');
 
-    //Daily Test XRAY Bagasi Routes
     Route::get('/daily-test/xraybagasi', [XrayController::class, 'xrayBagasiLayout'])->name('daily-test.xraybagasi');
+    Route::post('/daily-test/xraybagasi/store', [XrayController::class, 'storeXrayBagasi'])->name('daily-test.xrayBagasi.store');
+
+    // Common XRAY review routes
+    Route::get('/daily-test/xray/review/{id}', [XrayController::class, 'reviewForm'])->name('xray.reviewForm');
+    Route::patch('/daily-test/xray/update-status/{id}', [XrayController::class, 'updateStatus'])->name('xray.updateStatus');
+    Route::post('/daily-test/xray/save-supervisor-signature/{id}', [XrayController::class, 'saveSupervisorSignature'])->name('xray.saveSupervisorSignature');
 
     // Reports Routes
     Route::get('/reports/{id}', [HhmdController::class, 'show'])->name('reports.show');
@@ -90,9 +94,11 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::post('/equipment/store', [MasterDataController::class, 'storeEquipment'])->name('equipment.store');
     Route::post('/location/store', [MasterDataController::class, 'storeLocation'])->name('location.store');
     Route::post('/equipment-location/store', [MasterDataController::class, 'storeEquipmentLocation'])->name('equipment-location.store');
+
     // Route untuk mengedit equipment
     Route::post('/equipment/update/{id}', [MasterDataController::class, 'updateEquipment'])->name('equipment.update');
     Route::post('/location/update/{id}', [MasterDataController::class, 'updateLocation'])->name('location.update');
+
     // Route untuk menghapus equipment location relationship
     Route::delete('/equipment/{id}/destroy', [MasterDataController::class, 'destroyEquipment'])->name('equipment.destroy');
     Route::delete('/location/{id}/destroy', [MasterDataController::class, 'destroyLocation'])->name('location.destroy');
