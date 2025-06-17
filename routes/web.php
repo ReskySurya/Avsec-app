@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DailyTest\HhmdController;
+use App\Http\Controllers\DailyTest\XrayController;
 use App\Http\Controllers\MasterDataController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -71,8 +72,8 @@ Route::middleware(['auth'])->group(function () {
 
 
 
-    Route::get('/daily-test/xraycabin', [DailyTestController::class, 'xrayCabinLayout'])->name('daily-test.xraycabin');
-    Route::get('/daily-test/xraybagasi', [DailyTestController::class, 'xrayBagasiLayout'])->name('daily-test.xraybagasi');
+    Route::get('/daily-test/xraycabin', [XrayController::class, 'xrayCabinLayout'])->name('daily-test.xraycabin');
+    Route::get('/daily-test/xraybagasi', [XrayController::class, 'xrayBagasiLayout'])->name('daily-test.xraybagasi');
 
     // Reports Routes
     Route::get('/reports/{id}', [HhmdController::class, 'show'])->name('reports.show');

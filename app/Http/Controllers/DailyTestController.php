@@ -12,13 +12,5 @@ class DailyTestController extends Controller
      * @return \Illuminate\View\View
      */
 
-    public function xrayBagasiLayout()
-    {
-        return view('daily-test.xrayBagasiLayout');
-    }
-
-    public function xrayCabinLayout()
-    {
-        return view('daily-test.xrayCabinLayout');
-    }
+    
 }
