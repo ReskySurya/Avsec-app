@@ -5,9 +5,9 @@
 @endif
 
 
-<div class="bg-white-100 px-4 sm:px-8 md:px-16 lg:px-32 xl:px-64">
+<div class="bg-white-100 sm:px-2 md:px-16 lg:px-96 lg:mt-20">
     <div>
-        <x-form-xray type="xrayCabin"/>
+        <x-form-xray type="xrayCabin" :xrayCabinLocations="$xrayCabinLocations"/>
     </div>
 
     @if ($errors->any())
@@ -41,117 +41,141 @@
         const buttonLoading = document.getElementById('buttonLoading');
 
         // Fungsi untuk mengecek lokasi
-        async function checkLocation(location) {
+        async function checkLocation(locationId) {
             try {
-                const response = await fetch(`/check-xray-location?location=${location}`);
+                const response = await fetch('/daily-test/xraycabin/check-location', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ location_id: locationId })
+                });
+
                 const data = await response.json();
 
-                if (!data.available) {
-                    Swal.fire({
-                        title: 'Lokasi Tidak Tersedia',
-                        text: data.message,
-                        icon: 'warning',
-                        confirmButtonText: 'OK',
-                        confirmButtonColor: '#3085d6'
-                    });
-                    document.getElementById('location').value = '';
-                    return false;
+                if (!response.ok) {
+                    throw new Error(data.message || 'Terjadi kesalahan saat memeriksa lokasi');
                 }
-                return true;
+
+                return data;
             } catch (error) {
                 console.error('Error checking location:', error);
-                return false;
+                throw error;
             }
         }
 
-        // Event listener untuk form submit
-        form.addEventListener('submit', async function(event) {
-            event.preventDefault();
+        // Event listener untuk form submission
+        document.getElementById('xrayForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+
+            // Validasi lokasi
+            const locationSelect = document.getElementById('location');
+            const locationValue = locationSelect.value;
+
+            if (!locationValue) {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Silakan pilih lokasi terlebih dahulu',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
 
             try {
-                // Cek lokasi sebelum submit
-                const location = document.getElementById('location').value;
-                if (!(await checkLocation(location))) {
-                    return false;
-                }
-
-                const signatureInput = document.getElementById('officerSignatureData');
-                const supervisorSelect = document.getElementById('supervisor_id');
+                // Validasi lokasi dengan API
+                await checkLocation(locationValue);
 
                 // Validasi tanda tangan
-                if (!signatureInput || !signatureInput.value) {
+                const signatureData = document.getElementById('submitterSignatureData').value;
+                if (!signatureData) {
                     Swal.fire({
-                        title: 'Tanda Tangan Diperlukan!',
-                        text: 'Anda harus menyimpan tanda tangan terlebih dahulu sebelum submit form.',
-                        icon: 'warning',
-                        confirmButtonText: 'OK',
-                        confirmButtonColor: '#3085d6'
+                        title: 'Error',
+                        text: 'Silakan tambahkan tanda tangan officer',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
                     });
-
-                    document.querySelector('.signature-section').scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center'
-                    });
-                    return false;
+                    return;
                 }
 
                 // Validasi supervisor
-                if (!supervisorSelect.value) {
+                const supervisorId = document.getElementById('approvedByID').value;
+                if (!supervisorId) {
                     Swal.fire({
-                        title: 'Supervisor Diperlukan!',
-                        text: 'Silakan pilih supervisor terlebih dahulu.',
-                        icon: 'warning',
-                        confirmButtonText: 'OK',
-                        confirmButtonColor: '#3085d6'
+                        title: 'Error',
+                        text: 'Silakan pilih supervisor',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
                     });
-                    return false;
+                    return;
                 }
 
                 // Tampilkan loading state
-                submitButton.disabled = true;
+                const submitButton = document.getElementById('submitButton');
+                const buttonText = document.getElementById('buttonText');
+                const buttonLoading = document.getElementById('buttonLoading');
+
                 buttonText.classList.add('hidden');
                 buttonLoading.classList.remove('hidden');
+                submitButton.disabled = true;
 
-                // Submit form dengan fetch
-                const formData = new FormData(form);
-                const response = await fetch(form.action, {
+                // Submit form
+                const formData = new FormData(this);
+
+                const response = await fetch('/daily-test/xraycabin/store', {
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     }
                 });
 
-                if (!response.ok) {
-                    const data = await response.json();
-                    throw new Error(data.message || 'Terjadi kesalahan saat submit form');
+                const result = await response.json();
+
+                console.log('Form submission result:', formData, result);
+                if (response.ok) {
+                    Swal.fire({
+                        title: 'Berhasil',
+                        text: result.message || 'Form berhasil dikirim',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = result.redirect || '/dashboard/officer';
+                    });
+                } else {
+                    throw new Error(result.message || 'Terjadi kesalahan saat mengirim form');
                 }
-
-                // Redirect akan ditangani oleh response
-                window.location.href = response.url;
-
             } catch (error) {
+                console.error('Error submitting form:', error);
+
                 Swal.fire({
-                    title: 'Error!',
-                    text: error.message,
+                    title: 'Error',
+                    text: error.message || 'Terjadi kesalahan saat mengirim form',
                     icon: 'error',
                     confirmButtonText: 'OK'
                 });
             } finally {
-                submitButton.disabled = false;
+                // Reset button state
+                const buttonText = document.getElementById('buttonText');
+                const buttonLoading = document.getElementById('buttonLoading');
+                const submitButton = document.getElementById('submitButton');
+
                 buttonText.classList.remove('hidden');
                 buttonLoading.classList.add('hidden');
+                submitButton.disabled = false;
             }
         });
 
-        // Event listener untuk perubahan lokasi
-        document.getElementById('location').addEventListener('change', function() {
+         // Event listener untuk perubahan lokasi
+        document.getElementById('location').addEventListener('change', function () {
             if (this.value) {
                 checkLocation(this.value);
             }
         });
 
-        // Canvas setup dan event listeners
+        // Inisialisasi canvas untuk tanda tangan
         const canvas = document.getElementById('signatureCanvas');
         const ctx = canvas.getContext('2d');
         let isDrawing = false;
@@ -212,7 +236,7 @@
             try {
                 const canvas = document.getElementById('signatureCanvas');
                 const signatureData = canvas.toDataURL('image/png');
-                const signatureInput = document.getElementById('officerSignatureData');
+                const signatureInput = document.getElementById('submitterSignatureData');
 
                 if (!signatureInput) {
                     console.error('Element officerSignatureData tidak ditemukan');
@@ -235,7 +259,7 @@
 
                 // Sembunyikan tombol clear dan save
                 document.getElementById('clearSignature').style.display = 'none';
-                document.getElementById('saveOfficerSignature').style.display = 'none';
+                document.getElementById('saveSubmitterSignature').style.display = 'none';
 
                 alert('Tanda tangan berhasil disimpan');
                 console.log('Signature data saved:', signatureData.substring(0, 100) + '...');
@@ -257,7 +281,7 @@
         canvas.addEventListener('touchend', stopDrawing);
 
         document.getElementById('clearSignature').addEventListener('click', clearCanvas);
-        document.getElementById('saveOfficerSignature').addEventListener('click', saveOfficerSignature);
+        document.getElementById('saveSubmitterSignature').addEventListener('click', saveOfficerSignature);
 
         // Fungsi untuk mengecek status checkbox dan mengupdate radio button
         function updateRadioResult() {
@@ -312,6 +336,8 @@
             ];
 
             const test5Checkboxes = [
+                document.getElementById('test5ab_05mm'),
+                document.getElementById('test5b_05mm'),
                 document.getElementById('test5ab_10mm'),
                 document.getElementById('test5b_10mm')
             ];
@@ -332,6 +358,12 @@
                 resultFail.checked = true;
                 resultHidden.value = 'fail';
             }
+            console.log('Checkbox status updated:', {
+                allChecked,
+                resultPass: resultPass.checked,
+                resultFail: resultFail.checked,
+                resultValue: resultHidden.value
+            });
         }
 
         // Tambahkan event listener untuk semua checkbox
@@ -376,6 +408,8 @@
             'test4b_v15mm',
             'test4b_h20mm',
             'test4b_v20mm',
+            'test5ab_05mm',
+            'test5b_05mm',
             'test5ab_10mm',
             'test5b_10mm'
         ];

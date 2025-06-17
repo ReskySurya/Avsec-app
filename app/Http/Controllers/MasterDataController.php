@@ -34,7 +34,8 @@ class MasterDataController extends Controller
                 fn($query) =>
                 $query->where('name', 'like', "%{$searchTable}%")
             )
-            ->get();
+            ->paginate(5)
+            ->appends(['search_table' => $searchTable]);
 
         // Search untuk card
         $searchEquipment = $request->input('search_equipment');
@@ -44,9 +45,9 @@ class MasterDataController extends Controller
                 fn($query) =>
                 $query->where('name', 'like', "%{$searchEquipment}%")
             )
-            ->get();
-            // ->paginate(5)
-            // ->appends(['search_equipment' => $searchEquipment]);
+            ->paginate(5)
+            ->appends(['search_equipment' => $searchEquipment]);
+
         $searchLocation = $request->input('search_location');
         $locationList = Location::with('creator')
             ->when(
@@ -54,7 +55,8 @@ class MasterDataController extends Controller
                 fn($query) =>
                 $query->where('name', 'like', "%{$searchLocation}%")
             )
-            ->get();
+            ->paginate(5)
+            ->appends(['search_location' => $searchLocation]);
             // ->paginate(5)
             // ->appends(['search_location' => $searchLocation]);
 

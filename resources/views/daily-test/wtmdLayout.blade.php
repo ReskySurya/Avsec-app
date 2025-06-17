@@ -284,7 +284,6 @@
         document.getElementById('saveSubmitterSignature').addEventListener('click', saveOfficerSignature);
 
         // Fungsi untuk mengecek status checkbox dan mengupdate radio button
-        // Fungsi untuk mengecek status checkbox dan mengupdate radio button
         function updateRadioResult() {
             // Ambil semua checkbox berdasarkan ID yang ada
             const test1Checkboxes = [
