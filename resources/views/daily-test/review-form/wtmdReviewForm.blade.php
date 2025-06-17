@@ -307,13 +307,12 @@
                     </form>
                 </div>
             </div>
-
         </div>
     </div>
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('hhmdForm');
+        const form = document.getElementById('wtmdForm');
         const submitButton = document.getElementById('updateStatusButton');
         const statusSelect = document.getElementById('status_id');
         const rejectionNoteContainer = document.getElementById('rejectionNoteContainer');
@@ -521,7 +520,7 @@
             `;
 
             // Mengirim data tanda tangan ke server
-            fetch('{{ route("hhmd.saveSupervisorSignature", $form->reportID) }}', {
+            fetch('{{ route("wtmd.saveSupervisorSignature", $form->reportID) }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

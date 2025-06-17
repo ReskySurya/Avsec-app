@@ -9,11 +9,11 @@ use App\Models\Report;
 use App\Models\ReportDetail;
 use App\Models\ReportStatus;
 use App\Models\User;
-use Auth;
-use DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use Log;
-use Validator;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class WtmdController extends Controller
 {
@@ -265,62 +265,7 @@ class WtmdController extends Controller
         }
     }
 
-    public function showDataWtmd()
-    {
-        $equipment = Equipment::whereIn('name', ['hhmd', 'wtmd'])->get()->keyBy('name');
-
-        $allReports = collect();
-
-        foreach ($equipment as $equipmentType => $equipmentData) {
-            $equipmentLocationIds = $equipmentData->locations()
-                ->pluck('equipment_locations.id')
-                ->toArray();
-
-            if (empty($equipmentLocationIds)) {
-                continue;
-            }
-
-            $reports = Report::query()
-                ->join('equipment_locations', 'reports.equipmentLocationID', '=', 'equipment_locations.id')
-                ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
-                ->whereIn('reports.equipmentLocationID', $equipmentLocationIds)
-                ->where('reports.approvedByID', Auth::id())
-                ->with(['submittedBy', 'status'])
-                ->select(
-                    'reports.reportID as id',
-                    'reports.testDate',
-                    'reports.submittedByID',
-                    'reports.statusID',
-                    'locations.name as location_name'
-                )
-                ->orderBy('reports.created_at', 'desc')
-                ->get()
-                ->map(function ($report) use ($equipmentType) {
-                    return [
-                        'id' => $report->id,
-                        'date' => $report->testDate->format('d/m/Y'),
-                        'test_type' => strtoupper($equipmentType),
-                        'location' => $report->location_name,
-                        'status' => $report->status->name ?? 'pending',
-                        'operator' => $report->submittedBy->name ?? 'Unknown',
-                    ];
-                });
-
-            $allReports = $allReports->merge($reports);
-        }
-
-        // Urutkan berdasarkan tanggal
-        $sortedReports = $allReports->sortByDesc(function ($report) {
-            return \Carbon\Carbon::createFromFormat('d/m/Y', $report['date']);
-        })->values();
-
-        return view('supervisor.dailyTestForm', [
-            'reports' => $sortedReports,
-        ]);
-    }
-
-
-public function updateStatus(Request $request, $id)
+    public function updateStatus(Request $request, $id)
     {
         try {
             // Cari laporan berdasarkan ID

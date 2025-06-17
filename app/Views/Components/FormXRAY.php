@@ -9,13 +9,17 @@ use Illuminate\View\Component;
 class FormXRAY extends Component
 {
     public $type;
+    public $xrayCabinLocations;
+    public $xrayBagasiLocations;
 
     /**
      * Create a new component instance.
      */
-    public function __construct($type = 'xrayBagasi')
+    public function __construct($type = 'xrayBagasi', $xrayCabinLocations = null, $xrayBagasiLocations = null)
     {
         $this->type = $type;
+        $this->xrayCabinLocations = $xrayCabinLocations;
+        $this->xrayBagasiLocations = $xrayBagasiLocations;
     }
 
     /**

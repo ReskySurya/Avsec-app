@@ -17,15 +17,10 @@
             <ul class="text-blue-600">
                 <li><strong>Nama:</strong> {{ Auth::user()->name }}</li>
                 <li><strong>NIP:</strong> {{ Auth::user()->nip }}</li>
-                <li><strong>Email:</strong> {{ Auth::user()->email }}</li>
-                <li><strong>Role:</strong> {{ Auth::user()->role->name }}</li>
-                @if(Auth::user()->lisensi)
-                <li><strong>Lisensi:</strong> {{ Auth::user()->lisensi }}</li>
-                @endif
             </ul>
         </div>
 
-        <div class="bg-green-50 p-4 rounded-lg mb-6">
+        {{-- <div class="bg-green-50 p-4 rounded-lg mb-6">
             <h3 class="text-lg font-semibold text-green-800 mb-2">Menu Officer</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <a href="#" class="bg-white p-3 rounded shadow hover:shadow-md transition-shadow">
@@ -41,7 +36,7 @@
                     <p class="text-sm text-green-600">Lihat dan verifikasi laporan</p>
                 </a>
             </div>
-        </div>
+        </div> --}}
 
         <div class="bg-red-50 p-4 rounded-lg mb-6">
             <h3 class="text-lg font-semibold text-red-800 mb-2">List Laporan di Tolak</h3>
