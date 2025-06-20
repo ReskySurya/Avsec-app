@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('equipment_id')->constrained('equipment')->onDelete('cascade');
             $table->foreignId('location_id')->constrained('locations')->onDelete('cascade');
+            $table->string('merk_type')->nullable(); // Status field for the pivot table
             $table->text('description')->nullable(); // Field tambahan di pivot table
             $table->timestamps();
             

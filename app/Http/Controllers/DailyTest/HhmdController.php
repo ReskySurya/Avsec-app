@@ -36,6 +36,90 @@ class HhmdController extends Controller
         ]);
     }
 
+    public function get($id)
+    {
+        Log::info("Accessing HHMD review form with reportID: $id");
+
+        try {
+            // Load report tanpa relasi yang bermasalah dulu
+            $report = Report::with([
+                'submittedBy',
+                'status',
+                'reportDetails'
+            ])->findOrFail($id);
+
+            Log::info("Report found: " . $report->reportID);
+
+            // Get equipment and location data manually
+            $equipmentLocationData = DB::table('equipment_locations')
+                ->select(
+                    'equipment_locations.id',
+                    'equipment.id as equipment_id',
+                    'equipment.name as equipment_name',
+                    'locations.id as location_id',
+                    'locations.name as location_name'
+                )
+                ->join('equipment', 'equipment_locations.equipment_id', '=', 'equipment.id')
+                ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
+                ->where('equipment_locations.id', $report->equipmentLocationID)
+                ->first();
+
+            if (!$equipmentLocationData) {
+                Log::error("Equipment location data not found for reportID: $id");
+                return redirect()->back()->with('error', 'Equipment location not found');
+            }
+
+            // Validate if this is an HHMD report
+            if ($equipmentLocationData->equipment_name !== 'hhmd') {
+                Log::warning("Invalid report type for reportID: $id. Equipment: " . $equipmentLocationData->equipment_name);
+                return redirect()->back()->with('error', 'Invalid report type');
+            }
+
+            // Get all possible statuses for the dropdown
+            $statuses = ReportStatus::all();
+
+            // Get assigned supervisor details
+            $supervisor = null;
+            if ($report->approvedByID) {
+                $supervisor = User::find($report->approvedByID);
+            }
+
+            // Additional data validation
+            if (!$report->reportDetails || $report->reportDetails->isEmpty()) {
+                Log::warning("Report details not found for reportID: $id");
+                return redirect()->back()->with('error', 'Report details not found');
+            }
+
+            // Create objects for backward compatibility
+            $equipment = (object) [
+                'id' => $equipmentLocationData->equipment_id,
+                'name' => $equipmentLocationData->equipment_name
+            ];
+
+            $location = (object) [
+                'id' => $equipmentLocationData->location_id,
+                'name' => $equipmentLocationData->location_name
+            ];
+
+            return view('daily-test.review-form.hhmdReviewForm', [
+                'form' => $report,
+                // 'statuses' => $statuses,
+                'supervisor' => $supervisor,
+                'location' => $location,
+                'equipment' => $equipment,
+                'function' => 'update'
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::error("Report not found with reportID: $id");
+            return redirect()->back()->with('error', 'Report tidak ditemukan');
+        } catch (\Exception $e) {
+            Log::error('Error in HHMD review form: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+
     public function checkLocation(Request $request)
     {
         $locationId = $request->input('location_id');
@@ -245,7 +329,7 @@ class HhmdController extends Controller
                 'statuses' => $statuses,
                 'supervisor' => $supervisor,
                 'location' => $location,
-                'equipment' => $equipment
+                'equipment' => $equipment,
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::error("Report not found with reportID: $id");

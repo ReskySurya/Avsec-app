@@ -43,7 +43,7 @@
         // Fungsi untuk mengecek lokasi
         async function checkLocation(locationId) {
             try {
-                const response = await fetch('/daily-test/xraycabin/check-location', {
+                const response = await fetch('/daily-test/xray/check-location', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

@@ -37,7 +37,9 @@ class XrayController extends Controller
                 ->withPivot('description', 'id')
                 ->get();
         }
-        return view('daily-test.xrayBagasiLayout',[
+        return view(
+            'daily-test.xrayBagasiLayout',
+            [
                 'xrayBagasiLocations' => $xrayBagasiLocations,
                 'type' => 'xrayBagasi'
             ]
@@ -253,7 +255,11 @@ class XrayController extends Controller
                 'name' => $equipmentLocationData->location_name
             ];
 
-            return view('daily-test.review-form.xrayCabinReviewForm', [
+            $viewName = $equipmentLocationData->equipment_name === 'xraybagasi'
+                ? 'daily-test.review-form.xrayBagasiReviewForm'
+                : 'daily-test.review-form.xrayCabinReviewForm';
+
+            return view($viewName, [
                 'form' => $report,
                 'statuses' => $statuses,
                 'supervisor' => $supervisor,
@@ -537,7 +543,7 @@ class XrayController extends Controller
             $reportDetail = new ReportDetail();
             $reportDetail->reportID = $report->reportID;
             $reportDetail->terpenuhi = $request->terpenuhi ? true : false;
-            $reportDetail->tidakTerpenuhi = $request->tidakterpenuhi ? true : false; 
+            $reportDetail->tidakTerpenuhi = $request->tidakterpenuhi ? true : false;
             $reportDetail->test1aab_30 = $request->test1aab_30 ? true : false; //
             $reportDetail->test1aab_24 = $request->test1aab_24 ? true : false; //
             $reportDetail->test1bab_30_1 = $request->test1bab_30_1 ? true : false; //
@@ -585,5 +591,5 @@ class XrayController extends Controller
         }
     }
 
-    
+
 }

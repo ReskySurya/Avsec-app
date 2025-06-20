@@ -30,7 +30,7 @@ class Equipment extends Model
     public function locations(): BelongsToMany
     {
         return $this->belongsToMany(Location::class, 'equipment_locations')
-                    ->withPivot('id', 'description')
+                    ->withPivot('id', 'merk_type','description')
                     ->withTimestamps();
     }
 }

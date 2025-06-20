@@ -27,8 +27,8 @@ class MasterDataController extends Controller
         // Search untuk tabel (equipment + location)
         $searchTable = $request->input('search_table');
 
-
         $equipmentLocations = Equipment::with(['locations', 'creator'])
+
             ->when(
                 $searchTable,
                 fn($query) =>
@@ -57,8 +57,8 @@ class MasterDataController extends Controller
             )
             ->paginate(5)
             ->appends(['search_location' => $searchLocation]);
-            // ->paginate(5)
-            // ->appends(['search_location' => $searchLocation]);
+        // ->paginate(5)
+        // ->appends(['search_location' => $searchLocation]);
 
 
         return view('master-data.equipment-locations.index', compact(
@@ -70,8 +70,6 @@ class MasterDataController extends Controller
             'searchEquipment',
         ));
     }
-
-
 
     /**
      * Store a new equipment
@@ -127,6 +125,7 @@ class MasterDataController extends Controller
         $request->validate([
             'equipment_id' => 'required|exists:equipment,id',
             'location_id' => 'required|exists:locations,id',
+            'merk_type' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:1000',
         ]);
 
@@ -137,8 +136,8 @@ class MasterDataController extends Controller
             if ($equipment->locations()->where('location_id', $request->location_id)->exists()) {
                 return redirect()->back()->with('error', 'Relasi equipment dan location sudah ada!');
             }
-
             $equipment->locations()->attach($request->location_id, [
+                'merk_type' => $request->merk_type,
                 'description' => $request->description,
             ]);
 
@@ -186,6 +185,63 @@ class MasterDataController extends Controller
             return redirect()->back()->with('success', 'Location berhasil diperbarui!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal memperbarui location: ' . $e->getMessage());
+        }
+    }
+
+    //Update Equipment Location Relationship
+    public function updateEquipmentLocation(Request $request, $equipmentId, $locationId)
+    {
+        $request->validate([
+            'equipment_id' => 'required|exists:equipment,id',
+            'location_id' => 'required|exists:locations,id',
+            'merk_type' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:1000',
+        ]);
+
+        try {
+            $equipment = Equipment::findOrFail($equipmentId);
+
+            Log::info('Updating equipment location relationship', [
+                'equipment_id' => $equipmentId,
+                'location_id' => $locationId,
+                'new_equipment_id' => $request->equipment_id,
+                'new_location_id' => $request->location_id,
+            ]);
+
+            // Check if the relationship exists
+            if (!$equipment->locations()->where('location_id', $locationId)->exists()) {
+                return redirect()->back()->with('error', 'Relasi equipment dan location tidak ditemukan!');
+            }
+
+            // If equipment_id or location_id changed, detach old and attach new with updated data
+            $newEquipmentId = $request->equipment_id;
+            $newLocationId = $request->location_id;
+
+            if ($equipmentId != $newEquipmentId || $locationId != $newLocationId) {
+                // Cek jika relasi baru sudah ada
+                $newEquipment = Equipment::findOrFail($newEquipmentId);
+                if ($newEquipment->locations()->where('location_id', $newLocationId)->exists()) {
+                    // Relasi sudah ada, kembalikan tanpa mengubah apapun
+                    return redirect()->back()->with('error', 'Relasi equipment dan location yang baru sudah ada!');
+                }
+                // Detach relasi lama
+                $equipment->locations()->detach($locationId);
+                // Attach relasi baru
+                $newEquipment->locations()->attach($newLocationId, [
+                    'merk_type' => $request->merk_type,
+                    'description' => $request->description,
+                ]);
+            } else {
+                // Only update pivot data
+                $equipment->locations()->updateExistingPivot($locationId, [
+                    'merk_type' => $request->merk_type,
+                    'description' => $request->description,
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Equipment location berhasil diupdate!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal mengupdate equipment location: ' . $e->getMessage());
         }
     }
 
