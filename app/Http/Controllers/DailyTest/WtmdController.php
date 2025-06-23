@@ -4,6 +4,7 @@ namespace App\Http\Controllers\DailyTest;
 
 use App\Http\Controllers\Controller;
 use App\Models\Equipment;
+use App\Models\EquipmentLocation;
 use App\Models\Location;
 use App\Models\Report;
 use App\Models\ReportDetail;
@@ -22,14 +23,16 @@ class WtmdController extends Controller
         // Ambil equipment WTMD
         $wtmdEquipment = Equipment::where('name', 'wtmd')->first();
 
-        // Ambil lokasi yang terhubung dengan WTMD
-        $wtmdLocations = [];
+
+        $wtmdLocations = collect();
+
         if ($wtmdEquipment) {
-            $wtmdLocations = $wtmdEquipment->locations()
-                ->wherePivot('equipment_id', $wtmdEquipment->id)
-                ->withPivot('description', 'id')
+            // Gunakan EquipmentLocation untuk mendapatkan data yang lebih lengkap
+            $wtmdLocations = EquipmentLocation::where('equipment_id', $wtmdEquipment->id)
+                ->with(['location', 'equipment']) // Eager loading untuk menghindari N+1 query
                 ->get();
         }
+
         return view(
             'daily-test.wtmdLayout',
             [
@@ -38,47 +41,7 @@ class WtmdController extends Controller
         );
     }
 
-    public function checkLocation(Request $request)
-    {
-        $locationId = $request->input('location_id');
 
-        // Validasi lokasi
-        $location = Location::find($locationId);
-
-        if (!$location) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Lokasi tidak ditemukan'
-            ], 404);
-        }
-
-        // Cek apakah lokasi terhubung dengan WTMD
-        $wtmdEquipment = Equipment::where('name', 'wtmd')->first();
-
-        if (!$wtmdEquipment) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Equipment WTMD tidak ditemukan'
-            ], 404);
-        }
-
-        $isConnected = $wtmdEquipment->locations()
-            ->where('locations.id', $locationId)
-            ->exists();
-
-        if (!$isConnected) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Lokasi tidak terhubung dengan WTMD'
-            ], 400);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Lokasi valid',
-            'location' => $location
-        ]);
-    }
 
     public function store(Request $request)
     {
@@ -105,30 +68,19 @@ class WtmdController extends Controller
         }
 
         try {
-            // Ambil equipment WTMD
-            $wtmdEquipment = Equipment::where('name', 'wtmd')->first();
-
-            if (!$wtmdEquipment) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Equipment WTMD tidak ditemukan'
-                ], 404);
-            }
-
-            // Ambil equipment_locations_id
-            $equipmentLocation = $wtmdEquipment->locations()
-                ->where('locations.id', $request->location)
+            // Ambil equipment_location berdasarkan location_id dan equipment WTMD
+            $equipmentLocation = EquipmentLocation::whereHas('equipment', function ($query) {
+                $query->where('name', 'wtmd');
+            })
+                ->where('location_id', $request->location)
                 ->first();
 
             if (!$equipmentLocation) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Relasi equipment dan lokasi tidak ditemukan'
+                    'message' => 'Relasi equipment WTMD dan lokasi tidak ditemukan'
                 ], 404);
             }
-
-            $equipmentLocationId = $equipmentLocation->pivot->id;
-
             // Ambil status 'pending_supervisor'
             $pendingStatus = ReportStatus::where('name', 'pending')->first();
 
@@ -142,7 +94,7 @@ class WtmdController extends Controller
             // Buat report baru
             $report = new Report();
             $report->testDate = $request->testDateTime;
-            $report->equipmentLocationID = $equipmentLocationId;
+            $report->equipmentLocationID = $equipmentLocation->id;
             $report->deviceInfo = $request->deviceInfo;
             $report->certificateInfo = $request->certificateInfo;
             $report->isFullFilled = $request->terpenuhi ? true : false;

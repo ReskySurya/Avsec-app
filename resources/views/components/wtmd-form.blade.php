@@ -59,8 +59,10 @@
                                     class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base">
                                     <option value="">Pilih Lokasi</option>
                                     @if(isset($wtmdLocations))
-                                        @foreach($wtmdLocations as $location)
-                                            <option value="{{ $location->id }}">{{ $location->name }}</option>
+                                        @foreach($wtmdLocations as $equipmentLocation)
+                                            <option value="{{ $equipmentLocation->location_id }}">
+                                                {{ $equipmentLocation->location->name ?? 'Nama lokasi tidak tersedia' }}
+                                            </option>
                                         @endforeach
                                     @endif
                                 </select>

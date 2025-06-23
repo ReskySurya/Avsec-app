@@ -38,13 +38,13 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
 Route::middleware(['auth', 'role:officer'])->group(function () {
     Route::get('/dashboard/officer', function () {
         $rejectedReports = \App\Models\Report::rejected()
-            ->where('submittedByID', auth()->user()->id)
-            ->select('reports.*', 'equipment.name as equipment_name', 'locations.name as location_name')
-            ->join('equipment_locations', 'reports.equipmentLocationID', '=', 'equipment_locations.id')
-            ->join('equipment', 'equipment_locations.equipment_id', '=', 'equipment.id')
-            ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
-            ->with(['status'])
-            ->orderBy('reports.created_at', 'desc')
+            ->where('submittedByID', auth()->id())
+            ->with([
+                'status:id,name',
+                'equipmentLocation.equipment:id,name',
+                'equipmentLocation.location:id,name'
+            ])
+            ->orderBy('created_at', 'desc')
             ->get();
 
         return view('officer.dashboardOfficer', compact('rejectedReports'));
@@ -55,7 +55,7 @@ Route::middleware(['auth', 'role:officer'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     // Daily Test HHMD Routes
     Route::get('/daily-test/hhmd', [HhmdController::class, 'hhmdLayout'])->name('daily-test.hhmd');
-    Route::post('/daily-test/hhmd/check-location', [HhmdController::class, 'checkLocation'])->name('daily-test.hhmd.check-location');
+    // Route::post('/daily-test/hhmd/check-location', [HhmdController::class, 'checkLocation'])->name('daily-test.hhmd.check-location');
     Route::post('/daily-test/hhmd/store', [HhmdController::class, 'store'])->name('daily-test.hhmd.store');
     Route::get('/daily-test/hhmd/get/{id}', [HhmdController::class, 'get'])->name('hhmd.get');
     Route::post('/daily-test/hhmd/update/{id}', [HhmdController::class, 'update'])->name('hhmd.update');
@@ -65,7 +65,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Daily Test WTMD Routes
     Route::get('/daily-test/wtmd', [WtmdController::class, 'wtmdLayout'])->name('daily-test.wtmd');
-    Route::post('/daily-test/wtmd/check-location', [WtmdController::class, 'checkLocation'])->name('daily-test.wtmd.check-location');
+    // Route::post('/daily-test/wtmd/check-location', [WtmdController::class, 'checkLocation'])->name('daily-test.wtmd.check-location');
     Route::post('/daily-test/wtmd/store', [WtmdController::class, 'store'])->name('daily-test.wtmd.store');
     Route::get('/daily-test/wtmd/review/{id}', [WtmdController::class, 'reviewForm'])->name('wtmd.reviewForm');
     Route::patch('/daily-test/wtmd/update-status/{id}', [WtmdController::class, 'updateStatus'])->name('wtmd.updateStatus');
@@ -91,7 +91,7 @@ Route::middleware(['auth'])->group(function () {
 
 // Master Data Routes
 Route::middleware(['auth', 'role:superadmin'])->group(function () {
-    Route::get('/master-data/equipment-locations', [MasterDataController::class, 'indexEquipment'])->name('equipment-locations.index');
+    Route::get('/master-data/equipment-locations', [MasterDataController::class, 'indexEquipmentLocation'])->name('equipment-locations.index');
     // Route untuk menyimpan equipment location relationship
     Route::post('/equipment/store', [MasterDataController::class, 'storeEquipment'])->name('equipment.store');
     Route::post('/location/store', [MasterDataController::class, 'storeLocation'])->name('location.store');
@@ -100,12 +100,12 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     // Route untuk mengedit equipment
     Route::post('/equipment/update/{id}', [MasterDataController::class, 'updateEquipment'])->name('equipment.update');
     Route::post('/location/update/{id}', [MasterDataController::class, 'updateLocation'])->name('location.update');
-    Route::patch('/equipment-location/update/{equipmentId}/{locationId}', [MasterDataController::class, 'updateEquipmentLocation'])->name('equipment-location.update');
+    Route::patch('/equipment-location/update/{equipment_id}/{location_id}', [MasterDataController::class, 'updateEquipmentLocation'])->name('equipment-location.update');
 
     // Route untuk menghapus equipment location relationship
     Route::delete('/equipment/{id}/destroy', [MasterDataController::class, 'destroyEquipment'])->name('equipment.destroy');
     Route::delete('/location/{id}/destroy', [MasterDataController::class, 'destroyLocation'])->name('location.destroy');
-    Route::delete('/equipment-location/destroy/{equipmentId}/{locationId}', [MasterDataController::class, 'destroyEquipmentLocation'])->name('equipment-location.destroy');
+    Route::delete('/equipment-location/destroy/{id}', [MasterDataController::class, 'destroyEquipmentLocation'])->name('equipment-location.destroy');
 
     //Route untuk UserManagement
     Route::get('/users-management', [MasterDataController::class, 'indexUserManagement'])->name('users-management.index');

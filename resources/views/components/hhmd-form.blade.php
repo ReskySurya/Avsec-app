@@ -1,9 +1,9 @@
 @push('styles')
-<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 @endpush
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endpush
 
 <div class="bg-white p-4 mt-20 w-full max-w-full">
@@ -19,7 +19,7 @@
                     (HAND HELD METAL DETECTOR/HHMD)<br>
                     PADA KONDISI NORMAL (HIJAU)
                 </h1>
-                <img src="{{ asset('images/injourney-logo.png') }}" alt="Injourney Logo" class="w-20 h-20 mt-2 sm:mt-0">
+                <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo" class="w-20 h-20 mt-2 sm:mt-0">
             </div>
         </div>
 
@@ -62,9 +62,11 @@
                                     class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base">
                                     <option value="">Pilih Lokasi</option>
                                     @if(isset($hhmdLocations))
-                                    @foreach($hhmdLocations as $location)
-                                    <option value="{{ $location->id }}">{{ $location->name }}</option>
-                                    @endforeach
+                                        @foreach($hhmdLocations as $equipmentLocation)
+                                            <option value="{{ $equipmentLocation->location_id }}">
+                                                {{ $equipmentLocation->location->name ?? 'Nama lokasi tidak tersedia' }}
+                                            </option>
+                                        @endforeach
                                     @endif
                                 </select>
                             </td>
@@ -209,8 +211,8 @@
                     </label>
 
                     @php
-                        $supervisors = \App\Models\User::whereHas('role', function($query) {
-                        $query->where('name', \App\Models\Role::SUPERVISOR);
+                        $supervisors = \App\Models\User::whereHas('role', function ($query) {
+                            $query->where('name', \App\Models\Role::SUPERVISOR);
                         })->get();
                     @endphp
 
@@ -218,7 +220,7 @@
                         class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base" required>
                         <option value="">Pilih Supervisor</option>
                         @foreach($supervisors as $supervisor)
-                        <option value="{{ $supervisor->id }}">{{ $supervisor->name }}</option>
+                            <option value="{{ $supervisor->id }}">{{ $supervisor->name }}</option>
                         @endforeach
                     </select>
                 </div>

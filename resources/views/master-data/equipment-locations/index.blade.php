@@ -4,23 +4,23 @@
 
 @section('content')
     <div x-data="{
-        openEquipment: false,
-        openLocation: false,
-        openEquipmentLocation: false,
-        openEditEquipment: false,
-        openEditLocation: false,
-        openEditEquipmentLocation: false,
-        editEquipmentData: { id: null, name: '', description: '' },
-        editLocationData: { id: null, name: '', description: '' },
-        editEquipmentLocationData: { 
-            equipment_id: null, 
-            location_id: null, 
-            merk_type: '', 
-            description: '',
-            old_equipment_id: null,  
-            old_location_id: null, 
-        },
-        }" class="mx-auto  p-6 min-h-screen">
+                        openEquipment: false,
+                        openLocation: false,
+                        openEquipmentLocation: false,
+                        openEditEquipment: false,
+                        openEditLocation: false,
+                        openEditEquipmentLocation: false,
+                        editEquipmentData: { id: null, name: '', description: '' },
+                        editLocationData: { id: null, name: '', description: '' },
+                        editEquipmentLocationData: { 
+                            equipment_id: null, 
+                            locationd: null, 
+                            merkType: '', 
+                            description: '',
+                            old_equipment_id: null,  
+                            old_location_id: null, 
+                        },
+                        }" class="mx-auto  p-6 min-h-screen">
 
         <!-- Header Section with Enhanced Design -->
         <div class="mb-8 mt-20">
@@ -89,109 +89,101 @@
                 </div>
             </div>
             <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                <div class="p-5">
-                    <form method="GET" action="{{ route('equipment-locations.index') }}" class="flex items-center gap-2">
-                        <input type="text" name="search_table" value="{{ request('search_table') }}"
-                            placeholder="Cari location di tabel..."
-                            class="border border-gray-300 rounded-lg px-4 py-2 w-64" />
-                        <button type="submit"
-                            class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
-                            Cari
-                        </button>
-                    </form>
-                </div>
 
                 <table class="min-w-full">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 Equipment</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 Location</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 Merk/Type</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Certificate</th>
+                            <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 Description</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
-                        @foreach($equipmentLocations as $equipment)
-                            @foreach($equipment->locations as $location)
-                                <tr class="hover:bg-gray-50 transition-colors duration-200">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
-                                                    </path>
-                                                </svg>
-                                            </div>
-                                            <span class="font-medium text-gray-900">{{ $equipment->name }}</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
-                                                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                                                    </path>
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                </svg>
-                                            </div>
-                                            <span class="font-medium text-gray-900">{{ $location->name }}</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 text-gray-600">{{ $location->pivot->merk_type ?: 'Tidak ada merk' }}</td>
-                                    <td class="px-6 py-4 text-gray-600">{{ $location->pivot->description ?: 'Tidak ada deskripsi' }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap flex space-x-2">
-                                        <button type="button"
-                                            class="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 px-4 py-2 rounded-lg font-medium transition-colors duration-200"
-                                            @click="
-                                            openEditEquipmentLocation = true;
-                                            editEquipmentLocationData.equipment_id = {{ $equipment->id }};
-                                            editEquipmentLocationData.location_id = {{ $location->id }};
-                                            editEquipmentLocationData.old_equipment_id = {{ $equipment->id }};
-                                            editEquipmentLocationData.old_location_id = {{ $location->id }};
-                                            editEquipmentLocationData.merk_type = '{{ addslashes($location->pivot->merk_type ?? '') }}';
-                                            editEquipmentLocationData.description = '{{ addslashes($location->pivot->description ?? '') }}';
-                                            ">
-                                            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        @foreach($equipmentLocations as $equipmentLocation)
+                            <tr class="hover:bg-gray-50 transition-colors duration-200">
+                                <td class="px-2 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
                                                 </path>
                                             </svg>
-                                            Edit
+                                        </div>
+                                        <span
+                                            class="font-medium text-gray-900">{{ $equipmentLocation->equipment->name ?? '-'}}</span>
+                                    </div>
+                                </td>
+                                <td class="px-2 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                                </path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            </svg>
+                                        </div>
+                                        <span
+                                            class="font-medium text-gray-900">{{ $equipmentLocation->location->name ?? '-'}}</span>
+                                    </div>
+                                </td>
+                                <td class="px-2 py-4 text-gray-600">{{ $equipmentLocation->merk_type ?? 'Tidak ada merk' }}</td>
+                                <td class="px-2 py-4 text-gray-600">
+                                    {{ $equipmentLocation->certificateInfo ?? 'Tidak ada certificate info' }}
+                                </td>
+                                <td class="px-2 py-4 text-gray-600">
+                                    {{ $equipmentLocation->description ?? 'Tidak ada deskripsi' }}
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap flex space-x-2">
+                                    <button type="button"
+                                        class="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+                                        @click="
+                                                                            openEditEquipmentLocation = true;
+                                                                            editEquipmentLocationData.equipment_id = {{ $equipmentLocation->equipment_id }};
+                                                                            editEquipmentLocationData.location_id = {{ $equipmentLocation->location_id }};
+                                                                            editEquipmentLocationData.old_equipment_id = {{ $equipmentLocation->equipment_id }};
+                                                                            editEquipmentLocationData.old_location_id = {{ $equipmentLocation->location_id }};
+                                                                            editEquipmentLocationData.merkType = '{{ addslashes($equipmentLocation->merkType ?? '') }}';
+                                                                            editEquipmentLocationData.description = '{{ addslashes($equipmentLocation->description ?? '') }}';
+                                                                            ">
+                                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                            </path>
+                                        </svg>
+                                        Edit
+                                    </button>
+                                    <form action="{{ route('equipment-location.destroy', $equipmentLocation->id) }}"
+                                        method="POST" onsubmit="return confirm('Yakin ingin menghapus relasi ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="bg-red-100 text-red-600 hover:bg-red-200 px-4 py-2 rounded-lg font-medium transition-colors duration-200">
+                                            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                </path>
+                                            </svg>
+                                            Hapus
                                         </button>
-                                        <form
-                                            action="{{ route('equipment-location.destroy', ['equipmentId' => $equipment->id, 'locationId' => $location->id]) }}"
-                                            method="POST" onsubmit="return confirm('Yakin ingin menghapus relasi ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                class="bg-red-100 text-red-600 hover:bg-red-200 px-4 py-2 rounded-lg font-medium transition-colors duration-200">
-                                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                                    </path>
-                                                </svg>
-                                                Hapus
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-
-                            @endforeach
+                                    </form>
+                                </td>
+                            </tr>
                         @endforeach
-
                     </tbody>
                 </table>
                 <div class="px-4 py-3 bg-white border-t border-gray-200">
@@ -202,9 +194,9 @@
 
         <!-- Equipment and Location Grid -->
         <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-            {{-- Equipment Section --}}
+            {{-- Equipment Section as Table --}}
             <div
-                class="bg-white shadow-xl rou1nded-2xl overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-2xl">
+                class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-2xl">
                 <div class="bg-gradient-to-r from-blue-500 to-cyan-600 px-6 py-6 text-white">
                     <div class="flex justify-between items-center">
                         <div>
@@ -221,92 +213,86 @@
                         </button>
                     </div>
                 </div>
-                <div class="p-6">
-                    @if($equipmentList->count())
-                        <div class="space-y-4">
-                            <form method="GET" action="{{ route('equipment-locations.index') }}"
-                                class="flex items-center gap-2">
-                                <input type="text" name="search_equipment" value="{{ request('search_equipment') }}"
-                                    placeholder="Cari equipment di tabel..."
-                                    class="border border-gray-300 rounded-lg px-4 py-2 w-64" />
-                                <button type="submit"
-                                    class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
-                                    Cari
-                                </button>
-                            </form>
-
-                            @foreach($equipmentList as $equipment)
-                                <div
-                                    class="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
-                                    <div class="flex items-start justify-between">
-                                        <div class="flex-1">
-                                            <div class="flex items-center mb-2">
-                                                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                                                    <span class="text-blue-600 font-bold text-sm">#{{ $equipment->id }}</span>
-                                                </div>
-                                                <h4 class="text-lg font-semibold text-gray-900">{{ $equipment->name }}</h4>
-                                            </div>
-                                            <p class="text-gray-600 mb-2">{{ Str::limit($equipment->description, 80) }}</p>
-                                            <div class="flex items-center text-sm text-gray-500">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
-                                                    </path>
-                                                </svg>
-                                                {{ $equipment->creator->name ?? 'N/A' }}
-                                            </div>
-                                        </div>
-                                        <div class="flex space-x-2 ml-4">
-                                            <button type="button" @click="
-                                                                                                                        openEditEquipment = true;
-                                                                                                                        editEquipmentData.id = {{ $equipment->id }};
-                                                                                                                        editEquipmentData.name = '{{ addslashes($equipment->name) }}';
-                                                                                                                        editEquipmentData.description = '{{ addslashes($equipment->description) }}';
-                                                                                                                    "
-                                                class="bg-blue-100 text-blue-600 hover:bg-blue-200 p-2 rounded-lg transition-colors duration-200">
+                <div class="overflow-x-auto p-6">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th
+                                    class="px-2 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    No</th>
+                                <th
+                                    class="px-2 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Nama</th>
+                                <th
+                                    class="px-2 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Deskripsi</th>
+                                <th
+                                    class="px-2 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Dibuat Oleh</th>
+                                <th
+                                    class="px-2 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @forelse($equipmentList as $equipment)
+                                <tr class="hover:bg-gray-50 transition-colors duration-200">
+                                    <td class="px-2 py-4 text-blue-600 font-bold">{{ $equipment->id }}</td>
+                                    <td class="px-2 py-4 text-gray-900 font-semibold">{{ $equipment->name }}</td>
+                                    <td class="px-2 py-4 text-gray-600">{{ Str::limit($equipment->description, 80) }}</td>
+                                    <td class="px-2 py-4 text-gray-500">{{ $equipment->creator->name ?? 'N/A' }}</td>
+                                    <td class="px-2 py-4 flex space-x-2">
+                                        <button type="button" @click="
+                                                    openEditEquipment = true;
+                                                    editEquipmentData.id = {{ $equipment->id }};
+                                                    editEquipmentData.name = '{{ addslashes($equipment->name) }}';
+                                                    editEquipmentData.description = '{{ addslashes($equipment->description) }}';
+                                                "
+                                            class="bg-blue-100 text-blue-600 hover:bg-blue-200 p-2 rounded-lg transition-colors duration-200">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                        <form action="{{ route('equipment.destroy', $equipment->id) }}" method="POST"
+                                            class="inline-block">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" onclick="return confirm('Yakin ingin menghapus?')"
+                                                class="bg-red-100 text-red-600 hover:bg-red-200 p-2 rounded-lg transition-colors duration-200">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
                                                     </path>
                                                 </svg>
                                             </button>
-                                            <form action="{{ route('equipment.destroy', $equipment->id) }}" method="POST"
-                                                class="inline-block">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" onclick="return confirm('Yakin ingin menghapus?')"
-                                                    class="bg-red-100 text-red-600 hover:bg-red-200 p-2 rounded-lg transition-colors duration-200">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                                        </path>
-                                                    </svg>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                            <div class="px-4 py-3 bg-white border-t border-gray-200">
-                                {{ $equipmentList->links() }}
-                            </div>
-                        </div>
-                    @else
-                        <div class="text-center py-12">
-                            <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
-                                </path>
-                            </svg>
-                            <p class="text-gray-500 text-lg">Belum ada data Equipment</p>
-                            <p class="text-gray-400">Tambahkan equipment pertama Anda</p>
-                        </div>
-                    @endif
+                                        </form>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center py-12"></td>
+                                    <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                    <p class="text-gray-500 text-lg">Belum ada data Equipment</p>
+                                    <p class="text-gray-400">Tambahkan equipment pertama Anda</p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                    <div class="px-4 py-3 bg-white border-t border-gray-200">
+                        {{ $equipmentList->links() }}
+                    </div>
                 </div>
             </div>
 
-            {{-- Location Section --}}
+            {{-- Location Section as Table --}}
             <div
                 class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-2xl">
                 <div class="bg-gradient-to-r from-purple-500 to-pink-600 px-6 py-6 text-white">
@@ -325,114 +311,84 @@
                         </button>
                     </div>
                 </div>
-                <div class="p-6">
-                    @if($locationList->count())
-                        <div class="space-y-4">
-                            <form method="GET" action="{{ route('equipment-locations.index') }}"
-                                class="flex items-center gap-2">
-                                <input type="text" name="search_location" value="{{ request('search_location') }}"
-                                    placeholder="Cari location di tabel..."
-                                    class="border border-gray-300 rounded-lg px-4 py-2 w-64" />
-                                <button type="submit"
-                                    class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
-                                    Cari
-                                </button>
-                            </form>
-
-                            @foreach($locationList as $location)
-                                <div
-                                    class="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
-                                    <div class="flex items-start justify-between">
-                                        <div class="flex-1">
-                                            <div class="flex items-center mb-2">
-                                                <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                                                    <span class="text-purple-600 font-bold text-sm">#{{ $location->id }}</span>
-                                                </div>
-                                                <h4 class="text-lg font-semibold text-gray-900">{{ $location->name }}</h4>
-                                            </div>
-                                            <p class="text-gray-600 mb-2">{{ Str::limit($location->description, 80) }}</p>
-                                            <div class="flex items-center text-sm text-gray-500">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
-                                                    </path>
-                                                </svg>
-                                                {{ $location->creator->name ?? 'N/A' }}
-                                            </div>
-                                        </div>
-                                        <div class="flex space-x-2 ml-4">
-                                            <button type="button" @click="
-                                                                                    openEditLocation = true;
-                                                                                    editLocationData.id = {{ $location->id }};
-                                                                                    editLocationData.name = '{{ addslashes($location->name) }}';
-                                                                                    editLocationData.description = '{{ addslashes($location->description) }}';
-                                                                                "
-                                                class="bg-purple-100 text-purple-600 hover:bg-purple-200 p-2 rounded-lg transition-colors duration-200">
+                <div class="overflow-x-auto p-6">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th
+                                    class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                No</th>
+                                <th
+                                    class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Nama</th>
+                                <th
+                                    class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Deskripsi</th>
+                                <th
+                                    class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Dibuat Oleh</th>
+                                <th
+                                    class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @forelse($locationList as $location)
+                                <tr class="hover:bg-gray-50 transition-colors duration-200">
+                                    <td class="px-5 py-4 text-purple-600 font-bold">{{ $location->id }}</td>
+                                    <td class="px-5 py-4 text-gray-900 font-semibold">{{ $location->name }}</td>
+                                    <td class="px-5 py-4 text-gray-600">{{ Str::limit($location->description, 80) }}</td>
+                                    <td class="px-5 py-4 text-gray-500">{{ $location->creator->name ?? 'N/A' }}</td>
+                                    <td class="px-5 py-4 flex space-x-2">
+                                        <button type="button" @click="
+                                                    openEditLocation = true;
+                                                    editLocationData.id = {{ $location->id }};
+                                                    editLocationData.name = '{{ addslashes($location->name) }}';
+                                                    editLocationData.description = '{{ addslashes($location->description) }}';
+                                                "
+                                            class="bg-purple-100 text-purple-600 hover:bg-purple-200 p-2 rounded-lg transition-colors duration-200">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                        <form action="{{ route('location.destroy', $location->id) }}" method="POST"
+                                            class="inline-block">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" onclick="return confirm('Yakin ingin menghapus?')"
+                                                class="bg-red-100 text-red-600 hover:bg-red-200 p-2 rounded-lg transition-colors duration-200">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
                                                     </path>
                                                 </svg>
                                             </button>
-                                            <form action="{{ route('location.destroy', $location->id) }}" method="POST"
-                                                class="inline-block">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" onclick="return confirm('Yakin ingin menghapus?')"
-                                                    class="bg-red-100 text-red-600 hover:bg-red-200 p-2 rounded-lg transition-colors duration-200">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                                        </path>
-                                                    </svg>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                            <div class="px-4 sm:px-6 py-3 bg-white border-t border-gray-200 flex items-center justify-between">
-                                <div class="flex-1 flex justify-between sm:hidden">
-                                    <button
-                                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Sebelumnya</button>
-                                    <button
-                                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Selanjutnya</button>
-                                </div>
-                                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                                    <div>
-                                        <p class="text-sm text-gray-700">Menampilkan <span class="font-medium">1</span> sampai
-                                            <span class="font-medium">{{ count($locationList) }}</span> dari <span
-                                                class="font-medium">{{count($locationList) }}</span> hasil
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
-                                            aria-label="Pagination">
-                                            <button
-                                                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">Sebelumnya</button>
-                                            <button
-                                                class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-50 text-sm font-medium text-blue-600">1</button>
-                                            <button
-                                                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">Selanjutnya</button>
-                                        </nav>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @else
-                        <div class="text-center py-12">
-                            <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                                </path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                            <p class="text-gray-500 text-lg">Belum ada data Location</p>
-                            <p class="text-gray-400">Tambahkan lokasi pertama Anda</p>
-                        </div>
-                    @endif
+                                        </form>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center py-12">
+                                        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                            </path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        <p class="text-gray-500 text-lg">Belum ada data Location</p>
+                                        <p class="text-gray-400">Tambahkan lokasi pertama Anda</p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                    <div class="px-4 py-3 bg-white border-t border-gray-200">
+                        {{ $locationList->links() }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -521,7 +477,7 @@
                         </button>
                         <button type="submit"
                             class="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-xl hover:from-purple-600 hover:to-pink-700 transition-all
-                                                                                                        duration-200 font-medium shadow-lg">
+                                                                                                                        duration-200 font-medium shadow-lg">
                             Simpan
                         </button>
                     </div>
@@ -691,7 +647,9 @@
                     <h2 class="text-2xl font-bold">Edit Equipment Location</h2>
                     <p class="text-indigo-100">Ubah relasi equipment dan lokasi</p>
                 </div>
-                <form :action="'/equipment-location/update/' + editEquipmentLocationData.old_equipment_id + '/' + editEquipmentLocationData.old_location_id" method="POST">
+                <form
+                    :action="'/equipment-location/update/' + editEquipmentLocationData.old_equipment_id + '/' + editEquipmentLocationData.old_location_id"
+                    method="POST">
                     @csrf
                     @method('PATCH')
                     <div class="mb-6">

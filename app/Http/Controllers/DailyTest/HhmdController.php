@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\DailyTest;
 
 use App\Http\Controllers\Controller;
+use App\Models\EquipmentLocation;
 use Illuminate\Http\Request;
 use App\Models\Equipment;
 use App\Models\Location;
@@ -19,15 +20,15 @@ class HhmdController extends Controller
 {
     public function hhmdLayout()
     {
-        // Ambil equipment HHMD
+        // Ambil equipment HHMD terlebih dahulu
         $hhmdEquipment = Equipment::where('name', 'hhmd')->first();
 
-        // Ambil lokasi yang terhubung dengan HHMD
-        $hhmdLocations = [];
+        $hhmdLocations = collect();
+
         if ($hhmdEquipment) {
-            $hhmdLocations = $hhmdEquipment->locations()
-                ->wherePivot('equipment_id', $hhmdEquipment->id)
-                ->withPivot('description', 'id')
+            // Gunakan EquipmentLocation untuk mendapatkan data yang lebih lengkap
+            $hhmdLocations = EquipmentLocation::where('equipment_id', $hhmdEquipment->id)
+                ->with(['location', 'equipment']) // Eager loading untuk menghindari N+1 query
                 ->get();
         }
 
@@ -50,31 +51,6 @@ class HhmdController extends Controller
 
             Log::info("Report found: " . $report->reportID);
 
-            // Get equipment and location data manually
-            $equipmentLocationData = DB::table('equipment_locations')
-                ->select(
-                    'equipment_locations.id',
-                    'equipment.id as equipment_id',
-                    'equipment.name as equipment_name',
-                    'locations.id as location_id',
-                    'locations.name as location_name'
-                )
-                ->join('equipment', 'equipment_locations.equipment_id', '=', 'equipment.id')
-                ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
-                ->where('equipment_locations.id', $report->equipmentLocationID)
-                ->first();
-
-            if (!$equipmentLocationData) {
-                Log::error("Equipment location data not found for reportID: $id");
-                return redirect()->back()->with('error', 'Equipment location not found');
-            }
-
-            // Validate if this is an HHMD report
-            if ($equipmentLocationData->equipment_name !== 'hhmd') {
-                Log::warning("Invalid report type for reportID: $id. Equipment: " . $equipmentLocationData->equipment_name);
-                return redirect()->back()->with('error', 'Invalid report type');
-            }
-
             // Get all possible statuses for the dropdown
             $statuses = ReportStatus::all();
 
@@ -90,23 +66,10 @@ class HhmdController extends Controller
                 return redirect()->back()->with('error', 'Report details not found');
             }
 
-            // Create objects for backward compatibility
-            $equipment = (object) [
-                'id' => $equipmentLocationData->equipment_id,
-                'name' => $equipmentLocationData->equipment_name
-            ];
-
-            $location = (object) [
-                'id' => $equipmentLocationData->location_id,
-                'name' => $equipmentLocationData->location_name
-            ];
-
             return view('daily-test.review-form.hhmdReviewForm', [
                 'form' => $report,
-                // 'statuses' => $statuses,
+                'statuses' => $statuses,
                 'supervisor' => $supervisor,
-                'location' => $location,
-                'equipment' => $equipment,
                 'function' => 'update'
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -120,47 +83,7 @@ class HhmdController extends Controller
     }
 
 
-    public function checkLocation(Request $request)
-    {
-        $locationId = $request->input('location_id');
-
-        // Validasi lokasi
-        $location = Location::find($locationId);
-
-        if (!$location) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Lokasi tidak ditemukan'
-            ], 404);
-        }
-
-        // Cek apakah lokasi terhubung dengan HHMD
-        $hhmdEquipment = Equipment::where('name', 'hhmd')->first();
-
-        if (!$hhmdEquipment) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Equipment HHMD tidak ditemukan'
-            ], 404);
-        }
-
-        $isConnected = $hhmdEquipment->locations()
-            ->where('locations.id', $locationId)
-            ->exists();
-
-        if (!$isConnected) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Lokasi tidak terhubung dengan HHMD'
-            ], 400);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Lokasi valid',
-            'location' => $location
-        ]);
-    }
+    
 
     public function store(Request $request)
     {
@@ -187,30 +110,18 @@ class HhmdController extends Controller
         }
 
         try {
-            // Ambil equipment HHMD
-            $hhmdEquipment = Equipment::where('name', 'hhmd')->first();
-
-            if (!$hhmdEquipment) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Equipment HHMD tidak ditemukan'
-                ], 404);
-            }
-
-            // Ambil equipment_locations_id
-            $equipmentLocation = $hhmdEquipment->locations()
-                ->where('locations.id', $request->location)
+             $equipmentLocation = EquipmentLocation::whereHas('equipment', function ($query) {
+                $query->where('name', 'hhmd');
+            })
+                ->where('location_id', $request->location)
                 ->first();
 
             if (!$equipmentLocation) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Relasi equipment dan lokasi tidak ditemukan'
+                    'message' => 'Relasi equipment HHMD dan lokasi tidak ditemukan'
                 ], 404);
             }
-
-            $equipmentLocationId = $equipmentLocation->pivot->id;
-
             // Ambil status 'pending_supervisor'
             $pendingStatus = ReportStatus::where('name', 'pending')->first();
 
@@ -224,7 +135,7 @@ class HhmdController extends Controller
             // Buat report baru
             $report = new Report();
             $report->testDate = $request->testDateTime;
-            $report->equipmentLocationID = $equipmentLocationId;
+            $report->equipmentLocationID = $equipmentLocation->id;
             $report->deviceInfo = $request->deviceInfo;
             $report->certificateInfo = $request->certificateInfo;
             $report->isFullFilled = $request->terpenuhi ? true : false;
@@ -343,56 +254,38 @@ class HhmdController extends Controller
 
     public function showData()
     {
-        // Ambil equipment HHMD
-        $equipment = Equipment::whereIn('name', ['hhmd', 'wtmd', 'xraycabin', 'xraybagasi'])->get()->keyBy('name');
+        $equipmentTypes = ['hhmd', 'wtmd', 'xraycabin', 'xraybagasi'];
 
-        $allReports = collect();
-
-        foreach ($equipment as $equipmentType => $equipmentData) {
-            $equipmentLocationIds = $equipmentData->locations()
-                ->pluck('equipment_locations.id')
-                ->toArray();
-
-            if (empty($equipmentLocationIds)) {
-                continue;
-            }
-
-            $reports = Report::query()
-                ->join('equipment_locations', 'reports.equipmentLocationID', '=', 'equipment_locations.id')
-                ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
-                ->whereIn('reports.equipmentLocationID', $equipmentLocationIds)
-                ->where('reports.approvedByID', Auth::id())
-                ->with(['submittedBy', 'status'])
-                ->select(
-                    'reports.reportID as id',
-                    'reports.testDate',
-                    'reports.submittedByID',
-                    'reports.statusID',
-                    'locations.name as location_name'
-                )
-                ->orderBy('reports.created_at', 'desc')
-                ->get()
-                ->map(function ($report) use ($equipmentType) {
-                    return [
-                        'id' => $report->id,
-                        'date' => $report->testDate->format('d/m/Y'),
-                        'test_type' => strtoupper($equipmentType),
-                        'location' => $report->location_name,
-                        'status' => $report->status->name ?? 'pending',
-                        'operator' => $report->submittedBy->name ?? 'Unknown',
-                    ];
-                });
-
-            $allReports = $allReports->merge($reports);
-        }
-
-        // Urutkan berdasarkan tanggal
-        $sortedReports = $allReports->sortByDesc(function ($report) {
-            return \Carbon\Carbon::createFromFormat('d/m/Y', $report['date']);
-        })->values();
+        $reports = Report::query()
+            ->join('equipment_locations', 'reports.equipmentLocationID', '=', 'equipment_locations.id')
+            ->join('equipment', 'equipment_locations.equipment_id', '=', 'equipment.id')
+            ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
+            ->whereIn('equipment.name', $equipmentTypes)
+            ->where('reports.approvedByID', Auth::id())
+            ->with(['submittedBy', 'status'])
+            ->select(
+                'reports.reportID as id',
+                'reports.testDate',
+                'reports.submittedByID',
+                'reports.statusID',
+                'locations.name as location_name',
+                'equipment.name as equipment_name'
+            )
+            ->orderBy('reports.created_at', 'desc')
+            ->get()
+            ->map(function ($report) {
+                return [
+                    'id' => $report->id,
+                    'date' => $report->testDate->format('d/m/Y'),
+                    'test_type' => strtoupper($report->equipment_name),
+                    'location' => $report->location_name,
+                    'status' => $report->status->name ?? 'pending',
+                    'operator' => $report->submittedBy->name ?? 'Unknown',
+                ];
+            });
 
         return view('supervisor.dailyTestForm', [
-            'reports' => $sortedReports,
+            'reports' => $reports,
         ]);
     }
 
