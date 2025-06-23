@@ -69,8 +69,7 @@
                             <div>
                                 <h2 class="font-bold mb-2">TEST 1</h2>
                                 <div class="w-20 h-20 mx-auto border-2 border-black flex items-center justify-center">
-                                    <input type="checkbox" {{ $form->reportDetails->first()->test1 ? 'checked' : '' }} 
-                                           {{ $function != 'update' ? 'disabled' : '' }}>
+                                    <input type="checkbox" {{ $form->reportDetails->first()->test1 ? 'checked' : '' }} disabled>
                                 </div>
                             </div>
                         </div>
@@ -161,8 +160,6 @@
                 </div>
             </div>
         </div>
-
-        @if($function != 'update')
         <form action="{{ route('hhmd.updateStatus', $form->reportID) }}" method="POST" class="mt-2 sm:mt-4"
             id="hhmdForm">
             @csrf
@@ -210,14 +207,13 @@
             </button>
             </div>
         </form>
-        @endif
          <div class="flex items-center justify-end">
              <a href="{{ route('supervisor.dailytest-form') }}"
                  class="text-xs sm:text-sm font-bold text-blue-500 hover:text-blue-800">
                  Kembali ke Dashboard
              </a>
          </div>
-       
+
     </div>
 </div>
 
