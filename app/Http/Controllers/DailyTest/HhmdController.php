@@ -82,9 +82,6 @@ class HhmdController extends Controller
         }
     }
 
-
-    
-
     public function store(Request $request)
     {
         // Validasi input

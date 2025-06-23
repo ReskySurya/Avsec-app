@@ -4,6 +4,7 @@ namespace App\Http\Controllers\DailyTest;
 
 use App\Http\Controllers\Controller;
 use App\Models\Equipment;
+use App\Models\EquipmentLocation;
 use App\Models\Location;
 use App\Models\Report;
 use App\Models\ReportDetail;
@@ -28,15 +29,16 @@ class XrayController extends Controller
     {
         // Ambil equipment X-Ray Bagasi
         $xrayBagasiEquipment = Equipment::where('name', 'xraybagasi')->first();
-
         // Ambil lokasi yang terhubung dengan X-Ray Bagasi
-        $xrayBagasiLocations = [];
+        $xrayBagasiLocations = collect();
         if ($xrayBagasiEquipment) {
-            $xrayBagasiLocations = $xrayBagasiEquipment->locations()
-                ->wherePivot('equipment_id', $xrayBagasiEquipment->id)
-                ->withPivot('description', 'id')
+            // Gunakan EquipmentLocation untuk mendapatkan data yang lebih lengkap
+            $xrayBagasiLocations = EquipmentLocation::where('equipment_id', $xrayBagasiEquipment->id)
+                ->with(['location', 'equipment']) // Eager loading untuk menghindari N+1 query
                 ->get();
         }
+        
+
         return view(
             'daily-test.xrayBagasiLayout',
             [
@@ -77,29 +79,19 @@ class XrayController extends Controller
         }
 
         try {
-            // Ambil equipment Xray Cabin
-            $xrayCabinEquipment = Equipment::where('name', 'xraycabin')->first();
 
-            if (!$xrayCabinEquipment) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Equipment Xray tidak ditemukan'
-                ], 404);
-            }
-
-            // Ambil equipment_locations_id
-            $equipmentLocation = $xrayCabinEquipment->locations()
-                ->where('locations.id', $request->location)
+            $equipmentLocation = EquipmentLocation::whereHas('equipment', function ($query) {
+                $query->where('name', 'xraycabin');
+            })
+                ->where('location_id', $request->location)
                 ->first();
 
             if (!$equipmentLocation) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Relasi equipment dan lokasi tidak ditemukan'
+                    'message' => 'Relasi equipment XRAY CABIN dan lokasi tidak ditemukan'
                 ], 404);
             }
-
-            $equipmentLocationId = $equipmentLocation->pivot->id;
 
             // Ambil status 'pending_supervisor'
             $pendingStatus = ReportStatus::where('name', 'pending')->first();
@@ -114,7 +106,7 @@ class XrayController extends Controller
             // Buat report baru
             $report = new Report();
             $report->testDate = $request->testDateTime;
-            $report->equipmentLocationID = $equipmentLocationId;
+            $report->equipmentLocationID = $equipmentLocation->id;
             $report->deviceInfo = $request->deviceInfo;
             $report->certificateInfo = $request->certificateInfo;
             $report->isFullFilled = $request->terpenuhi ? true : false;
@@ -367,95 +359,93 @@ class XrayController extends Controller
     }
 
     // Check Location untuk X-Ray Bagasi dan X-Ray Cabin
-    public function checkLocation(Request $request)
-    {
-        $locationId = $request->input('location_id');
-        $type = $request->input('type'); // Tidak ada default, harus dikirim dari request
+    // public function checkLocation(Request $request)
+    // {
+    //     $locationId = $request->input('location_id');
+    //     $type = $request->input('type'); // Tidak ada default, harus dikirim dari request
 
-        // Validasi lokasi
-        $location = Location::find($locationId);
+    //     // Validasi lokasi
+    //     $location = Location::find($locationId);
 
-        if (!$location) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Lokasi tidak ditemukan'
-            ], 404);
-        }
+    //     if (!$location) {
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => 'Lokasi tidak ditemukan'
+    //         ], 404);
+    //     }
 
-        // Jika type tidak dikirim, cek ke dua equipment
-        if (empty($type)) {
-            $equipments = ['xraybagasi', 'xraycabin'];
-            $found = false;
-            foreach ($equipments as $eq) {
-                $xrayEquipment = Equipment::where('name', $eq)->first();
-                if ($xrayEquipment && $xrayEquipment->locations()->where('locations.id', $locationId)->exists()) {
-                    $found = $eq;
-                    break;
-                }
-            }
-            if ($found) {
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'Lokasi valid dan terhubung dengan ' . ucfirst($found),
-                    'location' => $location,
-                    'equipment' => $found
-                ]);
-            } else {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Lokasi tidak terhubung dengan Xray Bagasi maupun Xray Cabin'
-                ], 400);
-            }
-        }
+    //     // Jika type tidak dikirim, cek ke dua equipment
+    //     if (empty($type)) {
+    //         $equipments = ['xraybagasi', 'xraycabin'];
+    //         $found = false;
+    //         foreach ($equipments as $eq) {
+    //             $xrayEquipment = Equipment::where('name', $eq)->first();
+    //             if ($xrayEquipment && $xrayEquipment->locations()->where('locations.id', $locationId)->exists()) {
+    //                 $found = $eq;
+    //                 break;
+    //             }
+    //         }
+    //         if ($found) {
+    //             return response()->json([
+    //                 'status' => 'success',
+    //                 'message' => 'Lokasi valid dan terhubung dengan ' . ucfirst($found),
+    //                 'location' => $location,
+    //                 'equipment' => $found
+    //             ]);
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 'error',
+    //                 'message' => 'Lokasi tidak terhubung dengan Xray Bagasi maupun Xray Cabin'
+    //             ], 400);
+    //         }
+    //     }
 
-        // Jika type dikirim, cek sesuai type
-        if (!in_array($type, ['xraybagasi', 'xraycabin'])) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Tipe equipment tidak valid'
-            ], 400);
-        }
+    //     // Jika type dikirim, cek sesuai type
+    //     if (!in_array($type, ['xraybagasi', 'xraycabin'])) {
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => 'Tipe equipment tidak valid'
+    //         ], 400);
+    //     }
 
-        $xrayEquipment = Equipment::where('name', $type)->first();
+    //     $xrayEquipment = Equipment::where('name', $type)->first();
 
-        if (!$xrayEquipment) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Equipment tidak ditemukan'
-            ], 404);
-        }
+    //     if (!$xrayEquipment) {
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => 'Equipment tidak ditemukan'
+    //         ], 404);
+    //     }
 
-        $isConnected = $xrayEquipment->locations()
-            ->where('locations.id', $locationId)
-            ->exists();
+    //     $isConnected = $xrayEquipment->locations()
+    //         ->where('locations.id', $locationId)
+    //         ->exists();
 
-        if (!$isConnected) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Lokasi tidak terhubung dengan ' . ucfirst($type)
-            ], 400);
-        }
+    //     if (!$isConnected) {
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => 'Lokasi tidak terhubung dengan ' . ucfirst($type)
+    //         ], 400);
+    //     }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Lokasi valid',
-            'location' => $location,
-            'equipment' => $type
-        ]);
-    }
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'message' => 'Lokasi valid',
+    //         'location' => $location,
+    //         'equipment' => $type
+    //     ]);
+    // }
 
 
     public function xrayCabinLayout()
     {
-        // Ambil equipment X-Ray Cabin
         $xrayCabinEquipment = Equipment::where('name', 'xraycabin')->first();
-
         // Ambil lokasi yang terhubung dengan X-Ray Bagasi
-        $xrayCabinLocations = [];
+        $xrayCabinLocations = collect();
         if ($xrayCabinEquipment) {
-            $xrayCabinLocations = $xrayCabinEquipment->locations()
-                ->wherePivot('equipment_id', $xrayCabinEquipment->id)
-                ->withPivot('description', 'id')
+            // Gunakan EquipmentLocation untuk mendapatkan data yang lebih lengkap
+            $xrayCabinLocations = EquipmentLocation::where('equipment_id', $xrayCabinEquipment->id)
+                ->with(['location', 'equipment']) // Eager loading untuk menghindari N+1 query
                 ->get();
         }
         return view('daily-test.xrayCabinLayout', [
@@ -490,29 +480,19 @@ class XrayController extends Controller
         }
 
         try {
-            // Ambil equipment Xray Cabin
-            $xrayBagasiEquipment = Equipment::where('name', 'xraybagasi')->first();
-
-            if (!$xrayBagasiEquipment) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Equipment XRay tidak ditemukan'
-                ], 404);
-            }
-
-            // Ambil equipment_locations_id
-            $equipmentLocation = $xrayBagasiEquipment->locations()
-                ->where('locations.id', $request->location)
+             // Ambil equipment_location berdasarkan location_id dan equipment xraybagasi
+            $equipmentLocation = EquipmentLocation::whereHas('equipment', function ($query) {
+                $query->where('name', 'xraybagasi');
+            })
+                ->where('location_id', $request->location)
                 ->first();
 
             if (!$equipmentLocation) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Relasi equipment dan lokasi tidak ditemukan'
+                    'message' => 'Relasi equipment XRAY BAGASI dan lokasi tidak ditemukan'
                 ], 404);
             }
-
-            $equipmentLocationId = $equipmentLocation->pivot->id;
 
             // Ambil status 'pending_supervisor'
             $pendingStatus = ReportStatus::where('name', 'pending')->first();
@@ -527,7 +507,7 @@ class XrayController extends Controller
             // Buat report baru
             $report = new Report();
             $report->testDate = $request->testDateTime;
-            $report->equipmentLocationID = $equipmentLocationId;
+            $report->equipmentLocationID = $equipmentLocation->id;
             $report->deviceInfo = $request->deviceInfo;
             $report->certificateInfo = $request->certificateInfo;
             $report->isFullFilled = $request->terpenuhi ? true : false;

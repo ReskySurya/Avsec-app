@@ -79,7 +79,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Daily Test XRAY Routes
     Route::get('/daily-test/xraycabin', [XrayController::class, 'xrayCabinLayout'])->name('daily-test.xraycabin');
-    Route::post('/daily-test/xray/check-location', [XrayController::class, 'checkLocation'])->name('daily-test.xrayCabin.check-location');
+    // Route::post('/daily-test/xray/check-location', [XrayController::class, 'checkLocation'])->name('daily-test.xrayCabin.check-location');
     Route::post('/daily-test/xraycabin/store', [XrayController::class, 'storeXrayCabin'])->name('daily-test.xrayCabin.store');
 
     Route::get('/daily-test/xraybagasi', [XrayController::class, 'xrayBagasiLayout'])->name('daily-test.xraybagasi');
