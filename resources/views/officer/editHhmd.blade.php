@@ -25,8 +25,7 @@
             @csrf
             @method('PUT')
 
-            <div class="bg-white p-4"
-                <div id="format" class="mx-auto">
+            <div class="bg-white p-4" <div id="format" class="mx-auto">
                 <div class="border-t-2 border-x-2 border-black bg-white shadow-md">
                     <div class="flex items-center justify-between">
                         <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo" class="w-20 h-20">
@@ -46,7 +45,8 @@
                             <tr class="border-b border-black">
                                 <th class="w-1/3 text-left p-2">Nama Operator Penerbangan:</th>
                                 <td class="w-2/3 p-2">
-                                    <input type="text" name="operatorName" value="{{ old('operatorName', $form->operatorName) }}"
+                                    <input type="text" name="operatorName"
+                                        value="{{ old('operatorName', $form->operatorName) }}"
                                         class="w-full border rounded px-2 py-1">
                                 </td>
                             </tr>
@@ -62,14 +62,14 @@
                                 <th class="w-1/3 text-left p-2">Lokasi Penempatan:</th>
                                 <td class="w-2/3 p-2">
                                     <select id="location" name="location"
-                                    class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base">
-                                    <option value="">Pilih Lokasi</option>
-                                    @if(isset($hhmdLocations))
-                                    @foreach($hhmdLocations as $location)
-                                    <option value="{{ $location->id }}">{{ $location->name }}</option>
-                                    @endforeach
-                                    @endif
-                                </select>
+                                        class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base">
+                                        <option value="">Pilih Lokasi</option>
+                                        @if(isset($hhmdLocations))
+                                        @foreach($hhmdLocations as $location)
+                                        <option value="{{ $location->id }}">{{ $location->name }}</option>
+                                        @endforeach
+                                        @endif
+                                    </select>
                                     @error('location_id')
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                     @enderror
@@ -78,14 +78,16 @@
                             <tr class="border-b border-black">
                                 <th class="w-1/3 text-left p-2">Merk/Tipe/Nomor Seri:</th>
                                 <td class="w-2/3 p-2">
-                                    <input type="text" name="deviceInfo" value="{{ old('deviceInfo', $form->deviceInfo) }}"
+                                    <input type="text" name="deviceInfo"
+                                        value="{{ old('deviceInfo', $form->deviceInfo) }}"
                                         class="w-full border rounded px-2 py-1">
                                 </td>
                             </tr>
                             <tr class="border-b border-black">
                                 <th class="w-1/3 text-left p-2">Nomor dan Tanggal Sertifikat:</th>
                                 <td class="w-2/3 p-2">
-                                    <input type="text" name="certificateInfo" value="{{ old('certificateInfo', $form->certificateInfo) }}"
+                                    <input type="text" name="certificateInfo"
+                                        value="{{ old('certificateInfo', $form->certificateInfo) }}"
                                         class="w-full border rounded px-2 py-1">
                                 </td>
                             </tr>
@@ -97,14 +99,16 @@
                             <div class="mb-0">
                                 <label class="inline-flex items-center">
                                     <input type="hidden" name="terpenuhi" value="0">
-                                    <input type="checkbox" name="terpenuhi" value="1" {{ old('terpenuhi', $form->terpenuhi) ? 'checked' : '' }}>
+                                    <input type="checkbox" name="terpenuhi" value="1" {{ old('terpenuhi',
+                                        $form->terpenuhi) ? 'checked' : '' }}>
                                     <span class="ml-2 text-sm">Terpenuhi</span>
                                 </label>
                             </div>
                             <div>
                                 <label class="inline-flex items-center">
                                     <input type="hidden" name="tidakterpenuhi" value="0">
-                                    <input type="checkbox" name="tidakterpenuhi" value="1" {{ old('tidakterpenuhi', $form->tidakterpenuhi) ? 'checked' : '' }}>
+                                    <input type="checkbox" name="tidakterpenuhi" value="1" {{ old('tidakterpenuhi',
+                                        $form->tidakterpenuhi) ? 'checked' : '' }}>
                                     <span class="ml-2 text-sm">Tidak Terpenuhi</span>
                                 </label>
                             </div>
@@ -115,12 +119,9 @@
                                 <h2 class="font-bold mb-2">TEST 1</h2>
                                 <div class="w-20 h-20 mx-auto border-2 border-black flex items-center justify-center">
                                     <input type="hidden" name="test2" value="0">
-                                    <input type="checkbox"
-                                        id="test2"
-                                        name="test2"
-                                        value="1"
-                                        {{ old('test2', $form->test2) ? 'checked' : '' }}
-                                        onchange="updateRadioResult()">
+                                    <input type="checkbox" id="test2" name="test2" value="1" {{ old('test2',
+                                        $form->test2) ? 'checked' : '' }}
+                                    onchange="updateRadioResult()">
                                 </div>
                             </div>
                         </div>
@@ -128,12 +129,15 @@
                         <div class="border-x-2 border-black pt-10 pb-10">
                             <div class="flex items-center mb-0 pl-4">
                                 <input type="hidden" name="testCondition1" value="0">
-                                <input type="checkbox" name="testCondition1" value="1" {{ old('testCondition1', $form->testCondition1) ? 'checked' : '' }}>
-                                <label class="ml-2 text-sm">Letak alat uji OTP dan HHMD pada saat pengujian harus > 1m dari benda logam lain disekelilingnya.</label>
+                                <input type="checkbox" name="testCondition1" value="1" {{ old('testCondition1',
+                                    $form->testCondition1) ? 'checked' : '' }}>
+                                <label class="ml-2 text-sm">Letak alat uji OTP dan HHMD pada saat pengujian harus > 1m
+                                    dari benda logam lain disekelilingnya.</label>
                             </div>
                             <div class="flex items-center mb-0 pl-4">
                                 <input type="hidden" name="testCondition2" value="0">
-                                <input type="checkbox" name="testCondition2" value="1" {{ old('testCondition2', $form->testCondition2) ? 'checked' : '' }}>
+                                <input type="checkbox" name="testCondition2" value="1" {{ old('testCondition2',
+                                    $form->testCondition2) ? 'checked' : '' }}>
                                 <label class="ml-2 text-sm">Jarak antara HHMD dan OTP > 3-5 cm.</label>
                             </div>
                         </div>
@@ -144,19 +148,23 @@
                             <label class="text-gray-700 font-bold mr-4">Hasil:</label>
                             <div class="flex flex-col">
                                 <div class="flex items-center mb-0">
-                                    <input type="radio" id="resultPass" name="result" value="pass" {{ old('result', $form->result) == 'pass' ? 'checked' : '' }}>
+                                    <input type="radio" id="resultPass" name="result" value="pass" {{ old('result',
+                                        $form->result) == 'pass' ? 'checked' : '' }}>
                                     <label class="text-sm ml-2">PASS</label>
                                 </div>
                                 <div class="flex items-center">
-                                    <input type="radio" id="resultFail" name="result" value="fail" {{ old('result', $form->result) == 'fail' ? 'checked' : '' }}>
+                                    <input type="radio" id="resultFail" name="result" value="fail" {{ old('result',
+                                        $form->result) == 'fail' ? 'checked' : '' }}>
                                     <label class="text-sm ml-2">FAIL</label>
                                 </div>
-                                <input type="hidden" id="result" name="result" value="{{ old('result', $form->result) }}">
+                                <input type="hidden" id="result" name="result"
+                                    value="{{ old('result', $form->result) }}">
                             </div>
                         </div>
                         <div>
                             <label class="block text-gray-700 font-bold mb-2">CATATAN:</label>
-                            <textarea name="notes" class="w-full border rounded px-2 py-1" rows="3">{{ old('notes', $form->notes) }}</textarea>
+                            <textarea name="notes" class="w-full border rounded px-2 py-1"
+                                rows="3">{{ old('notes', $form->notes) }}</textarea>
                         </div>
                     </div>
                 </div>

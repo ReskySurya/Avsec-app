@@ -305,4 +305,59 @@ class WtmdController extends Controller
             ], 500);
         }
     }
+
+    public function editRejectedReport($id)
+    {
+        try {
+            // Load report dengan relasi yang diperlukan
+            $report = Report::with([
+                'submittedBy',
+                'status',
+                'reportDetails'
+            ])->findOrFail($id);
+
+            // Get equipment and location data manually
+            $equipmentLocationData = DB::table('equipment_locations')
+                ->select(
+                    'equipment_locations.id',
+                    'equipment.id as equipment_id',
+                    'equipment.name as equipment_name',
+                    'locations.id as location_id',
+                    'locations.name as location_name'
+                )
+                ->join('equipment', 'equipment_locations.equipment_id', '=', 'equipment.id')
+                ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
+                ->where('equipment_locations.id', $report->equipmentLocationID)
+                ->first();
+
+            if (!$equipmentLocationData) {
+                Log::error("Equipment location data not found for reportID: $id");
+                return redirect()->back()->with('error', 'Equipment location not found');
+            }
+
+            // Validate if this is an HHMD report
+            if ($equipmentLocationData->equipment_name !== 'wtmd') {
+                Log::warning("Invalid report type for reportID: $id. Equipment: " . $equipmentLocationData->equipment_name);
+                return redirect()->back()->with('error', 'Invalid report type');
+            }
+
+            // Create objects for backward compatibility
+            $name = (object) [
+                'id' => $equipmentLocationData->equipment_id,
+                'name' => $equipmentLocationData->equipment_name
+            ];
+
+            return view('officer.editWtmd', [
+                'form' => $report,
+                'equipment' => $name,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::error("Report not found with reportID: $id");
+            return redirect()->back()->with('error', 'Report tidak ditemukan');
+        } catch (\Exception $e) {
+            Log::error('Error in edit rejected report: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
 }

@@ -36,25 +36,25 @@
                             @forelse($rejectedReports as $report)
                                 <tr class="border-b hover:bg-red-50">
                                     <td class="px-4 py-2">{{ $report->created_at->format('d/m/Y') }}</td>
-                                    <td class="px-4 py-2">{{ $report->equipment_name }} ({{ $report->location_name }})</td>
+                                    <td class="px-4 py-2">{{ $report->equipmentLocation->location->name ?? '-' }}</td>
                                     <td class="px-4 py-2">{{ $report->approvalNote }}</td>
                                     <td class="px-4 py-2">
-                                        @if($report->equipment_name == 'hhmd')
+                                        @if($report->equipmentLocation->equipment->name == 'hhmd')
                                            <a href="{{ route('officer.hhmd.editRejectedReport', $report->reportID) }}"
                                                 class="text-blue-600 hover:text-blue-800">
                                                 Lihat Detail
                                             </a>
-                                        @elseif($report->equipment_name == 'wtmd')
+                                        @elseif($report->equipmentLocation->equipment->name == 'wtmd')
                                             <a href="{{ route('officer.wtmd.editRejectedReport', $report->reportID) }}"
                                                 class="text-blue-600 hover:text-blue-800">
                                                 Lihat Detail
                                             </a>
-                                        @elseif($report->equipment_name == 'xraycabin')
+                                        @elseif($report->equipmentLocation->equipment->name == 'xraycabin')
                                             <a href="{{ route('officer.xraycabin.editRejectedForm', $report->reportID) }}"
                                                 class="text-blue-600 hover:text-blue-800">
                                                 Lihat Detail
                                             </a>
-                                         @elseif($report->equipment_name == 'xraybagasi')
+                                         @elseif($report->equipmentLocation->equipment->name == 'xraybagasi')
                                             <a href="{{ route('officer.xraybagasi.editRejectedForm', $report->reportID) }}"
                                                 class="text-blue-600 hover:text-blue-800">
                                                 Lihat Detail

@@ -83,7 +83,7 @@ class HhmdController extends Controller
     }
 
 
-    
+
 
     public function store(Request $request)
     {
@@ -476,20 +476,14 @@ class HhmdController extends Controller
             }
 
             // Create objects for backward compatibility
-            $equipment = (object) [
+            $name = (object) [
                 'id' => $equipmentLocationData->equipment_id,
                 'name' => $equipmentLocationData->equipment_name
             ];
 
-            $location = (object) [
-                'id' => $equipmentLocationData->location_id,
-                'name' => $equipmentLocationData->location_name
-            ];
-
             return view('officer.editHhmd', [
                 'form' => $report,
-                'location' => $location,
-                'equipment' => $equipment,
+                'equipment' => $name,
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::error("Report not found with reportID: $id");

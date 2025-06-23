@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DailyTest\WtmdController;
 use App\Http\Controllers\DailyTest\XrayController;
-use App\Http\Controllers\DailyTestController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -41,8 +40,8 @@ Route::middleware(['auth', 'role:officer'])->group(function () {
             ->where('submittedByID', auth()->id())
             ->with([
                 'status:id,name',
+                'equipmentLocation.location:id,name',
                 'equipmentLocation.equipment:id,name',
-                'equipmentLocation.location:id,name'
             ])
             ->orderBy('created_at', 'desc')
             ->get();
