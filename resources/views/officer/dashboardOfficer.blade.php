@@ -50,12 +50,12 @@
                                                 Lihat Detail
                                             </a>
                                         @elseif($report->equipmentLocation->equipment->name == 'xraycabin')
-                                            <a href="{{ route('officer.xraycabin.editRejectedForm', $report->reportID) }}"
+                                            <a href="{{ route('officer.xraycabin.editRejectedReport', $report->reportID) }}"
                                                 class="text-blue-600 hover:text-blue-800">
                                                 Lihat Detail
                                             </a>
                                          @elseif($report->equipmentLocation->equipment->name == 'xraybagasi')
-                                            <a href="{{ route('officer.xraybagasi.editRejectedForm', $report->reportID) }}"
+                                            <a href="{{ route('officer.xraybagasi.editRejectedReport', $report->reportID) }}"
                                                 class="text-blue-600 hover:text-blue-800">
                                                 Lihat Detail
                                             </a>
