@@ -21,7 +21,7 @@
         </div>
         @endif
 
-        <form action="#" method="POST">
+        <form action="{{ route('officer.hhmd.update', ['id' => $form->reportID]) }}" method="POST">
             @csrf
             @method('PUT')
 
@@ -46,15 +46,15 @@
                                 <th class="w-1/3 text-left p-2">Nama Operator Penerbangan:</th>
                                 <td class="w-2/3 p-2">
                                     <input type="text" name="operatorName"
-                                        value="{{ old('operatorName', $form->operatorName) }}"
-                                        class="w-full border rounded px-2 py-1">
+                                        value="{{ old('operatorName', $form->submittedBy->name) }}"
+                                        class="w-full border rounded px-2 py-1 bg-gray-100" readonly>
                                 </td>
                             </tr>
                             <tr class="border-b border-black">
                                 <th class="w-1/3 text-left p-2">Tanggal & Waktu Pengujian:</th>
                                 <td class="w-2/3 p-2">
                                     <input type="datetime-local" name="testDateTime"
-                                        value="{{ old('testDateTime', optional($form->testDateTime)->format('Y-m-d\TH:i')) }}"
+                                        value="{{ old('testDateTime', optional($form->testDate)->format('Y-m-d\TH:i')) }}"
                                         class="w-full border rounded px-2 py-1">
                                 </td>
                             </tr>
@@ -66,11 +66,14 @@
                                         <option value="">Pilih Lokasi</option>
                                         @if(isset($hhmdLocations))
                                         @foreach($hhmdLocations as $location)
-                                        <option value="{{ $location->id }}">{{ $location->name }}</option>
+                                        <option value="{{ $location->id }}"
+                                            {{ old('location', $form->equipmentLocation->location_id) == $location->id ? 'selected' : '' }}>
+                                            {{ $location->name }}
+                                        </option>
                                         @endforeach
                                         @endif
                                     </select>
-                                    @error('location_id')
+                                    @error('location')
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                     @enderror
                                 </td>
@@ -100,7 +103,7 @@
                                 <label class="inline-flex items-center">
                                     <input type="hidden" name="terpenuhi" value="0">
                                     <input type="checkbox" name="terpenuhi" value="1" {{ old('terpenuhi',
-                                        $form->terpenuhi) ? 'checked' : '' }}>
+                                        $form->isFullFilled) ? 'checked' : '' }}>
                                     <span class="ml-2 text-sm">Terpenuhi</span>
                                 </label>
                             </div>
@@ -118,9 +121,9 @@
                             <div>
                                 <h2 class="font-bold mb-2">TEST 1</h2>
                                 <div class="w-20 h-20 mx-auto border-2 border-black flex items-center justify-center">
-                                    <input type="hidden" name="test2" value="0">
-                                    <input type="checkbox" id="test2" name="test2" value="1" {{ old('test2',
-                                        $form->test2) ? 'checked' : '' }}
+                                    <input type="hidden" name="test1" value="0">
+                                    <input type="checkbox" id="test1" name="test1" value="1" {{ old('test1',
+                                        $form->test1) ? 'checked' : '' }}
                                     onchange="updateRadioResult()">
                                 </div>
                             </div>
@@ -164,7 +167,7 @@
                         <div>
                             <label class="block text-gray-700 font-bold mb-2">CATATAN:</label>
                             <textarea name="notes" class="w-full border rounded px-2 py-1"
-                                rows="3">{{ old('notes', $form->notes) }}</textarea>
+                                rows="3">{{ old('notes', $form->note) }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -173,9 +176,9 @@
 
     <div class="flex items-center justify-between mt-4">
         <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Simpan Perubahan
+            Kirim Ulang Laporan
         </button>
-        <a href="#" class="text-gray-600 hover:text-gray-800">
+        <a href="{{ route('dashboard.officer') }}" class="text-gray-600 hover:text-gray-800">
             Kembali ke Dashboard
         </a>
     </div>
