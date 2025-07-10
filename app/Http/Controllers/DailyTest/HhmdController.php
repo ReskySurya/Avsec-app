@@ -471,20 +471,12 @@ class HhmdController extends Controller
                     ->unique('id');
             }
 
-            // Gabungkan data dari report dan reportDetails ke dalam satu objek $form
-            $form = $report;
-            if ($report->reportDetails->isNotEmpty()) {
-                $details = $report->reportDetails->first();
-                $form->terpenuhi = $details->terpenuhi;
-                $form->tidakterpenuhi = $details->tidakterpenuhi;
-                $form->test1 = $details->test1;
-                $form->testCondition1 = $details->testCondition1;
-                $form->testCondition2 = $details->testCondition2;
-            }
-
+            // Ambil detail report
+            $details = $report->reportDetails->first();
 
             return view('officer.editHhmd', [
-                'form' => $form,
+                'form' => $report,
+                'details' => $details,
                 'hhmdLocations' => $hhmdLocations,
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -505,8 +497,12 @@ class HhmdController extends Controller
             'location' => 'required|exists:locations,id',
             'deviceInfo' => 'required|string|max:255',
             'certificateInfo' => 'required|string|max:255',
-            'result' => 'required|in:pass,fail',
             'notes' => 'nullable|string',
+            'terpenuhi' => 'boolean',
+            'tidakterpenuhi' => 'boolean',
+            'test1' => 'boolean',
+            'testCondition1' => 'boolean',
+            'testCondition2' => 'boolean',
         ]);
 
         if ($validator->fails()) {
@@ -516,6 +512,9 @@ class HhmdController extends Controller
         }
 
         try {
+            Log::info('Updating HHMD Report ID: ' . $id);
+            Log::info('Request data:', $request->all());
+
             DB::beginTransaction();
 
             $report = Report::findOrFail($id);
@@ -539,21 +538,26 @@ class HhmdController extends Controller
             $report->equipmentLocationID = $equipmentLocation->id;
             $report->deviceInfo = $request->deviceInfo;
             $report->certificateInfo = $request->certificateInfo;
-            $report->isFullFilled = $request->has('terpenuhi');
-            $report->result = $request->result;
+            $report->isFullFilled = $request->boolean('terpenuhi');
+            $report->result = $request->boolean('test1') ? 'pass' : 'fail';
             $report->note = $request->notes;
             $report->statusID = $pendingStatus->id;
             $report->approvalNote = null; // Hapus catatan penolakan sebelumnya
             $report->save();
 
-            // Update report detail
-            $reportDetail = $report->reportDetails->first() ?? new ReportDetail();
-            $reportDetail->reportID = $report->reportID;
-            $reportDetail->terpenuhi = $request->has('terpenuhi');
-            $reportDetail->tidakterpenuhi = $request->has('tidakterpenuhi');
-            $reportDetail->test1 = $request->has('test1');
-            $reportDetail->testCondition1 = $request->has('testCondition1');
-            $reportDetail->testCondition2 = $request->has('testCondition2');
+            // Update report detail secara eksplisit
+            $reportDetail = ReportDetail::where('reportID', $report->reportID)->first();
+            if (!$reportDetail) {
+                // Fallback jika detail tidak ditemukan, meskipun seharusnya tidak terjadi
+                $reportDetail = new ReportDetail();
+                $reportDetail->reportID = $report->reportID;
+            }
+
+            $reportDetail->terpenuhi = $request->boolean('terpenuhi');
+            $reportDetail->tidakterpenuhi = $request->boolean('tidakterpenuhi');
+            $reportDetail->test1 = $request->boolean('test1');
+            $reportDetail->testCondition1 = $request->boolean('testCondition1');
+            $reportDetail->testCondition2 = $request->boolean('testCondition2');
             $reportDetail->save();
 
             DB::commit();
