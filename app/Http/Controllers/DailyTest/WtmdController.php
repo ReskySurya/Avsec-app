@@ -313,43 +313,49 @@ class WtmdController extends Controller
             $report = Report::with([
                 'submittedBy',
                 'status',
-                'reportDetails'
+                'reportDetails',
+                'equipmentLocation.location',
+                'equipmentLocation.equipment'
             ])->findOrFail($id);
 
-            // Get equipment and location data manually
-            $equipmentLocationData = DB::table('equipment_locations')
-                ->select(
-                    'equipment_locations.id',
-                    'equipment.id as equipment_id',
-                    'equipment.name as equipment_name',
-                    'locations.id as location_id',
-                    'locations.name as location_name'
-                )
-                ->join('equipment', 'equipment_locations.equipment_id', '=', 'equipment.id')
-                ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
-                ->where('equipment_locations.id', $report->equipmentLocationID)
-                ->first();
-
-            if (!$equipmentLocationData) {
-                Log::error("Equipment location data not found for reportID: $id");
-                return redirect()->back()->with('error', 'Equipment location not found');
-            }
-
-            // Validate if this is an HHMD report
-            if ($equipmentLocationData->equipment_name !== 'wtmd') {
-                Log::warning("Invalid report type for reportID: $id. Equipment: " . $equipmentLocationData->equipment_name);
+            // Pastikan ini adalah laporan WTMD
+            if ($report->equipmentLocation->equipment->name !== 'wtmd') {
+                Log::warning("Invalid report type for reportID: $id. Equipment: " . $report->equipmentLocation->equipment->name);
                 return redirect()->back()->with('error', 'Invalid report type');
             }
 
-            // Create objects for backward compatibility
-            $name = (object) [
-                'id' => $equipmentLocationData->equipment_id,
-                'name' => $equipmentLocationData->equipment_name
-            ];
+            // Ambil semua lokasi yang berelasi dengan equipment HHMD
+            $wtmdEquipment = Equipment::where('name', 'wtmd')->first();
+            $wtmdLocations = collect();
+            if ($wtmdEquipment) {
+                $wtmdLocations = EquipmentLocation::where('equipment_id', $wtmdEquipment->id)
+                    ->with('location')
+                    ->get()
+                    ->map(function ($el) {
+                        return $el->location;
+                    })
+                    ->unique('id');
+            }
+
+            // Gabungkan data dari report dan reportDetails ke dalam satu objek $form
+            $form = $report;
+            if ($report->reportDetails->isNotEmpty()) {
+                $details = $report->reportDetails->first();
+                $form->terpenuhi = $details->terpenuhi;
+                $form->tidakterpenuhi = $details->tidakterpenuhi;
+                $form->test1_in_depan = $details->test1_in_depan;
+                $form->test1_out_depan = $details->test1_out_depan;
+                $form->test2_in_depan = $details->test2_in_depan;
+                $form->test2_out_depan = $details->test2_out_depan;
+                $form->test3_in_belakang = $details->test3_in_belakang;
+                $form->test3_out_belakang = $details->test3_out_belakang;
+                $form->test4_in_depan = $details->test4_in_depan;
+                $form->test4_out_depan = $details->test4_out_depan;
+            }
 
             return view('officer.editWtmd', [
                 'form' => $report,
-                'equipment' => $name,
+                'wtmdLocations' => $wtmdLocations,
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::error("Report not found with reportID: $id");
@@ -360,4 +366,5 @@ class WtmdController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+    
 }

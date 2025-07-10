@@ -36,7 +36,7 @@
                             @forelse($rejectedReports as $report)
                                 <tr class="border-b hover:bg-red-50">
                                     <td class="px-4 py-2">{{ $report->created_at->format('d/m/Y') }}</td>
-                                    <td class="px-4 py-2">{{ $report->equipmentLocation->location->name ?? '-' }}</td>
+                                    <td class="px-4 py-2">{{ $report->equipmentLocation->equipment->name ?? '-' }} ( {{ $report->equipmentLocation->location->name ?? '-' }} )</td>
                                     <td class="px-4 py-2">{{ $report->approvalNote }}</td>
                                     <td class="px-4 py-2">
                                         @if($report->equipmentLocation->equipment->name == 'hhmd')

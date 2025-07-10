@@ -25,7 +25,7 @@
             @csrf
             @method('PUT')
 
-            <div class="bg-white p-4" <div id="format" class="mx-auto">
+            <div class="bg-white p-4" id="format" class="mx-auto">
                 <div class="border-t-2 border-x-2 border-black bg-white shadow-md">
                     <div class="flex items-center justify-between">
                         <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo" class="w-20 h-20">
@@ -35,7 +35,7 @@
                             (HAND HELD METAL DETECTOR/HHMD)<br>
                             PADA KONDISI NORMAL (HIJAU)
                         </h1>
-                        <img src="https://via.placeholder.com/80x80" alt="Additional Logo" class="w-20 h-20">
+                        <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo" class="w-20 h-20 mt-2 sm:mt-0">
                     </div>
                 </div>
 
@@ -45,9 +45,7 @@
                             <tr class="border-b border-black">
                                 <th class="w-1/3 text-left p-2">Nama Operator Penerbangan:</th>
                                 <td class="w-2/3 p-2">
-                                    <input type="text" name="operatorName"
-                                        value="{{ old('operatorName', $form->submittedBy->name) }}"
-                                        class="w-full border rounded px-2 py-1 bg-gray-100" readonly>
+                                    <input type="text" name="operatorName" value="Bandar Udara Adisutjipto Yogyakarta" class="w-full border rounded px-2 py-1 bg-gray-100" readonly>
                                 </td>
                             </tr>
                             <tr class="border-b border-black">
