@@ -5,7 +5,7 @@
 @endif
 
 
-<div class="bg-white-100 sm:px-2 md:px-16 lg:px-96 lg:mt-20">
+<div class="bg-white-100 px-4 sm:px-8 md:px-16 lg:px-32 xl:px-64">
     <div>
         <x-form-xray type="xrayCabin" :xrayCabinLocations="$xrayCabinLocations"/>
     </div>

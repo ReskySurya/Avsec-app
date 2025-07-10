@@ -7,6 +7,7 @@
 @endpush
 
 <div class="bg-white p-4 w-full max-w-full">
+    
     <div id="format" class="mx-auto w-full">
         <div class="border-t-2 border-x-2 border-black bg-white shadow-md p-4">
             <div class="flex flex-col sm:flex-row items-center justify-between">

@@ -176,43 +176,86 @@ class XrayController extends Controller
             $report = Report::with([
                 'submittedBy',
                 'status',
-                'reportDetails'
+                'reportDetails',
+                'equipmentLocation.location',
+                'equipmentLocation.equipment'
             ])->findOrFail($id);
 
-            // Get equipment and location data manually
-            $equipmentLocationData = DB::table('equipment_locations')
-                ->select(
-                    'equipment_locations.id',
-                    'equipment.id as equipment_id',
-                    'equipment.name as equipment_name',
-                    'locations.id as location_id',
-                    'locations.name as location_name'
-                )
-                ->join('equipment', 'equipment_locations.equipment_id', '=', 'equipment.id')
-                ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
-                ->where('equipment_locations.id', $report->equipmentLocationID)
-                ->first();
-
-            if (!$equipmentLocationData) {
-                Log::error("Equipment location data not found for reportID: $id");
-                return redirect()->back()->with('error', 'Equipment location not found');
-            }
-
-            // Validate if this is an HHMD report
-            if ($equipmentLocationData->equipment_name !== 'xraycabin') {
-                Log::warning("Invalid report type for reportID: $id. Equipment: " . $equipmentLocationData->equipment_name);
+            // Pastikan ini adalah laporan X-Ray Cabin
+            if ($report->equipmentLocation->equipment->name !== 'xraycabin') {
+                Log::warning("Invalid report type for reportID: $id. Equipment: " . $report->equipmentLocation->equipment->name);
                 return redirect()->back()->with('error', 'Invalid report type');
             }
 
-            // Create objects for backward compatibility
-            $name = (object) [
-                'id' => $equipmentLocationData->equipment_id,
-                'name' => $equipmentLocationData->equipment_name
-            ];
+            // Ambil semua lokasi yang berelasi dengan equipment X-Ray Cabin
+            $xrayEquipment = Equipment::where('name', 'xraycabin')->first();
+            $xrayLocations = collect();
+            if ($xrayEquipment) {
+                $xrayLocations = EquipmentLocation::where('equipment_id', $xrayEquipment->id)
+                    ->with('location')
+                    ->get()
+                    ->map(function ($el) {
+                        return $el->location;
+                    })
+                    ->unique('id');
+            }
+
+             $form = $report;
+            if ($report->reportDetails->isNotEmpty()) {
+                $details = $report->reportDetails->first();
+                $form->terpenuhi = $details->terpenuhi;
+                $form->tidakterpenuhi = $details->tidakterpenuhi;
+                $form->test1aab_32 = $details->test1aab_32;
+                $form->test1aab_30 = $details->test1aab_30;
+                $form->test1aab_24 = $details->test1aab_24;
+                $form->test1bab_30_1 = $details->test1bab_30_1;
+                $form->test1bab_24_1 = $details->test1bab_24_1;
+                $form->test1bab_30_2 = $details->test1bab_30_2;
+                $form->test1bab_24_2 = $details->test1bab_24_2;
+                $form->test1bab_24_3 = $details->test1bab_24_3;
+                $form->test1ab_32 = $details->test1ab_32;
+                $form->test1ab_30 = $details->test1ab_30;
+                $form->test1ab_24 = $details->test1ab_24;
+                $form->test1bb_30_1 = $details->test1bb_30_1;
+                $form->test1bb_24_1 = $details->test1bb_24_1;
+                $form->test1bb_30_2 = $details->test1bb_30_2;
+                $form->test1bb_24_2 = $details->test1bb_24_2;
+                $form->test1bb_24_3 = $details->test1bb_24_3;
+                $form->test2aab = $details->test2aab;
+                $form->test2bab = $details->test2bab;
+                $form->test2ab = $details->test2ab;
+                $form->test2bb = $details->test2bb;
+                $form->test3ab_14 = $details->test3ab_14;
+                $form->test3ab_16 = $details->test3ab_16;
+                $form->test3ab_18 = $details->test3ab_18;
+                $form->test3ab_20 = $details->test3ab_20;
+                $form->test3ab_22 = $details->test3ab_22;
+                $form->test3ab_24 = $details->test3ab_24;
+                $form->test3b_14 = $details->test3b_14;
+                $form->test3b_16 = $details->test3b_16;
+                $form->test3b_18 = $details->test3b_18;
+                $form->test3b_20 = $details->test3b_20;
+                $form->test3b_22 = $details->test3b_22;
+                $form->test3b_24 = $details->test3b_24;
+                $form->test4ab_h15mm = $details->test4ab_h15mm;
+                $form->test4ab_v15mm = $details->test4ab_v15mm;
+                $form->test4ab_h20mm = $details->test4ab_h20mm;
+                $form->test4ab_v20mm = $details->test4ab_v20mm;
+                $form->test4b_h15mm = $details->test4b_h15mm;
+                $form->test4b_v15mm = $details->test4b_v15mm;
+                $form->test4b_h20mm = $details->test4b_h20mm;
+                $form->test4b_v20mm = $details->test4b_v20mm;
+                $form->test5ab_05mm = $details->test5ab_05mm;
+                $form->test5b_05mm = $details->test5b_05mm;
+                $form->test5ab_10mm = $details->test5ab_10mm;
+                $form->test5b_10mm = $details->test5b_10mm;
+                $form->test5ab_15mm = $details->test5ab_15mm;
+                $form->test5b_15mm = $details->test5b_15mm;
+            }
 
             return view('officer.editXrayCabin', [
                 'form' => $report,
-                'equipment' => $name,
+                'xrayLocations' => $xrayLocations,
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::error("Report not found with reportID: $id");
@@ -376,43 +419,72 @@ class XrayController extends Controller
             $report = Report::with([
                 'submittedBy',
                 'status',
-                'reportDetails'
+                'reportDetails',
+                'equipmentLocation.location',
+                'equipmentLocation.equipment'
             ])->findOrFail($id);
 
-            // Get equipment and location data manually
-            $equipmentLocationData = DB::table('equipment_locations')
-                ->select(
-                    'equipment_locations.id',
-                    'equipment.id as equipment_id',
-                    'equipment.name as equipment_name',
-                    'locations.id as location_id',
-                    'locations.name as location_name'
-                )
-                ->join('equipment', 'equipment_locations.equipment_id', '=', 'equipment.id')
-                ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
-                ->where('equipment_locations.id', $report->equipmentLocationID)
-                ->first();
-
-            if (!$equipmentLocationData) {
-                Log::error("Equipment location data not found for reportID: $id");
-                return redirect()->back()->with('error', 'Equipment location not found');
-            }
-
-            // Validate if this is an HHMD report
-            if ($equipmentLocationData->equipment_name !== 'xraybagasi') {
-                Log::warning("Invalid report type for reportID: $id. Equipment: " . $equipmentLocationData->equipment_name);
+            // Pastikan ini adalah laporan X-Ray Bagasi
+            if ($report->equipmentLocation->equipment->name !== 'xraybagasi') {
+                Log::warning("Invalid report type for reportID: $id. Equipment: " . $report->equipmentLocation->equipment->name);
                 return redirect()->back()->with('error', 'Invalid report type');
             }
 
-            // Create objects for backward compatibility
-            $name = (object) [
-                'id' => $equipmentLocationData->equipment_id,
-                'name' => $equipmentLocationData->equipment_name
-            ];
+            // Ambil semua lokasi yang berelasi dengan equipment xray bagasi
+            $xrayEquipment = Equipment::where('name', 'xraybagasi')->first();
+            $xrayLocations = collect();
+            if ($xrayEquipment) {
+                $xrayLocations = EquipmentLocation::where('equipment_id', $xrayEquipment->id)
+                    ->with('location')
+                    ->get()
+                    ->map(function ($el) {
+                        return $el->location;
+                    })
+                    ->unique('id');
+            }
+
+            $form = $report;
+            if ($report->reportDetails->isNotEmpty()) {
+                $details = $report->reportDetails->first();
+                $form->terpenuhi = $details->terpenuhi;
+                $form->tidakterpenuhi = $details->tidakterpenuhi;
+                $form->test1aab_30 = $details->test1aab_30;
+                $form->test1aab_24 = $details->test1aab_24;
+                $form->test1bab_30_1 = $details->test1bab_30_1;
+                $form->test1bab_24_1 = $details->test1bab_24_1;
+                $form->test1bab_24_2 = $details->test1bab_24_2;
+                $form->test1bab_24_3 = $details->test1bab_24_3;
+                $form->test1ab_30 = $details->test1ab_30;
+                $form->test1ab_24 = $details->test1ab_24;
+                $form->test1bb_30_1 = $details->test1bb_30_1;
+                $form->test1bb_24_1 = $details->test1bb_24_1;
+                $form->test1bb_24_2 = $details->test1bb_24_2;
+                $form->test1bb_24_3 = $details->test1bb_24_3;
+                $form->test2aab = $details->test2aab;
+                $form->test2bab = $details->test2bab;
+                $form->test2ab = $details->test2ab;
+                $form->test2bb = $details->test2bb;
+                $form->test3ab_14 = $details->test3ab_14;
+                $form->test3ab_16 = $details->test3ab_16;
+                $form->test3ab_18 = $details->test3ab_18;
+                $form->test3ab_20 = $details->test3ab_20;
+                $form->test3ab_22 = $details->test3ab_22;
+                $form->test3b_14 = $details->test3b_14;
+                $form->test3b_16 = $details->test3b_16;
+                $form->test3b_18 = $details->test3b_18;
+                $form->test3b_20 = $details->test3b_20;
+                $form->test3b_22 = $details->test3b_22; 
+                $form->test4ab_h20mm = $details->test4ab_h20mm;
+                $form->test4ab_v20mm = $details->test4ab_v20mm;
+                $form->test4b_h20mm = $details->test4b_h20mm;
+                $form->test4b_v20mm = $details->test4b_v20mm;
+                $form->test5ab_10mm = $details->test5ab_10mm;
+                $form->test5b_10mm = $details->test5b_10mm;
+            }
 
             return view('officer.editXrayBagasi', [
                 'form' => $report,
-                'equipment' => $name,
+                'xrayLocations' => $xrayLocations,
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::error("Report not found with reportID: $id");
