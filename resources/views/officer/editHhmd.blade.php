@@ -103,7 +103,7 @@
                                 <label class="inline-flex items-center">
                                     <input type="hidden" name="terpenuhi" value="0">
                                     <input type="checkbox" name="terpenuhi" value="1" {{ old('terpenuhi',
-                                        $form->isFullFilled) ? 'checked' : '' }}>
+                                        $details->terpenuhi) ? 'checked' : '' }}>
                                     <span class="ml-2 text-sm">Terpenuhi</span>
                                 </label>
                             </div>
