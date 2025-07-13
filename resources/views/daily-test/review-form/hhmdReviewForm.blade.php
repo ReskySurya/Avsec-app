@@ -103,7 +103,7 @@
                         </div>
                         <div>
                             <label class="block text-gray-700 font-bold mb-2">CATATAN:</label>
-                            <p>{{ $form->notes }}</p>
+                            <p>{{ $form->note }}</p>
 
                         </div>
                     </div>
