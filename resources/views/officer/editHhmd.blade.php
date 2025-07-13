@@ -55,7 +55,7 @@
                                 <td class="w-2/3 p-2">
                                     <input type="datetime-local" name="testDateTime"
                                         value="{{ old('testDateTime', optional($form->testDate)->format('Y-m-d\TH:i')) }}"
-                                        class="w-full border rounded px-2 py-1">
+                                        class="w-full border rounded px-2 py-1" readonly>
                                 </td>
                             </tr>
                             <tr class="border-b border-black">
@@ -103,7 +103,7 @@
                                 <label class="inline-flex items-center">
                                     <input type="hidden" name="terpenuhi" value="0">
                                     <input type="checkbox" name="terpenuhi" value="1" {{ old('terpenuhi',
-                                        $form->isFullFilled) ? 'checked' : '' }}>
+                                        $details->terpenuhi) ? 'checked' : '' }}>
                                     <span class="ml-2 text-sm">Terpenuhi</span>
                                 </label>
                             </div>

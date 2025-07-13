@@ -70,6 +70,8 @@ class ReportDetail extends Model
         'test5ab_05mm',
         'test5ab_10mm',
         'test5ab_15mm',
+        'test2aab',
+        'test2bab',
         'test2ab',
         'test2bb',
         'test3b_14',

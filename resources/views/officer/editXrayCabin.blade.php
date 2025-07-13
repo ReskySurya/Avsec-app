@@ -21,7 +21,7 @@
         </div>
         @endif
 
-        <form action="#" method="POST">
+        <form action="{{ route('officer.xraycabin.update', ['id' => $form->reportID]) }}" method="POST">
             @csrf
             @method('PUT')
 
@@ -62,7 +62,7 @@
                                     <th class="w-1/3 text-left p-2">Lokasi Penempatan:</th>
                                     <td class="w-2/3 p-2">
                                     <select id="location" name="location"
-                                        class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base">
+                                        class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base  bg-gray-100" disabled>
                                         <option value="">Pilih Lokasi</option>
                                         @if(isset($xrayLocations))
                                         @foreach($xrayLocations as $location)
@@ -103,7 +103,7 @@
                                     <label class="inline-flex items-center">
                                         <input type="hidden" name="terpenuhi" value="0">
                                         <input type="checkbox" name="terpenuhi" value="1" {{ old('terpenuhi',
-                                            $form->terpenuhi) ? 'checked' : '' }}>
+                                            $details->terpenuhi) ? 'checked' : '' }}>
                                         <span class="ml-2 text-sm">Terpenuhi</span>
                                     </label>
                                 </div>
@@ -111,7 +111,7 @@
                                     <label class="inline-flex items-center">
                                         <input type="hidden" name="tidakterpenuhi" value="0">
                                         <input type="checkbox" name="tidakterpenuhi" value="1" {{ old('tidakterpenuhi',
-                                            $form->tidakterpenuhi) ? 'checked' : '' }}>
+                                            $details->tidakterpenuhi) ? 'checked' : '' }}>
                                         <span class="ml-2 text-sm">Tidak Terpenuhi</span>
                                     </label>
                                 </div>
@@ -124,7 +124,7 @@
                                         <h3 class="text-xs font-bold mb-2 text-center">TEST 2a</h3>
                                         <div class="grid grid-cols-2 gap-0">
                                             <input type="hidden" name="test2aab" value="0">
-                                            <input type="checkbox" name="test2aab" id="test2aab" {{ old('test2aab', $form->test2aab)
+                                            <input type="checkbox" name="test2aab" id="test2aab" {{ old('test2aab', $details->test2aab)
                                                     ? 'checked' : '' }} value="1"
                                                 class="form-checkbox absolute place-self-center">
                                             <div class="bg-green-500 h-16 flex items-center justify-center">
@@ -135,7 +135,7 @@
                                         <div class="grid grid-cols-[70%_30%] relative">
                                             <h3 class="text-xs font-bold text-end">TEST 2b</h3>
                                             <input type="hidden" name="test2bab" value="0">
-                                            <input type="checkbox" name="test2bab" id="test2bab" {{ old('test2bab', $form->test2bab)
+                                            <input type="checkbox" name="test2bab" id="test2bab" {{ old('test2bab', $details->test2bab)
                                                     ? 'checked' : '' }} value="1"
                                                 class="absolute place-self-end form-checkbox">
                                         </div>
@@ -147,55 +147,55 @@
                                             <div class="bg-cyan-100 h-16 flex items-center justify-center">
                                                 <input type="hidden" name="test3ab_14" value="0">
                                                 <input type="checkbox" name="test3ab_14" id="test3ab_14"
-                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3ab_14', $form->test3ab_14)
+                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3ab_14', $details->test3ab_14)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                             <div class="bg-cyan-200 h-16 flex items-center justify-center">
                                                 <input type="hidden" name="test3ab_16" value="0">
                                                 <input type="checkbox" name="test3ab_16" id="test3ab_16"
-                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3ab_16', $form->test3ab_16)
+                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3ab_16', $details->test3ab_16)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                             <div class="bg-sky-400 h-16 flex items-center justify-center">
                                                 <input type="hidden" name="test3ab_18" value="0">
                                                 <input type="checkbox" name="test3ab_18" id="test3ab_18"
-                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3ab_18', $form->test3ab_18)
+                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3ab_18', $details->test3ab_18)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                             <div class="bg-blue-500 h-16 flex items-center justify-center">
                                                 <input type="hidden" name="test3ab_20" value="0">
                                                 <input type="checkbox" name="test3ab_20" id="test3ab_20"
-                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3ab_20', $form->test3ab_20)
+                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3ab_20', $details->test3ab_20)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                             <div class="bg-blue-500 h-16 flex items-center justify-center">
                                                 <input type="hidden" name="test3ab_22" value="0">
                                                 <input type="checkbox" name="test3ab_22" id="test3ab_22"
-                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3ab_22', $form->test3ab_22)
+                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3ab_22', $details->test3ab_22)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                             <div class="bg-blue-700 h-16 flex items-center justify-center">
                                                 <input type="hidden" name="test3ab_24" value="0">
                                                 <input type="checkbox" name="test3ab_24" id="test3ab_24"
-                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3ab_24', $form->test3ab_24)
+                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3ab_24', $details->test3ab_24)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                             <div class="bg-blue-700 h-16 flex items-center justify-center">
                                                 <input type="hidden" name="test3ab_26" value="0">
                                                 <input type="checkbox" name="test3ab_26" id="test3ab_26"
-                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3ab_26', $form->test3ab_26)
+                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3ab_26', $details->test3ab_26)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                             <div class="bg-blue-950 h-16 flex items-center justify-center">
                                                 <input type="hidden" name="test3ab_28" value="0">
                                                 <input type="checkbox" name="test3ab_28" id="test3ab_28"
-                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3ab_28', $form->test3ab_28)
+                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3ab_28', $details->test3ab_28)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                             <div class="bg-blue-950 h-16 flex items-center justify-center">
                                                 <input type="hidden" name="test3ab_30" value="0">
                                                 <input type="checkbox" name="test3ab_30" id="test3ab_30"
-                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3ab_30', $form->test3ab_30)
+                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3ab_30', $details->test3ab_30)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                         </div>
@@ -228,88 +228,88 @@
                                             <div class="grid grid-rows-4 bg-white items-center justify-center">
                                                 <input type="hidden" name="test1aab_36" value="0">
                                                 <input type="checkbox" id="test1aab_36" name="test1aab_36"
-                                                    class="form-checkbox" {{ old('test1aab_36', $form->test1aab_36)
+                                                    class="form-checkbox" {{ old('test1aab_36', $details->test1aab_36)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1aab_32" value="0">
                                                 <input type="checkbox" id="test1aab_32" name="test1aab_32"
-                                                    class="form-checkbox" {{ old('test1aab_32', $form->test1aab_32)
+                                                    class="form-checkbox" {{ old('test1aab_32', $details->test1aab_32)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1aab_30" value="0">
                                                 <input type="checkbox" id="test1aab_30" name="test1aab_30"
-                                                    class="form-checkbox" {{ old('test1aab_30', $form->test1aab_30)
+                                                    class="form-checkbox" {{ old('test1aab_30', $details->test1aab_30)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1aab_24" value="0">
                                                 <input type="checkbox" id="test1aab_24" name="test1aab_24"
-                                                    class="form-checkbox" {{ old('test1aab_24', $form->test1aab_24)
+                                                    class="form-checkbox" {{ old('test1aab_24', $details->test1aab_24)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                             <div
                                                 class="grid grid-rows-4 bg-[#C5E0B3] border border-black items-center justify-center">
                                                 <input type="hidden" name="test1bab_36_1" value="0">
                                                 <input type="checkbox" id="test1bab_36_1" name="test1bab_36_1"
-                                                    class="form-checkbox" {{ old('test1bab_36_1', $form->test1bab_36_1)
+                                                    class="form-checkbox" {{ old('test1bab_36_1', $details->test1bab_36_1)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1bab_32_1" value="0">
                                                 <input type="checkbox" id="test1bab_32_1" name="test1bab_32_1"
-                                                    class="form-checkbox" {{ old('test1bab_32_1', $form->test1bab_32_1)
+                                                    class="form-checkbox" {{ old('test1bab_32_1', $details->test1bab_32_1)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1bab_30_1" value="0">
                                                 <input type="checkbox" id="test1bab_30_1" name="test1bab_30_1"
-                                                    class="form-checkbox" {{ old('test1bab_30_1', $form->test1bab_30_1)
+                                                    class="form-checkbox" {{ old('test1bab_30_1', $details->test1bab_30_1)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1bab_24_1" value="0">
                                                 <input type="checkbox" id="test1bab_24_1" name="test1bab_24_1"
-                                                    class="form-checkbox" {{ old('test1bab_24_1', $form->test1bab_24_1)
+                                                    class="form-checkbox" {{ old('test1bab_24_1', $details->test1bab_24_1)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                             <div
                                                 class="grid grid-rows-4 bg-[#92D050] border-y border-black items-center justify-center">
                                                 <input type="hidden" name="test1bab_36_2" value="0">
                                                 <input type="checkbox" id="test1bab_36_2" name="test1bab_36_2"
-                                                    class="form-checkbox" {{ old('test1bab_36_2', $form->test1bab_36_2)
+                                                    class="form-checkbox" {{ old('test1bab_36_2', $details->test1bab_36_2)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1bab_32_2" value="0">
                                                 <input type="checkbox" id="test1bab_32_2" name="test1bab_32_2"
-                                                    class="form-checkbox" {{ old('test1bab_32_2', $form->test1bab_32_2)
+                                                    class="form-checkbox" {{ old('test1bab_32_2', $details->test1bab_32_2)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1bab_30_2" value="0">
                                                 <input type="checkbox" id="test1bab_30_2" name="test1bab_30_2"
-                                                    class="form-checkbox" {{ old('test1bab_30_2', $form->test1bab_30_2)
+                                                    class="form-checkbox" {{ old('test1bab_30_2', $details->test1bab_30_2)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1bab_24_2" value="0">
                                                 <input type="checkbox" id="test1bab_24_2" name="test1bab_24_2"
-                                                    class="form-checkbox" {{ old('test1bab_24_2', $form->test1bab_24_2)
+                                                    class="form-checkbox" {{ old('test1bab_24_2', $details->test1bab_24_2)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                             <div
                                                 class="grid grid-rows-4 bg-green-500 border border-black items-center justify-center">
                                                 <input type="hidden" name="test1bab_36_3" value="0">
                                                 <input type="checkbox" id="test1bab_36_3" name="test1bab_36_3"
-                                                    class="form-checkbox" {{ old('test1bab_36_3', $form->test1bab_36_3)
+                                                    class="form-checkbox" {{ old('test1bab_36_3', $details->test1bab_36_3)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1bab_32_3" value="0">
                                                 <input type="checkbox" id="test1bab_32_3" name="test1bab_32_3"
-                                                    class="form-checkbox" {{ old('test1bab_32_3', $form->test1bab_32_3)
+                                                    class="form-checkbox" {{ old('test1bab_32_3', $details->test1bab_32_3)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1bab_30_3" value="0">
                                                 <input type="checkbox" id="test1bab_30_3" name="test1bab_30_3"
-                                                    class="form-checkbox" {{ old('test1bab_30_3', $form->test1bab_30_3)
+                                                    class="form-checkbox" {{ old('test1bab_30_3', $details->test1bab_30_3)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1bab_24_3" value="0">
                                                 <input type="checkbox" id="test1bab_24_3" name="test1bab_24_3"
-                                                    class="form-checkbox" {{ old('test1bab_24_3', $form->test1bab_24_3)
+                                                    class="form-checkbox" {{ old('test1bab_24_3', $details->test1bab_24_3)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                         </div>
@@ -328,7 +328,7 @@
                                                     <input type="hidden" name="test4ab_h15mm" value="0">
                                                     <input type="checkbox" name="test4ab_h15mm" id="test4ab_h15mm"
                                                         class="form-checkbox absolute place-self-center h-6 w-6"
-                                                        {{ old('test4ab_h15mm', $form->test4ab_h15mm)
+                                                        {{ old('test4ab_h15mm', $details->test4ab_h15mm)
                                                     ? 'checked' : '' }} value="1">
                                                     <div class="border border-black bg-white h-1"></div>
                                                     <div class="border border-black bg-white h-1"></div>
@@ -339,7 +339,7 @@
                                                     <input type="hidden" name="test4ab_v15mm" value="0">
                                                     <input type="checkbox" name="test4ab_v15mm" id="test4ab_v15mm"
                                                         class="form-checkbox absolute place-self-center h-5 w-5"
-                                                        {{ old('test4ab_v15mm', $form->test4ab_v15mm)
+                                                        {{ old('test4ab_v15mm', $details->test4ab_v15mm)
                                                     ? 'checked' : '' }} value="1">
                                                     <div class="border border-black bg-white w-1"></div>
                                                     <div class="border border-black bg-white w-1"></div>
@@ -354,7 +354,7 @@
                                                     <input type="hidden" name="test4ab_h20mm" value="0">
                                                     <input type="checkbox" name="test4ab_h20mm" id="test4ab_h20mm"
                                                         class="form-checkbox absolute place-self-center h-6 w-6"
-                                                        {{ old('test4ab_h20mm', $form->test4ab_h20mm)
+                                                        {{ old('test4ab_h20mm', $details->test4ab_h20mm)
                                                     ? 'checked' : '' }} value="1">
                                                     <div class="border border-black bg-white h-1"></div>
                                                     <div class="border border-black bg-white h-1"></div>
@@ -365,7 +365,7 @@
                                                     <input type="hidden" name="test4ab_v20mm" value="0">
                                                     <input type="checkbox" name="test4ab_v20mm" id="test4ab_v20mm"
                                                         class="form-checkbox absolute place-self-center h-4 w-4"
-                                                        {{ old('test4ab_v20mm', $form->test4ab_v20mm)
+                                                        {{ old('test4ab_v20mm', $details->test4ab_v20mm)
                                                     ? 'checked' : '' }} value="1">
                                                     <div class="border border-black bg-white w-1"></div>
                                                     <div class="border border-black bg-white w-1"></div>
@@ -380,7 +380,7 @@
                                                     <input type="hidden" name="test4ab_h10mm" value="0">
                                                     <input type="checkbox" name="test4ab_h10mm" id="test4ab_h10mm"
                                                         class="form-checkbox absolute place-self-center h-6 w-6"
-                                                        {{ old('test4ab_h10mm', $form->test4ab_h10mm)
+                                                        {{ old('test4ab_h10mm', $details->test4ab_h10mm)
                                                     ? 'checked' : '' }} value="1">
                                                     <div class="border border-black bg-white h-1"></div>
                                                     <div class="border border-black bg-white h-1"></div>
@@ -391,7 +391,7 @@
                                                     <input type="hidden" name="test4ab_v10mm" value="0">
                                                     <input type="checkbox" name="test4ab_v10mm" id="test4ab_v10mm"
                                                         class="form-checkbox absolute place-self-center h-5 w-5"
-                                                        {{ old('test4ab_v10mm', $form->test4ab_v10mm)
+                                                        {{ old('test4ab_v10mm', $details->test4ab_v10mm)
                                                     ? 'checked' : '' }} value="1">
                                                     <div class="border border-black bg-white w-1"></div>
                                                     <div class="border border-black bg-white w-1"></div>
@@ -409,19 +409,19 @@
                                                 <div class="bg-[#C5E0B3] h-10 flex items-center justify-center">
                                                     <input type="hidden" name="test5ab_05mm" value="0">
                                                     <input type="checkbox" id="test5ab_05mm" name="test5ab_05mm"
-                                                        class="form-checkbox" {{ old('test5ab_05mm', $form->test5ab_05mm)
+                                                        class="form-checkbox" {{ old('test5ab_05mm', $details->test5ab_05mm)
                                                     ? 'checked' : '' }} value="1">
                                                 </div>
                                                 <div class="bg-[#A8D08D] h-10 flex items-center justify-center">
                                                     <input type="hidden" name="test5ab_10mm" value="0">
                                                     <input type="checkbox" id="test5ab_10mm" name="test5ab_10mm"
-                                                        class="form-checkbox" {{ old('test5ab_10mm', $form->test5ab_10mm)
+                                                        class="form-checkbox" {{ old('test5ab_10mm', $details->test5ab_10mm)
                                                     ? 'checked' : '' }} value="1">
                                                 </div>
                                                 <div class="bg-[#548135] h-10 flex items-center justify-center">
                                                     <input type="hidden" name="test5ab_15mm" value="0">
                                                     <input type="checkbox" id="test5ab_15mm" name="test5ab_15mm"
-                                                        class="form-checkbox" {{ old('test5ab_15mm', $form->test5ab_15mm)
+                                                        class="form-checkbox" {{ old('test5ab_15mm', $details->test5ab_15mm)
                                                     ? 'checked' : '' }} value="1">
                                                 </div>
                                             </div>
@@ -443,7 +443,7 @@
                                         <h3 class="text-xs font-bold mb-2 text-center">TEST 2a</h3>
                                         <div class="grid grid-cols-2 gap-0">
                                             <input type="hidden" name="test2ab" value="0">
-                                            <input type="checkbox" name="test2ab" id="test2ab" {{ old('test2ab', $form->test2ab)
+                                            <input type="checkbox" name="test2ab" id="test2ab" {{ old('test2ab', $details->test2ab)
                                                     ? 'checked' : '' }} value="1"
                                                 class="form-checkbox absolute place-self-center">
                                             <div class="bg-green-500 h-16 flex items-center justify-center">
@@ -454,7 +454,7 @@
                                         <div class="grid grid-cols-[70%_30%] relative">
                                             <h3 class="text-xs font-bold text-end">TEST 2b</h3>
                                             <input type="hidden" name="test2bb" value="0">
-                                            <input type="checkbox" name="test2bb" id="test2bb" {{ old('test2bb', $form->test2bb)
+                                            <input type="checkbox" name="test2bb" id="test2bb" {{ old('test2bb', $details->test2bb)
                                                     ? 'checked' : '' }} value="1"
                                                 class="absolute place-self-end form-checkbox">
                                         </div>
@@ -466,55 +466,55 @@
                                             <div class="bg-cyan-100 h-16 flex items-center justify-center">
                                                 <input type="hidden" name="test3b_14" value="0">
                                                 <input type="checkbox" name="test3b_14" id="test3b_14"
-                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3b_14', $form->test3b_14)
+                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3b_14', $details->test3b_14)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                             <div class="bg-cyan-200 h-16 flex items-center justify-center">
                                                 <input type="hidden" name="test3b_16" value="0">
                                                 <input type="checkbox" name="test3b_16" id="test3b_16"
-                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3b_16', $form->test3b_16)
+                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3b_16', $details->test3b_16)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                             <div class="bg-sky-400 h-16 flex items-center justify-center">
                                                 <input type="hidden" name="test3b_18" value="0">
                                                 <input type="checkbox" name="test3b_18" id="test3b_18"
-                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3b_18', $form->test3b_18)
+                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3b_18', $details->test3b_18)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                             <div class="bg-blue-500 h-16 flex items-center justify-center">
                                                 <input type="hidden" name="test3b_20" value="0">
                                                 <input type="checkbox" name="test3b_20" id="test3b_20"
-                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3b_20', $form->test3b_20)
+                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3b_20', $details->test3b_20)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                             <div class="bg-blue-500 h-16 flex items-center justify-center">
                                                 <input type="hidden" name="test3b_22" value="0">
                                                 <input type="checkbox" name="test3b_22" id="test3b_22"
-                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3b_22', $form->test3b_22)
+                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3b_22', $details->test3b_22)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                             <div class="bg-blue-700 h-16 flex items-center justify-center">
                                                 <input type="hidden" name="test3b_24" value="0">
                                                 <input type="checkbox" name="test3b_24" id="test3b_24"
-                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3b_24', $form->test3b_24)
+                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3b_24', $details->test3b_24)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                             <div class="bg-blue-700 h-16 flex items-center justify-center">
                                                 <input type="hidden" name="test3b_26" value="0">
                                                 <input type="checkbox" name="test3b_26" id="test3b_26"
-                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3b_26', $form->test3b_26)
+                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3b_26', $details->test3b_26)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                             <div class="bg-blue-950 h-16 flex items-center justify-center">
                                                 <input type="hidden" name="test3b_28" value="0">
                                                 <input type="checkbox" name="test3b_28" id="test3b_28"
-                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3b_28', $form->test3b_28)
+                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3b_28', $details->test3b_28)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                             <div class="bg-blue-950 h-16 flex items-center justify-center">
                                                 <input type="hidden" name="test3b_30" value="0">
                                                 <input type="checkbox" name="test3b_30" id="test3b_30"
-                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3b_30', $form->test3b_30)
+                                                    class="form-checkbox justify-center absolute top-4" {{ old('test3b_30', $details->test3b_30)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                         </div>
@@ -547,88 +547,88 @@
                                             <div class="grid grid-rows-4 bg-white items-center justify-center">
                                                 <input type="hidden" name="test1ab_36" value="0">
                                                 <input type="checkbox" id="test1ab_36" name="test1ab_36"
-                                                    class="form-checkbox" {{ old('test1ab_36', $form->test1ab_36)
+                                                    class="form-checkbox" {{ old('test1ab_36', $details->test1ab_36)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1ab_32" value="0">
                                                 <input type="checkbox" id="test1ab_32" name="test1ab_32"
-                                                    class="form-checkbox" {{ old('test1ab_32', $form->test1ab_32)
+                                                    class="form-checkbox" {{ old('test1ab_32', $details->test1ab_32)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1ab_30" value="0">
                                                 <input type="checkbox" id="test1ab_30" name="test1ab_30"
-                                                    class="form-checkbox" {{ old('test1ab_30', $form->test1ab_30)
+                                                    class="form-checkbox" {{ old('test1ab_30', $details->test1ab_30)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1ab_24" value="0">
                                                 <input type="checkbox" id="test1ab_24" name="test1ab_24"
-                                                    class="form-checkbox" {{ old('test1ab_24', $form->test1ab_24)
+                                                    class="form-checkbox" {{ old('test1ab_24', $details->test1ab_24)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                             <div
                                                 class="grid grid-rows-4 bg-[#C5E0B3] border border-black items-center justify-center">
                                                 <input type="hidden" name="test1bb_36_1" value="0">
                                                 <input type="checkbox" id="test1bb_36_1" name="test1bb_36_1"
-                                                    class="form-checkbox" {{ old('test1bb_36_1', $form->test1bb_36_1)
+                                                    class="form-checkbox" {{ old('test1bb_36_1', $details->test1bb_36_1)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1bb_32_1" value="0">
                                                 <input type="checkbox" id="test1bb_32_1" name="test1bb_32_1"
-                                                    class="form-checkbox" {{ old('test1bb_32_1', $form->test1bb_32_1)
+                                                    class="form-checkbox" {{ old('test1bb_32_1', $details->test1bb_32_1)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1bb_30_1" value="0">
                                                 <input type="checkbox" id="test1bb_30_1" name="test1bb_30_1"
-                                                    class="form-checkbox" {{ old('test1bb_30_1', $form->test1bb_30_1)
+                                                    class="form-checkbox" {{ old('test1bb_30_1', $details->test1bb_30_1)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1bb_24_1" value="0">
                                                 <input type="checkbox" id="test1bb_24_1" name="test1bb_24_1"
-                                                    class="form-checkbox" {{ old('test1bb_24_1', $form->test1bb_24_1)
+                                                    class="form-checkbox" {{ old('test1bb_24_1', $details->test1bb_24_1)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                             <div
                                                 class="grid grid-rows-4 bg-[#92D050] border-y border-black items-center justify-center">
                                                 <input type="hidden" name="test1bb_36_2" value="0">
                                                 <input type="checkbox" id="test1bb_36_2" name="test1bb_36_2"
-                                                    class="form-checkbox" {{ old('test1bb_36_2', $form->test1bb_36_2)
+                                                    class="form-checkbox" {{ old('test1bb_36_2', $details->test1bb_36_2)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1bb_32_2" value="0">
                                                 <input type="checkbox" id="test1bb_32_2" name="test1bb_32_2"
-                                                    class="form-checkbox" {{ old('test1bb_32_2', $form->test1bb_32_2)
+                                                    class="form-checkbox" {{ old('test1bb_32_2', $details->test1bb_32_2)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1bb_30_2" value="0">
                                                 <input type="checkbox" id="test1bb_30_2" name="test1bb_30_2"
-                                                    class="form-checkbox" {{ old('test1bb_30_2', $form->test1bb_30_2)
+                                                    class="form-checkbox" {{ old('test1bb_30_2', $details->test1bb_30_2)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1bb_24_2" value="0">
                                                 <input type="checkbox" id="test1bb_24_2" name="test1bb_24_2"
-                                                    class="form-checkbox" {{ old('test1bb_24_2', $form->test1bb_24_2)
+                                                    class="form-checkbox" {{ old('test1bb_24_2', $details->test1bb_24_2)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                             <div
                                                 class="grid grid-rows-4 bg-green-500 border border-black items-center justify-center">
                                                 <input type="hidden" name="test1bb_36_3" value="0">
                                                 <input type="checkbox" id="test1bb_36_3" name="test1bb_36_3"
-                                                    class="form-checkbox" {{ old('test1bb_36_3', $form->test1bb_36_3)
+                                                    class="form-checkbox" {{ old('test1bb_36_3', $details->test1bb_36_3)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1bb_32_3" value="0">
                                                 <input type="checkbox" id="test1bb_32_3" name="test1bb_32_3"
-                                                    class="form-checkbox" {{ old('test1bb_32_3', $form->test1bb_32_3)
+                                                    class="form-checkbox" {{ old('test1bb_32_3', $details->test1bb_32_3)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1bb_30_3" value="0">
                                                 <input type="checkbox" id="test1bb_30_3" name="test1bb_30_3"
-                                                    class="form-checkbox" {{ old('test1bb_30_3', $form->test1bb_30_3)
+                                                    class="form-checkbox" {{ old('test1bb_30_3', $details->test1bb_30_3)
                                                     ? 'checked' : '' }} value="1">
 
                                                 <input type="hidden" name="test1bb_24_3" value="0">
                                                 <input type="checkbox" id="test1bb_24_3" name="test1bb_24_3"
-                                                    class="form-checkbox" {{ old('test1bb_24_3', $form->test1bb_24_3)
+                                                    class="form-checkbox" {{ old('test1bb_24_3', $details->test1bb_24_3)
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                         </div>
@@ -647,7 +647,7 @@
                                                     <input type="hidden" name="test4b_h15mm" value="0">
                                                     <input type="checkbox" name="test4b_h15mm" id="test4b_h15mm"
                                                         class="form-checkbox absolute place-self-center h-6 w-6"
-                                                        {{ old('test4b_h15mm', $form->test4b_h15mm)
+                                                        {{ old('test4b_h15mm', $details->test4b_h15mm)
                                                     ? 'checked' : '' }} value="1">
                                                     <div class="border border-black bg-white h-1"></div>
                                                     <div class="border border-black bg-white h-1"></div>
@@ -658,7 +658,7 @@
                                                     <input type="hidden" name="test4b_v15mm" value="0">
                                                     <input type="checkbox" name="test4b_v15mm" id="test4b_v15mm"
                                                         class="form-checkbox absolute place-self-center h-5 w-5"
-                                                        {{ old('test4b_v15mm', $form->test4b_v15mm)
+                                                        {{ old('test4b_v15mm', $details->test4b_v15mm)
                                                     ? 'checked' : '' }} value="1">
                                                     <div class="border border-black bg-white w-1"></div>
                                                     <div class="border border-black bg-white w-1"></div>
@@ -673,7 +673,7 @@
                                                     <input type="hidden" name="test4b_h20mm" value="0">
                                                     <input type="checkbox" name="test4b_h20mm" id="test4b_h20mm"
                                                         class="form-checkbox absolute place-self-center h-6 w-6"
-                                                        {{ old('test4b_h20mm', $form->test4b_h20mm)
+                                                        {{ old('test4b_h20mm', $details->test4b_h20mm)
                                                     ? 'checked' : '' }} value="1">
                                                     <div class="border border-black bg-white h-1"></div>
                                                     <div class="border border-black bg-white h-1"></div>
@@ -684,7 +684,7 @@
                                                     <input type="hidden" name="test4b_v20mm" value="0">
                                                     <input type="checkbox" name="test4b_v20mm" id="test4b_v20mm"
                                                         class="form-checkbox absolute place-self-center h-4 w-4"
-                                                        {{ old('test4b_v20mm', $form->test4b_v20mm)
+                                                        {{ old('test4b_v20mm', $details->test4b_v20mm)
                                                     ? 'checked' : '' }} value="1">
                                                     <div class="border border-black bg-white w-1"></div>
                                                     <div class="border border-black bg-white w-1"></div>
@@ -699,7 +699,7 @@
                                                     <input type="hidden" name="test4b_h10mm" value="0">
                                                     <input type="checkbox" name="test4b_h10mm" id="test4b_h10mm"
                                                         class="form-checkbox absolute place-self-center h-6 w-6"
-                                                        {{ old('test4b_h10mm', $form->test4b_h10mm)
+                                                        {{ old('test4b_h10mm', $details->test4b_h10mm)
                                                     ? 'checked' : '' }} value="1">
                                                     <div class="border border-black bg-white h-1"></div>
                                                     <div class="border border-black bg-white h-1"></div>
@@ -710,7 +710,7 @@
                                                     <input type="hidden" name="test4b_v10mm" value="0">
                                                     <input type="checkbox" name="test4b_v10mm" id="test4b_v10mm"
                                                         class="form-checkbox absolute place-self-center h-5 w-5"
-                                                        {{ old('test4b_v10mm', $form->test4b_v10mm)
+                                                        {{ old('test4b_v10mm', $details->test4b_v10mm)
                                                     ? 'checked' : '' }} value="1">
                                                     <div class="border border-black bg-white w-1"></div>
                                                     <div class="border border-black bg-white w-1"></div>
@@ -728,19 +728,19 @@
                                                 <div class="bg-[#C5E0B3] h-10 flex items-center justify-center">
                                                     <input type="hidden" name="test5b_05mm" value="0">
                                                     <input type="checkbox" id="test5b_05mm" name="test5b_05mm"
-                                                        class="form-checkbox" {{ old('test5b_05mm', $form->test5b_05mm)
+                                                        class="form-checkbox" {{ old('test5b_05mm', $details->test5b_05mm)
                                                     ? 'checked' : '' }} value="1">
                                                 </div>
                                                 <div class="bg-[#A8D08D] h-10 flex items-center justify-center">
                                                     <input type="hidden" name="test5b_10mm" value="0">
                                                     <input type="checkbox" id="test5b_10mm" name="test5b_10mm"
-                                                        class="form-checkbox" {{ old('test5b_10mm', $form->test5b_10mm)
+                                                        class="form-checkbox" {{ old('test5b_10mm', $details->test5b_10mm)
                                                     ? 'checked' : '' }} value="1">
                                                 </div>
                                                 <div class="bg-[#548135] h-10 flex items-center justify-center">
                                                     <input type="hidden" name="test5b_15mm" value="0">
                                                     <input type="checkbox" id="test5b_15mm" name="test5b_15mm"
-                                                        class="form-checkbox" {{ old('test5b_15mm', $form->test5b_15mm)
+                                                        class="form-checkbox" {{ old('test5b_15mm', $details->test5b_15mm)
                                                     ? 'checked' : '' }} value="1">
                                                 </div>
                                             </div>
@@ -761,22 +761,22 @@
                                 <label class="text-gray-700 font-bold mr-4">Hasil:</label>
                                 <div class="flex flex-col">
                                     <div class="flex items-center mb-0">
-                                        <input type="radio" id="resultPass" name="result" value="pass"
-                                            {{ old('result', $form->result) == 'pass' ? 'checked' : '' }}>
-                                        <label class="text-sm ml-2">PASS</label>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <input type="radio" id="resultFail" name="result" value="fail"
-                                            {{ old('result', $form->result) == 'fail' ? 'checked' : '' }}>
-                                        <label class="text-sm ml-2">FAIL</label>
-                                    </div>
-                                    <input type="hidden" id="result" name="result" value="{{ old('result', $form->result) }}">
+                                    <input type="radio" id="resultPass" name="result" value="pass"
+                                        {{ old('result', $form->result) == 'pass' ? 'checked' : '' }}>
+                                    <label class="text-sm ml-2">PASS</label>
                                 </div>
+                                <div class="flex items-center">
+                                    <input type="radio" id="resultFail" name="result" value="fail"
+                                        {{ old('result', $form->result) == 'fail' ? 'checked' : '' }}>
+                                    <label class="text-sm ml-2">FAIL</label>
+                                </div>
+                                <input type="hidden" id="result" name="result" value="{{ old('result', $form->result) }}">
                             </div>
-                            <div>
-                                <label class="block text-gray-700 font-bold mb-2">CATATAN:</label>
-                                <textarea name="notes" class="w-full border rounded px-2 py-1"
-                                    rows="3">{{ old('notes', $form->notes) }}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-bold mb-2">CATATAN:</label>
+                            <textarea name="notes" class="w-full border rounded px-2 py-1"
+                                rows="3">{{ old('notes', $form->note) }}</textarea>
                             </div>
                         </div>
                     </div>

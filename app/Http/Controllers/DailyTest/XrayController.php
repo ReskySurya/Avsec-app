@@ -200,61 +200,12 @@ class XrayController extends Controller
                     ->unique('id');
             }
 
-             $form = $report;
-            if ($report->reportDetails->isNotEmpty()) {
-                $details = $report->reportDetails->first();
-                $form->terpenuhi = $details->terpenuhi;
-                $form->tidakterpenuhi = $details->tidakterpenuhi;
-                $form->test1aab_32 = $details->test1aab_32;
-                $form->test1aab_30 = $details->test1aab_30;
-                $form->test1aab_24 = $details->test1aab_24;
-                $form->test1bab_30_1 = $details->test1bab_30_1;
-                $form->test1bab_24_1 = $details->test1bab_24_1;
-                $form->test1bab_30_2 = $details->test1bab_30_2;
-                $form->test1bab_24_2 = $details->test1bab_24_2;
-                $form->test1bab_24_3 = $details->test1bab_24_3;
-                $form->test1ab_32 = $details->test1ab_32;
-                $form->test1ab_30 = $details->test1ab_30;
-                $form->test1ab_24 = $details->test1ab_24;
-                $form->test1bb_30_1 = $details->test1bb_30_1;
-                $form->test1bb_24_1 = $details->test1bb_24_1;
-                $form->test1bb_30_2 = $details->test1bb_30_2;
-                $form->test1bb_24_2 = $details->test1bb_24_2;
-                $form->test1bb_24_3 = $details->test1bb_24_3;
-                $form->test2aab = $details->test2aab;
-                $form->test2bab = $details->test2bab;
-                $form->test2ab = $details->test2ab;
-                $form->test2bb = $details->test2bb;
-                $form->test3ab_14 = $details->test3ab_14;
-                $form->test3ab_16 = $details->test3ab_16;
-                $form->test3ab_18 = $details->test3ab_18;
-                $form->test3ab_20 = $details->test3ab_20;
-                $form->test3ab_22 = $details->test3ab_22;
-                $form->test3ab_24 = $details->test3ab_24;
-                $form->test3b_14 = $details->test3b_14;
-                $form->test3b_16 = $details->test3b_16;
-                $form->test3b_18 = $details->test3b_18;
-                $form->test3b_20 = $details->test3b_20;
-                $form->test3b_22 = $details->test3b_22;
-                $form->test3b_24 = $details->test3b_24;
-                $form->test4ab_h15mm = $details->test4ab_h15mm;
-                $form->test4ab_v15mm = $details->test4ab_v15mm;
-                $form->test4ab_h20mm = $details->test4ab_h20mm;
-                $form->test4ab_v20mm = $details->test4ab_v20mm;
-                $form->test4b_h15mm = $details->test4b_h15mm;
-                $form->test4b_v15mm = $details->test4b_v15mm;
-                $form->test4b_h20mm = $details->test4b_h20mm;
-                $form->test4b_v20mm = $details->test4b_v20mm;
-                $form->test5ab_05mm = $details->test5ab_05mm;
-                $form->test5b_05mm = $details->test5b_05mm;
-                $form->test5ab_10mm = $details->test5ab_10mm;
-                $form->test5b_10mm = $details->test5b_10mm;
-                $form->test5ab_15mm = $details->test5ab_15mm;
-                $form->test5b_15mm = $details->test5b_15mm;
-            }
+             // Ambil detail report
+            $details = $report->reportDetails->first();
 
             return view('officer.editXrayCabin', [
                 'form' => $report,
+                'details' => $details,
                 'xrayLocations' => $xrayLocations,
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -264,6 +215,80 @@ class XrayController extends Controller
             Log::error('Error in edit rejected report: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function updateCabin(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'testDateTime' => 'required|date',
+            'deviceInfo' => 'required|string|max:255',
+            'certificateInfo' => 'required|string|max:255',
+            'result' => 'required|in:pass,fail',
+            'notes' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        DB::beginTransaction();
+        try {
+            $report = Report::with('reportDetails')->findOrFail($id);
+            $reportDetail = $report->reportDetails->first();
+
+            if (!$reportDetail) {
+                throw new \Exception('Detail laporan tidak ditemukan.');
+            }
+
+            // Update Report
+            $report->testDate = $request->testDateTime;
+            $report->deviceInfo = $request->deviceInfo;
+            $report->certificateInfo = $request->certificateInfo;
+            $report->isFullFilled = $request->input('terpenuhi', 0);
+            $report->result = $request->result;
+            $report->note = $request->notes;
+
+            // Reset status to pending for re-approval
+            $pendingStatus = ReportStatus::where('name', 'pending')->firstOrFail();
+            $report->statusID = $pendingStatus->id;
+            $report->approvalNote = null;
+            $report->save();
+
+            // Prepare data for ReportDetail update
+            $detailsData = [];
+            $checkboxFields = [
+                'terpenuhi', 'tidakterpenuhi',
+                'test2aab', 'test2bab',
+                'test3ab_14', 'test3ab_16', 'test3ab_18', 'test3ab_20', 'test3ab_22', 'test3ab_24', 'test3ab_26', 'test3ab_28', 'test3ab_30',
+                'test1aab_36', 'test1aab_32', 'test1aab_30', 'test1aab_24',
+                'test1bab_36_1', 'test1bab_32_1', 'test1bab_30_1', 'test1bab_24_1', 'test1bab_36_2', 'test1bab_32_2', 'test1bab_30_2', 'test1bab_24_2', 'test1bab_36_3', 'test1bab_32_3', 'test1bab_30_3', 'test1bab_24_3',
+                'test4ab_h15mm', 'test4ab_v15mm', 'test4ab_h20mm', 'test4ab_v20mm', 'test4ab_h10mm', 'test4ab_v10mm',
+                'test5ab_05mm', 'test5ab_10mm', 'test5ab_15mm',
+                'test2ab', 'test2bb',
+                'test3b_14', 'test3b_16', 'test3b_18', 'test3b_20', 'test3b_22', 'test3b_24', 'test3b_26', 'test3b_28', 'test3b_30',
+                'test1ab_36', 'test1ab_32', 'test1ab_30', 'test1ab_24',
+                'test1bb_36_1', 'test1bb_32_1', 'test1bb_30_1', 'test1bb_24_1', 'test1bb_36_2', 'test1bb_32_2', 'test1bb_30_2', 'test1bb_24_2', 'test1bb_36_3', 'test1bb_32_3', 'test1bb_30_3', 'test1bb_24_3',
+                'test4b_h15mm', 'test4b_v15mm', 'test4b_h20mm', 'test4b_v20mm', 'test4b_h10mm', 'test4b_v10mm',
+                'test5b_05mm', 'test5b_10mm', 'test5b_15mm'
+            ];
+
+            foreach ($checkboxFields as $field) {
+                $detailsData[$field] = $request->input($field, 0);
+            }
+
+            $reportDetail->update($detailsData);
+
+            DB::commit();
+
+            return redirect()->route('dashboard.officer')->with('success', 'Laporan X-Ray Cabin berhasil diperbarui dan dikirim kembali untuk persetujuan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error updating X-Ray Cabin report: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat memperbarui laporan: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -473,7 +498,7 @@ class XrayController extends Controller
                 $form->test3b_16 = $details->test3b_16;
                 $form->test3b_18 = $details->test3b_18;
                 $form->test3b_20 = $details->test3b_20;
-                $form->test3b_22 = $details->test3b_22; 
+                $form->test3b_22 = $details->test3b_22;
                 $form->test4ab_h20mm = $details->test4ab_h20mm;
                 $form->test4ab_v20mm = $details->test4ab_v20mm;
                 $form->test4b_h20mm = $details->test4b_h20mm;
@@ -483,7 +508,7 @@ class XrayController extends Controller
             }
 
             return view('officer.editXrayBagasi', [
-                'form' => $report,
+                'form' => $form,
                 'xrayLocations' => $xrayLocations,
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
