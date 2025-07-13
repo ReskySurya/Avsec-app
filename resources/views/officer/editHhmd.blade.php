@@ -55,7 +55,7 @@
                                 <td class="w-2/3 p-2">
                                     <input type="datetime-local" name="testDateTime"
                                         value="{{ old('testDateTime', optional($form->testDate)->format('Y-m-d\TH:i')) }}"
-                                        class="w-full border rounded px-2 py-1">
+                                        class="w-full border rounded px-2 py-1" readonly>
                                 </td>
                             </tr>
                             <tr class="border-b border-black">

@@ -324,7 +324,7 @@ class WtmdController extends Controller
                 return redirect()->back()->with('error', 'Invalid report type');
             }
 
-            // Ambil semua lokasi yang berelasi dengan equipment HHMD
+            // Ambil semua lokasi yang berelasi dengan equipment WTMD
             $wtmdEquipment = Equipment::where('name', 'wtmd')->first();
             $wtmdLocations = collect();
             if ($wtmdEquipment) {
@@ -337,24 +337,11 @@ class WtmdController extends Controller
                     ->unique('id');
             }
 
-            // Gabungkan data dari report dan reportDetails ke dalam satu objek $form
-            $form = $report;
-            if ($report->reportDetails->isNotEmpty()) {
-                $details = $report->reportDetails->first();
-                $form->terpenuhi = $details->terpenuhi;
-                $form->tidakterpenuhi = $details->tidakterpenuhi;
-                $form->test1_in_depan = $details->test1_in_depan;
-                $form->test1_out_depan = $details->test1_out_depan;
-                $form->test2_in_depan = $details->test2_in_depan;
-                $form->test2_out_depan = $details->test2_out_depan;
-                $form->test3_in_belakang = $details->test3_in_belakang;
-                $form->test3_out_belakang = $details->test3_out_belakang;
-                $form->test4_in_depan = $details->test4_in_depan;
-                $form->test4_out_depan = $details->test4_out_depan;
-            }
-
+            // Ambil detail report
+            $details = $report->reportDetails->first();
             return view('officer.editWtmd', [
                 'form' => $report,
+                'details' => $details,
                 'wtmdLocations' => $wtmdLocations,
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -366,5 +353,97 @@ class WtmdController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+ 
     
+    public function update(Request $request, $id)
+    {
+        // Validasi input
+        $validator = Validator::make($request->all(), [
+            'testDateTime' => 'required|date',
+            'location' => 'required|exists:locations,id',
+            'deviceInfo' => 'required|string|max:255',
+            'certificateInfo' => 'required|string|max:255',
+            'notes' => 'nullable|string',
+            'terpenuhi' => 'boolean',
+            'tidakterpenuhi' => 'boolean',
+            'test1_in_depan' => 'boolean',
+            'test1_out_depan' => 'boolean',
+            'test2_in_depan' => 'boolean',
+            'test2_out_depan' => 'boolean',
+            'test3_in_belakang' => 'boolean',
+            'test3_out_belakang' => 'boolean',
+            'test4_in_depan' => 'boolean',
+            'test4_out_depan' => 'boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        try {
+            Log::info('Updating WTMD Report ID: ' . $id);
+            Log::info('Request data:', $request->all());
+
+            DB::beginTransaction();
+
+            $report = Report::findOrFail($id);
+
+            // Pastikan pengguna yang login adalah yang mengirim laporan
+            if ($report->submittedByID !== Auth::id()) {
+                return redirect()->route('dashboard.officer')->with('error', 'Anda tidak memiliki izin untuk mengedit laporan ini.');
+            }
+
+            $equipmentLocation = EquipmentLocation::whereHas('equipment', function ($query) {
+                $query->where('name', 'wtmd');
+            })
+            ->where('location_id', $request->location)
+            ->firstOrFail();
+
+            // Ambil status 'pending'
+            $pendingStatus = ReportStatus::where('name', 'pending')->firstOrFail();
+
+            // Update report
+            $report->testDate = $request->testDateTime;
+            $report->equipmentLocationID = $equipmentLocation->id;
+            $report->deviceInfo = $request->deviceInfo;
+            $report->certificateInfo = $request->certificateInfo;
+            $report->isFullFilled = $request->boolean('terpenuhi');
+            $report->result = $request->boolean('test1_in_depan') ? 'pass' : 'fail';
+            $report->note = $request->note;
+            $report->statusID = $pendingStatus->id;
+            $report->approvalNote = null; // Hapus catatan penolakan sebelumnya
+            $report->save();
+
+            // Update report detail secara eksplisit
+            $reportDetail = ReportDetail::where('reportID', $report->reportID)->first();
+            if (!$reportDetail) {
+                // Fallback jika detail tidak ditemukan, meskipun seharusnya tidak terjadi
+                $reportDetail = new ReportDetail();
+                $reportDetail->reportID = $report->reportID;
+            }
+
+            $reportDetail->terpenuhi = $request->boolean('terpenuhi');
+            $reportDetail->tidakterpenuhi = $request->boolean('tidakterpenuhi');
+            $reportDetail->test1_in_depan = $request->boolean('test1_in_depan');
+            $reportDetail->test1_out_depan = $request->boolean('test1_out_depan');
+            $reportDetail->test2_in_depan = $request->boolean('test2_in_depan');
+            $reportDetail->test2_out_depan = $request->boolean('test2_out_depan');
+            $reportDetail->test3_in_belakang = $request->boolean('test3_in_belakang');
+            $reportDetail->test3_out_belakang = $request->boolean('test3_out_belakang');    
+            $reportDetail->test4_in_depan = $request->boolean('test4_in_depan');
+            $reportDetail->test4_out_depan = $request->boolean('test4_out_depan');
+            $reportDetail->save();
+
+            DB::commit();
+
+            return redirect()->route('dashboard.officer')->with('success', 'Laporan berhasil diperbarui dan dikirim ulang untuk ditinjau.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error updating WTMD report: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat memperbarui laporan: ' . $e->getMessage())->withInput();
+        }
+    }
 }

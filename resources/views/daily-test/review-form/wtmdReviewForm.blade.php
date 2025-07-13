@@ -194,8 +194,8 @@
                                 </div>
                             </div>
                             <div>
-                                <label for="notes" class="block text-gray-700 font-bold mb-2">CATATAN:</label>
-                                <p>{{ $form->notes }}</p>
+                                <label for="note" class="block text-gray-700 font-bold mb-2">CATATAN:</label>
+                                <p>{{ $form->note }}</p>
                             </div>
                         </div>
 

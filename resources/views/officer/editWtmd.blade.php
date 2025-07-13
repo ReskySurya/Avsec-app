@@ -21,7 +21,7 @@
         </div>
         @endif
 
-       <form action="#" method="POST">
+        <form action="{{ route('officer.wtmd.update', ['id' => $form->reportID]) }}" method="POST">
             @csrf
             @method('PUT')
 
@@ -49,7 +49,7 @@
                                     <td class="w-2/3 p-2">
                                         <input type="text" name="operatorName"
                                             value="Bandar Udara Adisutjipto Yogyakarta"
-                                            class="w-full border rounded px-2 py-1">
+                                            class="w-full border rounded px-2 py-1" readonly>
                                     </td>
                                 </tr>
                                 <tr class="border-b border-black">
@@ -57,28 +57,28 @@
                                     <td class="w-2/3 p-2">
                                         <input type="datetime-local" name="testDateTime"
                                             value="{{ old('testDateTime', optional($form->testDate)->format('Y-m-d\TH:i')) }}"
-                                            class="w-full border rounded px-2 py-1">
+                                            class="w-full border rounded px-2 py-1" readonly>
                                     </td>
                                 </tr>
                                 <tr class="border-b border-black">
                                     <th class="w-1/3 text-left p-2">Lokasi Penempatan:</th>
                                     <td class="w-2/3 p-2">
-                                    <select id="location" name="location"
-                                        class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base">
-                                        <option value="">Pilih Lokasi</option>
-                                        @if(isset($wtmdLocations))
-                                        @foreach($wtmdLocations as $location)
-                                        <option value="{{ $location->id }}"
-                                            {{ old('location', $form->equipmentLocation->location_id) == $location->id ? 'selected' : '' }}>
-                                            {{ $location->name }}
-                                        </option>
-                                        @endforeach
-                                        @endif
-                                    </select>
-                                    @error('location')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                                    @enderror
-                                </td>
+                                        <select id="location" name="location_display"
+                                            class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base bg-gray-100" disabled>
+                                            @if(isset($wtmdLocations))
+                                            @foreach($wtmdLocations as $location)
+                                            <option value="{{ $location->id }}"
+                                                {{ old('location', $form->equipmentLocation->location_id) == $location->id ? 'selected' : '' }}>
+                                                {{ $location->name }}
+                                            </option>
+                                            @endforeach
+                                            @endif
+                                        </select>
+                                        <input type="hidden" name="location" value="{{ $form->equipmentLocation->location_id }}">
+                                        @error('location')
+                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </td>
                                 </tr>
                                 <tr class="border-b border-black">
                                     <th class="w-1/3 text-left p-2">Merk/Tipe/Nomor Seri:</th>
@@ -101,22 +101,22 @@
 
                         <div class="px-4">
                             <div class="p-2">
-                                 <div class="mb-0">
-                                <label class="inline-flex items-center">
-                                    <input type="hidden" name="terpenuhi" value="0">
-                                    <input type="checkbox" name="terpenuhi" value="1" {{ old('terpenuhi',
+                                <div class="mb-0">
+                                    <label class="inline-flex items-center">
+                                        <input type="hidden" name="terpenuhi" value="0">
+                                        <input type="checkbox" name="terpenuhi" value="1" {{ old('terpenuhi',
                                         $form->isFullFilled) ? 'checked' : '' }}>
-                                    <span class="ml-2 text-sm">Terpenuhi</span>
-                                </label>
-                            </div>
-                            <div>
-                                <label class="inline-flex items-center">
-                                    <input type="hidden" name="tidakterpenuhi" value="0">
-                                    <input type="checkbox" name="tidakterpenuhi" value="1" {{ old('tidakterpenuhi',
+                                        <span class="ml-2 text-sm">Terpenuhi</span>
+                                    </label>
+                                </div>
+                                <div>
+                                    <label class="inline-flex items-center">
+                                        <input type="hidden" name="tidakterpenuhi" value="0">
+                                        <input type="checkbox" name="tidakterpenuhi" value="1" {{ old('tidakterpenuhi',
                                         $form->tidakterpenuhi) ? 'checked' : '' }}>
-                                    <span class="ml-2 text-sm">Tidak Terpenuhi</span>
-                                </label>
-                            </div>
+                                        <span class="ml-2 text-sm">Tidak Terpenuhi</span>
+                                    </label>
+                                </div>
                             </div>
 
                             <div class="grid grid-cols-2 border-x-2 border-t-2 border-black text-center items-center">
@@ -134,13 +134,13 @@
                                                     <div class="flex items-center gap-1 pl-2.5">
                                                         <span class="text-[10px]">IN</span>
                                                         <input type="hidden" name="test1_in_depan" value="0">
-                                                        <input type="checkbox" id="test1_in_depan" name="test1_in_depan" value="1" {{ old('test1_in_depan', $form->test1_in_depan) ? 'checked' : '' }} 
+                                                        <input type="checkbox" id="test1_in_depan" name="test1_in_depan" value="1" {{ old('test1_in_depan', $details->test1_in_depan) ? 'checked' : '' }}
                                                             class="form-checkbox h-4 w-4 bg-white" onchange="updateRadioResult()">
                                                     </div>
                                                     <div class="flex items-center gap-1">
                                                         <span class="text-[10px]">OUT</span>
                                                         <input type="hidden" name="test1_out_depan" value="0">
-                                                        <input type="checkbox" name="test1_out_depan" {{ old('test1_out_depan', $form->test1_out_depan) ? 'checked' : '' }}
+                                                        <input type="checkbox" name="test1_out_depan" {{ old('test1_out_depan', $details->test1_out_depan) ? 'checked' : '' }}
                                                             id="test1_out_depan" class="form-checkbox h-4 w-4 bg-white"
                                                             value="1">
                                                     </div>
@@ -160,14 +160,14 @@
                                                     <div class="flex items-center gap-1 pl-2.5">
                                                         <span class="text-[10px]">IN</span>
                                                         <input type="hidden" name="test2_in_depan" value="0">
-                                                        <input type="checkbox" name="test2_in_depan" {{ old('test2_in_depan', $form->test2_in_depan) ? 'checked' : '' }} id="test2_in_depan"
+                                                        <input type="checkbox" name="test2_in_depan" {{ old('test2_in_depan', $details->test2_in_depan) ? 'checked' : '' }} id="test2_in_depan"
                                                             class="form-checkbox h-4 w-4 bg-white" value="1">
                                                     </div>
                                                     <div class="flex items-center gap-1">
                                                         <span class="text-[10px]">OUT</span>
                                                         <input type="hidden" name="test2_out_depan" value="0">
-                                                        <input type="checkbox" name="test2_out_depan"
-                                                        {{ old('test2_out_depan', $form->test2_out_depan) ? 'checked' : '' }} id="test2_out_depan" class="form-checkbox h-4 w-4 bg-white" value="1">
+                                                        <input type="checkbox" name="test2_out_depan" {{ old('test2_out_depan', $details->test2_out_depan) ? 'checked' : '' }}
+                                                            id="test2_out_depan" class="form-checkbox h-4 w-4 bg-white" value="1">
                                                     </div>
                                                 </div>
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
@@ -185,14 +185,14 @@
                                                     <div class="flex items-center gap-1 pl-2.5">
                                                         <span class="text-[10px]">IN</span>
                                                         <input type="hidden" name="test4_in_depan" value="0">
-                                                        <input type="checkbox" name="test4_in_depan" id="test4_in_depan" {{ old('test4_in_depan', $form->test4_in_depan) ? 'checked' : '' }}
+                                                        <input type="checkbox" name="test4_in_depan" id="test4_in_depan" {{ old('test4_in_depan', $details->test4_in_depan) ? 'checked' : '' }}
                                                             class="form-checkbox h-4 w-4 bg-white" value="1">
                                                     </div>
                                                     <div class="flex items-center gap-1">
                                                         <span class="text-[10px]">OUT</span>
                                                         <input type="hidden" name="test4_out_depan" value="0">
                                                         <input type="checkbox" name="test4_out_depan"
-                                                            id="test4_out_depan" {{ old('test4_out_depan', $form->test4_out_depan) ? 'checked' : '' }} class="form-checkbox h-4 w-4 bg-white"
+                                                            id="test4_out_depan" {{ old('test4_out_depan', $details->test4_out_depan) ? 'checked' : '' }} class="form-checkbox h-4 w-4 bg-white"
                                                             value="1">
                                                     </div>
                                                 </div>
@@ -227,14 +227,14 @@
                                                     <div class="flex items-center gap-1 pr-2.5">
                                                         <input type="hidden" name="test3_in_belakang" value="0">
                                                         <input type="checkbox" name="test3_in_belakang"
-                                                            id="test3_in_belakang" {{ old('test3_in_belakang', $form->test3_in_belakang) ? 'checked' : '' }} class="form-checkbox h-4 w-4 bg-white"
+                                                            id="test3_in_belakang" {{ old('test3_in_belakang', $details->test3_in_belakang) ? 'checked' : '' }} class="form-checkbox h-4 w-4 bg-white"
                                                             class="form-checkbox h-4 w-4 bg-white" value="1">
                                                         <span class="text-[10px]">IN</span>
                                                     </div>
                                                     <div class="flex items-center gap-1">
                                                         <input type="hidden" name="test3_out_belakang" value="0">
                                                         <input type="checkbox" name="test3_out_belakang"
-                                                            id="test3_out_belakang" {{ old('test3_out_belakang', $form->test3_out_belakang) ? 'checked' : '' }}
+                                                            id="test3_out_belakang" {{ old('test3_out_belakang', $details->test3_out_belakang) ? 'checked' : '' }}
                                                             class="form-checkbox h-4 w-4 bg-white" value="1">
                                                         <span class="text-[10px]">OUT</span>
                                                     </div>
@@ -265,29 +265,27 @@
                             </div>
                             <div>
                                 <label class="block text-gray-700 font-bold mb-2">CATATAN:</label>
-                                <textarea name="notes" class="w-full border rounded px-2 py-1" rows="3">{{ old('notes', $form->notes) }}</textarea>
+                                <textarea name="note" class="w-full border rounded px-2 py-1" rows="3">{{ old('note', $form->note) }}</textarea>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="flex items-center justify-between m-4">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Kirim Ulang Laporan
+                </button>
+                <a href="{{ route('dashboard.officer') }}" class="text-gray-600 hover:text-gray-800">
+                    Kembali ke Dashboard
+                </a>
+            </div>
         </form>
     </div>
-    <div class="flex items-center justify-between mt-4">
-        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Kirim Ulang Laporan
-        </button>
-        <a href="{{ route('dashboard.officer') }}" class="text-gray-600 hover:text-gray-800">
-            Kembali ke Dashboard
-        </a>
-    </div>
-    </form>
-</div>
 </div>
 
 @push('scripts')
 <script>
-   // Fungsi untuk mengecek status checkbox dan mengupdate radio button
+    // Fungsi untuk mengecek status checkbox dan mengupdate radio button
     function updateRadioResult() {
         // Ambil semua checkbox berdasarkan ID yang ada
         const test1Checkboxes = [
