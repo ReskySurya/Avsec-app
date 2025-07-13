@@ -96,9 +96,9 @@ class Report extends Model
 
         // Get the last report for today to determine sequence
         $lastReport = static::whereDate('created_at', today())
-                           ->where('reportID', 'like', $prefix . $date . '%')
-                           ->orderBy('reportID', 'desc')
-                           ->first();
+            ->where('reportID', 'like', $prefix . $date . '%')
+            ->orderBy('reportID', 'desc')
+            ->first();
 
         if ($lastReport) {
             // Extract the sequence number from the last report ID
@@ -117,8 +117,8 @@ class Report extends Model
     public function equipment(): BelongsTo
     {
         return $this->belongsTo(Equipment::class, 'equipmentLocationID', 'id')
-                    ->join('equipment_locations', 'equipment.id', '=', 'equipment_locations.equipment_id')
-                    ->where('equipment_locations.id', $this->equipmentLocationID);
+            ->join('equipment_locations', 'equipment.id', '=', 'equipment_locations.equipment_id')
+            ->where('equipment_locations.id', $this->equipmentLocationID);
     }
 
     /**
@@ -127,8 +127,8 @@ class Report extends Model
     public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class, 'equipmentLocationID', 'id')
-                    ->join('equipment_locations', 'locations.id', '=', 'equipment_locations.location_id')
-                    ->where('equipment_locations.id', $this->equipmentLocationID);
+            ->join('equipment_locations', 'locations.id', '=', 'equipment_locations.location_id')
+            ->where('equipment_locations.id', $this->equipmentLocationID);
     }
 
     /**
@@ -137,9 +137,14 @@ class Report extends Model
     public function equipmentLocationData()
     {
         return $this->belongsTo(Equipment::class, 'equipmentLocationID', 'equipment_locations.id')
-                    ->select(['equipment.*', 'equipment_locations.id as pivot_id', 'locations.name as location_name'])
-                    ->join('equipment_locations', 'equipment.id', '=', 'equipment_locations.equipment_id')
-                    ->join('locations', 'equipment_locations.location_id', '=', 'locations.id');
+            ->select(['equipment.*', 'equipment_locations.id as pivot_id', 'locations.name as location_name'])
+            ->join('equipment_locations', 'equipment.id', '=', 'equipment_locations.equipment_id')
+            ->join('locations', 'equipment_locations.location_id', '=', 'locations.id');
+    }
+
+    public function equipmentLocation()
+    {
+        return $this->belongsTo(EquipmentLocation::class, 'equipmentLocationID', 'id');
     }
 
     /**
@@ -211,7 +216,7 @@ class Report extends Model
      */
     public function scopePending($query)
     {
-        return $query->whereHas('status', function($q) {
+        return $query->whereHas('status', function ($q) {
             $q->where('name', 'pending');
         });
     }
@@ -221,7 +226,7 @@ class Report extends Model
      */
     public function scopeApproved($query)
     {
-        return $query->whereHas('status', function($q) {
+        return $query->whereHas('status', function ($q) {
             $q->where('name', 'approved');
         });
     }
@@ -231,7 +236,7 @@ class Report extends Model
      */
     public function scopeRejected($query)
     {
-        return $query->whereHas('status', function($q) {
+        return $query->whereHas('status', function ($q) {
             $q->where('name', 'rejected');
         });
     }
@@ -319,13 +324,13 @@ class Report extends Model
      */
     public function scopeSearch($query, $search)
     {
-        return $query->where(function($q) use ($search) {
+        return $query->where(function ($q) use ($search) {
             $q->where('reportID', 'like', "%{$search}%")
-              ->orWhere('deviceInfo', 'like', "%{$search}%")
-              ->orWhere('note', 'like', "%{$search}%")
-              ->orWhereHas('submittedBy', function($subQ) use ($search) {
-                  $subQ->where('name', 'like', "%{$search}%");
-              });
+                ->orWhere('deviceInfo', 'like', "%{$search}%")
+                ->orWhere('note', 'like', "%{$search}%")
+                ->orWhereHas('submittedBy', function ($subQ) use ($search) {
+                    $subQ->where('name', 'like', "%{$search}%");
+                });
         });
     }
 

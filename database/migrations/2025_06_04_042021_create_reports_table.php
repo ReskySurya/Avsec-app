@@ -18,7 +18,6 @@ return new class extends Migration
             // Foreign key to equipment_locations table
             $table->unsignedBigInteger('equipmentLocationID');
             $table->foreign('equipmentLocationID')->references('id')->on('equipment_locations')->onDelete('cascade');
-            
             $table->text('deviceInfo')->nullable();
             $table->text('certificateInfo')->nullable();
             $table->boolean('isFullFilled')->default(false);

@@ -7,6 +7,7 @@
 @endpush
 
 <div class="bg-white p-4 w-full max-w-full">
+    
     <div id="format" class="mx-auto w-full">
         <div class="border-t-2 border-x-2 border-black bg-white shadow-md p-4">
             <div class="flex flex-col sm:flex-row items-center justify-between">
@@ -15,7 +16,7 @@
                     CHECK LIST PENGUJIAN HARIAN<br>
                     MESIN X-RAY CABIN MULTIVIEW<br>
                 </h1>
-                <img src="{{ asset('images/injourney-logo.png') }}" alt="Injourney Logo" class="w-20 h-20 mt-2 sm:mt-0">
+                <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo" class="w-20 h-20 mt-2 sm:mt-0">
             </div>
         </div>
 
@@ -57,10 +58,12 @@
                                 <select id="location" name="location"
                                     class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base">
                                     <option value="">Pilih Lokasi</option>
-                                    @if(isset($xrayCabinLocations))
-                                    @foreach($xrayCabinLocations as $location)
-                                    <option value="{{ $location->id }}">{{ $location->name }}</option>
-                                    @endforeach
+                                     @if(isset($xrayCabinLocations))
+                                        @foreach($xrayCabinLocations as $equipmentLocation)
+                                            <option value="{{ $equipmentLocation->location_id }}">
+                                                {{ $equipmentLocation->location->name ?? 'Nama lokasi tidak tersedia' }}
+                                            </option>
+                                        @endforeach
                                     @endif
                                 </select>
                             </td>

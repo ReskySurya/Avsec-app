@@ -13,13 +13,23 @@ return new class extends Migration
     {
         Schema::create('equipment_locations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('equipment_id')->constrained('equipment')->onDelete('cascade');
-            $table->foreignId('location_id')->constrained('locations')->onDelete('cascade');
-            $table->text('description')->nullable(); // Field tambahan di pivot table
+            $table->unsignedBigInteger('equipment_id');
+            $table->unsignedBigInteger('location_id');
+            $table->string('merk_type', 255)->nullable();
+            $table->string('certificateInfo', 255)->nullable();
+            $table->text('description')->nullable();
             $table->timestamps();
             
+            // Foreign key constraints
+            $table->foreign('equipment_id')->references('id')->on('equipment')->onDelete('cascade');
+            $table->foreign('location_id')->references('id')->on('locations')->onDelete('cascade');
+            
             // Ensure unique combination
-            $table->unique(['equipment_id', 'location_id']);
+            $table->unique(['equipment_id', 'location_id'], 'equipment_location_unique');
+            
+            // Add indexes for better performance
+            $table->index('equipment_id');
+            $table->index('location_id');
         });
     }
 

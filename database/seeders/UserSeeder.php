@@ -21,7 +21,7 @@ class UserSeeder extends Seeder
             'nip' => '2024001',
             'lisensi' => 'LIC001',
             'email' => 'superadmin@example.com',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('1'),
             'role_id' => $superAdminRole->id,
         ]);
 
@@ -31,7 +31,7 @@ class UserSeeder extends Seeder
             'nip' => '2024002',
             'lisensi' => 'LIC002',
             'email' => 'supervisor@example.com',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('1'),
             'role_id' => $supervisorRole->id,
         ]);
 
@@ -41,7 +41,7 @@ class UserSeeder extends Seeder
             'nip' => '2024003',
             'lisensi' => 'LIC003',
             'email' => 'officer@example.com',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('1'),
             'role_id' => $officerRole->id,
         ]);
     }

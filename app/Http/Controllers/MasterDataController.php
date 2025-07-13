@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Equipment;
+use App\Models\EquipmentLocation;
 use App\Models\Location;
 use App\Models\User;
 use App\Models\Role;
@@ -13,73 +14,63 @@ use Illuminate\Support\Facades\Log;
 
 class MasterDataController extends Controller
 {
-    // public function indexEquipment()
-    // {
-    //     // $equipments = Equipment::with('creator')->get();
-    //     // $locations = Location::with('creator')->get();
-    //     $equipments = Equipment::with(['locations', 'creator'])->get();
-    //     $locations = Location::with(['equipments', 'creator'])->get();
-    //     return view('master-data.equipment-locations.index', compact('equipments', 'locations'));
-    // }
-
-    public function indexEquipment(Request $request)
+    public function indexEquipmentLocation(Request $request)
     {
-        // Search untuk tabel (equipment + location)
         $searchTable = $request->input('search_table');
 
+       $equipmentLocations = EquipmentLocation::with(['equipment', 'location'])
+        ->whereHas('equipment')
+        ->whereHas('location')
+        ->when($searchTable, function($query) use ($searchTable) {
+            $query->where(function($q) use ($searchTable) {
+                $q->whereHas('equipment', function($subQ) use ($searchTable) {
+                    $subQ->where('name', 'like', "%{$searchTable}%");
+                })
+                ->orWhereHas('location', function($subQ) use ($searchTable) {
+                    $subQ->where('name', 'like', "%{$searchTable}%");
+                })
+                ->orWhere('merkType', 'like', "%{$searchTable}%")
+                ->orWhere('description', 'like', "%{$searchTable}%");
+            });
+        })
+        ->paginate(5, ['*'], 'equipmentLocationsPage') // paginate with custom page query string
+        ->appends(request()->query());
+        // $equipmentList = Equipment::with('creator')->orderBy('name')->get();
 
-        $equipmentLocations = Equipment::with(['locations', 'creator'])
-            ->when(
-                $searchTable,
-                fn($query) =>
-                $query->where('name', 'like', "%{$searchTable}%")
-            )
-            ->paginate(5)
-            ->appends(['search_table' => $searchTable]);
-
-        // Search untuk card
-        $searchEquipment = $request->input('search_equipment');
+        // $locationList = Location::with('creator')->orderBy('name')->get();
+        // Equipment
         $equipmentList = Equipment::with('creator')
-            ->when(
-                $searchEquipment,
-                fn($query) =>
-                $query->where('name', 'like', "%{$searchEquipment}%")
-            )
-            ->paginate(5)
-            ->appends(['search_equipment' => $searchEquipment]);
+            ->when($searchTable, function ($query) use ($searchTable) {
+                $query->where('name', 'like', "%{$searchTable}%")
+                    ->orWhere('merkType', 'like', "%{$searchTable}%")
+                    ->orWhere('description', 'like', "%{$searchTable}%");
+            })
+            ->orderBy('id')
+            ->paginate(5, ['*'], 'equipmentPage') 
+            ->appends(request()->query());
 
-        $searchLocation = $request->input('search_location');
+        // Location
         $locationList = Location::with('creator')
-            ->when(
-                $searchLocation,
-                fn($query) =>
-                $query->where('name', 'like', "%{$searchLocation}%")
-            )
-            ->paginate(5)
-            ->appends(['search_location' => $searchLocation]);
-            // ->paginate(5)
-            // ->appends(['search_location' => $searchLocation]);
-
+            ->when($searchTable, function ($query) use ($searchTable) {
+                $query->where('name', 'like', "%{$searchTable}%")
+                    ->orWhere('description', 'like', "%{$searchTable}%");
+            })
+            ->orderBy('id')
+            ->paginate(5, ['*'], 'locationPage') 
+            ->appends(request()->query());
 
         return view('master-data.equipment-locations.index', compact(
             'equipmentLocations',
             'equipmentList',
             'locationList',
-            'searchTable',
-            'searchLocation',
-            'searchEquipment',
+            'searchTable'
         ));
     }
 
-
-
-    /**
-     * Store a new equipment
-     */
     public function storeEquipment(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:equipment,name',
             'description' => 'nullable|string|max:1000',
         ]);
 
@@ -87,22 +78,20 @@ class MasterDataController extends Controller
             Equipment::create([
                 'name' => $request->name,
                 'description' => $request->description,
-                'creationID' => Auth::id(), // ID user yang sedang login
+                'creationID' => Auth::id(),
             ]);
 
             return redirect()->back()->with('success', 'Equipment berhasil ditambahkan!');
         } catch (\Exception $e) {
+            Log::error('Error creating equipment: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal menambahkan equipment: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Store a new location
-     */
     public function storeLocation(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:locations,name',
             'description' => 'nullable|string|max:1000',
         ]);
 
@@ -110,49 +99,54 @@ class MasterDataController extends Controller
             Location::create([
                 'name' => $request->name,
                 'description' => $request->description,
-                'creationID' => Auth::id(), // ID user yang sedang login
+                'creationID' => Auth::id(),
             ]);
 
             return redirect()->back()->with('success', 'Location berhasil ditambahkan!');
         } catch (\Exception $e) {
+            Log::error('Error creating location: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal menambahkan location: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Store equipment location relationship
-     */
     public function storeEquipmentLocation(Request $request)
     {
         $request->validate([
             'equipment_id' => 'required|exists:equipment,id',
             'location_id' => 'required|exists:locations,id',
+            'merk_type' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:1000',
         ]);
 
         try {
-            $equipment = Equipment::findOrFail($request->equipment_id);
-
             // Check if relationship already exists
-            if ($equipment->locations()->where('location_id', $request->location_id)->exists()) {
+            $exists = EquipmentLocation::where('equipment_id', $request->equipment_id)
+                ->where('location_id', $request->location_id)
+                ->exists();
+
+            if ($exists) {
                 return redirect()->back()->with('error', 'Relasi equipment dan location sudah ada!');
             }
 
-            $equipment->locations()->attach($request->location_id, [
+            // Create new equipment location relationship
+            EquipmentLocation::create([
+                'equipment_id' => $request->equipment_id,
+                'location_id' => $request->location_id,
+                'merk_type' => $request->merk_type,
                 'description' => $request->description,
             ]);
 
             return redirect()->back()->with('success', 'Equipment location berhasil ditambahkan!');
         } catch (\Exception $e) {
+            Log::error('Error creating equipment location: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal menambahkan equipment location: ' . $e->getMessage());
         }
     }
 
-    // Update Equipment
     public function updateEquipment(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:equipment,name,' . $id,
             'description' => 'nullable|string|max:1000',
         ]);
 
@@ -165,14 +159,15 @@ class MasterDataController extends Controller
 
             return redirect()->back()->with('success', 'Equipment berhasil diperbarui!');
         } catch (\Exception $e) {
+            Log::error('Error updating equipment: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal memperbarui equipment: ' . $e->getMessage());
         }
     }
-    // Update Location
+
     public function updateLocation(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:locations,name,' . $id,
             'description' => 'nullable|string|max:1000',
         ]);
 
@@ -185,44 +180,103 @@ class MasterDataController extends Controller
 
             return redirect()->back()->with('success', 'Location berhasil diperbarui!');
         } catch (\Exception $e) {
+            Log::error('Error updating location: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal memperbarui location: ' . $e->getMessage());
         }
     }
 
-    // Hapus Equipment
+    public function updateEquipmentLocation(Request $request, $id)
+    {
+        $request->validate([
+            'equipment_id' => 'required|exists:equipment,id',
+            'location_id' => 'required|exists:locations,id',
+            'merk_type' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:1000',
+        ]);
+
+        try {
+            $equipmentLocation = EquipmentLocation::findOrFail($id);
+
+            Log::info('Updating equipment location relationship', [
+                'id' => $id,
+                'old_equipment_id' => $equipmentLocation->equipment_id,
+                'old_location_id' => $equipmentLocation->location_id,
+                'new_equipment_id' => $request->equipment_id,
+                'new_location_id' => $request->location_id,
+            ]);
+
+            // Check if the new combination already exists (but not the current record)
+            $exists = EquipmentLocation::where('equipment_id', $request->equipment_id)
+                ->where('location_id', $request->location_id)
+                ->where('id', '!=', $id)
+                ->exists();
+
+            if ($exists) {
+                return redirect()->back()->with('error', 'Relasi equipment dan location yang baru sudah ada!');
+            }
+
+            // Update the relationship
+            $equipmentLocation->update([
+                'equipment_id' => $request->equipment_id,
+                'location_id' => $request->location_id,
+                'merk_type' => $request->merk_type,
+                'description' => $request->description,
+            ]);
+
+            return redirect()->back()->with('success', 'Equipment location berhasil diupdate!');
+        } catch (\Exception $e) {
+            Log::error('Error updating equipment location: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal mengupdate equipment location: ' . $e->getMessage());
+        }
+    }
+
     public function destroyEquipment($id)
     {
         try {
             $equipment = Equipment::findOrFail($id);
+
+            // Check if equipment has relationships
+            if ($equipment->equipmentLocations()->exists()) {
+                return redirect()->back()->with('error', 'Equipment tidak dapat dihapus karena masih memiliki relasi dengan location!');
+            }
+
             $equipment->delete();
 
             return redirect()->back()->with('success', 'Equipment berhasil dihapus!');
         } catch (\Exception $e) {
+            Log::error('Error deleting equipment: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal menghapus equipment: ' . $e->getMessage());
         }
     }
 
-    // Hapus Location
     public function destroyLocation($id)
     {
         try {
             $location = Location::findOrFail($id);
+
+            // Check if location has relationships
+            if ($location->equipmentLocations()->exists()) {
+                return redirect()->back()->with('error', 'Location tidak dapat dihapus karena masih memiliki relasi dengan equipment!');
+            }
+
             $location->delete();
 
             return redirect()->back()->with('success', 'Location berhasil dihapus!');
         } catch (\Exception $e) {
+            Log::error('Error deleting location: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal menghapus location: ' . $e->getMessage());
         }
     }
 
-    // Hapus Equipment Location Relationship
-    public function destroyEquipmentLocation($equipmentId, $locationId)
+    public function destroyEquipmentLocation($id)
     {
         try {
-            $equipment = Equipment::findOrFail($equipmentId);
-            $equipment->locations()->detach($locationId);
+            $equipmentLocation = EquipmentLocation::findOrFail($id);
+            $equipmentLocation->delete();
+
             return redirect()->back()->with('success', 'Relasi equipment dan location berhasil dihapus!');
         } catch (\Exception $e) {
+            Log::error('Error deleting equipment location: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal menghapus relasi equipment dan location: ' . $e->getMessage());
         }
     }

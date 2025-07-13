@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\DailyTest;
 
 use App\Http\Controllers\Controller;
+use App\Models\EquipmentLocation;
 use Illuminate\Http\Request;
 use App\Models\Equipment;
 use App\Models\Location;
@@ -19,15 +20,15 @@ class HhmdController extends Controller
 {
     public function hhmdLayout()
     {
-        // Ambil equipment HHMD
+        // Ambil equipment HHMD terlebih dahulu
         $hhmdEquipment = Equipment::where('name', 'hhmd')->first();
 
-        // Ambil lokasi yang terhubung dengan HHMD
-        $hhmdLocations = [];
+        $hhmdLocations = collect();
+
         if ($hhmdEquipment) {
-            $hhmdLocations = $hhmdEquipment->locations()
-                ->wherePivot('equipment_id', $hhmdEquipment->id)
-                ->withPivot('description', 'id')
+            // Gunakan EquipmentLocation untuk mendapatkan data yang lebih lengkap
+            $hhmdLocations = EquipmentLocation::where('equipment_id', $hhmdEquipment->id)
+                ->with(['location', 'equipment']) // Eager loading untuk menghindari N+1 query
                 ->get();
         }
 
@@ -36,47 +37,53 @@ class HhmdController extends Controller
         ]);
     }
 
-    public function checkLocation(Request $request)
+    public function get($id)
     {
-        $locationId = $request->input('location_id');
+        Log::info("Accessing HHMD review form with reportID: $id");
 
-        // Validasi lokasi
-        $location = Location::find($locationId);
+        try {
+            // Load report tanpa relasi yang bermasalah dulu
+            $report = Report::with([
+                'submittedBy',
+                'status',
+                'reportDetails'
+            ])->findOrFail($id);
 
-        if (!$location) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Lokasi tidak ditemukan'
-            ], 404);
+            Log::info("Report found: " . $report->reportID);
+
+            // Get all possible statuses for the dropdown
+            $statuses = ReportStatus::all();
+
+            // Get assigned supervisor details
+            $supervisor = null;
+            if ($report->approvedByID) {
+                $supervisor = User::find($report->approvedByID);
+            }
+
+            // Additional data validation
+            if (!$report->reportDetails || $report->reportDetails->isEmpty()) {
+                Log::warning("Report details not found for reportID: $id");
+                return redirect()->back()->with('error', 'Report details not found');
+            }
+
+            return view('daily-test.review-form.hhmdReviewForm', [
+                'form' => $report,
+                'statuses' => $statuses,
+                'supervisor' => $supervisor,
+                'function' => 'update'
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::error("Report not found with reportID: $id");
+            return redirect()->back()->with('error', 'Report tidak ditemukan');
+        } catch (\Exception $e) {
+            Log::error('Error in HHMD review form: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-
-        // Cek apakah lokasi terhubung dengan HHMD
-        $hhmdEquipment = Equipment::where('name', 'hhmd')->first();
-
-        if (!$hhmdEquipment) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Equipment HHMD tidak ditemukan'
-            ], 404);
-        }
-
-        $isConnected = $hhmdEquipment->locations()
-            ->where('locations.id', $locationId)
-            ->exists();
-
-        if (!$isConnected) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Lokasi tidak terhubung dengan HHMD'
-            ], 400);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Lokasi valid',
-            'location' => $location
-        ]);
     }
+
+
+
 
     public function store(Request $request)
     {
@@ -103,30 +110,18 @@ class HhmdController extends Controller
         }
 
         try {
-            // Ambil equipment HHMD
-            $hhmdEquipment = Equipment::where('name', 'hhmd')->first();
-
-            if (!$hhmdEquipment) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Equipment HHMD tidak ditemukan'
-                ], 404);
-            }
-
-            // Ambil equipment_locations_id
-            $equipmentLocation = $hhmdEquipment->locations()
-                ->where('locations.id', $request->location)
+             $equipmentLocation = EquipmentLocation::whereHas('equipment', function ($query) {
+                $query->where('name', 'hhmd');
+            })
+                ->where('location_id', $request->location)
                 ->first();
 
             if (!$equipmentLocation) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Relasi equipment dan lokasi tidak ditemukan'
+                    'message' => 'Relasi equipment HHMD dan lokasi tidak ditemukan'
                 ], 404);
             }
-
-            $equipmentLocationId = $equipmentLocation->pivot->id;
-
             // Ambil status 'pending_supervisor'
             $pendingStatus = ReportStatus::where('name', 'pending')->first();
 
@@ -140,7 +135,7 @@ class HhmdController extends Controller
             // Buat report baru
             $report = new Report();
             $report->testDate = $request->testDateTime;
-            $report->equipmentLocationID = $equipmentLocationId;
+            $report->equipmentLocationID = $equipmentLocation->id;
             $report->deviceInfo = $request->deviceInfo;
             $report->certificateInfo = $request->certificateInfo;
             $report->isFullFilled = $request->terpenuhi ? true : false;
@@ -245,7 +240,7 @@ class HhmdController extends Controller
                 'statuses' => $statuses,
                 'supervisor' => $supervisor,
                 'location' => $location,
-                'equipment' => $equipment
+                'equipment' => $equipment,
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::error("Report not found with reportID: $id");
@@ -259,56 +254,38 @@ class HhmdController extends Controller
 
     public function showData()
     {
-        // Ambil equipment HHMD
-        $equipment = Equipment::whereIn('name', ['hhmd', 'wtmd', 'xraycabin', 'xraybagasi'])->get()->keyBy('name');
+        $equipmentTypes = ['hhmd', 'wtmd', 'xraycabin', 'xraybagasi'];
 
-        $allReports = collect();
-
-        foreach ($equipment as $equipmentType => $equipmentData) {
-            $equipmentLocationIds = $equipmentData->locations()
-                ->pluck('equipment_locations.id')
-                ->toArray();
-
-            if (empty($equipmentLocationIds)) {
-                continue;
-            }
-
-            $reports = Report::query()
-                ->join('equipment_locations', 'reports.equipmentLocationID', '=', 'equipment_locations.id')
-                ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
-                ->whereIn('reports.equipmentLocationID', $equipmentLocationIds)
-                ->where('reports.approvedByID', Auth::id())
-                ->with(['submittedBy', 'status'])
-                ->select(
-                    'reports.reportID as id',
-                    'reports.testDate',
-                    'reports.submittedByID',
-                    'reports.statusID',
-                    'locations.name as location_name'
-                )
-                ->orderBy('reports.created_at', 'desc')
-                ->get()
-                ->map(function ($report) use ($equipmentType) {
-                    return [
-                        'id' => $report->id,
-                        'date' => $report->testDate->format('d/m/Y'),
-                        'test_type' => strtoupper($equipmentType),
-                        'location' => $report->location_name,
-                        'status' => $report->status->name ?? 'pending',
-                        'operator' => $report->submittedBy->name ?? 'Unknown',
-                    ];
-                });
-
-            $allReports = $allReports->merge($reports);
-        }
-
-        // Urutkan berdasarkan tanggal
-        $sortedReports = $allReports->sortByDesc(function ($report) {
-            return \Carbon\Carbon::createFromFormat('d/m/Y', $report['date']);
-        })->values();
+        $reports = Report::query()
+            ->join('equipment_locations', 'reports.equipmentLocationID', '=', 'equipment_locations.id')
+            ->join('equipment', 'equipment_locations.equipment_id', '=', 'equipment.id')
+            ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
+            ->whereIn('equipment.name', $equipmentTypes)
+            ->where('reports.approvedByID', Auth::id())
+            ->with(['submittedBy', 'status'])
+            ->select(
+                'reports.reportID as id',
+                'reports.testDate',
+                'reports.submittedByID',
+                'reports.statusID',
+                'locations.name as location_name',
+                'equipment.name as equipment_name'
+            )
+            ->orderBy('reports.created_at', 'desc')
+            ->get()
+            ->map(function ($report) {
+                return [
+                    'id' => $report->id,
+                    'date' => $report->testDate->format('d/m/Y'),
+                    'test_type' => strtoupper($report->equipment_name),
+                    'location' => $report->location_name,
+                    'status' => $report->status->name ?? 'pending',
+                    'operator' => $report->submittedBy->name ?? 'Unknown',
+                ];
+            });
 
         return view('supervisor.dailyTestForm', [
-            'reports' => $sortedReports,
+            'reports' => $reports,
         ]);
     }
 
@@ -460,6 +437,137 @@ class HhmdController extends Controller
             Log::error('Error in show report: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function editRejectedReport($id)
+    {
+        try {
+            // Load report dengan relasi yang diperlukan
+            $report = Report::with([
+                'submittedBy',
+                'status',
+                'reportDetails',
+                'equipmentLocation.location',
+                'equipmentLocation.equipment'
+            ])->findOrFail($id);
+
+            // Pastikan ini adalah laporan HHMD
+            if ($report->equipmentLocation->equipment->name !== 'hhmd') {
+                Log::warning("Invalid report type for reportID: $id. Equipment: " . $report->equipmentLocation->equipment->name);
+                return redirect()->back()->with('error', 'Invalid report type');
+            }
+
+            // Ambil semua lokasi yang berelasi dengan equipment HHMD
+            $hhmdEquipment = Equipment::where('name', 'hhmd')->first();
+            $hhmdLocations = collect();
+            if ($hhmdEquipment) {
+                $hhmdLocations = EquipmentLocation::where('equipment_id', $hhmdEquipment->id)
+                    ->with('location')
+                    ->get()
+                    ->map(function ($el) {
+                        return $el->location;
+                    })
+                    ->unique('id');
+            }
+
+            // Ambil detail report
+            $details = $report->reportDetails->first();
+
+            return view('officer.editHhmd', [
+                'form' => $report,
+                'details' => $details,
+                'hhmdLocations' => $hhmdLocations,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::error("Report not found with reportID: $id");
+            return redirect()->back()->with('error', 'Report tidak ditemukan');
+        } catch (\Exception $e) {
+            Log::error('Error in edit rejected report: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        // Validasi input
+        $validator = Validator::make($request->all(), [
+            'testDateTime' => 'required|date',
+            'location' => 'required|exists:locations,id',
+            'deviceInfo' => 'required|string|max:255',
+            'certificateInfo' => 'required|string|max:255',
+            'notes' => 'nullable|string',
+            'terpenuhi' => 'boolean',
+            'tidakterpenuhi' => 'boolean',
+            'test1' => 'boolean',
+            'testCondition1' => 'boolean',
+            'testCondition2' => 'boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        try {
+            Log::info('Updating HHMD Report ID: ' . $id);
+            Log::info('Request data:', $request->all());
+
+            DB::beginTransaction();
+
+            $report = Report::findOrFail($id);
+
+            // Pastikan pengguna yang login adalah yang mengirim laporan
+            if ($report->submittedByID !== Auth::id()) {
+                return redirect()->route('dashboard.officer')->with('error', 'Anda tidak memiliki izin untuk mengedit laporan ini.');
+            }
+
+            $equipmentLocation = EquipmentLocation::whereHas('equipment', function ($query) {
+                $query->where('name', 'hhmd');
+            })
+            ->where('location_id', $request->location)
+            ->firstOrFail();
+
+            // Ambil status 'pending'
+            $pendingStatus = ReportStatus::where('name', 'pending')->firstOrFail();
+
+            // Update report
+            $report->testDate = $request->testDateTime;
+            $report->equipmentLocationID = $equipmentLocation->id;
+            $report->deviceInfo = $request->deviceInfo;
+            $report->certificateInfo = $request->certificateInfo;
+            $report->isFullFilled = $request->boolean('terpenuhi');
+            $report->result = $request->boolean('test1') ? 'pass' : 'fail';
+            $report->note = $request->notes;
+            $report->statusID = $pendingStatus->id;
+            $report->approvalNote = null; // Hapus catatan penolakan sebelumnya
+            $report->save();
+
+            // Update report detail secara eksplisit
+            $reportDetail = ReportDetail::where('reportID', $report->reportID)->first();
+            if (!$reportDetail) {
+                // Fallback jika detail tidak ditemukan, meskipun seharusnya tidak terjadi
+                $reportDetail = new ReportDetail();
+                $reportDetail->reportID = $report->reportID;
+            }
+
+            $reportDetail->terpenuhi = $request->boolean('terpenuhi');
+            $reportDetail->tidakterpenuhi = $request->boolean('tidakterpenuhi');
+            $reportDetail->test1 = $request->boolean('test1');
+            $reportDetail->testCondition1 = $request->boolean('testCondition1');
+            $reportDetail->testCondition2 = $request->boolean('testCondition2');
+            $reportDetail->save();
+
+            DB::commit();
+
+            return redirect()->route('dashboard.officer')->with('success', 'Laporan berhasil diperbarui dan dikirim ulang untuk ditinjau.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error updating HHMD report: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat memperbarui laporan: ' . $e->getMessage())->withInput();
         }
     }
 }

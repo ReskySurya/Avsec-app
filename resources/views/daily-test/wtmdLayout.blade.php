@@ -41,29 +41,7 @@
         const buttonLoading = document.getElementById('buttonLoading');
 
         // Fungsi untuk mengecek lokasi
-        async function checkLocation(locationId) {
-            try {
-                const response = await fetch('/daily-test/wtmd/check-location', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify({ location_id: locationId })
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.message || 'Terjadi kesalahan saat memeriksa lokasi');
-                }
-
-                return data;
-            } catch (error) {
-                console.error('Error checking location:', error);
-                throw error;
-            }
-        }
+        
 
         // Event listener untuk form submission
         document.getElementById('wtmdForm').addEventListener('submit', async function (e) {
@@ -85,8 +63,7 @@
             }
 
             try {
-                // Validasi lokasi dengan API
-                await checkLocation(locationValue);
+                
 
                 // Validasi tanda tangan
                 const signatureData = document.getElementById('submitterSignatureData').value;
@@ -136,6 +113,7 @@
 
                 console.log('Form submission result:', formData, result);
                 if (response.ok) {
+                    alert(locationValue);
                     Swal.fire({
                         title: 'Berhasil',
                         text: result.message || 'Form berhasil dikirim',
@@ -170,9 +148,7 @@
 
         // Event listener untuk perubahan lokasi
         document.getElementById('location').addEventListener('change', function () {
-            if (this.value) {
-                checkLocation(this.value);
-            }
+           
         });
 
         // Inisialisasi canvas untuk tanda tangan

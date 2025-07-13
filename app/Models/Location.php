@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Location extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'id',
         'name',
         'description',
         'creationID',
@@ -26,13 +26,12 @@ class Location extends Model
         return $this->belongsTo(User::class, 'creationID');
     }
 
+
     /**
-     * Relasi: Location many-to-many dengan Equipment
+     * Relasi: Location has many EquipmentLocation (untuk akses langsung ke pivot)
      */
-    public function equipments(): BelongsToMany
+    public function equipmentLocations(): HasMany
     {
-        return $this->belongsToMany(Equipment::class, 'equipment_locations')
-                    ->withPivot('id', 'description')
-                    ->withTimestamps();
+        return $this->hasMany(EquipmentLocation::class);
     }
 }
