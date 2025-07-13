@@ -35,7 +35,7 @@
                             (HAND HELD METAL DETECTOR/HHMD)<br>
                             PADA KONDISI NORMAL (HIJAU)
                         </h1>
-                        <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo" class="w-20 h-20 mt-2 sm:mt-0">
+                        <img src="https://via.placeholder.com/80x80" alt="Additional Logo" class="w-20 h-20">
                     </div>
                 </div>
 
@@ -45,7 +45,9 @@
                             <tr class="border-b border-black">
                                 <th class="w-1/3 text-left p-2">Nama Operator Penerbangan:</th>
                                 <td class="w-2/3 p-2">
-                                    <input type="text" name="operatorName" value="Bandar Udara Adisutjipto Yogyakarta" class="w-full border rounded px-2 py-1 bg-gray-100" readonly>
+                                    <input type="text" name="operatorName"
+                                        value="Bandar Udara Adisutjipto Yogyakarta"
+                                        class="w-full border rounded px-2 py-1 bg-gray-100" readonly>
                                 </td>
                             </tr>
                             <tr class="border-b border-black">
@@ -59,9 +61,8 @@
                             <tr class="border-b border-black">
                                 <th class="w-1/3 text-left p-2">Lokasi Penempatan:</th>
                                 <td class="w-2/3 p-2">
-                                    <select id="location" name="location"
-                                        class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base">
-                                        <option value="">Pilih Lokasi</option>
+                                    <select id="location" name="location_display"
+                                        class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base bg-gray-100" disabled>
                                         @if(isset($hhmdLocations))
                                         @foreach($hhmdLocations as $location)
                                         <option value="{{ $location->id }}"
@@ -71,6 +72,7 @@
                                         @endforeach
                                         @endif
                                     </select>
+                                    <input type="hidden" name="location" value="{{ $form->equipmentLocation->location_id }}">
                                     @error('location')
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                     @enderror
@@ -109,7 +111,7 @@
                                 <label class="inline-flex items-center">
                                     <input type="hidden" name="tidakterpenuhi" value="0">
                                     <input type="checkbox" name="tidakterpenuhi" value="1" {{ old('tidakterpenuhi',
-                                        $form->tidakterpenuhi) ? 'checked' : '' }}>
+                                        $details->tidakterpenuhi) ? 'checked' : '' }}>
                                     <span class="ml-2 text-sm">Tidak Terpenuhi</span>
                                 </label>
                             </div>
@@ -119,9 +121,8 @@
                             <div>
                                 <h2 class="font-bold mb-2">TEST 1</h2>
                                 <div class="w-20 h-20 mx-auto border-2 border-black flex items-center justify-center">
-                                    <input type="hidden" name="test1" value="0">
                                     <input type="checkbox" id="test1" name="test1" value="1" {{ old('test1',
-                                        $form->test1) ? 'checked' : '' }}
+                                        $details->test1) ? 'checked' : '' }}
                                     onchange="updateRadioResult()">
                                 </div>
                             </div>
@@ -131,14 +132,14 @@
                             <div class="flex items-center mb-0 pl-4">
                                 <input type="hidden" name="testCondition1" value="0">
                                 <input type="checkbox" name="testCondition1" value="1" {{ old('testCondition1',
-                                    $form->testCondition1) ? 'checked' : '' }}>
+                                    $details->testCondition1) ? 'checked' : '' }}>
                                 <label class="ml-2 text-sm">Letak alat uji OTP dan HHMD pada saat pengujian harus > 1m
                                     dari benda logam lain disekelilingnya.</label>
                             </div>
                             <div class="flex items-center mb-0 pl-4">
                                 <input type="hidden" name="testCondition2" value="0">
                                 <input type="checkbox" name="testCondition2" value="1" {{ old('testCondition2',
-                                    $form->testCondition2) ? 'checked' : '' }}>
+                                    $details->testCondition2) ? 'checked' : '' }}>
                                 <label class="ml-2 text-sm">Jarak antara HHMD dan OTP > 3-5 cm.</label>
                             </div>
                         </div>
@@ -158,8 +159,6 @@
                                         $form->result) == 'fail' ? 'checked' : '' }}>
                                     <label class="text-sm ml-2">FAIL</label>
                                 </div>
-                                <input type="hidden" id="result" name="result"
-                                    value="{{ old('result', $form->result) }}">
                             </div>
                         </div>
                         <div>
@@ -188,38 +187,24 @@
 <script>
     // Fungsi untuk mengecek status checkbox dan mengupdate radio button
     function updateRadioResult() {
-        const test2Checkbox = document.getElementById('test2');
+        const test1Checkbox = document.getElementById('test1');
         const resultPass = document.getElementById('resultPass');
         const resultFail = document.getElementById('resultFail');
-        const resultHidden = document.getElementById('result');
 
-        if (test2Checkbox && resultPass && resultFail && resultHidden) {
-            if (test2Checkbox.checked) {
+        if (test1Checkbox && resultPass && resultFail) {
+            if (test1Checkbox.checked) {
                 resultPass.checked = true;
-                resultHidden.value = 'pass';
             } else {
                 resultFail.checked = true;
-                resultHidden.value = 'fail';
             }
         }
     }
 
     // Event listener untuk checkbox setelah DOM sepenuhnya dimuat
     document.addEventListener('DOMContentLoaded', function() {
-        const test2Checkbox = document.getElementById('test2');
-        if (test2Checkbox) {
-            test2Checkbox.addEventListener('change', updateRadioResult);
-        }
-
-        // Nonaktifkan radio button agar tidak bisa diklik manual
-        const resultPass = document.getElementById('resultPass');
-        const resultFail = document.getElementById('resultFail');
-
-        if (resultPass) {
-            resultPass.addEventListener('click', (e) => e.preventDefault());
-        }
-        if (resultFail) {
-            resultFail.addEventListener('click', (e) => e.preventDefault());
+        const test1Checkbox = document.getElementById('test1');
+        if (test1Checkbox) {
+            test1Checkbox.addEventListener('change', updateRadioResult);
         }
 
         // Inisialisasi status awal
