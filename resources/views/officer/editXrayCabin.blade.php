@@ -775,8 +775,8 @@
                         </div>
                         <div>
                             <label class="block text-gray-700 font-bold mb-2">CATATAN:</label>
-                            <textarea name="notes" class="w-full border rounded px-2 py-1"
-                                rows="3">{{ old('notes', $form->note) }}</textarea>
+                            <textarea name="note" class="w-full border rounded px-2 py-1"
+                                rows="3">{{ old('note', $form->note) }}</textarea>
                             </div>
                         </div>
                     </div>

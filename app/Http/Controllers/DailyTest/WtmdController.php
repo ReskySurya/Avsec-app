@@ -410,7 +410,7 @@ class WtmdController extends Controller
             $report->deviceInfo = $request->deviceInfo;
             $report->certificateInfo = $request->certificateInfo;
             $report->isFullFilled = $request->boolean('terpenuhi');
-            $report->result = $request->boolean('test1_in_depan') ? 'pass' : 'fail';
+            $report->result = $request->result;
             $report->note = $request->note;
             $report->statusID = $pendingStatus->id;
             $report->approvalNote = null; // Hapus catatan penolakan sebelumnya

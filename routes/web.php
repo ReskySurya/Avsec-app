@@ -56,6 +56,7 @@ Route::middleware(['auth', 'role:officer'])->group(function () {
     Route::get('officer/edit-rejected-report/xraycabin/{id}', [XrayController::class, 'editRejectedReportCabin'])->name('officer.xraycabin.editRejectedReport');
     Route::put('officer/edit-rejected-report/xraycabin/{id}', [XrayController::class, 'updateCabin'])->name('officer.xraycabin.update');
     Route::get('officer/edit-rejected-report/xraybagasi/{id}', [XrayController::class, 'editRejectedReportBagasi'])->name('officer.xraybagasi.editRejectedReport');
+    Route::put('officer/edit-rejected-report/xraybagasi/{id}', [XrayController::class, 'updateBagasi'])->name('officer.xraybagasi.update');
 });
 
 // Daily Test Routes
