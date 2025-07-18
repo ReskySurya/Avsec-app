@@ -45,6 +45,46 @@ class HhmdController extends Controller
         ]);
     }
 
+    public function checkSubmission(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'location_id' => 'required|exists:locations,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid location',
+            ], 422);
+        }
+
+        $equipmentLocation = EquipmentLocation::whereHas('equipment', function ($query) {
+            $query->where('name', 'hhmd');
+        })
+            ->where('location_id', $request->location_id)
+            ->first();
+
+        if (!$equipmentLocation) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Equipment location not found'
+            ], 404);
+        }
+
+        if ($latestReport = Report::getLatestSubmissionInTimeWindow($equipmentLocation->id)) {
+            $submissionTime = $latestReport->created_at;
+            $nextSubmissionTime = $submissionTime->addHours(3);
+            $remainingMinutes = (int)ceil(now()->diffInSeconds($nextSubmissionTime) / 60);
+
+            return response()->json([
+                'status' => 'submitted',
+                'message' => 'Anda telah mengirim formulir untuk lokasi ini. Coba lagi dalam ' . $remainingMinutes . ' menit.'
+            ]);
+        }
+
+        return response()->json(['status' => 'available']);
+    }
+
     public function get($id)
     {
         Log::info("Accessing HHMD review form with reportID: $id");
@@ -130,6 +170,18 @@ class HhmdController extends Controller
                     'message' => 'Relasi equipment HHMD dan lokasi tidak ditemukan'
                 ], 404);
             }
+
+            if ($latestReport = Report::getLatestSubmissionInTimeWindow($equipmentLocation->id)) {
+                $submissionTime = $latestReport->created_at;
+                $nextSubmissionTime = $submissionTime->addHours(3);
+                $remainingMinutes = (int)ceil(now()->diffInSeconds($nextSubmissionTime) / 60);
+
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Anda telah mengirim formulir untuk lokasi ini. Coba lagi dalam ' . $remainingMinutes . ' menit.'
+                ], 429);
+            }
+
             // Ambil status 'pending_supervisor'
             $pendingStatus = ReportStatus::where('name', 'pending')->first();
 

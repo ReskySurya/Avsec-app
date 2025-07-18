@@ -40,7 +40,7 @@
             </div>
         </div>
 
-        <form id="hhmdForm" method="POST" enctype="multipart/form-data" onsubmit="onFormSubmit(event)" class="mt-0">
+        <form id="hhmdForm" method="POST" action="{{ route('daily-test.hhmd.store') }}" enctype="multipart/form-data" onsubmit="onFormSubmit(event)" class="mt-0">
             @csrf
             <div class="border-2 border-black bg-white shadow">
                 <table class="w-full text-xs sm:text-sm">

@@ -88,6 +88,17 @@ class XrayController extends Controller
                 ], 404);
             }
 
+            if ($latestReport = Report::getLatestSubmissionInTimeWindow($equipmentLocation->id)) {
+                $submissionTime = $latestReport->created_at;
+                $nextSubmissionTime = $submissionTime->addHours(3);
+                $remainingMinutes = (int)ceil(now()->diffInSeconds($nextSubmissionTime) / 60);
+
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Anda telah mengirim formulir untuk lokasi ini. Coba lagi dalam ' . $remainingMinutes . ' menit.'
+                ], 429);
+            }
+
             // Ambil status 'pending_supervisor'
             $pendingStatus = ReportStatus::where('name', 'pending')->first();
 
@@ -374,6 +385,17 @@ class XrayController extends Controller
                     'status' => 'error',
                     'message' => 'Relasi equipment XRAY BAGASI dan lokasi tidak ditemukan'
                 ], 404);
+            }
+
+            if ($latestReport = Report::getLatestSubmissionInTimeWindow($equipmentLocation->id)) {
+                $submissionTime = $latestReport->created_at;
+                $nextSubmissionTime = $submissionTime->addHours(3);
+                $remainingMinutes = (int)ceil(now()->diffInSeconds($nextSubmissionTime) / 60);
+
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Anda telah mengirim formulir untuk lokasi ini. Coba lagi dalam ' . $remainingMinutes . ' menit.'
+                ], 429);
             }
 
             // Ambil status 'pending_supervisor'

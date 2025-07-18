@@ -98,11 +98,12 @@
                 // Submit form
                 const formData = new FormData(this);
 
-                const response = await fetch('/daily-test/hhmd/store', {
+                const response = await fetch("{{ route('daily-test.hhmd.store') }}", {
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
                     }
                 });
 
@@ -115,10 +116,23 @@
                         icon: 'success',
                         confirmButtonText: 'OK'
                     }).then(() => {
+                        // Reset the location select to its default option
+                        const locationSelect = document.getElementById('location');
+                        if (locationSelect) {
+                            locationSelect.value = ''; // Assuming '' is the value for "Pilih Lokasi" or the default empty option
+                        }
                         window.location.href = result.redirect || '/dashboard/officer';
                     });
                 } else {
-                    throw new Error(result.message || 'Terjadi kesalahan saat mengirim form');
+                    let errorMessage = result.message;
+                    if (result.errors) {
+                        errorMessage = Object.values(result.errors).flat().join('\n');
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: errorMessage,
+                    });
                 }
             } catch (error) {
                 console.error('Error submitting form:', error);
@@ -142,8 +156,36 @@
         });
 
         // Event listener untuk perubahan lokasi
-        document.getElementById('location').addEventListener('change', function() {
+        document.getElementById('location').addEventListener('change', async function() {
+            const locationId = this.value;
 
+            if (!locationId) {
+                return;
+            }
+
+            try {
+                const response = await fetch("{{ route('daily-test.hhmd.check-submission') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ location_id: locationId })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'submitted') {
+                    Swal.fire({
+                        title: 'Peringatan',
+                        text: result.message,
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            } catch (error) {
+                console.error('Error checking submission status:', error);
+            }
         });
 
         const canvas = document.getElementById('signatureCanvas');
