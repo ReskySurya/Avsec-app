@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
+<div class="container mx-auto px-2 py-4 lg:mt-20">
     <div class="bg-white shadow-md rounded px-4 sm:px-8 pt-6 pb-8 mb-4 w-full max-w-full">
         <h1 class="text-xl sm:text-2xl font-bold mb-4">Tinjau Formulir XRAY CABIN</h1>
 
@@ -15,8 +15,7 @@
                             CHECK LIST PENGUJIAN HARIAN<br>
                             MESIN X-RAY CABIN MULTIVIEW<br>
                         </h1>
-                        <img src="{{ asset('images/injourney-logo.png') }}" alt="Injourney Logo"
-                            class="w-20 h-20 mt-2 sm:mt-0">
+                        <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo" class="w-20 h-20 mt-2 sm:mt-0">
                     </div>
                 </div>
 

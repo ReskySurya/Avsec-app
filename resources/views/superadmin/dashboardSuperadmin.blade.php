@@ -55,7 +55,7 @@
             </div>
         </div>
 
-        <div class="bg-yellow-50 p-4 rounded-lg">
+        <!-- <div class="bg-yellow-50 p-4 rounded-lg">
             <h3 class="text-lg font-semibold text-yellow-800 mb-2">Laporan Terbaru</h3>
             <table class="min-w-full bg-white">
                 <thead>
@@ -88,7 +88,7 @@
                     </tr>
                 </tbody>
             </table>
-        </div>
+        </div> -->
     </div>
 </div>
 @endsection

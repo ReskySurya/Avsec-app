@@ -83,7 +83,7 @@
                                     <td class="w-2/3 p-2">
                                         <input type="text" name="deviceInfo"
                                             value="{{ old('deviceInfo', $form->deviceInfo) }}"
-                                            class="w-full border rounded px-2 py-1">
+                                            class="w-full border rounded px-2 py-1" readonly>
                                     </td>
                                 </tr>
                                 <tr class="border-b border-black">
@@ -91,7 +91,7 @@
                                     <td class="w-2/3 p-2">
                                         <input type="text" name="certificateInfo"
                                             value="{{ old('certificateInfo', $form->certificateInfo) }}"
-                                            class="w-full border rounded px-2 py-1">
+                                            class="w-full border rounded px-2 py-1" readonly>
                                     </td>
                                 </tr>
                             </tbody>
@@ -783,7 +783,7 @@
                 </div>
             </div>
 
-            <div class="flex items-center justify-between mt-4">
+            <div class="flex items-center justify-between m-4 space-x-6">
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     Simpan Perubahan
                 </button>

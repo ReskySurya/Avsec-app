@@ -6,7 +6,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endpush
 <div class="bg-white p-4 mt-10 w-full max-w-full"
-     x-data="{
+    x-data="{
         xrayBagasiLocations: {{ Js::from($xrayBagasiLocations) }},
         selectedLocationId: '',
         deviceInfo: '',
@@ -24,9 +24,7 @@
     }">
 
 
-<div class="bg-white p-4 mt-20 w-full max-w-full">
-
-   <div id="format" class="mx-auto w-full">
+    <div id="format" class="mx-auto w-full">
         <div class="border-t-2 border-x-2 border-black bg-white shadow-md p-4">
             <div class="flex flex-col sm:flex-row items-center justify-between">
                 <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo" class="w-20 h-20 mb-2 sm:mb-0">
@@ -76,12 +74,12 @@
                                 <select id="location" name="location"
                                     class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base" x-model="selectedLocationId" @change="updateFields">
                                     <option value="">Pilih Lokasi</option>
-                                     @if(isset($xrayBagasiLocations))
-                                        @foreach($xrayBagasiLocations as $bagasiLocation)
-                                            <option value="{{ $bagasiLocation['location_id'] }}">
-                                                {{ $bagasiLocation['location_name'] }}
-                                            </option>
-                                        @endforeach
+                                    @if(isset($xrayBagasiLocations))
+                                    @foreach($xrayBagasiLocations as $bagasiLocation)
+                                    <option value="{{ $bagasiLocation['location_id'] }}">
+                                        {{ $bagasiLocation['location_name'] }}
+                                    </option>
+                                    @endforeach
                                     @endif
                                 </select>
                             </td>
@@ -564,7 +562,7 @@
                 <div class="border-t-2 border-black p-2 sm:p-4">
                     <h3 class="text-xs sm:text-sm font-bold mb-2">Personel Pengamanan Penerbangan</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-                        <div class="grid grid-rows-2 gap-1 sm:gap-2 items-center text-center">
+                       <div class="grid grid-rows-2 gap-1 sm:gap-2 items-center text-center" >
                             <!-- Kolom Kiri (Label 1) -->
                             <div class="text-center self-end">
                                 <h4 class="font-bold">
@@ -584,7 +582,7 @@
                             <div class="signature-section mt-4">
                                 <h3 class="text-lg font-semibold mb-2">Tanda Tangan Officer</h3>
                                 <div class="border p-4 rounded">
-                                    <canvas id="signatureCanvas" class="border border-gray-300 rounded" width="400"
+                                    <canvas id="signatureCanvas" class="border border-gray-300 rounded" width="220"
                                         height="200"></canvas>
                                     <div class="mt-2 flex space-x-2">
                                         <button type="button" id="clearSignature"
@@ -607,7 +605,7 @@
             <input type="hidden" name="status" value="pending_supervisor">
 
             <div class="mt-2 sm:mt-4 px-2 sm:px-0">
-                 <div class="mb-2 sm:mb-4">
+                <div class="mb-2 sm:mb-4">
                     <label for="supervisor_id"
                         class="block text-gray-700 font-bold text-xs sm:text-base mb-1 sm:mb-2">Pilih
                         Supervisor:
@@ -644,5 +642,3 @@
             </div>
         </form>
     </div>
-    
-</div>

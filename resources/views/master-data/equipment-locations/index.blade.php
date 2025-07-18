@@ -4,6 +4,7 @@
 
 @section('content')
     <div x-data="{
+                        activeTab: 'equipmentLocations',
                         openEquipment: false,
                         openLocation: false,
                         openEquipmentLocation: false,
@@ -45,6 +46,27 @@
             </div>
         </div>
 
+                <!-- Tab Toggles -->
+        <div class="mb-8">
+            <div class="flex justify-center bg-gray-100 rounded-xl p-1.5 shadow-inner">
+                <button @click="activeTab = 'equipmentLocations'"
+                        :class="{'bg-white text-indigo-600 shadow-md': activeTab === 'equipmentLocations', 'text-gray-500': activeTab !== 'equipmentLocations'}"
+                        class="w-full text-center px-4 py-3 rounded-lg font-semibold transition-all duration-300">
+                    Relasi
+                </button>
+                <button @click="activeTab = 'equipment'"
+                        :class="{'bg-white text-blue-600 shadow-md': activeTab === 'equipment', 'text-gray-500': activeTab !== 'equipment'}"
+                        class="w-full text-center px-4 py-3 rounded-lg font-semibold transition-all duration-300">
+                    Equipment
+                </button>
+                <button @click="activeTab = 'locations'"
+                        :class="{'bg-white text-purple-600 shadow-md': activeTab === 'locations', 'text-gray-500': activeTab !== 'locations'}"
+                        class="w-full text-center px-4 py-3 rounded-lg font-semibold transition-all duration-300">
+                    Lokasi
+                </button>
+            </div>
+        </div>
+
         <!-- Alert Messages with Enhanced Design -->
         @if(session('success'))
             <div
@@ -71,8 +93,8 @@
             </div>
         @endif
 
-        <!-- Equipment Location Section with Enhanced Design -->
-        <div class="bg-white shadow-xl rounded-2xl overflow-hidden mb-8 border border-gray-100">
+        <!-- Equipment Location Section -->
+        <div x-show="activeTab === 'equipmentLocations'" class="bg-white shadow-xl rounded-2xl overflow-hidden mb-8 border border-gray-100">
             <div class="bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-6 text-white">
                 <div class="flex justify-between items-center">
                     <div>
@@ -80,15 +102,61 @@
                         <p class="text-indigo-100">Relasi antara peralatan dan lokasi</p>
                     </div>
                     <button @click="openEquipmentLocation = true"
-                        class="bg-white text-indigo-600 hover:bg-indigo-50 px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        class="bg-white text-indigo-600 hover:bg-indigo-50 px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl w-full sm:w-auto">
                         <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                         </svg>
-                        Tambah Equipment Location
+                        Tambah Relasi
                     </button>
                 </div>
             </div>
-            <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+            
+            <!-- Mobile Card View -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6 md:hidden">
+                @foreach($equipmentLocations as $el)
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+                        <div class="p-5">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">{{ $el->equipment->name ?? '-' }}</span>
+                                <svg class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                  </svg>
+                                <span class="px-3 py-1 text-xs font-semibold text-purple-800 bg-purple-100 rounded-full">{{ $el->location->name ?? '-' }}</span>
+                            </div>
+                            <div class="mt-4 space-y-2 text-sm text-gray-600">
+                                <p><strong class="font-medium text-gray-800">Merk/Type:</strong> {{ $el->merk_type ?? 'N/A' }}</p>
+                                <p><strong class="font-medium text-gray-800">Sertifikat:</strong> {{ $el->certificateInfo ?? 'N/A' }}</p>
+                                <p><strong class="font-medium text-gray-800">Deskripsi:</strong> {{ $el->description ?? 'N/A' }}</p>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 px-5 py-3 flex justify-end space-x-2">
+                            <button type="button"
+                                class="p-2 bg-yellow-100 text-yellow-700 rounded-full hover:bg-yellow-200 transition-colors duration-200"
+                                @click="
+                                    openEditEquipmentLocation = true;
+                                    editEquipmentLocationData.equipment_id = {{ $el->equipment_id }};
+                                    editEquipmentLocationData.location_id = {{ $el->location_id }};
+                                    editEquipmentLocationData.old_equipment_id = {{ $el->equipment_id }};
+                                    editEquipmentLocationData.old_location_id = {{ $el->location_id }};
+                                    editEquipmentLocationData.merkType = '{{ addslashes($el->merkType ?? '') }}';
+                                    editEquipmentLocationData.description = '{{ addslashes($el->description ?? '') }}';
+                                ">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            </button>
+                            <form action="{{ route('equipment-location.destroy', $el->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus relasi ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors duration-200">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <!-- Desktop Table View -->
+            <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hidden md:block">
 
                 <table class="min-w-full">
                     <thead class="bg-gray-50">
@@ -192,28 +260,67 @@
             </div>
         </div>
 
-        <!-- Equipment and Location Grid -->
-        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-            {{-- Equipment Section as Table --}}
+        <!-- Equipment and Location Sections -->
+        <div x-show="activeTab === 'equipment'">
+            {{-- Equipment Section --}}
             <div
-                class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-2xl">
+                class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-2xl mb-8">
                 <div class="bg-gradient-to-r from-blue-500 to-cyan-600 px-6 py-6 text-white">
-                    <div class="flex justify-between items-center">
-                        <div>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                        <div class="mb-4 sm:mb-0">
                             <h3 class="text-2xl font-bold mb-1">Equipment</h3>
-                            <p class="text-blue-100">Kelola peralatan</p>
+                            <p class="text-blue-100">Kelola semua peralatan Anda</p>
                         </div>
                         <button @click="openEquipment = true"
-                            class="bg-white text-blue-600 hover:bg-blue-50 px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                            class="bg-white text-blue-600 hover:bg-blue-50 px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl w-full sm:w-auto">
                             <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
-                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                             </svg>
-                            Tambah
+                            Tambah Equipment
                         </button>
                     </div>
                 </div>
-                <div class="overflow-x-auto p-6">
+                
+                <!-- Mobile Card View -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6 md:hidden">
+                    @forelse($equipmentList as $equipment)
+                        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+                            <div class="p-5">
+                                <h4 class="text-lg font-bold text-gray-800 truncate">{{ $equipment->name }}</h4>
+                                <p class="text-sm text-gray-500 mt-1">Dibuat oleh: {{ $equipment->creator->name ?? 'N/A' }}</p>
+                                <p class="text-gray-600 mt-3 text-sm">{{ Str::limit($equipment->description, 100) }}</p>
+                            </div>
+                            <div class="bg-gray-50 px-5 py-3 flex justify-end space-x-2">
+                                <button type="button" @click="
+                                            openEditEquipment = true;
+                                            editEquipmentData.id = {{ $equipment->id }};
+                                            editEquipmentData.name = '{{ addslashes($equipment->name) }}';
+                                            editEquipmentData.description = '{{ addslashes($equipment->description) }}';
+                                        "
+                                    class="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 transition-colors duration-200">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                </button>
+                                <form action="{{ route('equipment.destroy', $equipment->id) }}" method="POST" class="inline-block">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" onclick="return confirm('Yakin ingin menghapus?')"
+                                        class="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors duration-200">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="col-span-1 sm:col-span-2 text-center py-12">
+                            <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            <p class="text-gray-500 text-lg">Belum ada data Equipment</p>
+                            <p class="text-gray-400">Tambahkan equipment pertama Anda</p>
+                        </div>
+                    @endforelse
+                </div>
+
+                <!-- Desktop Table View -->
+                <div class="overflow-x-auto p-6 hidden md:block">
                     <table class="min-w-full">
                         <thead class="bg-gray-50">
                             <tr>
@@ -272,7 +379,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center py-12"></td>
+                                    <td colspan="5" class="text-center py-12 hidden md:table-cell"></td>
                                     <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -291,27 +398,68 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            {{-- Location Section as Table --}}
+        <div x-show="activeTab === 'locations'">
+            {{-- Location Section --}}
             <div
                 class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-2xl">
                 <div class="bg-gradient-to-r from-purple-500 to-pink-600 px-6 py-6 text-white">
-                    <div class="flex justify-between items-center">
-                        <div>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                        <div class="mb-4 sm:mb-0">
                             <h3 class="text-2xl font-bold mb-1">Locations</h3>
-                            <p class="text-purple-100">Kelola lokasi</p>
+                            <p class="text-purple-100">Kelola semua lokasi Anda</p>
                         </div>
                         <button @click="openLocation = true"
-                            class="bg-white text-purple-600 hover:bg-purple-50 px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                            class="bg-white text-purple-600 hover:bg-purple-50 px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl w-full sm:w-auto">
                             <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
-                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                             </svg>
-                            Tambah
+                            Tambah Lokasi
                         </button>
                     </div>
                 </div>
-                <div class="overflow-x-auto p-6">
+
+                <!-- Mobile Card View -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6 md:hidden">
+                    @forelse($locationList as $location)
+                        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+                            <div class="p-5">
+                                <h4 class="text-lg font-bold text-gray-800 truncate">{{ $location->name }}</h4>
+                                <p class="text-sm text-gray-500 mt-1">Dibuat oleh: {{ $location->creator->name ?? 'N/A' }}</p>
+                                <p class="text-gray-600 mt-3 text-sm">{{ Str::limit($location->description, 100) }}</p>
+                            </div>
+                            <div class="bg-gray-50 px-5 py-3 flex justify-end space-x-2">
+                                <button type="button" @click="
+                                            openEditLocation = true;
+                                            editLocationData.id = {{ $location->id }};
+                                            editLocationData.name = '{{ addslashes($location->name) }}';
+                                            editLocationData.description = '{{ addslashes($location->description) }}';
+                                        "
+                                    class="p-2 bg-purple-100 text-purple-600 rounded-full hover:bg-purple-200 transition-colors duration-200">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                </button>
+                                <form action="{{ route('location.destroy', $location->id) }}" method="POST" class="inline-block">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" onclick="return confirm('Yakin ingin menghapus?')"
+                                        class="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors duration-200">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="col-span-1 sm:col-span-2 text-center py-12">
+                            <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            <p class="text-gray-500 text-lg">Belum ada data Location</p>
+                            <p class="text-gray-400">Tambahkan lokasi pertama Anda</p>
+                        </div>
+                    @endforelse
+                </div>
+
+                <!-- Desktop Table View -->
+                <div class="overflow-x-auto p-6 hidden md:block">
                     <table class="min-w-full">
                         <thead class="bg-gray-50">
                             <tr>
@@ -370,7 +518,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center py-12">
+                                    <td colspan="5" class="text-center py-12 hidden md:table-cell">
                                         <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

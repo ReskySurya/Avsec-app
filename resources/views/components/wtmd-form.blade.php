@@ -1,12 +1,12 @@
 @push('styles')
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 @endpush
 
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endpush
 <div class="bg-white p-4 mt-10 w-full max-w-full"
-     x-data="{
+    x-data="{
         wtmdLocations: {{ Js::from($wtmdLocations) }},
         selectedLocationId: '',
         deviceInfo: '',
@@ -24,7 +24,7 @@
     }">
 
 
-<div class="bg-white p-4 w-full max-w-full lg:mt-20">
+
     <div id="format" class="mx-auto w-full">
         <div class="border-t-2 border-x-2 border-black bg-white shadow-md p-4">
             <div class="flex flex-col sm:flex-row items-center justify-between">
@@ -77,11 +77,11 @@
                                     class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base" x-model="selectedLocationId" @change="updateFields">
                                     <option value="">Pilih Lokasi</option>
                                     @if(isset($wtmdLocations))
-                                        @foreach($wtmdLocations as $location)
-                                            <option value="{{ $location['location_id'] }}">
-                                                {{ $location['location_name'] }}
-                                            </option>
-                                        @endforeach
+                                    @foreach($wtmdLocations as $location)
+                                    <option value="{{ $location['location_id'] }}">
+                                        {{ $location['location_name'] }}
+                                    </option>
+                                    @endforeach
                                     @endif
                                 </select>
                             </td>
@@ -92,7 +92,7 @@
                             </th>
                             <td class="w-2/3 p-2">
                                 <input type="text" id="deviceInfo" name="deviceInfo"
-                                    class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base "x-model="deviceInfo" readonly>
+                                    class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base " x-model="deviceInfo" readonly>
                             </td>
                         </tr>
                         <tr class="border-b border-black">
@@ -133,7 +133,7 @@
                                 <p class="text-sm font-semibold pb-20">DEPAN</p>
                             </div>
 
-                            <div class="absolute inset-0 flex flex-col items-start pt-44 pointer-events-auto">
+                            <div class="absolute inset-0 flex flex-col items-start pt-20 lg:pt-44 pointer-events-auto">
                                 <div class="mb-1">
                                     <div class="flex items-center gap-1">
                                         <div class="flex flex-col gap-2">
@@ -213,7 +213,7 @@
                             </div>
 
                             <div class="absolute inset-0 flex flex-col items-end pr-2 pt-4 pointer-events-auto">
-                                <div class="mt-52">
+                                <div class="mt-44 lg:mt-96">
                                     <div class="flex items-center gap-1">
                                         <span class="text-xs font-bold">TEST 3</span>
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 rotate-180" fill="none"
@@ -289,7 +289,7 @@
                             <div class="signature-section mt-4">
                                 <h3 class="text-lg font-semibold mb-2">Tanda Tangan Officer</h3>
                                 <div class="border p-4 rounded">
-                                    <canvas id="signatureCanvas" class="border border-gray-300 rounded" width="300"
+                                    <canvas id="signatureCanvas" class="border border-gray-300 rounded" width="220"
                                         height="200"></canvas>
                                     <div class="mt-2 flex space-x-2">
                                         <button type="button" id="clearSignature"
@@ -312,16 +312,16 @@
             <input type="hidden" name="status" value="pending_supervisor">
 
             <div class="mt-2 sm:mt-4 px-2 sm:px-0">
-                  <div class="mb-2 sm:mb-4">
+                <div class="mb-2 sm:mb-4">
                     <label for="approvedByID"
                         class="block text-gray-700 font-bold text-xs sm:text-base mb-1 sm:mb-2">Pilih
                         Supervisor:
                     </label>
 
                     @php
-                        $supervisors = \App\Models\User::whereHas('role', function($query) {
-                        $query->where('name', \App\Models\Role::SUPERVISOR);
-                        })->get();
+                    $supervisors = \App\Models\User::whereHas('role', function($query) {
+                    $query->where('name', \App\Models\Role::SUPERVISOR);
+                    })->get();
                     @endphp
 
                     <select name="approvedByID" id="approvedByID"
@@ -352,4 +352,3 @@
             </div>
         </form>
     </div>
-</div>

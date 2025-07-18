@@ -203,7 +203,7 @@
                             <div class="signature-section mt-4">
                                 <h3 class="text-lg font-semibold mb-2">Tanda Tangan Officer</h3>
                                 <div class="border p-4 rounded">
-                                    <canvas id="signatureCanvas" class="border border-gray-300 rounded" width="300"
+                                    <canvas id="signatureCanvas" class="border border-gray-300 rounded" width="220"
                                         height="200"></canvas>
                                     <div class="mt-2 flex space-x-2">
                                         <button type="button" id="clearSignature"

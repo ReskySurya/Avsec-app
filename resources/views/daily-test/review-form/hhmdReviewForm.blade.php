@@ -17,8 +17,7 @@
                             (HAND HELD METAL DETECTOR/HHMD)<br>
                             PADA KONDISI NORMAL (HIJAU)
                         </h1>
-                        <img src="{{ asset('images/injourney-logo.png') }}" alt="Injourney Logo"
-                            class="w-20 h-20 mt-2 sm:mt-0">
+                        <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo" class="w-20 h-20 mt-2 sm:mt-0">
                     </div>
                 </div>
 
@@ -165,13 +164,13 @@
             @csrf
             @method('PATCH')
             <div class="mb-2 sm:mb-4">
-                <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2" for="status_id">
+                <label class="block text-gray-700 text-sm font-bold mb-1 sm:mb-2" for="status_id">
                     Status
                 </label>
 
 
                 <select name="status_id" id="status_id"
-                    class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base">
+                    class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-base">
                     @php
                     $rejectedStatus = $statuses->firstWhere('name', 'rejected');
                     @endphp
@@ -198,19 +197,16 @@
             </div>
             <div class="flex items-center justify-between">
                 <button id="updateStatusButton"
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold px-2 py-1 sm:px-4 sm:py-2 rounded text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold px-2 py-2 sm:px-4 sm:py-2 rounded text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                     type="submit" title="Harap simpan tanda tangan terlebih dahulu">
                     Perbarui Status
                 </button>
+                <a href="{{ route('supervisor.dailytest-form') }}"
+                    class="text-xs sm:text-sm font-bold text-blue-500 hover:text-blue-800">
+                    Kembali ke Dashboard
+                </a>
             </div>
         </form>
-        <div class="flex items-center justify-end">
-            <a href="{{ route('supervisor.dailytest-form') }}"
-                class="text-xs sm:text-sm font-bold text-blue-500 hover:text-blue-800">
-                Kembali ke Dashboard
-            </a>
-        </div>
-
     </div>
 </div>
 

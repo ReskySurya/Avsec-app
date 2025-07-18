@@ -27,15 +27,16 @@
 
             <div class="bg-white p-4" id="format" class="mx-auto">
                 <div class="border-t-2 border-x-2 border-black bg-white shadow-md">
-                    <div class="flex items-center justify-between">
-                        <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo" class="w-20 h-20">
-                        <h1 class="text-xl font-bold text-center flex-grow px-2">
+                    <div class="flex flex-col sm:flex-row items-center justify-between">
+                        <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo"
+                            class="w-20 h-20 mb-2 sm:mb-0">
+                        <h1 class="text-sm sm:text-xl font-bold text-center flex-grow px-2">
                             CHECK LIST PENGUJIAN HARIAN<br>
                             PENDETEKSI LOGAM GENGGAM<br>
                             (HAND HELD METAL DETECTOR/HHMD)<br>
                             PADA KONDISI NORMAL (HIJAU)
                         </h1>
-                        <img src="https://via.placeholder.com/80x80" alt="Additional Logo" class="w-20 h-20">
+                        <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo" class="w-20 h-20 mt-2 sm:mt-0">
                     </div>
                 </div>
 
@@ -83,7 +84,7 @@
                                 <td class="w-2/3 p-2">
                                     <input type="text" name="deviceInfo"
                                         value="{{ old('deviceInfo', $form->deviceInfo) }}"
-                                        class="w-full border rounded px-2 py-1">
+                                        class="w-full border rounded px-2 py-1" readonly>
                                 </td>
                             </tr>
                             <tr class="border-b border-black">
@@ -91,7 +92,7 @@
                                 <td class="w-2/3 p-2">
                                     <input type="text" name="certificateInfo"
                                         value="{{ old('certificateInfo', $form->certificateInfo) }}"
-                                        class="w-full border rounded px-2 py-1">
+                                        class="w-full border rounded px-2 py-1" readonly>
                                 </td>
                             </tr>
                         </tbody>
@@ -117,18 +118,18 @@
                             </div>
                         </div>
 
-                        <div class="border-x-2 border-t-2 border-black text-center items-center pt-10">
+                        <div class="border-x-2 border-t-2 border-black text-center items-center pt-4">
                             <div>
                                 <h2 class="font-bold mb-2">TEST 1</h2>
                                 <div class="w-20 h-20 mx-auto border-2 border-black flex items-center justify-center">
                                     <input type="checkbox" id="test1" name="test1" value="1" {{ old('test1',
                                         $details->test1) ? 'checked' : '' }}
-                                    onchange="updateRadioResult()">
+                                        onchange="updateRadioResult()">
                                 </div>
                             </div>
                         </div>
 
-                        <div class="border-x-2 border-black pt-10 pb-10">
+                        <div class="border-x-2 border-black pt-10 pb-4">
                             <div class="flex items-center mb-0 pl-4">
                                 <input type="hidden" name="testCondition1" value="0">
                                 <input type="checkbox" name="testCondition1" value="1" {{ old('testCondition1',
@@ -169,16 +170,16 @@
                     </div>
                 </div>
             </div>
+            <div class="flex items-center justify-between m-4 space-x-6">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Kirim Ulang Laporan
+                </button>
+                <a href="{{ route('dashboard.officer') }}" class="text-gray-600 hover:text-gray-800">
+                    Kembali ke Dashboard
+                </a>
+            </div>
     </div>
 
-    <div class="flex items-center justify-between mt-4">
-        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Kirim Ulang Laporan
-        </button>
-        <a href="{{ route('dashboard.officer') }}" class="text-gray-600 hover:text-gray-800">
-            Kembali ke Dashboard
-        </a>
-    </div>
     </form>
 </div>
 </div>

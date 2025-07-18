@@ -36,8 +36,7 @@
                                 GAWANG PENDETEKSI LOGAM<br>
                                 (WALK THROUGH METAL DETECTOR/WTMD)
                             </h1>
-                            <img src="https://via.placeholder.com/80x80" alt="Additional Logo"
-                                class="w-20 h-20 mt-2 sm:mt-0">
+                            <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo" class="w-20 h-20 mt-2 sm:mt-0">
                         </div>
                     </div>
 
@@ -85,7 +84,7 @@
                                     <td class="w-2/3 p-2">
                                         <input type="text" name="deviceInfo"
                                             value="{{ old('deviceInfo', $form->deviceInfo) }}"
-                                            class="w-full border rounded px-2 py-1">
+                                            class="w-full border rounded px-2 py-1" readonly>
                                     </td>
                                 </tr>
                                 <tr class="border-b border-black">
@@ -93,7 +92,7 @@
                                     <td class="w-2/3 p-2">
                                         <input type="text" name="certificateInfo"
                                             value="{{ old('certificateInfo', $form->certificateInfo) }}"
-                                            class="w-full border rounded px-2 py-1">
+                                            class="w-full border rounded px-2 py-1" readonly>
                                     </td>
                                 </tr>
                             </tbody>
@@ -127,7 +126,7 @@
                                         <p class="text-sm font-semibold pb-20">DEPAN</p>
                                     </div>
 
-                                    <div class="absolute inset-0 flex flex-col items-start pt-44 pointer-events-auto">
+                                    <div class="absolute inset-0 flex flex-col items-start pt-20 lg:pt-44 pointer-events-auto">
                                         <div class="mb-1">
                                             <div class="flex items-center gap-1">
                                                 <div class="flex flex-col gap-2">
@@ -215,7 +214,7 @@
                                     </div>
 
                                     <div class="absolute inset-0 flex flex-col items-end pr-2 pt-4 pointer-events-auto">
-                                        <div class="mt-52">
+                                        <div class="mt-20 lg:mt-52">
                                             <div class="flex items-center gap-1">
                                                 <span class="text-xs font-bold">TEST 3</span>
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 rotate-180"
@@ -271,7 +270,7 @@
                     </div>
                 </div>
             </div>
-            <div class="flex items-center justify-between m-4">
+            <div class="flex items-center justify-between m-4 space-x-6">
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     Kirim Ulang Laporan
                 </button>
