@@ -341,4 +341,31 @@ class Report extends Model
     {
         return $this->status && $this->status->name === 'rejected';
     }
+
+    /**
+     * Check if a report for the given equipment location has been submitted within the last 3 hours.
+     *
+     * @param string $equipmentLocationId
+     * @return bool
+     */
+    public static function hasSubmittedToday(string $equipmentLocationId): bool
+    {
+        return static::where('equipmentLocationID', $equipmentLocationId)
+            ->where('created_at', '>=', now()->subHours(3))
+            ->exists();
+    }
+
+    /**
+     * Get the latest report for a given equipment location submitted within the last 3 hours.
+     *
+     * @param string $equipmentLocationId
+     * @return \App\Models\Report|null
+     */
+    public static function getLatestSubmissionInTimeWindow(string $equipmentLocationId)
+    {
+        return static::where('equipmentLocationID', $equipmentLocationId)
+            ->where('created_at', '>=', now()->subHours(3))
+            ->latest('created_at')
+            ->first();
+    }
 }
