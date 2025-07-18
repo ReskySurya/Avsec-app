@@ -165,54 +165,51 @@
             @csrf
             @method('PATCH')
             <div class="mb-2 sm:mb-4">
-            <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2" for="status_id">
-                Status
-            </label>
+                <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2" for="status_id">
+                    Status
+                </label>
 
-            @php
-            $statuses = \App\Models\ReportStatus::select('id', 'name', 'label')->orderBy('id')->get();
-            @endphp
 
-            <select name="status_id" id="status_id"
-                class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base">
-                @php
-                $rejectedStatus = $statuses->firstWhere('name', 'rejected');
-                @endphp
-                @foreach($statuses as $status)
-                <option value="{{ $status->id }}" {{ $form->status_id == $status->id ? 'selected' : '' }}
-                data-requires-note="{{ $status->name === 'rejected' ? 'true' : 'false' }}">
-                {{ $status->label }}
-                </option>
-                @endforeach
-            </select>
+                <select name="status_id" id="status_id"
+                    class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base">
+                    @php
+                    $rejectedStatus = $statuses->firstWhere('name', 'rejected');
+                    @endphp
+                    @foreach($statuses as $status)
+                    <option value="{{ $status->id }}" {{ $form->status && $form->status->id == $status->id ? 'selected' : '' }}
+                        data-requires-note="{{ $status->name === 'rejected' ? 'true' : 'false' }}">
+                        {{ $status->label }}
+                    </option>
+                    @endforeach
+                </select>
             </div>
 
             <div id="rejectionNoteContainer" class="mb-4 {{ $form->isRejected() ? '' : 'hidden' }}">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="approvalNote">
-                Catatan Penolakan
-            </label>
-            <textarea name="approvalNote" id="approvalNote" rows="4"
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                placeholder="Masukkan alasan penolakan..." {{
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="approvalNote">
+                    Catatan Penolakan
+                </label>
+                <textarea name="approvalNote" id="approvalNote" rows="4"
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    placeholder="Masukkan alasan penolakan..." {{
                 $form->isRejected() ? 'required' : '' }}>{{ old('approvalNote', $form->approvalNote) }}</textarea>
-            @error('approvalNote')
-            <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
-            @enderror
+                @error('approvalNote')
+                <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+                @enderror
             </div>
             <div class="flex items-center justify-between">
-            <button id="updateStatusButton"
-                class="bg-blue-500 hover:bg-blue-700 text-white font-bold px-2 py-1 sm:px-4 sm:py-2 rounded text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
-                type="submit" title="Harap simpan tanda tangan terlebih dahulu">
-                Perbarui Status
-            </button>
+                <button id="updateStatusButton"
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold px-2 py-1 sm:px-4 sm:py-2 rounded text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                    type="submit" title="Harap simpan tanda tangan terlebih dahulu">
+                    Perbarui Status
+                </button>
             </div>
         </form>
-         <div class="flex items-center justify-end">
-             <a href="{{ route('supervisor.dailytest-form') }}"
-                 class="text-xs sm:text-sm font-bold text-blue-500 hover:text-blue-800">
-                 Kembali ke Dashboard
-             </a>
-         </div>
+        <div class="flex items-center justify-end">
+            <a href="{{ route('supervisor.dailytest-form') }}"
+                class="text-xs sm:text-sm font-bold text-blue-500 hover:text-blue-800">
+                Kembali ke Dashboard
+            </a>
+        </div>
 
     </div>
 </div>
@@ -268,8 +265,12 @@
         updateSubmitButtonState();
 
         // Touch events for mobile
-        canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
-        canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+        canvas.addEventListener('touchstart', handleTouchStart, {
+            passive: false
+        });
+        canvas.addEventListener('touchmove', handleTouchMove, {
+            passive: false
+        });
         canvas.addEventListener('touchend', stopDrawing);
 
         // Mouse events for desktop
@@ -428,39 +429,41 @@
 
             // Mengirim data tanda tangan ke server
             fetch('{{ route("hhmd.saveSupervisorSignature", $form->reportID) }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ signature: supervisorSignatureData })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        signature: supervisorSignatureData
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: 'Tanda tangan berhasil disimpan',
+                            icon: 'success',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#3085d6'
+                        });
+                        // Enable tombol perbarui status
+                        updateSubmitButtonState();
+                    } else {
+                        throw new Error('Gagal menyimpan tanda tangan');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
                     Swal.fire({
-                        title: 'Berhasil!',
-                        text: 'Tanda tangan berhasil disimpan',
-                        icon: 'success',
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan saat menyimpan tanda tangan',
+                        icon: 'error',
                         confirmButtonText: 'OK',
                         confirmButtonColor: '#3085d6'
                     });
-                    // Enable tombol perbarui status
-                    updateSubmitButtonState();
-                } else {
-                    throw new Error('Gagal menyimpan tanda tangan');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Terjadi kesalahan saat menyimpan tanda tangan',
-                    icon: 'error',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#3085d6'
                 });
-            });
         }
 
         // Handle window resize

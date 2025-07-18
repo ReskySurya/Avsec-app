@@ -29,8 +29,16 @@ class WtmdController extends Controller
         if ($wtmdEquipment) {
             // Gunakan EquipmentLocation untuk mendapatkan data yang lebih lengkap
             $wtmdLocations = EquipmentLocation::where('equipment_id', $wtmdEquipment->id)
-                ->with(['location', 'equipment']) // Eager loading untuk menghindari N+1 query
-                ->get();
+                ->with(['location']) // Eager loading untuk menghindari N+1 query
+                ->get()
+                ->map(function ($el) {
+                    return [
+                        'location_id' => $el->location_id,
+                        'location_name' => $el->location->name ?? 'Nama lokasi tidak tersedia',
+                        'merk_type' => $el->merk_type ?? 'Merk/Type tidak tersedia',
+                        'certificateInfo' => $el->certificateInfo ?? 'Informasi sertifikat tidak tersedia',
+                    ];
+                });
         }
 
         return view(

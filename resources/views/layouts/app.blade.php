@@ -70,9 +70,12 @@
                 // Close menu when clicking on a link (mobile only)
                 const sidebarLinks = sidebar.querySelectorAll('a, button');
                 sidebarLinks.forEach(link => {
-                    link.addEventListener('click', () => {
-                        if (window.innerWidth < 1024) { // lg breakpoint
-                            toggleMobileMenu();
+                    link.addEventListener('click', (event) => {
+                        // Check if the clicked element or its parent has the 'no-mobile-close' class
+                        if (!event.target.closest('.no-mobile-close')) {
+                            if (window.innerWidth < 1024) { // lg breakpoint
+                                toggleMobileMenu();
+                            }
                         }
                     });
                 });

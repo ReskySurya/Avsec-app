@@ -6,7 +6,24 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endpush
 
-<div class="bg-white p-4 mt-20 w-full max-w-full">
+<div class="bg-white p-4 mt-10 w-full max-w-full"
+     x-data="{
+        hhmdLocations: {{ Js::from($hhmdLocations) }},
+        selectedLocationId: '',
+        deviceInfo: '',
+        certificateInfo: '',
+        updateFields() {
+            const selectedLocation = this.hhmdLocations.find(loc => loc.location_id == this.selectedLocationId);
+            if (selectedLocation) {
+                this.deviceInfo = selectedLocation.merk_type;
+                this.certificateInfo = selectedLocation.certificateInfo;
+            } else {
+                this.deviceInfo = '';
+                this.certificateInfo = '';
+            }
+        }
+    }">
+
 
     <!-- <p>INI FORM HHMD</p> -->
     <div id="format" class="mx-auto w-full">
@@ -59,12 +76,13 @@
                             </th>
                             <td class="w-2/3 p-2">
                                 <select id="location" name="location"
-                                    class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base">
+                                    class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base"
+                                    x-model="selectedLocationId" @change="updateFields">
                                     <option value="">Pilih Lokasi</option>
                                     @if(isset($hhmdLocations))
-                                        @foreach($hhmdLocations as $equipmentLocation)
-                                            <option value="{{ $equipmentLocation->location_id }}">
-                                                {{ $equipmentLocation->location->name ?? 'Nama lokasi tidak tersedia' }}
+                                        @foreach($hhmdLocations as $location)
+                                            <option value="{{ $location['location_id'] }}">
+                                                {{ $location['location_name'] }}
                                             </option>
                                         @endforeach
                                     @endif
@@ -77,7 +95,8 @@
                             </th>
                             <td class="w-2/3 p-2">
                                 <input type="text" id="deviceInfo" name="deviceInfo"
-                                    class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base">
+                                    class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base"
+                                    x-model="deviceInfo" >
                             </td>
                         </tr>
                         <tr class="border-b border-black">
@@ -87,7 +106,8 @@
                             </th>
                             <td class="w-2/3 p-2">
                                 <input type="text" id="certificateInfo" name="certificateInfo"
-                                    class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base">
+                                    class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base"
+                                    x-model="certificateInfo" readonly>
                             </td>
                         </tr>
                     </tbody>

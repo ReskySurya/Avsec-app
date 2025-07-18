@@ -26,10 +26,18 @@ class HhmdController extends Controller
         $hhmdLocations = collect();
 
         if ($hhmdEquipment) {
-            // Gunakan EquipmentLocation untuk mendapatkan data yang lebih lengkap
+            // Ambil data dan transformasikan untuk view
             $hhmdLocations = EquipmentLocation::where('equipment_id', $hhmdEquipment->id)
-                ->with(['location', 'equipment']) // Eager loading untuk menghindari N+1 query
-                ->get();
+                ->with('location') // Eager load relasi location
+                ->get()
+                ->map(function ($el) {
+                    return [
+                        'location_id' => $el->location_id,
+                        'location_name' => $el->location->name ?? 'Nama lokasi tidak tersedia',
+                        'merk_type' => $el->merk_type ?? 'Merk/Type tidak tersedia',
+                        'certificateInfo' => $el->certificateInfo ?? 'Informasi sertifikat tidak tersedia',
+                    ];
+                });
         }
 
         return view('daily-test.hhmdLayout', [
@@ -212,6 +220,7 @@ class HhmdController extends Controller
             // Get all possible statuses for the dropdown
             $statuses = ReportStatus::all();
 
+
             // Get assigned supervisor details
             $supervisor = null;
             if ($report->approvedByID) {
@@ -250,43 +259,6 @@ class HhmdController extends Controller
             Log::error('Stack trace: ' . $e->getTraceAsString());
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-    }
-
-    public function showData()
-    {
-        $equipmentTypes = ['hhmd', 'wtmd', 'xraycabin', 'xraybagasi'];
-
-        $reports = Report::query()
-            ->join('equipment_locations', 'reports.equipmentLocationID', '=', 'equipment_locations.id')
-            ->join('equipment', 'equipment_locations.equipment_id', '=', 'equipment.id')
-            ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
-            ->whereIn('equipment.name', $equipmentTypes)
-            ->where('reports.approvedByID', Auth::id())
-            ->with(['submittedBy', 'status'])
-            ->select(
-                'reports.reportID as id',
-                'reports.testDate',
-                'reports.submittedByID',
-                'reports.statusID',
-                'locations.name as location_name',
-                'equipment.name as equipment_name'
-            )
-            ->orderBy('reports.created_at', 'desc')
-            ->get()
-            ->map(function ($report) {
-                return [
-                    'id' => $report->id,
-                    'date' => $report->testDate->format('d/m/Y'),
-                    'test_type' => strtoupper($report->equipment_name),
-                    'location' => $report->location_name,
-                    'status' => $report->status->name ?? 'pending',
-                    'operator' => $report->submittedBy->name ?? 'Unknown',
-                ];
-            });
-
-        return view('supervisor.dailyTestForm', [
-            'reports' => $reports,
-        ]);
     }
 
     public function updateStatus(Request $request, $id)
@@ -375,68 +347,6 @@ class HhmdController extends Controller
                 'success' => false,
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
             ], 500);
-        }
-    }
-    public function show($id)
-    {
-        try {
-            // Load report dengan relasi yang diperlukan
-            $report = Report::with([
-                'submittedBy',
-                'approvedBy',
-                'reviewedBy',
-                'status',
-                'reportDetails'
-            ])->findOrFail($id);
-
-            // Get equipment and location data manually
-            $equipmentLocationData = DB::table('equipment_locations')
-                ->select(
-                    'equipment_locations.id',
-                    'equipment.id as equipment_id',
-                    'equipment.name as equipment_name',
-                    'locations.id as location_id',
-                    'locations.name as location_name'
-                )
-                ->join('equipment', 'equipment_locations.equipment_id', '=', 'equipment.id')
-                ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
-                ->where('equipment_locations.id', $report->equipmentLocationID)
-                ->first();
-
-            if (!$equipmentLocationData) {
-                Log::error("Equipment location data not found for reportID: $id");
-                return redirect()->back()->with('error', 'Equipment location not found');
-            }
-
-            // Create objects for backward compatibility
-            $equipment = (object) [
-                'id' => $equipmentLocationData->equipment_id,
-                'name' => $equipmentLocationData->equipment_name
-            ];
-
-            $location = (object) [
-                'id' => $equipmentLocationData->location_id,
-                'name' => $equipmentLocationData->location_name
-            ];
-
-            // Tentukan view berdasarkan jenis equipment
-            $viewName = 'daily-test.show';
-            if ($equipmentLocationData->equipment_name === 'hhmd') {
-                $viewName = 'daily-test.show-hhmd';
-            }
-
-            return view($viewName, [
-                'report' => $report,
-                'location' => $location,
-                'equipment' => $equipment
-            ]);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error("Report not found with reportID: $id");
-            return redirect()->back()->with('error', 'Report tidak ditemukan');
-        } catch (\Exception $e) {
-            Log::error('Error in show report: ' . $e->getMessage());
-            Log::error('Stack trace: ' . $e->getTraceAsString());
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 

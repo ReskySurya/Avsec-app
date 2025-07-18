@@ -750,17 +750,13 @@
                             Status
                         </label>
 
-                        @php
-                        $statuses = \App\Models\ReportStatus::select('id', 'name', 'label')->orderBy('id')->get();
-                        @endphp
-
                         <select name="status_id" id="status_id"
                             class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base">
                             @php
                             $rejectedStatus = $statuses->firstWhere('name', 'rejected');
                             @endphp
                             @foreach($statuses as $status)
-                            <option value="{{ $status->id }}" {{ $form->status_id == $status->id ? 'selected' : '' }}
+                            <option value="{{ $status->id }}" {{ $form->status && $form->status->id == $status->id ? 'selected' : '' }}
                                 data-requires-note="{{ $status->name === 'rejected' ? 'true' : 'false' }}">
                                 {{ $status->label }}
                             </option>

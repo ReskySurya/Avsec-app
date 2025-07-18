@@ -74,7 +74,7 @@
                                     <div class="grid grid-cols-2 gap-0">
                                         <input type="checkbox" {{$form->reportDetails->first()->test2aab ? 'checked' :
                                         '' }}
-                                        class="form-checkbox absolute place-self-center" disabled>
+                                            class="form-checkbox absolute place-self-center" disabled>
                                         <div class="bg-green-500 h-16 flex items-center justify-center">
                                         </div>
                                         <div class="bg-orange-500 h-16 flex items-center justify-center">
@@ -84,7 +84,7 @@
                                         <h3 class="text-xs font-bold text-end">TEST 2b</h3>
                                         <input type="checkbox" {{$form->reportDetails->first()->test2bab ? 'checked' :
                                         '' }}
-                                        class="absolute place-self-end form-checkbox" disabled>
+                                            class="absolute place-self-end form-checkbox" disabled>
                                     </div>
                                 </div>
 
@@ -94,56 +94,56 @@
                                         <div class="bg-cyan-100 h-16 flex items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test3ab_14 ?
                                             'checked' : '' }}
-                                            name="test3ab_14" id="test3ab_14"
-                                            class="form-checkbox justify-center absolute top-4" disabled>
+                                                name="test3ab_14" id="test3ab_14"
+                                                class="form-checkbox justify-center absolute top-4" disabled>
                                         </div>
                                         <div class="bg-cyan-200 h-16 flex items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test3ab_16 ?
                                             'checked' : '' }}
-                                            name="test3ab_16" id="test3ab_16"
-                                            class="form-checkbox justify-center absolute top-4" disabled>
+                                                name="test3ab_16" id="test3ab_16"
+                                                class="form-checkbox justify-center absolute top-4" disabled>
                                         </div>
                                         <div class="bg-sky-400 h-16 flex items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test3ab_18 ?
                                             'checked' : '' }}
-                                            name="test3ab_18" id="test3ab_18"
-                                            class="form-checkbox justify-center absolute top-4" disabled>
+                                                name="test3ab_18" id="test3ab_18"
+                                                class="form-checkbox justify-center absolute top-4" disabled>
                                         </div>
                                         <div class="bg-blue-500 h-16 flex items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test3ab_20 ?
                                             'checked' : '' }}
-                                            name="test3ab_20" id="test3ab_20"
-                                            class="form-checkbox justify-center absolute top-4" disabled>
+                                                name="test3ab_20" id="test3ab_20"
+                                                class="form-checkbox justify-center absolute top-4" disabled>
                                         </div>
                                         <div class="bg-blue-500 h-16 flex items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test3ab_22 ?
                                             'checked' : '' }}
-                                            name="test3ab_22" id="test3ab_22"
-                                            class="form-checkbox justify-center absolute top-4" disabled>
+                                                name="test3ab_22" id="test3ab_22"
+                                                class="form-checkbox justify-center absolute top-4" disabled>
                                         </div>
                                         <div class="bg-blue-700 h-16 flex items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test3ab_24 ?
                                             'checked' : '' }}
-                                            name="test3ab_24" id="test3ab_24"
-                                            class="form-checkbox justify-center absolute top-4" disabled>
+                                                name="test3ab_24" id="test3ab_24"
+                                                class="form-checkbox justify-center absolute top-4" disabled>
                                         </div>
                                         <div class="bg-blue-700 h-16 flex items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test3ab_26 ?
                                             'checked' : '' }}
-                                            name="test3ab_26" id="test3ab_26"
-                                            class="form-checkbox justify-center absolute top-4" disabled>
+                                                name="test3ab_26" id="test3ab_26"
+                                                class="form-checkbox justify-center absolute top-4" disabled>
                                         </div>
                                         <div class="bg-blue-950 h-16 flex items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test3ab_28 ?
                                             'checked' : '' }}
-                                            name="test3ab_28" id="test3ab_28"
-                                            class="form-checkbox justify-center absolute top-4" disabled>
+                                                name="test3ab_28" id="test3ab_28"
+                                                class="form-checkbox justify-center absolute top-4" disabled>
                                         </div>
                                         <div class="bg-blue-950 h-16 flex items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test3ab_30 ?
                                             'checked' : '' }}
-                                            name="test3ab_30" id="test3ab_30"
-                                            class="form-checkbox justify-center absolute top-4" disabled>
+                                                name="test3ab_30" id="test3ab_30"
+                                                class="form-checkbox justify-center absolute top-4" disabled>
                                         </div>
                                     </div>
                                     <div class="grid grid-cols-9 gap-0">
@@ -175,77 +175,77 @@
                                         <div class="grid grid-rows-4 bg-white items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test1aab_36 ?
                                             'checked' : '' }}
-                                            id="test1aab_36" name="test1aab_36"
-                                            class="form-checkbox" disabled>
+                                                id="test1aab_36" name="test1aab_36"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1aab_32 ?
                                             'checked' : '' }}
-                                            id="test1aab_32" name="test1aab_32"
-                                            class="form-checkbox" disabled>
+                                                id="test1aab_32" name="test1aab_32"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1aab_30 ?
                                             'checked' : '' }}
-                                            id="test1aab_30" name="test1aab_30"
-                                            class="form-checkbox" disabled>
+                                                id="test1aab_30" name="test1aab_30"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1aab_24 ?
                                             'checked' : '' }}
-                                            id="test1aab_24" name="test1aab_24"
-                                            class="form-checkbox" disabled>
+                                                id="test1aab_24" name="test1aab_24"
+                                                class="form-checkbox" disabled>
                                         </div>
                                         <div
                                             class="grid grid-rows-4 bg-[#C5E0B3] border border-black items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bab_36_1 ?
                                             'checked' : '' }}
-                                            id="test1bab_36_1" name="test1bab_36_1"
-                                            class="form-checkbox" disabled>
+                                                id="test1bab_36_1" name="test1bab_36_1"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bab_32_1 ?
                                             'checked' : '' }}
-                                            id="test1bab_32_1" name="test1bab_32_1"
-                                            class="form-checkbox" disabled>
+                                                id="test1bab_32_1" name="test1bab_32_1"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bab_30_1 ?
                                             'checked' : '' }}
-                                            id="test1bab_30_1" name="test1bab_30_1"
-                                            class="form-checkbox" disabled>
+                                                id="test1bab_30_1" name="test1bab_30_1"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bab_24_1 ?
                                             'checked' : '' }}
-                                            id="test1bab_24_1" name="test1bab_24_1"
-                                            class="form-checkbox" disabled>
+                                                id="test1bab_24_1" name="test1bab_24_1"
+                                                class="form-checkbox" disabled>
                                         </div>
                                         <div
                                             class="grid grid-rows-4 bg-[#92D050] border-y border-black items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bab_36_2 ?
                                             'checked' : '' }}
-                                            id="test1bab_36_2" name="test1bab_36_2"
-                                            class="form-checkbox" disabled>
+                                                id="test1bab_36_2" name="test1bab_36_2"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bab_32_2 ?
                                             'checked' : '' }}
-                                            id="test1bab_32_2" name="test1bab_32_2"
-                                            class="form-checkbox" disabled>
+                                                id="test1bab_32_2" name="test1bab_32_2"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bab_30_2 ?
                                             'checked' : '' }}
-                                            id="test1bab_30_2" name="test1bab_30_2"
-                                            class="form-checkbox" disabled>
+                                                id="test1bab_30_2" name="test1bab_30_2"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bab_24_2 ?
                                             'checked' : '' }}
-                                            id="test1bab_24_2" name="test1bab_24_2"
-                                            class="form-checkbox" disabled>
+                                                id="test1bab_24_2" name="test1bab_24_2"
+                                                class="form-checkbox" disabled>
                                         </div>
                                         <div
                                             class="grid grid-rows-4 bg-green-500 border border-black items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bab_36_3 ?
                                             'checked' : '' }}
-                                            id="test1bab_36_3" name="test1bab_36_3"
-                                            class="form-checkbox" disabled>
+                                                id="test1bab_36_3" name="test1bab_36_3"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bab_32_3 ?
                                             'checked' : '' }}
-                                            id="test1bab_32_3" name="test1bab_32_3"
-                                            class="form-checkbox" disabled>
+                                                id="test1bab_32_3" name="test1bab_32_3"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bab_30_3 ?
                                             'checked' : '' }}
-                                            id="test1bab_30_3" name="test1bab_30_3"
-                                            class="form-checkbox" disabled>
+                                                id="test1bab_30_3" name="test1bab_30_3"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bab_24_3 ?
                                             'checked' : '' }}
-                                            id="test1bab_24_3" name="test1bab_24_3"
-                                            class="form-checkbox" disabled>
+                                                id="test1bab_24_3" name="test1bab_24_3"
+                                                class="form-checkbox" disabled>
                                         </div>
                                     </div>
                                     <div class="grid grid-cols-[50%_50%] mt-3">
@@ -262,8 +262,8 @@
                                                 <p class="text-[8px] font-semibold absolute -top-1">1.5 mm gaps</p>
                                                 <input type="checkbox" {{$form->reportDetails->first()->test4ab_h15mm ?
                                                 'checked' : '' }}
-                                                name="test4ab_h15mm" id="test4ab_h15mm"
-                                                class="form-checkbox absolute place-self-center h-6 w-6" disabled>
+                                                    name="test4ab_h15mm" id="test4ab_h15mm"
+                                                    class="form-checkbox absolute place-self-center h-6 w-6" disabled>
                                                 <div class="border border-black bg-white h-1"></div>
                                                 <div class="border border-black bg-white h-1"></div>
                                                 <div class="border border-black bg-white h-1"></div>
@@ -272,8 +272,8 @@
                                             <div class="grid grid-cols-4 gap-0 text-xs h-7 px-8">
                                                 <input type="checkbox" {{$form->reportDetails->first()->test4ab_v15mm ?
                                                 'checked' : '' }}
-                                                name="test4ab_v15mm" id="test4ab_v15mm"
-                                                class="form-checkbox absolute place-self-center h-5 w-5" disabled>
+                                                    name="test4ab_v15mm" id="test4ab_v15mm"
+                                                    class="form-checkbox absolute place-self-center h-5 w-5" disabled>
                                                 <div class="border border-black bg-white w-1"></div>
                                                 <div class="border border-black bg-white w-1"></div>
                                                 <div class="border border-black bg-white w-1"></div>
@@ -286,8 +286,8 @@
                                                 <p class="text-[8px] font-semibold absolute -top-1">2.0 mm gaps</p>
                                                 <input type="checkbox" {{$form->reportDetails->first()->test4ab_h20mm ?
                                                 'checked' : '' }}
-                                                name="test4ab_h20mm" id="test4ab_h20mm"
-                                                class="form-checkbox absolute place-self-center h-6 w-6" disabled>
+                                                    name="test4ab_h20mm" id="test4ab_h20mm"
+                                                    class="form-checkbox absolute place-self-center h-6 w-6" disabled>
                                                 <div class="border border-black bg-white h-1"></div>
                                                 <div class="border border-black bg-white h-1"></div>
                                                 <div class="border border-black bg-white h-1"></div>
@@ -296,8 +296,8 @@
                                             <div class="grid grid-cols-4 gap-0 text-xs h-8 px-2">
                                                 <input type="checkbox" {{$form->reportDetails->first()->test4ab_v20mm ?
                                                 'checked' : '' }}
-                                                name="test4ab_v20mm" id="test4ab_v20mm"
-                                                class="form-checkbox absolute place-self-center h-4 w-4" disabled>
+                                                    name="test4ab_v20mm" id="test4ab_v20mm"
+                                                    class="form-checkbox absolute place-self-center h-4 w-4" disabled>
                                                 <div class="border border-black bg-white w-1"></div>
                                                 <div class="border border-black bg-white w-1"></div>
                                                 <div class="border border-black bg-white w-1"></div>
@@ -310,8 +310,8 @@
                                                 <p class="text-[8px] font-semibold absolute -top-1">1.0 mm gaps</p>
                                                 <input type="checkbox" {{$form->reportDetails->first()->test4ab_h10mm ?
                                                 'checked' : '' }}
-                                                name="test4ab_h10mm" id="test4ab_h10mm"
-                                                class="form-checkbox absolute place-self-center h-6 w-6" disabled>
+                                                    name="test4ab_h10mm" id="test4ab_h10mm"
+                                                    class="form-checkbox absolute place-self-center h-6 w-6" disabled>
                                                 <div class="border border-black bg-white h-1"></div>
                                                 <div class="border border-black bg-white h-1"></div>
                                                 <div class="border border-black bg-white h-1"></div>
@@ -320,8 +320,8 @@
                                             <div class="grid grid-cols-4 gap-0 text-xs h-11 px-9 py-1">
                                                 <input type="checkbox" {{$form->reportDetails->first()->test4ab_v10mm ?
                                                 'checked' : '' }}
-                                                name="test4ab_v10mm" id="test4ab_v10mm"
-                                                class="form-checkbox absolute place-self-center h-5 w-5" disabled>
+                                                    name="test4ab_v10mm" id="test4ab_v10mm"
+                                                    class="form-checkbox absolute place-self-center h-5 w-5" disabled>
                                                 <div class="border border-black bg-white w-1"></div>
                                                 <div class="border border-black bg-white w-1"></div>
                                                 <div class="border border-black bg-white w-1"></div>
@@ -338,20 +338,20 @@
                                             <div class="bg-[#C5E0B3] h-10 flex items-center justify-center">
                                                 <input type="checkbox" {{$form->reportDetails->first()->test5ab_05mm ?
                                                 'checked' : '' }}
-                                                id="test5ab_05mm" name="test5ab_05mm"
-                                                class="form-checkbox" disabled>
+                                                    id="test5ab_05mm" name="test5ab_05mm"
+                                                    class="form-checkbox" disabled>
                                             </div>
                                             <div class="bg-[#A8D08D] h-10 flex items-center justify-center">
                                                 <input type="checkbox" {{$form->reportDetails->first()->test5ab_10mm ?
                                                 'checked' : '' }}
-                                                id="test5ab_10mm" name="test5ab_10mm"
-                                                class="form-checkbox" disabled>
+                                                    id="test5ab_10mm" name="test5ab_10mm"
+                                                    class="form-checkbox" disabled>
                                             </div>
                                             <div class="bg-[#548135] h-10 flex items-center justify-center">
                                                 <input type="checkbox" {{$form->reportDetails->first()->test5ab_15mm ?
                                                 'checked' : '' }}
-                                                id="test5ab_15mm" name="test5ab_15mm"
-                                                class="form-checkbox" disabled>
+                                                    id="test5ab_15mm" name="test5ab_15mm"
+                                                    class="form-checkbox" disabled>
                                             </div>
                                         </div>
                                         <div class="grid grid-rows-3 pl-1">
@@ -373,8 +373,8 @@
                                     <div class="grid grid-cols-2 gap-0">
                                         <input type="checkbox" {{$form->reportDetails->first()->test2ab ? 'checked' : ''
                                         }} name="test2ab"
-                                        id="test2ab" disabled
-                                        class="form-checkbox absolute place-self-center">
+                                            id="test2ab" disabled
+                                            class="form-checkbox absolute place-self-center">
                                         <div class="bg-green-500 h-16 flex items-center justify-center">
                                         </div>
                                         <div class="bg-orange-500 h-16 flex items-center justify-center">
@@ -384,8 +384,8 @@
                                         <h3 class="text-xs font-bold text-end">TEST 2b</h3>
                                         <input type="checkbox" {{$form->reportDetails->first()->test2bb ? 'checked' : ''
                                         }} name="test2bb"
-                                        id="test2bb" disabled
-                                        class="absolute place-self-end form-checkbox">
+                                            id="test2bb" disabled
+                                            class="absolute place-self-end form-checkbox">
                                     </div>
                                 </div>
 
@@ -395,56 +395,56 @@
                                         <div class="bg-cyan-100 h-16 flex items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test3b_14 ?
                                             'checked' : '' }}
-                                            name="test3b_14" id="test3b_14"
-                                            class="form-checkbox justify-center absolute top-4" disabled>
+                                                name="test3b_14" id="test3b_14"
+                                                class="form-checkbox justify-center absolute top-4" disabled>
                                         </div>
                                         <div class="bg-cyan-200 h-16 flex items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test3b_16 ?
                                             'checked' : '' }}
-                                            name="test3b_16" id="test3b_16"
-                                            class="form-checkbox justify-center absolute top-4" disabled>
+                                                name="test3b_16" id="test3b_16"
+                                                class="form-checkbox justify-center absolute top-4" disabled>
                                         </div>
                                         <div class="bg-sky-400 h-16 flex items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test3b_18 ?
                                             'checked' : '' }}
-                                            name="test3b_18" id="test3b_18"
-                                            class="form-checkbox justify-center absolute top-4" disabled>
+                                                name="test3b_18" id="test3b_18"
+                                                class="form-checkbox justify-center absolute top-4" disabled>
                                         </div>
                                         <div class="bg-blue-500 h-16 flex items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test3b_20 ?
                                             'checked' : '' }}
-                                            name="test3b_20" id="test3b_20"
-                                            class="form-checkbox justify-center absolute top-4" disabled>
+                                                name="test3b_20" id="test3b_20"
+                                                class="form-checkbox justify-center absolute top-4" disabled>
                                         </div>
                                         <div class="bg-blue-500 h-16 flex items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test3b_22 ?
                                             'checked' : '' }}
-                                            name="test3b_22" id="test3b_22"
-                                            class="form-checkbox justify-center absolute top-4" disabled>
+                                                name="test3b_22" id="test3b_22"
+                                                class="form-checkbox justify-center absolute top-4" disabled>
                                         </div>
                                         <div class="bg-blue-700 h-16 flex items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test3b_24 ?
                                             'checked' : '' }}
-                                            name="test3b_24" id="test3b_24"
-                                            class="form-checkbox justify-center absolute top-4" disabled>
+                                                name="test3b_24" id="test3b_24"
+                                                class="form-checkbox justify-center absolute top-4" disabled>
                                         </div>
                                         <div class="bg-blue-700 h-16 flex items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test3b_26 ?
                                             'checked' : '' }}
-                                            name="test3b_26" id="test3b_26"
-                                            class="form-checkbox justify-center absolute top-4" disabled>
+                                                name="test3b_26" id="test3b_26"
+                                                class="form-checkbox justify-center absolute top-4" disabled>
                                         </div>
                                         <div class="bg-blue-950 h-16 flex items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test3b_28 ?
                                             'checked' : ''
                                             }}name="test3b_28" id="test3b_28"
-                                            class="form-checkbox justify-center absolute top-4" disabled>
+                                                class="form-checkbox justify-center absolute top-4" disabled>
                                         </div>
                                         <div class="bg-blue-950 h-16 flex items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test3b_30 ?
                                             'checked' : '' }}
-                                            name="test3b_30" id="test3b_30"
-                                            class="form-checkbox justify-center absolute top-4" disabled>
+                                                name="test3b_30" id="test3b_30"
+                                                class="form-checkbox justify-center absolute top-4" disabled>
                                         </div>
                                     </div>
                                     <div class="grid grid-cols-9 gap-0">
@@ -476,77 +476,77 @@
                                         <div class="grid grid-rows-4 bg-white items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test1ab_36 ?
                                             'checked' : '' }}
-                                            id="test1ab_36" name="test1ab_36"
-                                            class="form-checkbox" disabled>
+                                                id="test1ab_36" name="test1ab_36"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1ab_32 ?
                                             'checked' : '' }}
-                                            id="test1ab_32" name="test1ab_32"
-                                            class="form-checkbox" disabled>
+                                                id="test1ab_32" name="test1ab_32"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1ab_30 ?
                                             'checked' : '' }}
-                                            id="test1ab_30" name="test1ab_30"
-                                            class="form-checkbox" disabled>
+                                                id="test1ab_30" name="test1ab_30"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1ab_24 ?
                                             'checked' : '' }}
-                                            id="test1ab_24" name="test1ab_24"
-                                            class="form-checkbox" disabled>
+                                                id="test1ab_24" name="test1ab_24"
+                                                class="form-checkbox" disabled>
                                         </div>
                                         <div
                                             class="grid grid-rows-4 bg-[#C5E0B3] border border-black items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bb_36_1 ?
                                             'checked' : '' }}
-                                            id="test1bb_36_1" name="test1bb_36_1"
-                                            class="form-checkbox" disabled>
+                                                id="test1bb_36_1" name="test1bb_36_1"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bb_32_1 ?
                                             'checked' : '' }}
-                                            id="test1bb_32_1" name="test1bb_32_1"
-                                            class="form-checkbox" disabled>
+                                                id="test1bb_32_1" name="test1bb_32_1"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bb_30_1 ?
                                             'checked' : '' }}
-                                            id="test1bb_30_1" name="test1bb_30_1"
-                                            class="form-checkbox" disabled>
+                                                id="test1bb_30_1" name="test1bb_30_1"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bb_24_1 ?
                                             'checked' : '' }}
-                                            id="test1bb_24_1" name="test1bb_24_1"
-                                            class="form-checkbox" disabled>
+                                                id="test1bb_24_1" name="test1bb_24_1"
+                                                class="form-checkbox" disabled>
                                         </div>
                                         <div
                                             class="grid grid-rows-4 bg-[#92D050] border-y border-black items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bb_36_2 ?
                                             'checked' : '' }}
-                                            id="test1bb_36_2" name="test1bb_36_2"
-                                            class="form-checkbox" disabled>
+                                                id="test1bb_36_2" name="test1bb_36_2"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bb_32_2 ?
                                             'checked' : '' }}
-                                            id="test1bb_32_2" name="test1bb_32_2"
-                                            class="form-checkbox" disabled>
+                                                id="test1bb_32_2" name="test1bb_32_2"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bb_30_2 ?
                                             'checked' : '' }}
-                                            id="test1bb_30_2" name="test1bb_30_2"
-                                            class="form-checkbox" disabled>
+                                                id="test1bb_30_2" name="test1bb_30_2"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bb_24_2 ?
                                             'checked' : '' }}
-                                            id="test1bb_24_2" name="test1bb_24_2"
-                                            class="form-checkbox" disabled>
+                                                id="test1bb_24_2" name="test1bb_24_2"
+                                                class="form-checkbox" disabled>
                                         </div>
                                         <div
                                             class="grid grid-rows-4 bg-green-500 border border-black items-center justify-center">
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bb_36_3 ?
                                             'checked' : '' }}
-                                            id="test1bb_36_3" name="test1bb_36_3"
-                                            class="form-checkbox" disabled>
+                                                id="test1bb_36_3" name="test1bb_36_3"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bb_32_3 ?
                                             'checked' : '' }}
-                                            id="test1bb_32_3" name="test1bb_32_3"
-                                            class="form-checkbox" disabled>
+                                                id="test1bb_32_3" name="test1bb_32_3"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bb_30_3 ?
                                             'checked' : '' }}
-                                            id="test1bb_30_3" name="test1bb_30_3"
-                                            class="form-checkbox" disabled>
+                                                id="test1bb_30_3" name="test1bb_30_3"
+                                                class="form-checkbox" disabled>
                                             <input type="checkbox" {{$form->reportDetails->first()->test1bb_24_3 ?
                                             'checked' : '' }}
-                                            id="test1bb_24_3" name="test1bb_24_3"
-                                            class="form-checkbox" disabled>
+                                                id="test1bb_24_3" name="test1bb_24_3"
+                                                class="form-checkbox" disabled>
                                         </div>
                                     </div>
                                     <div class="grid grid-cols-[50%_50%] mt-3">
@@ -563,8 +563,8 @@
                                                 <p class="text-[8px] font-semibold absolute -top-1">1.5 mm gaps</p>
                                                 <input type="checkbox" {{$form->reportDetails->first()->test4b_h15mm ?
                                                 'checked' : '' }}
-                                                name="test4b_h15mm" id="test4b_h15mm"
-                                                class="form-checkbox absolute place-self-center h-6 w-6" disabled>
+                                                    name="test4b_h15mm" id="test4b_h15mm"
+                                                    class="form-checkbox absolute place-self-center h-6 w-6" disabled>
                                                 <div class="border border-black bg-white h-1"></div>
                                                 <div class="border border-black bg-white h-1"></div>
                                                 <div class="border border-black bg-white h-1"></div>
@@ -573,8 +573,8 @@
                                             <div class="grid grid-cols-4 gap-0 text-xs h-7 px-8">
                                                 <input type="checkbox" {{$form->reportDetails->first()->test4b_v15mm ?
                                                 'checked' : '' }}
-                                                name="test4b_v15mm" id="test4b_v15mm"
-                                                class="form-checkbox absolute place-self-center h-5 w-5" disabled>
+                                                    name="test4b_v15mm" id="test4b_v15mm"
+                                                    class="form-checkbox absolute place-self-center h-5 w-5" disabled>
                                                 <div class="border border-black bg-white w-1"></div>
                                                 <div class="border border-black bg-white w-1"></div>
                                                 <div class="border border-black bg-white w-1"></div>
@@ -587,8 +587,8 @@
                                                 <p class="text-[8px] font-semibold absolute -top-1">2.0 mm gaps</p>
                                                 <input type="checkbox" {{$form->reportDetails->first()->test4b_h20mm ?
                                                 'checked' : '' }}
-                                                name="test4b_h20mm" id="test4b_h20mm"
-                                                class="form-checkbox absolute place-self-center h-6 w-6" disabled>
+                                                    name="test4b_h20mm" id="test4b_h20mm"
+                                                    class="form-checkbox absolute place-self-center h-6 w-6" disabled>
                                                 <div class="border border-black bg-white h-1"></div>
                                                 <div class="border border-black bg-white h-1"></div>
                                                 <div class="border border-black bg-white h-1"></div>
@@ -597,8 +597,8 @@
                                             <div class="grid grid-cols-4 gap-0 text-xs h-8 px-2">
                                                 <input type="checkbox" {{$form->reportDetails->first()->test4b_v20mm ?
                                                 'checked' : '' }}
-                                                name="test4b_v20mm" id="test4b_v20mm"
-                                                class="form-checkbox absolute place-self-center h-4 w-4" disabled>
+                                                    name="test4b_v20mm" id="test4b_v20mm"
+                                                    class="form-checkbox absolute place-self-center h-4 w-4" disabled>
                                                 <div class="border border-black bg-white w-1"></div>
                                                 <div class="border border-black bg-white w-1"></div>
                                                 <div class="border border-black bg-white w-1"></div>
@@ -611,8 +611,8 @@
                                                 <p class="text-[8px] font-semibold absolute -top-1">1.0 mm gaps</p>
                                                 <input type="checkbox" {{$form->reportDetails->first()->test4b_h10mm ?
                                                 'checked' : '' }}
-                                                name="test4b_h10mm" id="test4b_h10mm"
-                                                class="form-checkbox absolute place-self-center h-6 w-6" disabled>
+                                                    name="test4b_h10mm" id="test4b_h10mm"
+                                                    class="form-checkbox absolute place-self-center h-6 w-6" disabled>
                                                 <div class="border border-black bg-white h-1"></div>
                                                 <div class="border border-black bg-white h-1"></div>
                                                 <div class="border border-black bg-white h-1"></div>
@@ -621,8 +621,8 @@
                                             <div class="grid grid-cols-4 gap-0 text-xs h-11 px-9 py-1">
                                                 <input type="checkbox" {{$form->reportDetails->first()->test4b_v10mm ?
                                                 'checked' : '' }}
-                                                name="test4b_v10mm" id="test4b_v10mm"
-                                                class="form-checkbox absolute place-self-center h-5 w-5" disabled>
+                                                    name="test4b_v10mm" id="test4b_v10mm"
+                                                    class="form-checkbox absolute place-self-center h-5 w-5" disabled>
                                                 <div class="border border-black bg-white w-1"></div>
                                                 <div class="border border-black bg-white w-1"></div>
                                                 <div class="border border-black bg-white w-1"></div>
@@ -639,20 +639,20 @@
                                             <div class="bg-[#C5E0B3] h-10 flex items-center justify-center">
                                                 <input type="checkbox" {{$form->reportDetails->first()->test5b_05mm ?
                                                 'checked' : '' }}
-                                                id="test5b_05mm" name="test5b_05mm"
-                                                class="form-checkbox" disabled>
+                                                    id="test5b_05mm" name="test5b_05mm"
+                                                    class="form-checkbox" disabled>
                                             </div>
                                             <div class="bg-[#A8D08D] h-10 flex items-center justify-center">
                                                 <input type="checkbox" {{$form->reportDetails->first()->test5b_10mm ?
                                                 'checked' : '' }}
-                                                id="test5b_10mm" name="test5b_10mm"
-                                                class="form-checkbox" disabled>
+                                                    id="test5b_10mm" name="test5b_10mm"
+                                                    class="form-checkbox" disabled>
                                             </div>
                                             <div class="bg-[#548135] h-10 flex items-center justify-center">
                                                 <input type="checkbox" {{$form->reportDetails->first()->test5b_15mm ?
                                                 'checked' : '' }}
-                                                id="test5b_15mm" name="test5b_15mm"
-                                                class="form-checkbox" disabled>
+                                                    id="test5b_15mm" name="test5b_15mm"
+                                                    class="form-checkbox" disabled>
                                             </div>
                                         </div>
                                         <div class="grid grid-rows-3 pl-1">
@@ -750,17 +750,13 @@
                             Status
                         </label>
 
-                        @php
-                        $statuses = \App\Models\ReportStatus::select('id', 'name', 'label')->orderBy('id')->get();
-                        @endphp
-
                         <select name="status_id" id="status_id"
                             class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base">
                             @php
                             $rejectedStatus = $statuses->firstWhere('name', 'rejected');
                             @endphp
                             @foreach($statuses as $status)
-                            <option value="{{ $status->id }}" {{ $form->status_id == $status->id ? 'selected' : '' }}
+                            <option value="{{ $status->id }}" {{ $form->status && $form->status->id == $status->id ? 'selected' : '' }}
                                 data-requires-note="{{ $status->name === 'rejected' ? 'true' : 'false' }}">
                                 {{ $status->label }}
                             </option>
@@ -849,8 +845,12 @@
         updateSubmitButtonState();
 
         // Touch events for mobile
-        canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
-        canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+        canvas.addEventListener('touchstart', handleTouchStart, {
+            passive: false
+        });
+        canvas.addEventListener('touchmove', handleTouchMove, {
+            passive: false
+        });
         canvas.addEventListener('touchend', stopDrawing);
 
         // Mouse events for desktop
@@ -1009,39 +1009,41 @@
 
             // Mengirim data tanda tangan ke server
             fetch('{{ route("xray.saveSupervisorSignature", $form->reportID) }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ signature: supervisorSignatureData })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        signature: supervisorSignatureData
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: 'Tanda tangan berhasil disimpan',
+                            icon: 'success',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#3085d6'
+                        });
+                        // Enable tombol perbarui status
+                        updateSubmitButtonState();
+                    } else {
+                        throw new Error('Gagal menyimpan tanda tangan');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
                     Swal.fire({
-                        title: 'Berhasil!',
-                        text: 'Tanda tangan berhasil disimpan',
-                        icon: 'success',
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan saat menyimpan tanda tangan',
+                        icon: 'error',
                         confirmButtonText: 'OK',
                         confirmButtonColor: '#3085d6'
                     });
-                    // Enable tombol perbarui status
-                    updateSubmitButtonState();
-                } else {
-                    throw new Error('Gagal menyimpan tanda tangan');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Terjadi kesalahan saat menyimpan tanda tangan',
-                    icon: 'error',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#3085d6'
                 });
-            });
         }
 
         // Handle window resize

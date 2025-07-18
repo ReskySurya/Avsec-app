@@ -1,5 +1,5 @@
 <div id="sidebar"
-    class="bg-gray-800 text-white w-64 min-h-screen p-4 fixed top-16 lg:top-0 left-0 z-30 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out lg:pt-4">
+    class="bg-gray-800 text-white w-64 min-h-screen p-4 fixed top-16 lg:top-0 left-0 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out lg:pt-4">
     <!-- <div class="mb-8 hidden lg:block">
         <h2 class="text-2xl font-bold mb-2">AVSEC App</h2>
         <p class="text-sm text-gray-400">{{ auth()->user()->role->name }}</p>
@@ -24,7 +24,7 @@
             @if(auth()->user()->role->name === 'superadmin')
              <li x-data="{ open: false }">
                 <button @click="open = !open"
-                    class="flex items-center justify-between w-full py-2 px-2 rounded hover:bg-gray-700">
+                    class="flex items-center justify-between w-full py-2 px-2 rounded hover:bg-gray-700 no-mobile-close">
                     <div class="flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
@@ -59,9 +59,9 @@
             @endif
 
             <!-- Common Menu Items for All Roles -->
-            <li x-data="{ open: false }" @click.away="$store.sidebar.open = true">
-                <button @click="open = !open; $store.sidebar.open = true"
-                    class="flex items-center justify-between w-full py-2 px-2 rounded hover:bg-gray-700">
+            <li x-data="{ open: false }">
+                <button @click="open = !open"
+                    class="flex items-center justify-between w-full py-2 px-2 rounded hover:bg-gray-700 no-mobile-close">
                     <div class="flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
@@ -79,7 +79,7 @@
                 </button>
                 <ul x-show="open" class="pl-4 mt-2 space-y-2">
                     <li>
-                        <a href="{{ route('daily-test.hhmd') }}" @click="$store.sidebar.open = false" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                        <a href="{{ route('daily-test.hhmd') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
                             <span>HHMD</span>
                         </a>
                     </li>
@@ -92,7 +92,7 @@
 
                     <li x-data="{ openXray: false }">
                         <button @click="openXray = !openXray"
-                            class="flex items-center justify-between w-full py-2 px-4 rounded hover:bg-gray-700">
+                            class="flex items-center justify-between w-full py-2 px-4 rounded hover:bg-gray-700 no-mobile-close">
                             <span>X-RAY</span>
                             <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': openXray }"
                                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -114,7 +114,6 @@
                             </li>
                         </ul>
                     </li>
-
                 </ul>
             </li>
 

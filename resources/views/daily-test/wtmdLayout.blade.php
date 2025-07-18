@@ -113,7 +113,7 @@
 
                 console.log('Form submission result:', formData, result);
                 if (response.ok) {
-                    alert(locationValue);
+                    // alert(locationValue);
                     Swal.fire({
                         title: 'Berhasil',
                         text: result.message || 'Form berhasil dikirim',
