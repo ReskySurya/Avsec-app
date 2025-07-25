@@ -16,13 +16,20 @@
                         </svg>
                     </button>
                 </div>
-                
+
                 <!-- Logo -->
                 <div class="flex-shrink-0 flex items-center">
                     <a href="#" class="text-white font-bold text-xl">AVSEC App</a>
                 </div>
+<!-- 
+                <button id="toggleSidebar" class="lg:inline-flex hidden items-center px-3 py-2 text-white  rounded">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button> -->
 
-               
+
                 <!-- Navigation Links - Hidden on mobile and tablet, shown on desktop -->
                 <!-- <div class="hidden xl:ml-6 xl:flex xl:space-x-8">
                     <a href="{{ url('/dashboard/' . auth()->user()->role->name) }}" class="border-transparent text-white hover:border-white hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {{ request()->is('dashboard/*') ? 'border-white' : '' }}">
@@ -56,7 +63,7 @@
                     @endif
                 </div> -->
             </div>
-            
+
             <!-- User Dropdown -->
             <div class="flex items-center">
                 <div class="ml-3 relative">

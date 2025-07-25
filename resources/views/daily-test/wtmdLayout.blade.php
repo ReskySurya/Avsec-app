@@ -5,7 +5,7 @@
 @endif
 
 
-<div class="bg-white-100 px-4 sm:px-8 md:px-16 lg:px-32 xl:px-64">
+<div class="bg-white-100 mx-auto px-4 sm:px-8 lg:px-24 lg:mt-20">
     <div>
         <x-form-wtmd :wtmdLocations="$wtmdLocations" />
     </div>
