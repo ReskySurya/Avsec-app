@@ -117,55 +117,65 @@
                 </ul>
             </li>
 
-            <li class="mt-6">
-                <a href="#" class="flex items-center p-2 rounded hover:bg-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            <li x-data="{ open: false }">
+                <button @click="open = !open"
+                    class="flex items-center justify-between w-full py-2 px-2 rounded hover:bg-gray-700 no-mobile-close">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                        </svg>
+                        <span class="text-white">Logbook</span>
+                    </div>
+                    <svg x-show="sidebarOpen" class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }"
+                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                            clip-rule="evenodd" />
                     </svg>
-                    <span>Logbook Pos Jaga</span>
-                </a>
-            </li>
-            <li class="mt-6">
-                <a href="#" class="flex items-center p-2 rounded hover:bg-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    <span>Check List CCTV</span>
-                </a>
-            </li>
-            <li class="mt-6">
-                <a href="#" class="flex items-center p-2 rounded hover:bg-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    <span>Check List Kendaraan</span>
-                </a>
-            </li>
-            <li class="mt-6">
-                <a href="#" class="flex items-center p-2 rounded hover:bg-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    <span>Sweeping PI</span>
-                </a>
-            </li>
-            <li class="mt-6">
-                <a href="#" class="flex items-center p-2 rounded hover:bg-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    <span>Laporan Kejadian</span>
-                </a>
+                </button>
+                <ul x-show="open" class="pl-4 mt-2 space-y-2">
+                    <li x-data="{ openPosJaga: false }">
+                        <button @click="openPosJaga = !openPosJaga"
+                            class="flex items-center justify-between w-full py-2 px-4 rounded hover:bg-gray-700 no-mobile-close">
+                            <span>Logbook Pos Jaga</span>
+                            <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': openPosJaga }"
+                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <ul x-show="openPosJaga" class="pl-4 mt-2 space-y-2">
+                            <li>
+                                <a href="{{ route('logbookPosJagaTimur.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                                    <span>Logbook Pos Jaga Pos Timur</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('logbookPosJagaBarat.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                                    <span>Logbook Pos Jaga Pos Barat</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="{{ route('logbookSweppingPI.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                            <span>Logbook Sweeping PI</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('logbookRotasiHBSCP.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                            <span>Logbook Rotasi HBCCP</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('logbookRotasiPSCP.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                            <span>Logbook Rotasi PSCP</span>
+                        </a>
+                    </li>
+                </ul>
             </li>
             <li>
                 <a href="#" class="flex items-center p-2 rounded hover:bg-gray-700">

@@ -727,6 +727,20 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Check for success message from previous page load
+        const successMessage = sessionStorage.getItem('userActionSuccess');
+        if (successMessage) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: successMessage,
+                timer: 2500,
+                showConfirmButton: false
+            });
+            // Clear the message so it doesn't show again
+            sessionStorage.removeItem('userActionSuccess');
+        }
+
         // === Konfigurasi Awal ===
         const modalTambah = document.getElementById('modalTambah');
         const formTambah = document.getElementById('formTambah');
@@ -741,12 +755,7 @@
         const hideModal = (modal) => modal.classList.add('hidden');
 
         // Header untuk request fetch CSRF
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
-        const fetchHeaders = {
-            "X-CSRF-TOKEN": csrfToken,
-            "X-Requested-With": "XMLHttpRequest",
-            "Accept": "application/json",
-        };
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content') || '{{ csrf_token() }}';
 
         // === Event Listener Utama (Event Delegation) ===
         document.body.addEventListener('click', function(e) {
@@ -781,27 +790,22 @@
                 didOpen: () => Swal.showLoading()
             });
 
-            // Pastikan URL fetch ini sesuai dengan route GET Anda
-            fetch(`/users-management/update/${userId}`) // Sesuai dengan route name 'users-management.get'
+            fetch(`/users-management/update/${userId}`)
                 .then(response => {
                     if (!response.ok) throw new Error('Data user tidak ditemukan.');
                     return response.json();
                 })
                 .then(user => {
                     Swal.close();
-                    // URL action untuk form submit, sesuai dengan route PUT
                     formEdit.action = `/users-management/update/${userId}`;
                     formEdit.querySelector('#edit_user_id').value = user.id;
                     formEdit.querySelector('#edit_name').value = user.name;
                     formEdit.querySelector('#edit_nip').value = user.nip;
                     formEdit.querySelector('#edit_lisensi').value = user.lisensi;
                     formEdit.querySelector('#edit_email').value = user.email;
-
-                    // Mengisi role dengan cara yang lebih aman
                     if (user.roles && user.roles.length > 0) {
                         formEdit.querySelector('#edit_role_id').value = user.roles[0].id;
                     }
-
                     formEdit.querySelector('#edit_password').value = '';
                     formEdit.querySelector('#edit_password_confirmation').value = '';
                     showModal(modalEdit);
@@ -810,7 +814,6 @@
                     Swal.fire({ icon: 'error', title: 'Oops...', text: 'Gagal mengambil data user. ' + error.message });
                 });
         }
-
 
         function handleDelete(userId, userRow) {
             Swal.fire({
@@ -826,7 +829,11 @@
                 if (result.isConfirmed) {
                     fetch(`/users-management/hapus/${userId}`, {
                         method: 'POST',
-                        headers: fetchHeaders,
+                        headers: {
+                            "X-CSRF-TOKEN": csrfToken,
+                            "X-Requested-With": "XMLHttpRequest",
+                            "Accept": "application/json",
+                        },
                         body: new URLSearchParams({ '_method': 'DELETE' })
                     })
                     .then(response => response.json())
@@ -849,46 +856,80 @@
             e.preventDefault();
             const formData = new FormData(this);
 
-            fetch(this.action, { method: 'POST', headers: fetchHeaders, body: formData })
-            .then(response => response.json())
+            fetch(this.action, {
+                method: 'POST',
+                headers: {
+                    "X-CSRF-TOKEN": csrfToken,
+                    "X-Requested-With": "XMLHttpRequest",
+                    "Accept": "application/json",
+                },
+                body: formData
+            })
+            .then(response => {
+                if (response.redirected) {
+                    sessionStorage.setItem('userActionSuccess', 'User baru berhasil ditambahkan.');
+                    window.location.href = response.url;
+                    return null;
+                }
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
             .then(data => {
-                if (data.success) {
-                    hideModal(modalTambah);
-                    Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'User baru berhasil ditambahkan.' })
-                    .then(() => location.reload());
-                } else {
+                if (data) { // This block will now only handle non-redirected, JSON error responses
                     const errors = data.errors ? Object.values(data.errors).flat().join('\n') : (data.message || 'Terjadi kesalahan.');
                     Swal.fire({ icon: 'error', title: 'Gagal Menyimpan', html: `<pre style="text-align: left; white-space: pre-wrap;">${errors}</pre>` });
                 }
             })
-            .catch(() => Swal.fire({ icon: 'error', title: 'Oops...', text: 'Terjadi kesalahan teknis.' }));
+            .catch(error => {
+                const errorMessage = error && error.message ? error.message : 'Terjadi kesalahan teknis.';
+                Swal.fire({ icon: 'error', title: 'Oops...', text: errorMessage });
+            });
         });
 
         formEdit.addEventListener('submit', function(e) {
             e.preventDefault();
             const formData = new FormData(this);
+            formData.append('_method', 'PUT');
 
-            fetch(this.action, { method: 'POST', headers: fetchHeaders, body: formData })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
+            fetch(this.action, {
+                method: 'POST',
+                headers: {
+                    "X-CSRF-TOKEN": csrfToken,
+                    "X-Requested-With": "XMLHttpRequest",
+                    "Accept": "application/json",
+                },
+                body: formData
+            })
+            .then(response => {
+                if (response.redirected) {
+                    sessionStorage.setItem('userActionSuccess', 'Data user berhasil diupdate.');
+                    window.location.href = response.url;
+                    return null; // Stop processing
+                }
+                // If not redirected, we expect a JSON response
+                return response.json().then(data => ({ok: response.ok, data}));
+            })
+            .then(res => {
+                if (res && res.ok && res.data.success) {
+                    // Handle successful update
                     hideModal(modalEdit);
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil!',
-                        text: 'Data user berhasil diupdate.',
-                        willClose: () => {
-                            window.location.reload();
-                        }
-                    });
-                } else {
-                    const errors = data.errors ? Object.values(data.errors).flat().join('\n') : (data.message || 'Terjadi kesalahan.');
+                    sessionStorage.setItem('userActionSuccess', res.data.message || 'Data user berhasil diupdate.');
+                    window.location.reload();
+                } else if (res) {
+                    // Handle errors returned in JSON
+                    const errors = res.data.errors ? Object.values(res.data.errors).flat().join('\n') : (res.data.message || 'Terjadi kesalahan.');
                     Swal.fire({ icon: 'error', title: 'Gagal Mengupdate', html: `<pre style="text-align: left; white-space: pre-wrap;">${errors}</pre>` });
                 }
             })
-            .catch(() => Swal.fire({ icon: 'error', title: 'Oops...', text: 'Terjadi kesalahan teknis. Periksa kembali backend Anda.' }));
+            .catch(error => {
+                // Handle network errors or other exceptions
+                console.error('Error:', error);
+                const errorMessage = error && error.message ? error.message : 'Terjadi kesalahan teknis.';
+                Swal.fire({ icon: 'error', title: 'Oops...', text: errorMessage });
+            });
         });
-
 
         [btnCloseModalTambah, btnCloseModalEdit].forEach(btn => {
             btn.addEventListener('click', () => { hideModal(modalTambah); hideModal(modalEdit); });
@@ -900,46 +941,29 @@
         // Tab switching functionality with localStorage
         const tabButtons = document.querySelectorAll('.tab-button');
         const tabContents = document.querySelectorAll('.tab-content');
-
-        // Hide all tab contents initially
         tabContents.forEach(content => content.classList.add('hidden'));
-
-        // Reset all tab buttons to inactive state
         tabButtons.forEach(btn => {
             btn.classList.add('bg-transparent', 'hover:bg-gray-100', 'text-gray-600', 'hover:text-gray-800');
             btn.classList.remove('bg-blue-600', 'text-white');
         });
-
-        // Get active tab from localStorage or use the first tab button's target
         const activeTab = localStorage.getItem('activeTab') || tabButtons[0].getAttribute('data-target');
-
-        // Activate the correct tab
         const activeButton = document.querySelector(`[data-target="${activeTab}"]`);
         const activeContent = document.getElementById(activeTab);
-
         if (activeButton && activeContent) {
             activeButton.classList.remove('bg-transparent', 'hover:bg-gray-100', 'text-gray-600', 'hover:text-gray-800');
             activeButton.classList.add('bg-blue-600', 'text-white');
             activeContent.classList.remove('hidden');
         }
-
-        // Add click handlers
         tabButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const targetId = this.getAttribute('data-target');
-
-                // Save active tab to localStorage
                 localStorage.setItem('activeTab', targetId);
-
-                // Update tab buttons
                 tabButtons.forEach(btn => {
                     btn.classList.remove('bg-blue-600', 'text-white');
                     btn.classList.add('bg-transparent', 'hover:bg-gray-100', 'text-gray-600', 'hover:text-gray-800');
                 });
                 this.classList.remove('bg-transparent', 'hover:bg-gray-100', 'text-gray-600', 'hover:text-gray-800');
                 this.classList.add('bg-blue-600', 'text-white');
-
-                // Update tab contents
                 tabContents.forEach(content => content.classList.add('hidden'));
                 document.getElementById(targetId).classList.remove('hidden');
             });

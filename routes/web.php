@@ -2,11 +2,16 @@
 
 use App\Http\Controllers\DailyTest\HhmdController;
 use App\Http\Controllers\DailyTestController;
+use App\Http\Controllers\LogBook\LogbookSweppingPIController;
 use App\Http\Controllers\MasterDataController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DailyTest\WtmdController;
 use App\Http\Controllers\DailyTest\XrayController;
+use App\Http\Controllers\LogBook\LogbookRotasiHBSCPController;
+use App\Http\Controllers\LogBook\LogbookRotasiPSCPController;
+use App\Http\Controllers\LogBook\PosJaga\LogbookPosJagaBaratController;
+use App\Http\Controllers\LogBook\PosJaga\LogbookPosJagaTimurController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -121,4 +126,13 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::put('/users-management/update/{id}', [MasterDataController::class,'updateUserManagement'])->name('users-management.update');
     Route::delete('/users-management/hapus/{id}', [MasterDataController::class, 'destroyUserManagement'])->name('users-management.destroy');
 
+});
+
+// Logbook Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/logbook-posjagabarat', [LogbookPosJagaBaratController::class, 'index'])->name('logbookPosJagaBarat.index');
+    Route::get('/logbook-posjagatimur', [LogbookPosJagaTimurController::class, 'index'])->name('logbookPosJagaTimur.index');
+    Route::get('/logbook-rotasihbscp', [LogbookRotasiHBSCPController::class, 'index'])->name('logbookRotasiHBSCP.index');
+    Route::get('/logbook-rotasipscp', [LogbookRotasiPSCPController::class, 'index'])->name('logbookRotasiPSCP.index');
+    Route::get('/logbook-sweppingpi', [LogbookSweppingPIController::class, 'index'])->name('logbookSweppingPI.index');
 });
