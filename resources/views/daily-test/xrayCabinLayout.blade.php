@@ -5,7 +5,7 @@
 @endif
 
 
-<div class="bg-white-100 px-4 sm:px-8 md:px-16 lg:px-32 xl:px-64">
+<div class="bg-white-100 px-4 sm:px-8 lg:px-24 lg:mt-20">
     <div>
         <x-form-xray type="xrayCabin" :xrayCabinLocations="$xrayCabinLocations"/>
     </div>
@@ -308,8 +308,8 @@
             ];
 
             const test5Checkboxes = [
-                document.getElementById('test5ab_05mm'),
-                document.getElementById('test5b_05mm'),
+                document.getElementById('test5ab_15mm'),
+                document.getElementById('test5b_15mm'),
                 document.getElementById('test5ab_10mm'),
                 document.getElementById('test5b_10mm')
             ];
@@ -380,8 +380,8 @@
             'test4b_v15mm',
             'test4b_h20mm',
             'test4b_v20mm',
-            'test5ab_05mm',
-            'test5b_05mm',
+            'test5ab_15mm',
+            'test5b_15mm',
             'test5ab_10mm',
             'test5b_10mm'
         ];
