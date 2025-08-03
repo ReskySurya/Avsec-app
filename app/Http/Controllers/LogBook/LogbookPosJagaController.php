@@ -45,15 +45,29 @@ class LogbookPosJagaController extends Controller
         ]);
     }
 
-    public function detail($id)
-    {
-        // Logika untuk menampilkan detail logbook berdasarkan ID
-        // Misalnya, ambil data dari model LogbookPosJaga
+    public function detail($location, $id){
+         if (!in_array($location, $this->allowedLocations)) {
+            abort(404);
+        }
 
-        $logbook = []; // Ambil data dari model sesuai ID, kalau butuh
+        $locationModel = Location::where('name', $location)->first();
+
+        if (!$locationModel) {
+            abort(404, 'Location tidak ditemukan di database. Pastikan data lokasi sudah tersedia.');
+        }
+        $logbooks = Logbook::where('location_area_id', $locationModel->id)
+            ->where('logbookID', $id) // Ganti 'logbook_id' dengan nama kolom primary key yang benar jika bukan 'id'
+            // ->with('location_area_id') // Eager load the location area
+            ->first();
+
+        if (!$logbooks) {
+            abort(404, 'Logbook tidak ditemukan.');
+        }
 
         return view('logbook.posjaga.detailPosJaga', [
-            'logbook' => $logbook,
+            'location' => $location,
+            'location_id' => $locationModel->id,
+            'logbook' => $logbooks,
         ]);
     }
 

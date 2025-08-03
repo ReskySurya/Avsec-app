@@ -11,7 +11,7 @@
             grup: '',
             shift: ''
         },
-    }" class="mx-auto p-6 min-h-screen pt-20">
+    }" class="mx-auto p-0 sm:p-6 min-h-screen pt-5 sm:pt-20">
 
 
     <!-- Alert Messages with Enhanced Design -->
@@ -43,17 +43,17 @@
     <!-- Logbook Section -->
     <div class="bg-white shadow-xl rounded-2xl overflow-hidden mb-8 border border-gray-100">
         <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-6 py-6 text-white">
-            <div class="flex justify-between items-center">
+            <div class="flex flex-col sm:flex-row justify-between items-start">
                 <div>
                     <h3 class="text-2xl font-bold mb-1">{{ 'Logbook Pos Jaga ' . $location }}</h3>
                     <p class="text-blue-100">Catatan aktivitas pos jaga harian</p>
                 </div>
                 <button @click="openLogbook = true"
-                    class="bg-white text-blue-600 hover:bg-blue-50 px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl w-full sm:w-auto">
+                    class="bg-white text-blue-600 hover:bg-blue-50 px-6 py-3 mt-3 sm:mt-0 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl w-full sm:w-auto ">
                     <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
-                    Tambah Entry
+                    Tambah Data
                 </button>
             </div>
         </div>
@@ -61,7 +61,7 @@
         <!-- Mobile Card View -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6 md:hidden">
             @forelse($logbooks ?? [] as $logbook)
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200" @click="window.location.href='{{ route('logbook.detail', ['location' => $location,'id' => $logbook->logbookID]) }}'">
                 <div class="p-5">
                     <div class="flex items-center justify-between mb-3">
                         <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">{{ \Carbon\Carbon::parse($logbook->date)->format('d M Y') }}</span>
@@ -130,7 +130,7 @@
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     @forelse($logbooks ?? [] as $index => $logbook)
-                    <tr @click="window.location.href='{{ route('logbook.detail', ['id' => $logbook->logbookID]) }}'"
+                    <tr @click="window.location.href='{{ route('logbook.detail', ['location' => $location,'id' => $logbook->logbookID]) }}'"
                         class="hover:bg-gray-50 transition-colors duration-200 cursor-pointer">
 
                         <td class="px-5 py-4 text-blue-600 font-bold">{{ $index + 1 }}</td>

@@ -3,21 +3,11 @@
 @php
 // Data statis untuk uraian kegiatan
 $uraianKegiatan = [
-[
-'waktu' => '07:00',
-'uraian' => 'Pengecekan area pos jaga',
-'keterangan' => 'Semua aman dan terkendali',
-],
-[
-'waktu' => '09:30',
-'uraian' => 'Pengawasan pintu masuk',
-'keterangan' => 'Tidak ditemukan hal mencurigakan',
-],
-[
-'waktu' => '12:00',
-'uraian' => 'Istirahat personil',
-'keterangan' => 'Bergantian, pos tetap terjaga',
-],
+    ['waktu' => '08:00', 'uraian' => 'Pemeriksaan area pos jaga', 'keterangan' => 'Semua aman'],
+    ['waktu' => '10:00', 'uraian' => 'Patroli rutin', 'keterangan' => 'Tidak ada kejadian'],
+    ['waktu' => '12:00', 'uraian' => 'Istirahat makan siang', 'keterangan' => ''],
+    ['waktu' => '14:00', 'uraian' => 'Pemeriksaan dokumen pengunjung', 'keterangan' => ''],
+    ['waktu' => '16:00', 'uraian' => 'Penutupan pos jaga', 'keterangan' => ''],
 ];
 @endphp
 @section('content')
@@ -47,7 +37,7 @@ $uraianKegiatan = [
 </div>
 @endif
 
-<div class="mx-auto p-6 min-h-screen pt-5 sm:pt-20">
+<div class="mx-auto p-0 sm:p-6 min-h-screen pt-5 sm:pt-20">
     <div class="mb-4">
         <a href="{{ route('logbook.index',['location'=> $location])}}" class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-semibold rounded-lg shadow transition">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -69,17 +59,17 @@ $uraianKegiatan = [
 
         <!-- Mobile Card View -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 md:hidden">
-            @if(isset($logbook) && is_array($logbook))
+            @if(isset($logbook))
             <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 cursor-pointer">
                 <div class="p-5">
                     <div class="flex items-center justify-between mb-3">
-                        <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">{{ $logbook['tanggal'] ?? 'N/A' }}</span>
-                        <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-teal-100 rounded-full">{{ $logbook['dinas_shift'] ?? 'N/A' }}</span>
+                        <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">{{ $logbook->date ?? 'N/A' }}</span>
+                        <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-teal-100 rounded-full">{{ $logbook->shift ?? 'N/A' }}</span>
                     </div>
                     <div class="mt-4 space-y-2 text-sm text-gr</div>ay-600">
-                        <p><strong class="font-medium text-gray-800">Area:</strong> {{ $logbook['area'] ?? 'N/A' }}</p>
-                        <p><strong class="font-medium text-gray-800">Grup:</strong> {{ $logbook['group'] ?? 'N/A' }}</p>
-                        <p><strong class="font-medium text-gray-800">Dinas/Shift:</strong> {{ $logbook['dinas_shift'] ?? 'N/A' }}</p>
+                        <p><strong class="font-medium text-gray-800">Area:</strong> {{ $logbook->locationArea->name ?? 'N/A' }}</p>
+                        <p><strong class="font-medium text-gray-800">Grup:</strong> {{ $logbook->grup ?? 'N/A' }}</p>
+                        <p><strong class="font-medium text-gray-800">Dinas/Shift:</strong> {{ $logbook->shift ?? 'N/A' }}</p>
                     </div>
                 </div>
             </div>
@@ -100,14 +90,14 @@ $uraianKegiatan = [
             <div class="grid grid-cols-1 md:grid-cols-2">
                 <div class="bg-blue-50 rounded-lg ">
                     <ul class="text-blue-600">
-                        <li><strong>Tanggal:</strong> {{ $logbook['tanggal'] ?? 'N/A' }}</li>
-                        <li><strong>Area:</strong> {{ $logbook['area'] ?? 'N/A' }}</li>
+                        <li><strong>Tanggal:</strong> {{ $logbook->date ?? 'N/A' }}</li>
+                        <li><strong>Area:</strong> {{ $logbook->locationArea->name ?? 'N/A' }}</li>
                     </ul>
                 </div>
                 <div class="bg-blue-50 rounded-lg ">
                     <ul class="text-blue-600 mt-2">
-                        <li><strong>Grup:</strong> {{ $logbook['group'] ?? 'N/A' }}</li>
-                        <li><strong>Dinas/Shift:</strong> {{ $logbook['dinas_shift'] ?? 'N/A' }}</li>
+                        <li><strong>Grup:</strong> {{ $logbook->grup ?? 'N/A' }}</li>
+                        <li><strong>Dinas/Shift:</strong> {{ $logbook->shift ?? 'N/A' }}</li>
                     </ul>
                 </div>
             </div>
@@ -153,7 +143,7 @@ $uraianKegiatan = [
         </div>
 
         <!-- Mobile Card View -->
-        <div class="grid grid-cols-1 gap-6 md:hidden p-4">
+        <div class="grid grid-cols-1 gap-2 md:hidden p-4">
             @forelse($uraianKegiatan as $i => $item)
             <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
                 <div class="p-4">
