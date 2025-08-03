@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DailyTest\WtmdController;
 use App\Http\Controllers\DailyTest\XrayController;
+use App\Http\Controllers\LogBook\LogbookPosJagaController;
 use App\Http\Controllers\LogBook\LogbookRotasiHBSCPController;
 use App\Http\Controllers\LogBook\LogbookRotasiPSCPController;
 use App\Http\Controllers\LogBook\PosJaga\LogbookPosJagaBaratController;
@@ -130,8 +131,8 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
 
 // Logbook Routes
 Route::middleware(['auth'])->group(function () {
-    Route::get('/logbook-posjagabarat', [LogbookPosJagaBaratController::class, 'index'])->name('logbookPosJagaBarat.index');
-    Route::get('/logbook-posjagatimur', [LogbookPosJagaTimurController::class, 'index'])->name('logbookPosJagaTimur.index');
+    Route::get('/logbook/{location}', [LogbookPosJagaController::class, 'index'])->name('logbook.index');
+    Route::get('/logbook/posjaga/detail/{id}', [LogbookPosJagaController::class, 'detail'])->name('logbook.detail');
     Route::get('/logbook-rotasihbscp', [LogbookRotasiHBSCPController::class, 'index'])->name('logbookRotasiHBSCP.index');
     Route::get('/logbook-rotasipscp', [LogbookRotasiPSCPController::class, 'index'])->name('logbookRotasiPSCP.index');
     Route::get('/logbook-sweppingpi', [LogbookSweppingPIController::class, 'index'])->name('logbookSweppingPI.index');

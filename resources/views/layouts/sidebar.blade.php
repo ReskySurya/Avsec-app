@@ -7,7 +7,7 @@ $isLogbookPosJagaOpen = request()->is('logbookPosJaga*');
 @endphp
 
 <div id="sidebar"
-    class="bg-gray-800 text-white w-64 min-h-screen p-4 fixed top-16 lg:top-0 left-0 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out lg:pt-4">
+     class="bg-gray-800 text-white w-72 h-screen p-4 fixed top-16 lg:top-0 left-0 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out lg:pt-4 overflow-y-auto">
     <nav class="lg:mt-20 sm:mt-0">
         <ul class="space-y-2">
             <li>
@@ -116,7 +116,6 @@ $isLogbookPosJagaOpen = request()->is('logbookPosJaga*');
                 </ul>
             </li>
 
-            <!-- Logbook -->
             <li x-data="{ open: {{ $isLogbookOpen ? 'true' : 'false' }} }">
                 <button @click="open = !open"
                     class="flex items-center justify-between w-full py-2 px-2 rounded hover:bg-gray-700 no-mobile-close">
@@ -135,9 +134,9 @@ $isLogbookPosJagaOpen = request()->is('logbookPosJaga*');
                             clip-rule="evenodd" />
                     </svg>
                 </button>
-                <ul x-show="open" class="pl-8 mt-2 space-y-2">
 
-                    <!-- Pos Jaga -->
+                <ul x-show="open" class="pl-8 mt-2 space-y-2">
+                    <!-- Submenu Pos Jaga -->
                     <li x-data="{ openPosJaga: {{ $isLogbookPosJagaOpen ? 'true' : 'false' }} }">
                         <button @click="openPosJaga = !openPosJaga"
                             class="flex items-center justify-between w-full py-2 px-4 rounded hover:bg-gray-700 no-mobile-close">
@@ -151,35 +150,78 @@ $isLogbookPosJagaOpen = request()->is('logbookPosJaga*');
                         </button>
                         <ul x-show="openPosJaga" class="pl-4 mt-2 space-y-2">
                             <li>
-                                <a href="{{ route('logbookPosJagaTimur.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                                <a href="{{ route('logbook.index', ['location' => 'Kedatangan']) }}"
+                                    class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook/poskedatangan') ? 'bg-gray-700' : '' }}">
+                                    <span>Logbook Pos Kedatangan</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('logbook.index', ['location' => 'Timur']) }}"
+                                    class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook/posjagatimur') ? 'bg-gray-700' : '' }}">
                                     <span>Logbook Pos Timur</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('logbookPosJagaBarat.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                                <a href="{{ route('logbook.index', ['location' => 'Barat']) }}"
+                                    class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook/posjagabarat') ? 'bg-gray-700' : '' }}">
                                     <span>Logbook Pos Barat</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('logbook.index', ['location' => 'HBSCP']) }}"
+                                    class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook/hbscp') ? 'bg-gray-700' : '' }}">
+                                    <span>Logbook Pos HBSCP</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('logbook.index', ['location' => 'PSCP']) }}"
+                                    class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook/pscp') ? 'bg-gray-700' : '' }}">
+                                    <span>Logbook Pos PSCP</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('logbook.index', ['location' => 'Patroli']) }}"
+                                    class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook/patroli') ? 'bg-gray-700' : '' }}">
+                                    <span>Logbook Patroli</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('logbook.index', ['location' => 'CCTV']) }}"
+                                    class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook/cctv') ? 'bg-gray-700' : '' }}">
+                                    <span>Logbook CCTV</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('logbook.index', ['location' => 'Walking Patrol']) }}"
+                                    class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook/walkingpatrol') ? 'bg-gray-700' : '' }}">
+                                    <span>Logbook Walking Patrol</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
 
+                    <!-- Menu Lainnya -->
                     <li>
-                        <a href="{{ route('logbookSweppingPI.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                        <a href="{{ route('logbook.index', ['location' => 'sweppingpi']) }}"
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook/sweppingpi') ? 'bg-gray-700' : '' }}">
                             <span>Logbook Sweeping PI</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('logbookRotasiHBSCP.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                        <a href="{{ route('logbook.index', ['location' => 'rotasihbscp']) }}"
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook/rotasihbscp') ? 'bg-gray-700' : '' }}">
                             <span>Logbook Rotasi HBCCP</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('logbookRotasiPSCP.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                        <a href="{{ route('logbook.index', ['location' => 'rotasipscp']) }}"
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook/rotasipscp') ? 'bg-gray-700' : '' }}">
                             <span>Logbook Rotasi PSCP</span>
                         </a>
                     </li>
                 </ul>
             </li>
+
 
             <!-- Other static menu items -->
             <li>
