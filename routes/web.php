@@ -132,7 +132,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
 // Logbook Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/logbook/{location}', [LogbookPosJagaController::class, 'index'])->name('logbook.index');
-    Route::get('/logbook/posjaga/detail/{id}', [LogbookPosJagaController::class, 'detail'])->name('logbook.detail');
+    Route::get('/logbook/posjaga/detail{location}/{id}', [LogbookPosJagaController::class, 'detail'])->name('logbook.detail');
     Route::get('/logbook-rotasihbscp', [LogbookRotasiHBSCPController::class, 'index'])->name('logbookRotasiHBSCP.index');
     Route::get('/logbook-rotasipscp', [LogbookRotasiPSCPController::class, 'index'])->name('logbookRotasiPSCP.index');
     Route::get('/logbook-sweppingpi', [LogbookSweppingPIController::class, 'index'])->name('logbookSweppingPI.index');

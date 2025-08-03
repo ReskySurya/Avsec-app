@@ -18,7 +18,7 @@ $logbooks = collect([
 'tanggal' => '2025-01-26',
 'area' => $location,
 'group' => 'B',
-'dinas_shift' => 'Siang',
+'dinas_shift' => 'Malam',
 'created_at' => '2025-01-26 14:00:00'
 ],
 
@@ -85,7 +85,8 @@ $logbooks = collect([
         <!-- Mobile Card View -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6 md:hidden">
             @forelse($logbooks ?? [] as $logbook)
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 cursor-pointer"
+                @click="window.location.href='{{ route('logbook.detail', ['location'=> $logbook->area,'id' => $logbook->id]) }}'">
                 <div class="p-5">
                     <div class="flex items-center justify-between mb-3">
                         <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">{{ $logbook->tanggal ?? 'N/A' }}</span>
@@ -97,17 +98,18 @@ $logbooks = collect([
                         <p><strong class="font-medium text-gray-800">Dinas/Shift:</strong> {{ $logbook->dinas_shift ?? 'N/A' }}</p>
                     </div>
                 </div>
-                <div class="bg-gray-50 px-5 py-3 flex justify-end space-x-2">
+                <div class="bg-gray-50 px-5 py-3 flex justify-end space-x-2"
+                    @click.stop>
                     <button type="button"
                         class="p-2 bg-yellow-100 text-yellow-700 rounded-full hover:bg-yellow-200 transition-colors duration-200"
                         @click="
-                                    openEditLogbook = true;
-                                    editLogbookData.id = {{ $logbook->id ?? 0 }};
-                                    editLogbookData.tanggal = '{{ $logbook->tanggal ?? '' }}';
-                                    editLogbookData.area = '{{ addslashes($logbook->area ?? '') }}';
-                                    editLogbookData.group = '{{ addslashes($logbook->group ?? '') }}';
-                                    editLogbookData.dinas_shift = '{{ addslashes($logbook->dinas_shift ?? '') }}';
-                                ">
+                            openEditLogbook = true;
+                            editLogbookData.id = {{ $logbook->id ?? 0 }};
+                            editLogbookData.tanggal = '{{ $logbook->tanggal ?? '' }}';
+                            editLogbookData.area = '{{ addslashes($logbook->area ?? '') }}';
+                            editLogbookData.group = '{{ addslashes($logbook->group ?? '') }}';
+                            editLogbookData.dinas_shift = '{{ addslashes($logbook->dinas_shift ?? '') }}';
+                        ">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                         </svg>
@@ -155,7 +157,7 @@ $logbooks = collect([
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     @forelse($logbooks ?? [] as $index => $logbook)
-                    <tr @click="window.location.href='{{ route('logbook.detail', ['id' => $logbook->id]) }}'"
+                    <tr @click="window.location.href='{{ route('logbook.detail', ['location'=> $logbook->area,'id' => $logbook->id]) }}'"
                         class="hover:bg-gray-50 transition-colors duration-200 cursor-pointer">
 
                         <td class="px-5 py-4 text-blue-600 font-bold">{{ $index + 1 }}</td>
@@ -183,7 +185,7 @@ $logbooks = collect([
                         <td class="px-4 py-4 whitespace-nowrap flex space-x-2">
                             <button type="button"
                                 class="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 px-4 py-2 rounded-lg font-medium transition-colors duration-200"
-                                @click="
+                                @click.stop="
                                             openEditLogbook = true;
                                             editLogbookData.id = {{ $logbook->id ?? 0 }};
                                             editLogbookData.tanggal = '{{ $logbook->tanggal ?? '' }}';
@@ -199,7 +201,7 @@ $logbooks = collect([
                                 Edit
                             </button>
                             <form action="#"
-                                method="POST" onsubmit="return confirm('Yakin ingin menghapus entry ini?')">
+                                method="POST" onsubmit="return confirm('Yakin ingin menghapus entry ini?')" @click.stop>
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit"
@@ -329,26 +331,31 @@ $logbooks = collect([
                         class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
                 </div>
                 <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Area</label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Area Pos Jaga</label>
                     <input type="text" name="area" required x-model="editLogbookData.area"
                         class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200"
                         placeholder="Masukkan area pos jaga">
                 </div>
                 <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Group</label>
-                    <input type="text" name="group" required x-model="editLogbookData.group"
-                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200"
-                        placeholder="Masukkan group">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Grup</label>
+                    <select name="group" required x-model="editLogbookData.group"
+                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
+                        <option value="">Pilih Grup</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                    </select>
                 </div>
+
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Dinas / Shift</label>
                     <select name="dinas_shift" required x-model="editLogbookData.dinas_shift"
                         class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
                         <option value="">Pilih Dinas/Shift</option>
-                        <option value="Pagi">Pagi (06:00-14:00)</option>
-                        <option value="Siang">Siang (14:00-22:00)</option>
-                        <option value="Malam">Malam (22:00-06:00)</option>
+                        <option value="Pagi">Pagi </option>
+                        <option value="Malam">Malam </option>
                     </select>
+                    
                 </div>
                 <div class="flex justify-end space-x-3">
                     <button type="button" @click="openEditLogbook = false"

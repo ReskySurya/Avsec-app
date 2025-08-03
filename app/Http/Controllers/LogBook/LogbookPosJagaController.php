@@ -26,24 +26,33 @@ class LogbookPosJagaController extends Controller
             abort(404);
         }
 
-        // Contoh: Bisa ambil data berdasarkan lokasi jika perlu
-        $data = []; // Ambil data dari model sesuai lokasi, kalau butuh
 
         return view('logbook.posjaga.logbookPosJaga', [
-            'location' => $location,
-            'data' => $data,
+            'location' => $location
         ]);
     }
 
-    public function detail($id)
+    public function detail($location, $id)
     {
         // Logika untuk menampilkan detail logbook berdasarkan ID
         // Misalnya, ambil data dari model LogbookPosJaga
+        if (!in_array($location, $this->allowedLocations)) {
+            abort(404);
+        }
 
-        $logbook = []; // Ambil data dari model sesuai ID, kalau butuh
+        $logbook = [
+            // Contoh data, ganti dengan query ke model LogbookPosJaga
+            'id' => $id,
+            'tanggal' => '2023-10-01',
+            'area' => $location,
+            'group' => 'A',
+            'dinas_shift' => 'Pagi',
+            // 'keterangan' => 'Contoh keterangan logbook',
+        ]; // Ambil data dari model sesuai ID, kalau butuh
 
         return view('logbook.posjaga.detailPosJaga', [
             'logbook' => $logbook,
+            'location' => $location 
         ]);
     }
 }
