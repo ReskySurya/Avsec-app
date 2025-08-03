@@ -50,6 +50,22 @@ class LocationSeeder extends Seeder
             'PSCP Cabin Selatan'
         ];
 
+        // Additional Locations for Logbook
+        $additionalLocations = [
+            'PSCP',
+            'CCTV',
+            'Patroli',
+            'Walking Patrol'
+        ];
+
+        foreach ($additionalLocations as $location) {
+            Location::create([
+                'name' => $location,
+                'description' => 'Lokasi untuk Logbook Pos Jaga',
+                'creationID' => 1
+            ]);
+        }
+
         foreach ($xrayCabinLocations as $location) {
             Location::create([
                 'name' => $location,

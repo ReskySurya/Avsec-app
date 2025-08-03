@@ -4,20 +4,21 @@ namespace App\Http\Controllers\LogBook;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Logbook;
+use App\Models\Location;
+use Illuminate\Support\Facades\Auth;
 
 class LogbookPosJagaController extends Controller
 {
      protected $allowedLocations = [
-        'Kedatangan',
-        'Barat',
-        'Timur',
+        'Pos Kedatangan',
+        'Pos Barat',
+        'Pos Timur',
         'HBSCP',
         'PSCP',
         'CCTV',
         'Patroli',
         'Walking Patrol'
-        
-        // tambahkan jika ada lagi
     ];
 
     public function index($location)
@@ -26,12 +27,21 @@ class LogbookPosJagaController extends Controller
             abort(404);
         }
 
-        // Contoh: Bisa ambil data berdasarkan lokasi jika perlu
-        $data = []; // Ambil data dari model sesuai lokasi, kalau butuh
+        $locationModel = Location::where('name', $location)->first();
+
+        if (!$locationModel) {
+            abort(404, 'Location tidak ditemukan di database. Pastikan data lokasi sudah tersedia.');
+        }
+
+        $logbooks = Logbook::where('location_area_id', $locationModel->id)
+            ->with('locationArea') // Eager load the location area
+            ->orderBy('date', 'desc')
+            ->paginate(10); // Paginate the results
 
         return view('logbook.posjaga.logbookPosJaga', [
             'location' => $location,
-            'data' => $data,
+            'location_id' => $locationModel->id,
+            'logbooks' => $logbooks,
         ]);
     }
 
@@ -45,5 +55,72 @@ class LogbookPosJagaController extends Controller
         return view('logbook.posjaga.detailPosJaga', [
             'logbook' => $logbook,
         ]);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'location_area_id' => 'required|exists:locations,id',
+            'grup' => 'required|string|max:255',
+            'shift' => 'required|string|max:255',
+        ]);
+
+        try {
+            Logbook::create([
+            'date' => $request->date,
+            'location_area_id' => $request->location_area_id,
+            'grup' => $request->grup,
+            'shift' => $request->shift,
+            'senderID' => Auth::id(),
+            ]);
+
+            return redirect()->back()->with([
+            'success' => 'Logbook entry created successfully.',
+            'alert_timeout' => 3000 // dalam milidetik (3 detik)
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to create logbook entry. ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Logbook $logbook)
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'grup' => 'required|string|max:255',
+            'shift' => 'required|string|max:255',
+        ]);
+
+        try {
+            $logbook->update([
+                'date' => $request->date,
+                'grup' => $request->grup,
+                'shift' => $request->shift,
+            ]);
+
+            return redirect()->back()->with('success', 'Logbook entry updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update logbook entry. ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Logbook $logbook)
+    {
+        try {
+            $logbook->delete();
+            return redirect()->back()->with([
+            'success' => 'Logbook entry created successfully.',
+            'alert_timeout' => 3000 // dalam milidetik (3 detik)
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to delete logbook entry. ' . $e->getMessage());
+        }
     }
 }
