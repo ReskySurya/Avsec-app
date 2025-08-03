@@ -1,41 +1,17 @@
 @extends('layouts.app')
 
 @section('title', 'Logbook Pos Jaga ')
-
-@php
-// Data static untuk demo logbook pos jaga
-$logbooks = collect([
-(object)[
-'id' => 1,
-'tanggal' => '2025-01-26',
-'area' => $location,
-'group' => 'C',
-'dinas_shift' => 'Pagi',
-'created_at' => '2025-01-26 06:00:00'
-],
-(object)[
-'id' => 2,
-'tanggal' => '2025-01-26',
-'area' => $location,
-'group' => 'B',
-'dinas_shift' => 'Malam',
-'created_at' => '2025-01-26 14:00:00'
-],
-
-]);
-@endphp
 @section('content')
 <div x-data="{
-                        openLogbook: false,
-                        openEditLogbook: false,
-                        editLogbookData: { 
-                            id: null, 
-                            tanggal: '', 
-                            area: '', 
-                            group: '',
-                            dinas_shift: ''
-                        },
-                        }" class="mx-auto p-6 min-h-screen pt-20">
+        openLogbook: false,
+        openEditLogbook: false,
+        editLogbookData: {
+            logbookID: null,
+            date: '',
+            grup: '',
+            shift: ''
+        },
+    }" class="mx-auto p-6 min-h-screen pt-20">
 
 
     <!-- Alert Messages with Enhanced Design -->
@@ -85,36 +61,33 @@ $logbooks = collect([
         <!-- Mobile Card View -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6 md:hidden">
             @forelse($logbooks ?? [] as $logbook)
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 cursor-pointer"
-                @click="window.location.href='{{ route('logbook.detail', ['location'=> $logbook->area,'id' => $logbook->id]) }}'">
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
                 <div class="p-5">
                     <div class="flex items-center justify-between mb-3">
-                        <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">{{ $logbook->tanggal ?? 'N/A' }}</span>
-                        <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-teal-100 rounded-full">{{ $logbook->dinas_shift ?? 'N/A' }}</span>
+                        <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">{{ \Carbon\Carbon::parse($logbook->date)->format('d M Y') }}</span>
+                        <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-teal-100 rounded-full">{{ $logbook->shift ?? 'N/A' }}</span>
                     </div>
                     <div class="mt-4 space-y-2 text-sm text-gray-600">
-                        <p><strong class="font-medium text-gray-800">Area:</strong> {{ $logbook->area ?? 'N/A' }}</p>
-                        <p><strong class="font-medium text-gray-800">Group:</strong> {{ $logbook->group ?? 'N/A' }}</p>
-                        <p><strong class="font-medium text-gray-800">Dinas/Shift:</strong> {{ $logbook->dinas_shift ?? 'N/A' }}</p>
+                        <p><strong class="font-medium text-gray-800">Area:</strong> {{ $logbook->locationArea->name ?? 'N/A' }}</p>
+                        <p><strong class="font-medium text-gray-800">Group:</strong> {{ $logbook->grup ?? 'N/A' }}</p>
+                        <p><strong class="font-medium text-gray-800">Dinas/Shift:</strong> {{ $logbook->shift ?? 'N/A' }}</p>
                     </div>
                 </div>
-                <div class="bg-gray-50 px-5 py-3 flex justify-end space-x-2"
-                    @click.stop>
+                <div class="bg-gray-50 px-5 py-3 flex justify-end space-x-2">
                     <button type="button"
                         class="p-2 bg-yellow-100 text-yellow-700 rounded-full hover:bg-yellow-200 transition-colors duration-200"
-                        @click="
+                        @click.stop="
                             openEditLogbook = true;
-                            editLogbookData.id = {{ $logbook->id ?? 0 }};
-                            editLogbookData.tanggal = '{{ $logbook->tanggal ?? '' }}';
-                            editLogbookData.area = '{{ addslashes($logbook->area ?? '') }}';
-                            editLogbookData.group = '{{ addslashes($logbook->group ?? '') }}';
-                            editLogbookData.dinas_shift = '{{ addslashes($logbook->dinas_shift ?? '') }}';
+                            editLogbookData.logbookID = '{{ $logbook->logbookID }}';
+                            editLogbookData.date = '{{ $logbook->date->format('Y-m-d') }}';
+                            editLogbookData.grup = '{{ addslashes($logbook->grup ?? '') }}';
+                            editLogbookData.shift = '{{ addslashes($logbook->shift ?? '') }}';
                         ">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                         </svg>
                     </button>
-                    <form action="#" method="POST" onsubmit="return confirm('Yakin ingin menghapus entry ini?')">
+                    <form action="{{ route('logbook.destroy', $logbook->logbookID) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus entry ini?')">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors duration-200">
@@ -157,7 +130,7 @@ $logbooks = collect([
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     @forelse($logbooks ?? [] as $index => $logbook)
-                    <tr @click="window.location.href='{{ route('logbook.detail', ['location'=> $logbook->area,'id' => $logbook->id]) }}'"
+                    <tr @click="window.location.href='{{ route('logbook.detail', ['id' => $logbook->logbookID]) }}'"
                         class="hover:bg-gray-50 transition-colors duration-200 cursor-pointer">
 
                         <td class="px-5 py-4 text-blue-600 font-bold">{{ $index + 1 }}</td>
@@ -172,27 +145,26 @@ $logbooks = collect([
                                     </svg>
                                 </div>
                                 <span
-                                    class="font-medium text-gray-900">{{ $logbook->tanggal ?? 'N/A'}}</span>
+                                    class="font-medium text-gray-900">{{ \Carbon\Carbon::parse($logbook->date)->format('d M Y') }}</span>
                             </div>
                         </td>
-                        <td class="px-5 py-4 text-gray-600">{{ $logbook->area ?? 'N/A' }}</td>
-                        <td class="px-5 py-4 text-gray-600">{{ $logbook->group ?? 'N/A' }}</td>
+                        <td class="px-5 py-4 text-gray-600">{{ $logbook->locationArea->name ?? 'N/A' }}</td>
+                        <td class="px-5 py-4 text-gray-600">{{ $logbook->grup ?? 'N/A' }}</td>
                         <td class="px-5 py-4 whitespace-nowrap">
                             <span class="px-3 py-1 text-xs font-semibold text-teal-800 bg-teal-100 rounded-full">
-                                {{ $logbook->dinas_shift ?? 'N/A' }}
+                                {{ $logbook->shift ?? 'N/A' }}
                             </span>
                         </td>
                         <td class="px-4 py-4 whitespace-nowrap flex space-x-2">
                             <button type="button"
                                 class="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 px-4 py-2 rounded-lg font-medium transition-colors duration-200"
                                 @click.stop="
-                                            openEditLogbook = true;
-                                            editLogbookData.id = {{ $logbook->id ?? 0 }};
-                                            editLogbookData.tanggal = '{{ $logbook->tanggal ?? '' }}';
-                                            editLogbookData.area = '{{ addslashes($logbook->area ?? '') }}';
-                                            editLogbookData.group = '{{ addslashes($logbook->group ?? '') }}';
-                                            editLogbookData.dinas_shift = '{{ addslashes($logbook->dinas_shift ?? '') }}';
-                                        ">
+                                    openEditLogbook = true;
+                                    editLogbookData.logbookID = '{{ $logbook->logbookID }}';
+                                    editLogbookData.date = '{{ $logbook->date->format('Y-m-d') }}';
+                                    editLogbookData.grup = '{{ addslashes($logbook->grup ?? '') }}';
+                                    editLogbookData.shift = '{{ addslashes($logbook->shift ?? '') }}';
+                                ">
                                 <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
@@ -200,12 +172,14 @@ $logbooks = collect([
                                 </svg>
                                 Edit
                             </button>
-                            <form action="#"
-                                method="POST" onsubmit="return confirm('Yakin ingin menghapus entry ini?')" @click.stop>
+                            <form action="{{ route('logbook.destroy', $logbook->logbookID) }}"
+                                method="POST"
+                                onsubmit="event.stopPropagation(); return confirm('Yakin ingin menghapus entry ini?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit"
-                                    class="bg-red-100 text-red-600 hover:bg-red-200 px-4 py-2 rounded-lg font-medium transition-colors duration-200">
+                                    class="bg-red-100 text-red-600 hover:bg-red-200 px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+                                    @click.stop>
                                     <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -252,48 +226,46 @@ $logbooks = collect([
                 <h2 class="text-2xl font-bold">Tambah Entry Logbook</h2>
                 <p class="text-blue-100">Tambahkan catatan pos jaga baru</p>
             </div>
-            <form id="logbookPosJaga" action="#" method="POST" class="p-6" onsubmit="onFormSubmit(event)">
+            <form action="{{ route('logbook.store') }}" method="POST" class="p-6">
                 @csrf
+                <input type="hidden" name="location_area_id" value="{{ $location_id }}">
                 <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal</label>
-                    <input type="date" id="tanggal" name="tanggal" required
-                        class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base"
+                    <label for="date" class="block text-sm font-semibold text-gray-700 mb-2">Tanggal</label>
+                    <input type="date" id="date" name="date" required
+                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200"
                         readonly>
-                    @error('tanggal')
+                    @error('date')
                     <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
                     @enderror
                 </div>
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Area Pos Jaga</label>
-                    <input type="text" name="area" required
-                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200"
-                        value="{{ $location }}" placeholder="Masukkan area pos jaga" readonly>
-                    @error('area')
-                    <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
-                    @enderror
+                    <input type="text"
+                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 bg-gray-100"
+                        value="{{ $location }}" readonly>
                 </div>
                 <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Grup</label>
-                    <select name="group" required
+                    <label for="grup" class="block text-sm font-semibold text-gray-700 mb-2">Grup</label>
+                    <select id="grup" name="grup" required
                         class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
                         <option value="">Pilih Grup</option>
                         <option value="A">A</option>
                         <option value="B">B</option>
                         <option value="C">C</option>
                     </select>
-                    @error('group')
+                    @error('grup')
                     <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
                     @enderror
                 </div>
                 <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Dinas / Shift</label>
-                    <select name="dinas_shift" required
+                    <label for="shift" class="block text-sm font-semibold text-gray-700 mb-2">Dinas / Shift</label>
+                    <select id="shift" name="shift" required
                         class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
                         <option value="">Pilih Dinas/Shift</option>
-                        <option value="Pagi">Pagi </option>
-                        <option value="Malam">Malam </option>
+                        <option value="Pagi">Pagi</option>
+                        <option value="Malam">Malam</option>
                     </select>
-                    @error('dinas_shift')
+                    @error('shift')
                     <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
                     @enderror
                 </div>
@@ -322,23 +294,23 @@ $logbooks = collect([
                 <h2 class="text-2xl font-bold">Edit Entry Logbook</h2>
                 <p class="text-blue-100">Ubah informasi logbook</p>
             </div>
-            <form :action="'/logbook/update/' + editLogbookData.id" method="POST" class="p-6">
+            <form :action="'/logbook/' + editLogbookData.logbookID" method="POST" class="p-6">
                 @csrf
                 @method('PATCH')
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal</label>
-                    <input type="date" name="tanggal" required x-model="editLogbookData.tanggal"
+                    <input type="date" name="date" required x-model="editLogbookData.date"
                         class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
                 </div>
                 <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Area Pos Jaga</label>
-                    <input type="text" name="area" required x-model="editLogbookData.area"
-                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200"
-                        placeholder="Masukkan area pos jaga">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Area</label>
+                    <input type="text"
+                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 bg-gray-100"
+                        value="{{ $location }}" readonly>
                 </div>
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Grup</label>
-                    <select name="group" required x-model="editLogbookData.group"
+                    <select name="grup" required x-model="editLogbookData.grup"
                         class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
                         <option value="">Pilih Grup</option>
                         <option value="A">A</option>
@@ -346,16 +318,14 @@ $logbooks = collect([
                         <option value="C">C</option>
                     </select>
                 </div>
-
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Dinas / Shift</label>
-                    <select name="dinas_shift" required x-model="editLogbookData.dinas_shift"
+                    <select name="shift" required x-model="editLogbookData.shift"
                         class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
                         <option value="">Pilih Dinas/Shift</option>
-                        <option value="Pagi">Pagi </option>
-                        <option value="Malam">Malam </option>
+                        <option value="Pagi">Pagi</option>
+                        <option value="Malam">Malam</option>
                     </select>
-                    
                 </div>
                 <div class="flex justify-end space-x-3">
                     <button type="button" @click="openEditLogbook = false"
@@ -409,45 +379,39 @@ $logbooks = collect([
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
         const formattedDate = `${year}-${month}-${day}`;
-        const tanggalInput = document.getElementById('tanggal');
-        if (tanggalInput) {
-            tanggalInput.value = formattedDate;
+        const dateInput = document.getElementById('date');
+        if (dateInput) {
+            dateInput.value = formattedDate;
         }
-    });
 
-    // Handle form submit for Tambah Logbook (API)
-    function onFormSubmit(e) {
-        e.preventDefault();
+        // Form validation
+        const form = document.querySelector('form[action="{{ route('logbook.store') }}"]');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const grup = form.querySelector('#grup').value;
+                const shift = form.querySelector('#shift').value;
 
-        const form = document.getElementById('logbookPosJaga');
-        const formData = new FormData(form);
-
-        // Optional: show loading indicator here
-
-        fetch('/api/logbook-posjaga', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-                },
-                body: formData
-            })
-            .then(async response => {
-                if (response.ok) {
-                    // Success, reload or update UI
-                    window.location.reload();
-                } else {
-                    // Show error
-                    let data = await response.json();
-                    let msg = data.message || 'Gagal menambah data';
-                    alert(msg);
+                if (!grup || !shift) {
+                    e.preventDefault();
+                    alert('Silakan lengkapi semua field yang diperlukan');
+                    return false;
                 }
-            })
-            .catch(() => {
-                alert('Terjadi kesalahan saat mengirim data.');
             });
+        }
 
-        return false;
-    }
+        // Reset form when modal is closed
+        const resetForm = () => {
+            if (form) {
+                form.reset();
+                dateInput.value = formattedDate;
+            }
+        };
+
+        // Add event listener for modal close button
+        const closeButtons = document.querySelectorAll('[x-on\\:click="openLogbook = false"]');
+        closeButtons.forEach(button => {
+            button.addEventListener('click', resetForm);
+        });
+    });
 </script>
 @endsection

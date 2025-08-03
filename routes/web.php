@@ -11,8 +11,6 @@ use App\Http\Controllers\DailyTest\XrayController;
 use App\Http\Controllers\LogBook\LogbookPosJagaController;
 use App\Http\Controllers\LogBook\LogbookRotasiHBSCPController;
 use App\Http\Controllers\LogBook\LogbookRotasiPSCPController;
-use App\Http\Controllers\LogBook\PosJaga\LogbookPosJagaBaratController;
-use App\Http\Controllers\LogBook\PosJaga\LogbookPosJagaTimurController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -131,9 +129,14 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
 
 // Logbook Routes
 Route::middleware(['auth'])->group(function () {
-    Route::get('/logbook/{location}', [LogbookPosJagaController::class, 'index'])->name('logbook.index');
-    Route::get('/logbook/posjaga/detail{location}/{id}', [LogbookPosJagaController::class, 'detail'])->name('logbook.detail');
     Route::get('/logbook-rotasihbscp', [LogbookRotasiHBSCPController::class, 'index'])->name('logbookRotasiHBSCP.index');
     Route::get('/logbook-rotasipscp', [LogbookRotasiPSCPController::class, 'index'])->name('logbookRotasiPSCP.index');
     Route::get('/logbook-sweppingpi', [LogbookSweppingPIController::class, 'index'])->name('logbookSweppingPI.index');
+
+    // Logbook Pos Jaga
+    Route::get('/logbook/posjaga/{location}', [LogbookPosJagaController::class, 'index'])->name('logbook.index');
+    Route::get('/logbook/posjaga/detail/{id}', [LogbookPosJagaController::class, 'detail'])->name('logbook.detail');
+    Route::post('/logbook/posjaga', [LogbookPosJagaController::class, 'store'])->name('logbook.store');
+    Route::patch('/logbook/posjaga/{logbook}', [LogbookPosJagaController::class, 'update'])->name('logbook.update');
+    Route::delete('/logbook/posjaga/{logbook}', [LogbookPosJagaController::class, 'destroy'])->name('logbook.destroy');
 });
