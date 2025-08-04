@@ -97,7 +97,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/daily-test/xray/review/{id}', [XrayController::class, 'reviewForm'])->name('xray.reviewForm');
     Route::patch('/daily-test/xray/update-status/{id}', [XrayController::class, 'updateStatus'])->name('xray.updateStatus');
     Route::post('/daily-test/xray/save-supervisor-signature/{id}', [XrayController::class, 'saveSupervisorSignature'])->name('xray.saveSupervisorSignature');
-
 });
 
 // Master Data Routes
@@ -122,9 +121,8 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::get('/users-management', [MasterDataController::class, 'indexUserManagement'])->name('users-management.index');
     Route::post('/users-management/tambah', [MasterDataController::class, 'storeUserManagement'])->name('users-management.store');
     Route::get('/users-management/update/{id}', [MasterDataController::class, 'getUserManagement'])->name('users-management.get');
-    Route::put('/users-management/update/{id}', [MasterDataController::class,'updateUserManagement'])->name('users-management.update');
+    Route::put('/users-management/update/{id}', [MasterDataController::class, 'updateUserManagement'])->name('users-management.update');
     Route::delete('/users-management/hapus/{id}', [MasterDataController::class, 'destroyUserManagement'])->name('users-management.destroy');
-
 });
 
 // Logbook Routes
@@ -135,8 +133,14 @@ Route::middleware(['auth'])->group(function () {
 
     // Logbook Pos Jaga
     Route::get('/logbook/posjaga/{location}', [LogbookPosJagaController::class, 'index'])->name('logbook.index');
-    Route::get('/logbook/posjaga/detail{location}/{id}', [LogbookPosJagaController::class, 'detail'])->name('logbook.detail');
     Route::post('/logbook/posjaga', [LogbookPosJagaController::class, 'store'])->name('logbook.store');
     Route::patch('/logbook/posjaga/{location}/{logbookID}', [LogbookPosJagaController::class, 'update'])->name('logbook.update');
     Route::delete('/logbook/posjaga/{logbook}', [LogbookPosJagaController::class, 'destroy'])->name('logbook.destroy');
+    
+    // Logbook Detail Pos Jaga
+    Route::get('/logbook/posjaga/detail{location}/{id}', [LogbookPosJagaController::class, 'detail'])->name('logbook.detail');
+    Route::post('/logbook/detail/store', [LogbookPosJagaController::class, 'storeDetail'])->name('logbook.detail.store');
+    Route::post('/logbook/detail/update/{id}', [LogbookPosJagaController::class, 'updateDetail'])->name('logbook.detail.update');
+    Route::delete('/logbook/detail/delete/{id}', [LogbookPosJagaController::class, 'deleteDetail'])->name('logbook.detail.delete');
+    
 });

@@ -28,4 +28,6 @@ class AppServiceProvider extends ServiceProvider
         Blade::component('form-wtmd', FormWTMD::class);
         Blade::component('form-xray', FormXRAY::class);
     }
+
+    
 }

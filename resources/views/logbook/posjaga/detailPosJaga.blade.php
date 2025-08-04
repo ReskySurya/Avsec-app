@@ -1,43 +1,87 @@
 @extends('layouts.app')
 @section('title', 'Detail Logbook Pos Jaga')
-@php
-// Data statis untuk uraian kegiatan
-$uraianKegiatan = [
-['waktu' => '08:00', 'uraian' => 'Pemeriksaan area pos jaga', 'keterangan' => 'Semua aman'],
-['waktu' => '10:00', 'uraian' => 'Patroli rutin', 'keterangan' => 'Tidak ada kejadian'],
-['waktu' => '12:00', 'uraian' => 'Istirahat makan siang', 'keterangan' => ''],
-['waktu' => '14:00', 'uraian' => 'Pemeriksaan dokumen pengunjung', 'keterangan' => ''],
-['waktu' => '16:00', 'uraian' => 'Penutupan pos jaga', 'keterangan' => ''],
-];
-@endphp
+
 @section('content')
-<!-- Alert Messages with Enhanced Design -->
+<!-- Alert Success -->
 @if(session('success'))
-<div
-    class="bg-gradient-to-r from-blue-400 to-blue-500 text-white px-6 py-4 rounded-xl mb-6 shadow-lg border-l-4 border-blue-600 animate-pulse">
+<div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)"
+    class="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg">
     <div class="flex items-center">
-        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
         </svg>
         {{ session('success') }}
+        <button @click="show = false" class="ml-4 text-white hover:text-gray-200">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+        </button>
     </div>
 </div>
 @endif
 
+<!-- Alert Error -->
 @if(session('error'))
-<div
-    class="bg-gradient-to-r from-red-400 to-red-500 text-white px-6 py-4 rounded-xl mb-6 shadow-lg border-l-4 border-red-600">
+<div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 8000)"
+    class="fixed top-4 right-4 z-50 bg-red-500 text-white px-6 py-4 rounded-lg shadow-lg">
     <div class="flex items-center">
-        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
         </svg>
         {{ session('error') }}
+        <button @click="show = false" class="ml-4 text-white hover:text-gray-200">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+        </button>
     </div>
 </div>
 @endif
 
-<div class="mx-auto p-0 sm:p-6 min-h-screen pt-5 sm:pt-20" x-data="{ openEditDetail: false, openAddDetail: false, editDetailData: { waktu: '', uraian: '', keterangan: '' } }">
+<div class="mx-auto p-0 sm:p-6 min-h-screen pt-5 sm:pt-20"
+    x-data="{ 
+        openEditDetail: false, 
+        openAddDetail: false, 
+        editDetailData: { 
+            id: null,
+            start_time: '', 
+            end_time: '',
+            summary: '', 
+            description: '' 
+        },
+         openEditDetailFn(id, startTime, endTime, summary, description) {
+            this.editDetailData.id = id;
+            // Handle berbagai format waktu yang mungkin
+            if (startTime) {
+                // Jika format datetime (2024-01-01 08:30:00) atau time (08:30:00)
+                if (startTime.includes(' ')) {
+                    this.editDetailData.start_time = startTime.split(' ')[1].substring(0, 5);
+                } else if (startTime.length > 5) {
+                    this.editDetailData.start_time = startTime.substring(0, 5);
+                } else {
+                    this.editDetailData.start_time = startTime;
+                }
+            } else {
+                this.editDetailData.start_time = '';
+            }
+            if (endTime) {
+                // Jika format datetime (2024-01-01 17:30:00) atau time (17:30:00)
+                if (endTime.includes(' ')) {
+                    this.editDetailData.end_time = endTime.split(' ')[1].substring(0, 5);
+                } else if (endTime.length > 5) {
+                    this.editDetailData.end_time = endTime.substring(0, 5);
+                } else {
+                    this.editDetailData.end_time = endTime;
+                }
+            } else {
+                this.editDetailData.end_time = '';
+            }
+            
+            this.editDetailData.summary = summary;
+            this.editDetailData.description = description;
+            this.openEditDetail = true;
+        }
+     }">
     <div class="mb-4">
         <a href="{{ route('logbook.index',['location'=> $location])}}" class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-semibold rounded-lg shadow transition">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,15 +92,6 @@ $uraianKegiatan = [
     </div>
 
     <div class="overflow-hidden mb-8">
-        <!-- <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-6 py-6 text-white">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h3 class="text-2xl font-bold mb-1">{{ 'Logbook Pos Jaga '. $location}}</h3>
-                    <p class="text-blue-100">Catatan aktivitas pos jaga harian</p>
-                </div>
-            </div>
-        </div> -->
-
         <!-- Mobile Card View -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 md:hidden">
             @if(isset($logbook))
@@ -88,13 +123,14 @@ $uraianKegiatan = [
         <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hidden md:block">
             <h3 class="text-lg font-semibold text-blue-800 mb-2">Informasi Logbook</h3>
             <div class="grid grid-cols-1 md:grid-cols-2">
-                <div class="bg-blue-50 rounded-lg ">
+                <div class=" rounded-lg ">
                     <ul class="text-blue-600">
-                        <li><strong>Tanggal:</strong> {{ $logbook->date ?? 'N/A' }}</li>
+                        <li><strong>ID:</strong> {{ $logbook->logbookID ?? 'N/A' }}</li>
+                        <li><strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($logbook->tanggal)->translatedFormat('l, d F Y') }}</li>
                         <li><strong>Area:</strong> {{ $logbook->locationArea->name ?? 'N/A' }}</li>
                     </ul>
                 </div>
-                <div class="bg-blue-50 rounded-lg ">
+                <div class=" rounded-lg ">
                     <ul class="text-blue-600 mt-2">
                         <li><strong>Grup:</strong> {{ $logbook->grup ?? 'N/A' }}</li>
                         <li><strong>Dinas/Shift:</strong> {{ $logbook->shift ?? 'N/A' }}</li>
@@ -111,7 +147,6 @@ $uraianKegiatan = [
 
 
     <div
-
         class="bg-white shadow-xl rounded-2xl overflow-hidden mb-8 border border-gray-100">
         <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-6 py-6 text-white">
             <div class="flex justify-between items-center">
@@ -126,21 +161,48 @@ $uraianKegiatan = [
             </div>
         </div>
 
-
         <!-- Mobile Card View -->
         <div class="grid grid-cols-1 gap-2 md:hidden p-4">
-            @forelse($uraianKegiatan as $i => $item)
+            @forelse($uraianKegiatan ?? [] as $index => $items)
             <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
                 <div class="p-4">
                     <div class="flex items-center justify-between mb-2">
                         <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">
-                            {{ $item['waktu'] }}
+                            {{ \Carbon\Carbon::parse($items->start_time)->format('H:i') }}
+                            {{ $items->end_time ? ' - ' . \Carbon\Carbon::parse($items->end_time)->format('H:i') : '' }}
                         </span>
-                        <span class="text-xs text-gray-400">#{{ $i+1 }}</span>
+                        <span class="text-xs text-gray-400">#{{ $index+1 }}</span>
                     </div>
                     <div class="mb-2">
-                        <p class="font-semibold text-gray-800 mb-1">{{ $item['uraian'] }}</p>
-                        <p class="text-gray-600 text-sm">{{ $item['keterangan'] }}</p>
+                        <p class="font-semibold text-gray-800 mb-1">{{ $items->summary }}</p>
+                        <p class="text-gray-600 text-sm">{{ $items->description }}</p>
+                    </div>
+                    <div class="flex justify-end space-x-2 mt-3">
+                        <!-- Edit button for mobile -->
+                        <button type="button"
+                            class="p-2 bg-yellow-100 text-yellow-700 rounded-full hover:bg-yellow-200 transition-colors duration-200"
+                            title="Edit Uraian Kegiatan"
+                            @click="openEditDetailFn({{ $items->id }}, '{{ \Carbon\Carbon::parse($items->start_time)->format('H:i') }}', '{{ $items->end_time ? \Carbon\Carbon::parse($items->end_time)->format('H:i') : '' }}', '{{ addslashes($items->summary ?? '') }}', '{{ addslashes($items->description ?? '') }}')">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </button>
+
+                        <!-- Delete button for mobile -->
+                        <form action="{{ route('logbook.detail.delete', $items->id) }}"
+                            method="POST"
+                            class="inline-block"
+                            onsubmit="return confirmDelete('Apakah Anda yakin ingin menghapus uraian kegiatan ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                class="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors duration-200"
+                                title="Hapus Uraian Kegiatan">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -168,42 +230,46 @@ $uraianKegiatan = [
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
-                    @forelse($uraianKegiatan as $i => $item)
+                    @forelse($uraianKegiatan ?? [] as $index => $items)
                     <tr class="hover:bg-gray-50 transition-colors duration-200 cursor-pointer">
-                        <td class="px-5 py-4 text-blue-600 font-bold">{{ $i+1 }}</td>
-                        <td class="px-5 py-4">{{ $item['waktu'] }}</td>
-                        <td class="px-5 py-4">{{ $item['uraian'] }}</td>
-                        <td class="px-5 py-4">{{ $item['keterangan'] }}</td>
+                        <td class="px-5 py-4 text-blue-600 font-bold">{{ $index + 1 }}</td>
+                        <td class="px-5 py-4">
+                            {{ \Carbon\Carbon::parse($items->start_time)->format('H:i') }}
+                            {{ $items->end_time ? ' - ' . \Carbon\Carbon::parse($items->end_time)->format('H:i') : '' }}
+                        </td>
+                        <td class="px-5 py-4">{{ $items->summary }}</td>
+                        <td class="px-5 py-4">{{ $items->description }}</td>
                         <td class="px-5 py-4 flex justify-center space-x-2" @click.stop>
-                            <!-- Edit Button -->
+                            <!-- Edit button -->
                             <button type="button"
                                 class="p-2 bg-yellow-100 text-yellow-700 rounded-full hover:bg-yellow-200 transition-colors duration-200"
-                                @click="openEditDetailFn({{ $i }}, '{{ $item['waktu'] }}', '{{ addslashes($item['uraian']) }}', '{{ addslashes($item['keterangan']) }}')">
+                                title="Edit Uraian Kegiatan"
+                                @click="openEditDetailFn({{ $items->id }}, '{{ \Carbon\Carbon::parse($items->start_time)->format('H:i') }}', '{{ $items->end_time ? \Carbon\Carbon::parse($items->end_time)->format('H:i') : '' }}', '{{ addslashes($items->summary ?? '') }}', '{{ addslashes($items->description ?? '') }}')">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                 </svg>
                             </button>
-                            <!-- Delete Button -->
-                            <form action="#" method="POST" onsubmit="return confirm('Yakin ingin menghapus entry ini?')"></form>
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors duration-200">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                </svg>
-                            </button>
+
+                            <!-- Delete button with better confirmation -->
+                            <form action="{{ route('logbook.detail.delete', $items->id) }}"
+                                method="POST"
+                                class="inline-block"
+                                onsubmit="return confirmDelete('Apakah Anda yakin ingin menghapus uraian kegiatan ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                    class="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors duration-200"
+                                    title="Hapus Uraian Kegiatan">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
                             </form>
                         </td>
                     </tr>
                     @empty
                     <tr>
                         <td colspan="5" class="text-center py-12">
-                            <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                </path>
-                            </svg>
                             <p class="text-gray-500 text-lg">Belum ada uraian kegiatan</p>
                             <p class="text-gray-400">Tambahkan uraian kegiatan pertama Anda</p>
                         </td>
@@ -230,25 +296,48 @@ $uraianKegiatan = [
                     <h2 class="text-2xl font-bold">Tambah Uraian Kegiatan</h2>
                     <p class="text-blue-100">Masukkan uraian kegiatan baru</p>
                 </div>
-                <form action="#" method="POST" class="p-6">
+
+                <form action="{{ route('logbook.detail.store') }}" method="POST" class="p-6">
                     @csrf
+                    <input type="hidden" name="logbookID" value="{{ $logbook->logbookID ?? '' }}">
+
                     <div class="mb-6">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Waktu</label>
-                        <input type="time" name="waktu"
-                            class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" required>
+                        <div class="flex space-x-4">
+                            <input type="time" name="start_time" value="{{ old('start_time') }}"
+                                class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('start_time') border-red-500 @enderror" required>
+
+                            <input type="time" name="end_time" value="{{ old('end_time') }}"
+                                class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('start_time') border-red-500 @enderror" required>
+                        </div>
+                        @error('start_time')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                        @error('end_time')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
+
                     <div class="mb-6">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Uraian Kegiatan</label>
-                        <input type="text" name="uraian"
-                            class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-green-500 focus:outline-none transition-colors duration-200"
+                        <input type="text" name="summary" value="{{ old('summary') }}"
+                            class="w-full border-2 px-4 py-3 rounded-xl focus:border-green-500 focus:outline-none transition-colors duration-200 @error('summary') border-red-500 @enderror"
                             placeholder="Masukkan uraian kegiatan" required>
+                        @error('summary')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
+
                     <div class="mb-6">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Keterangan</label>
-                        <textarea name="keterangan"
-                            class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-green-500 focus:outline-none transition-colors duration-200"
-                            placeholder="Masukkan keterangan" required></textarea>
+                        <textarea name="description" rows="3"
+                            class="w-full border-2 px-4 py-3 rounded-xl focus:border-green-500 focus:outline-none transition-colors duration-200 @error('description') border-red-500 @enderror"
+                            placeholder="Masukkan keterangan" required>{{ old('description') }}</textarea>
+                        @error('description')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
+
                     <div class="flex justify-end space-x-3">
                         <button type="button" @click="openAddDetail = false"
                             class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium">
@@ -265,8 +354,7 @@ $uraianKegiatan = [
 
 
         <!-- Modal Edit Uraian Kegiatan -->
-        <div
-            x-show="openEditDetail"
+        <div x-show="openEditDetail"
             x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 transform scale-95"
             x-transition:enter-end="opacity-100 transform scale-100"
@@ -280,25 +368,35 @@ $uraianKegiatan = [
                     <h2 class="text-2xl font-bold">Edit Uraian Kegiatan</h2>
                     <p class="text-blue-100">Ubah informasi uraian kegiatan</p>
                 </div>
-                <form action="#" method="POST" class="p-6">
+                <form x-bind:action="`/logbook/detail/update/${editDetailData.id}`" method="POST" class="p-6">
                     @csrf
-                    @method('PATCH')
+                    @method('POST')
                     <div class="mb-6">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Waktu</label>
-                        <input type="time" name="waktu" required x-model="editDetailData.waktu"
-                            class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
+                        <div class="flex space-x-4">
+                            <div class="w-full">
+                                <label class="block text-xs text-gray-500 mb-1">Waktu Mulai</label>
+                                <input type="time" name="start_time" required x-model="editDetailData.start_time"
+                                    class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
+                            </div>
+                            <div class="w-full">
+                                <label class="block text-xs text-gray-500 mb-1">Waktu Selesai</label>
+                                <input type="time" name="end_time" x-model="editDetailData.end_time"
+                                    class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
+                            </div>
+                        </div>
                     </div>
                     <div class="mb-6">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Uraian Kegiatan</label>
-                        <input type="text" name="uraian" required x-model="editDetailData.uraian"
+                        <input type="text" name="summary" required x-model="editDetailData.summary"
                             class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200"
                             placeholder="Masukkan uraian kegiatan">
                     </div>
                     <div class="mb-6">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Keterangan</label>
-                        <textarea name="keterangan" required x-model="editDetailData.keterangan"
+                        <textarea name="description" required x-model="editDetailData.description"
                             class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200"
-                            placeholder="Masukkan keterangan"></textarea>
+                            placeholder="Masukkan keterangan" rows="3"></textarea>
                     </div>
                     <div class="flex justify-end space-x-3">
                         <button type="button" @click="openEditDetail = false"
@@ -307,7 +405,7 @@ $uraianKegiatan = [
                         </button>
                         <button type="submit"
                             class="px-6 py-3 bg-gradient-to-r from-blue-500 to-teal-600 text-white rounded-xl hover:from-blue-600 hover:to-teal-700 transition-all duration-200 font-medium shadow-lg">
-                            Update
+                            Perbarui
                         </button>
                     </div>
                 </form>
@@ -317,4 +415,140 @@ $uraianKegiatan = [
 
     </div>
 </div>
+
+<script>
+    // Definisikan function di global scope
+    async function submitDetail(event) {
+        event.preventDefault();
+
+        // Gunakan ID yang sesuai dengan HTML
+        const waktuMulai = document.getElementById('start_time').value;
+        const waktuSelesai = document.getElementById('end_time').value;
+        const uraian = document.getElementById('summary').value;
+        const keterangan = document.getElementById('description').value;
+        const logbookID = document.getElementById('logbookID').value;
+
+        // Validasi sederhana
+        if (!waktu || !uraian || !keterangan || !logbookID) {
+            alert("Semua field wajib diisi.");
+            return;
+        }
+
+        try {
+            // Ambil CSRF token dari form atau meta tag
+            let csrfToken = document.querySelector('input[name="_token"]')?.value;
+            if (!csrfToken) {
+                csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            }
+
+            const response = await fetch("{{ route('logbook.detail.store') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": csrfToken
+                },
+                body: JSON.stringify({
+                    logbookID: logbookID,
+                    start_time: waktuMulai, // Jika hanya pakai 1 input waktu, bisa pakai sama
+                    end_time: waktuSelesai, // Jika hanya pakai 1 input waktu, bisa pakai sama
+                    summary: uraian,
+                    description: keterangan
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                // Reset form
+                document.getElementById('formDetail').reset();
+                document.querySelector('[x-data]').__x.$data.openAddDetail = false;
+
+                // Atau reload halaman untuk menampilkan data baru
+                window.location.reload();
+            } else {
+                alert("Gagal menyimpan data: " + (result.message ?? 'Terjadi kesalahan.'));
+            }
+
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Terjadi kesalahan pada server.");
+        }
+    }
+
+    async function submitEditDetail(event) {
+        event.preventDefault();
+
+        // Ambil data dari Alpine.js
+        const alpineData = document.querySelector('[x-data]').__x.$data;
+        const editData = alpineData.editDetailData;
+        // const id = editData.id;
+
+        // Validasi sederhana
+        if (!editData.start_time || !editData.summary || !editData.description || !editData.id) {
+            alert("Semua field wajib diisi.");
+            return;
+        }
+
+        try {
+            // Ambil CSRF token dari form atau meta tag
+            let csrfToken = document.querySelector('input[name="_token"]')?.value;
+            if (!csrfToken) {
+                csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            }
+
+            // Show loading state
+            const submitButton = event.target.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = 'Memperbarui...';
+            submitButton.disabled = true;
+
+
+            const response = await fetch(`/logbook/detail/update/${editData.id}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": csrfToken,
+                },
+                body: JSON.stringify({
+                    start_time: editData.start_time,
+                    end_time: editData.end_time,
+                    summary: editData.summary,
+                    description: editData.description
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                // Reset form dan tutup modal
+                alpineData.openEditDetail = false;
+
+                // Show success message
+                alert("Data berhasil diupdate!");
+
+                // Reload halaman untuk menampilkan data terbaru
+                window.location.reload();
+            } else {
+                alert("Gagal mengupdate data: " + (result.message ?? 'Terjadi kesalahan.'));
+            }
+
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Terjadi kesalahan pada server.");
+        } finally {
+            // Reset button state
+            const submitButton = event.target.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.textContent = originalText;
+                submitButton.disabled = false;
+            }
+        }
+    }
+
+    function confirmDelete(message) {
+        return confirm(message);
+    }
+    
+</script>
+
 @endsection

@@ -13,6 +13,8 @@ class LogbookDetail extends Model
     /**
      * The attributes that are mass assignable.
      */
+    protected $table = 'logbook_details';
+
     protected $fillable = [
         'logbookID',
         'start_time',
