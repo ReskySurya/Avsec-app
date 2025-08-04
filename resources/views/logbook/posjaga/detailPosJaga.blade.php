@@ -111,28 +111,7 @@ $uraianKegiatan = [
 
 
     <div
-        x-data="{
-            openEditDetail: false,
-            editDetailData:{
-                index: null,
-                waktu: '',
-                uraian: '',
-                keterangan: ''
-            },
-            openEditDetailFn(index, waktu, uraian, keterangan) {
-                this.editDetailData.index = index;
-                this.editDetailData.waktu = waktu;
-                this.editDetailData.uraian = uraian;
-                this.editDetailData.keterangan = keterangan;
-                this.openEditDetail = true;
-            }
-        }"
-        x-init="
-            window.openEditDetail = (index, waktu, uraian, keterangan) => {
-                $refs.editDetailModal.openEditDetailFn(index, waktu, uraian, keterangan);
-            }
-        "
-        x-ref="editDetailModal"
+        
         class="bg-white shadow-xl rounded-2xl overflow-hidden mb-8 border border-gray-100">
         <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-6 py-6 text-white">
             <div class="flex justify-between items-center">
