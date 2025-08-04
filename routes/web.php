@@ -137,6 +137,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/logbook/posjaga/{location}', [LogbookPosJagaController::class, 'index'])->name('logbook.index');
     Route::get('/logbook/posjaga/detail{location}/{id}', [LogbookPosJagaController::class, 'detail'])->name('logbook.detail');
     Route::post('/logbook/posjaga', [LogbookPosJagaController::class, 'store'])->name('logbook.store');
-    Route::patch('/logbook/posjaga/{logbook}', [LogbookPosJagaController::class, 'update'])->name('logbook.update');
+    Route::patch('/logbook/posjaga/{location}/{logbookID}', [LogbookPosJagaController::class, 'update'])->name('logbook.update');
     Route::delete('/logbook/posjaga/{logbook}', [LogbookPosJagaController::class, 'destroy'])->name('logbook.destroy');
 });

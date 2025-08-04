@@ -17,8 +17,11 @@
     <!-- Alert Messages with Enhanced Design -->
     @if(session('success'))
     <div
-        id="alert-success"
-        class="bg-gradient-to-r from-blue-400 to-blue-500 text-white px-6 py-4 rounded-xl mb-6 shadow-lg border-l-4 border-blue-600 animate-pulse transition-opacity duration-500">
+        x-data="{ show: true }"
+        x-init="setTimeout(() => show = false, 2000)"
+        x-show="show"
+        x-transition
+        class="bg-gradient-to-r from-blue-400 to-blue-500 text-white px-6 py-4 rounded-xl mb-6 shadow-lg border-l-4 border-blue-600 animate-pulse">
         <div class="flex items-center">
             <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -30,8 +33,11 @@
 
     @if(session('error'))
     <div
-        id="alert-error"
-        class="bg-gradient-to-r from-red-400 to-red-500 text-white px-6 py-4 rounded-xl mb-6 shadow-lg border-l-4 border-red-600 transition-opacity duration-500">
+        x-data="{ show: true }"
+        x-init="setTimeout(() => show = false, 2000)"
+        x-show="show"
+        x-transition
+        class="bg-gradient-to-r from-red-400 to-red-500 text-white px-6 py-4 rounded-xl mb-6 shadow-lg border-l-4 border-red-600">
         <div class="flex items-center">
             <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -176,7 +182,7 @@
                             </button>
                             <form action="{{ route('logbook.destroy', $logbook->logbookID) }}"
                                 method="POST"
-                                onsubmit="event.stopPropagation(); return confirm('Yakin ingin menghapus data logbook ini?')">
+                                onsubmit="event.stopPropagation(); return confirm('Yakin ingin menghapus entry ini?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit"
@@ -296,7 +302,7 @@
                 <h2 class="text-2xl font-bold">Edit Entry Logbook</h2>
                 <p class="text-blue-100">Ubah informasi logbook</p>
             </div>
-            <form :action="'/logbook/' + editLogbookData.logbookID" method="POST" class="p-6">
+            <form :action="'{{ url('/logbook/posjaga') }}/' + '{{ $location }}' + '/' + editLogbookData.logbookID" method="POST" class="p-6">
                 @csrf
                 @method('PATCH')
                 <div class="mb-6">
@@ -375,7 +381,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-
         // Set current date for tanggal input
         const now = new Date();
         const year = now.getFullYear();

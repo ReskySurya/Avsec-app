@@ -90,18 +90,36 @@ class LogbookPosJagaController extends Controller
             ]);
 
             return redirect()->back()->with([
-            'success' => 'Logbook berhasil dibuat.',
+            'success' => 'Logbook entry created successfully.',
+            'alert_timeout' => 3000 // dalam milidetik (3 detik)
             ]);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal membuat logbook. ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to create logbook entry. ' . $e->getMessage());
         }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Logbook $logbook)
+    public function update(Request $request, $location, $logbookID)
     {
+        if (!in_array($location, $this->allowedLocations)) {
+            abort(404);
+        }
+
+        $locationModel = Location::where('name', $location)->first();
+        if (!$locationModel) {
+            abort(404, 'Location tidak ditemukan di database.');
+        }
+
+        $logbook = Logbook::where('logbookID', $logbookID)
+                         ->where('location_area_id', $locationModel->id)
+                         ->first();
+        
+        if (!$logbook) {
+            abort(404, 'Logbook entry tidak ditemukan.');
+        }
+
         $request->validate([
             'date' => 'required|date',
             'grup' => 'required|string|max:255',
@@ -115,9 +133,12 @@ class LogbookPosJagaController extends Controller
                 'shift' => $request->shift,
             ]);
 
-            return redirect()->back()->with('success', 'Logbook berhasil di perbarui.');
+            return redirect()->back()->with([
+                'success' => 'Logbook berhasil diupdate.',
+                'alert_timeout' => 3000
+            ]);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal memperbarui data logbook. ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal mengupdate logbook. ' . $e->getMessage());
         }
     }
 
@@ -129,10 +150,11 @@ class LogbookPosJagaController extends Controller
         try {
             $logbook->delete();
             return redirect()->back()->with([
-            'success' => 'Logbook berhasil dihapus.',
+            'success' => 'Logbook entry created successfully.',
+            'alert_timeout' => 3000 // dalam milidetik (3 detik)
             ]);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menghapus data logbook. ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to delete logbook entry. ' . $e->getMessage());
         }
     }
 }
