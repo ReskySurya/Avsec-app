@@ -101,8 +101,25 @@ class LogbookPosJagaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Logbook $logbook)
+    public function update(Request $request, $location, $logbookID)
     {
+        if (!in_array($location, $this->allowedLocations)) {
+            abort(404);
+        }
+
+        $locationModel = Location::where('name', $location)->first();
+        if (!$locationModel) {
+            abort(404, 'Location tidak ditemukan di database.');
+        }
+
+        $logbook = Logbook::where('logbookID', $logbookID)
+                         ->where('location_area_id', $locationModel->id)
+                         ->first();
+        
+        if (!$logbook) {
+            abort(404, 'Logbook entry tidak ditemukan.');
+        }
+
         $request->validate([
             'date' => 'required|date',
             'grup' => 'required|string|max:255',
@@ -116,9 +133,12 @@ class LogbookPosJagaController extends Controller
                 'shift' => $request->shift,
             ]);
 
-            return redirect()->back()->with('success', 'Logbook entry updated successfully.');
+            return redirect()->back()->with([
+                'success' => 'Logbook berhasil diupdate.',
+                'alert_timeout' => 3000
+            ]);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to update logbook entry. ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal mengupdate logbook. ' . $e->getMessage());
         }
     }
 

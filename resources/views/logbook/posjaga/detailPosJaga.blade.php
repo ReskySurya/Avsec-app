@@ -48,14 +48,6 @@ $uraianKegiatan = [
     </div>
 
     <div class="overflow-hidden mb-8">
-        <!-- <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-6 py-6 text-white">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h3 class="text-2xl font-bold mb-1">{{ 'Logbook Pos Jaga '. $location}}</h3>
-                    <p class="text-blue-100">Catatan aktivitas pos jaga harian</p>
-                </div>
-            </div>
-        </div> -->
 
         <!-- Mobile Card View -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 md:hidden">
@@ -110,9 +102,7 @@ $uraianKegiatan = [
     </div>
 
 
-    <div
-        
-        class="bg-white shadow-xl rounded-2xl overflow-hidden mb-8 border border-gray-100">
+    <div class="bg-white shadow-xl rounded-2xl overflow-hidden mb-8 border border-gray-100">
         <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-6 py-6 text-white">
             <div class="flex justify-between items-center">
                 <div>
