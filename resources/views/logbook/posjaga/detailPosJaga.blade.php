@@ -3,11 +3,11 @@
 @php
 // Data statis untuk uraian kegiatan
 $uraianKegiatan = [
-    ['waktu' => '08:00', 'uraian' => 'Pemeriksaan area pos jaga', 'keterangan' => 'Semua aman'],
-    ['waktu' => '10:00', 'uraian' => 'Patroli rutin', 'keterangan' => 'Tidak ada kejadian'],
-    ['waktu' => '12:00', 'uraian' => 'Istirahat makan siang', 'keterangan' => ''],
-    ['waktu' => '14:00', 'uraian' => 'Pemeriksaan dokumen pengunjung', 'keterangan' => ''],
-    ['waktu' => '16:00', 'uraian' => 'Penutupan pos jaga', 'keterangan' => ''],
+['waktu' => '08:00', 'uraian' => 'Pemeriksaan area pos jaga', 'keterangan' => 'Semua aman'],
+['waktu' => '10:00', 'uraian' => 'Patroli rutin', 'keterangan' => 'Tidak ada kejadian'],
+['waktu' => '12:00', 'uraian' => 'Istirahat makan siang', 'keterangan' => ''],
+['waktu' => '14:00', 'uraian' => 'Pemeriksaan dokumen pengunjung', 'keterangan' => ''],
+['waktu' => '16:00', 'uraian' => 'Penutupan pos jaga', 'keterangan' => ''],
 ];
 @endphp
 @section('content')
@@ -37,7 +37,7 @@ $uraianKegiatan = [
 </div>
 @endif
 
-<div class="mx-auto p-0 sm:p-6 min-h-screen pt-5 sm:pt-20">
+<div class="mx-auto p-0 sm:p-6 min-h-screen pt-5 sm:pt-20" x-data="{ openEditDetail: false, openAddDetail: false, editDetailData: { waktu: '', uraian: '', keterangan: '' } }">
     <div class="mb-4">
         <a href="{{ route('logbook.index',['location'=> $location])}}" class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-semibold rounded-lg shadow transition">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,7 +78,7 @@ $uraianKegiatan = [
                 <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
-                <p class="text-gray-500 text-lg">Belum ada entry logbook</p>
+                <p class="text-gray-500 text-lg">Belum ada data logbook</p>
                 <p class="text-gray-400">Tambahkan entry pertama Anda</p>
             </div>
             @endif
@@ -111,15 +111,21 @@ $uraianKegiatan = [
 
 
     <div
-        
+
         class="bg-white shadow-xl rounded-2xl overflow-hidden mb-8 border border-gray-100">
         <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-6 py-6 text-white">
             <div class="flex justify-between items-center">
                 <div>
                     <h3 class="text-2xl font-bold mb-1">{{ 'Uraian Kegiatan'}}</h3>
                 </div>
+                <button
+                    @click="openAddDetail = true"
+                    class="px-4 py-2 bg-green-500 hover:bg-blue-600 text-white rounded-xl text-sm font-semibold shadow">
+                    + Tambah Uraian Kegiatan
+                </button>
             </div>
         </div>
+
 
         <!-- Mobile Card View -->
         <div class="grid grid-cols-1 gap-2 md:hidden p-4">
@@ -207,6 +213,57 @@ $uraianKegiatan = [
             </table>
         </div>
 
+
+        <!-- Modal Tambah Uraian Kegiatan -->
+        <div
+            x-show="openAddDetail"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform scale-95"
+            x-transition:enter-end="opacity-100 transform scale-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 transform scale-100"
+            x-transition:leave-end="opacity-0 transform scale-95"
+            class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+            style="display: none;">
+            <div @click.away="openAddDetail = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
+                <div class="bg-gradient-to-r from-blue-500 to-emerald-600 text-white p-6 rounded-t-2xl">
+                    <h2 class="text-2xl font-bold">Tambah Uraian Kegiatan</h2>
+                    <p class="text-blue-100">Masukkan uraian kegiatan baru</p>
+                </div>
+                <form action="#" method="POST" class="p-6">
+                    @csrf
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Waktu</label>
+                        <input type="time" name="waktu"
+                            class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" required>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Uraian Kegiatan</label>
+                        <input type="text" name="uraian"
+                            class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-green-500 focus:outline-none transition-colors duration-200"
+                            placeholder="Masukkan uraian kegiatan" required>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Keterangan</label>
+                        <textarea name="keterangan"
+                            class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-green-500 focus:outline-none transition-colors duration-200"
+                            placeholder="Masukkan keterangan" required></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" @click="openAddDetail = false"
+                            class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium">
+                            Batal
+                        </button>
+                        <button type="submit"
+                            class="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 font-medium shadow-lg">
+                            Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
         <!-- Modal Edit Uraian Kegiatan -->
         <div
             x-show="openEditDetail"
@@ -256,6 +313,8 @@ $uraianKegiatan = [
                 </form>
             </div>
         </div>
+
+
     </div>
 </div>
 @endsection

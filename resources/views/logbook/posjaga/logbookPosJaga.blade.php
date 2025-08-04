@@ -17,7 +17,8 @@
     <!-- Alert Messages with Enhanced Design -->
     @if(session('success'))
     <div
-        class="bg-gradient-to-r from-blue-400 to-blue-500 text-white px-6 py-4 rounded-xl mb-6 shadow-lg border-l-4 border-blue-600 animate-pulse">
+        id="alert-success"
+        class="bg-gradient-to-r from-blue-400 to-blue-500 text-white px-6 py-4 rounded-xl mb-6 shadow-lg border-l-4 border-blue-600 animate-pulse transition-opacity duration-500">
         <div class="flex items-center">
             <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -29,7 +30,8 @@
 
     @if(session('error'))
     <div
-        class="bg-gradient-to-r from-red-400 to-red-500 text-white px-6 py-4 rounded-xl mb-6 shadow-lg border-l-4 border-red-600">
+        id="alert-error"
+        class="bg-gradient-to-r from-red-400 to-red-500 text-white px-6 py-4 rounded-xl mb-6 shadow-lg border-l-4 border-red-600 transition-opacity duration-500">
         <div class="flex items-center">
             <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -174,7 +176,7 @@
                             </button>
                             <form action="{{ route('logbook.destroy', $logbook->logbookID) }}"
                                 method="POST"
-                                onsubmit="event.stopPropagation(); return confirm('Yakin ingin menghapus entry ini?')">
+                                onsubmit="event.stopPropagation(); return confirm('Yakin ingin menghapus data logbook ini?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit"
@@ -373,6 +375,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+
         // Set current date for tanggal input
         const now = new Date();
         const year = now.getFullYear();
@@ -385,7 +388,8 @@
         }
 
         // Form validation
-        const form = document.querySelector('form[action="{{ route('logbook.store') }}"]');
+        const routeLogbookStore = "{{ route('logbook.store') }}";
+        const form = document.querySelector(`form[action="${routeLogbookStore}"]`);
         if (form) {
             form.addEventListener('submit', function(e) {
                 const grup = form.querySelector('#grup').value;

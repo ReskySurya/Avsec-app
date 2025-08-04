@@ -90,11 +90,10 @@ class LogbookPosJagaController extends Controller
             ]);
 
             return redirect()->back()->with([
-            'success' => 'Logbook entry created successfully.',
-            'alert_timeout' => 3000 // dalam milidetik (3 detik)
+            'success' => 'Logbook berhasil dibuat.',
             ]);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to create logbook entry. ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal membuat logbook. ' . $e->getMessage());
         }
     }
 
@@ -116,9 +115,9 @@ class LogbookPosJagaController extends Controller
                 'shift' => $request->shift,
             ]);
 
-            return redirect()->back()->with('success', 'Logbook entry updated successfully.');
+            return redirect()->back()->with('success', 'Logbook berhasil di perbarui.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to update logbook entry. ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal memperbarui data logbook. ' . $e->getMessage());
         }
     }
 
@@ -130,11 +129,10 @@ class LogbookPosJagaController extends Controller
         try {
             $logbook->delete();
             return redirect()->back()->with([
-            'success' => 'Logbook entry created successfully.',
-            'alert_timeout' => 3000 // dalam milidetik (3 detik)
+            'success' => 'Logbook berhasil dihapus.',
             ]);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to delete logbook entry. ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menghapus data logbook. ' . $e->getMessage());
         }
     }
 }
