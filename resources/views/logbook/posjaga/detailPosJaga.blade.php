@@ -110,8 +110,8 @@
             <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 cursor-pointer">
                 <div class="p-5">
                     <div class="flex items-center justify-between mb-3">
-                        <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">{{
-                            $logbook->date ?? 'N/A' }}</span>
+                        <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">{{ \Carbon\Carbon::parse($logbook->tanggal)->translatedFormat('l,
+                            d F Y') }}</span>
                         <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-teal-100 rounded-full">{{
                             $logbook->shift ?? 'N/A' }}</span>
                     </div>

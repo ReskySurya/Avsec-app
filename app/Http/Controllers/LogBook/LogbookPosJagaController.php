@@ -8,6 +8,7 @@ use App\Models\Logbook;
 use App\Models\Location;
 use App\Models\LogbookDetail;
 use Illuminate\Support\Facades\Auth;
+
 \Carbon\Carbon::setLocale('id');
 
 
@@ -25,30 +26,27 @@ class LogbookPosJagaController extends Controller
         'Walking Patrol'
     ];
 
-    public function index($location)
+    public function index()
     {
-        if (!in_array($location, $this->allowedLocations)) {
-            abort(404);
-        }
+        // Ambil ID user yang sedang login
+        $currentUserId =  Auth::id();
 
-        $locationModel = Location::where('name', $location)->first();
-
-        if (!$locationModel) {
-            abort(404, 'Location tidak ditemukan di database. Pastikan data lokasi sudah tersedia.');
-        }
-
-        $logbooks = Logbook::where('location_area_id', $locationModel->id)
-            ->with('locationArea') // Eager load the location area
+        $logbooks = Logbook::with('locationArea') // Eager load the location area
+            ->where('senderID', $currentUserId) // Filter berdasarkan user yang login
             ->orderBy('date', 'desc')
+            ->orderBy('created_at', 'desc') // Secondary ordering jika diperlukan
             ->paginate(10); // Paginate the results
 
+        // Ambil semua locations untuk dropdown
+        $locations = Location::whereIn('name', $this->allowedLocations)
+            ->orderBy('name', 'asc')
+            ->get();
+
         return view('logbook.posjaga.logbookPosJaga', [
-            'location' => $location,
-            'location_id' => $locationModel->id,
             'logbooks' => $logbooks,
+            'locations' => $locations, // Pass locations to view
         ]);
     }
-
 
     public function store(Request $request)
     {
@@ -79,27 +77,20 @@ class LogbookPosJagaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $location, $logbookID)
+    public function update(Request $request, $logbookID)
     {
-        if (!in_array($location, $this->allowedLocations)) {
-            abort(404);
-        }
-
-        $locationModel = Location::where('name', $location)->first();
-        if (!$locationModel) {
-            abort(404, 'Location tidak ditemukan di database.');
-        }
-
+        // Validasi apakah user yang login adalah pemilik logbook
         $logbook = Logbook::where('logbookID', $logbookID)
-            ->where('location_area_id', $locationModel->id)
+            ->where('senderID', Auth::id()) // Tambah validasi ownership
             ->first();
 
         if (!$logbook) {
-            abort(404, 'Data logbook tidak ditemukan.');
+            abort(404, 'Data logbook tidak ditemukan atau Anda tidak memiliki akses untuk mengedit logbook ini.');
         }
 
         $request->validate([
             'date' => 'required|date',
+            'location_area_id' => 'required|exists:locations,id', // Tambah validasi location_area_id
             'grup' => 'required|string|max:255',
             'shift' => 'required|string|max:255',
         ]);
@@ -107,10 +98,10 @@ class LogbookPosJagaController extends Controller
         try {
             $logbook->update([
                 'date' => $request->date,
+                'location_area_id' => $request->location_area_id, // Update location_area_id
                 'grup' => $request->grup,
                 'shift' => $request->shift,
             ]);
-
             return redirect()->back()->with([
                 'success' => 'Logbook berhasil diupdate.',
             ]);
@@ -161,32 +152,23 @@ class LogbookPosJagaController extends Controller
                 ->withInput(); // Kembalikan input yang sudah diisi
         }
     }
-    public function detail($location, $id)
+    public function detail($id)
     {
-        if (!in_array($location, $this->allowedLocations)) {
-            abort(404);
-        }
-
-        $locationModel = Location::where('name', $location)->first();
-
-        if (!$locationModel) {
-            abort(404, 'Location tidak ditemukan di database. Pastikan data lokasi sudah tersedia.');
-        }
-        $logbooks = Logbook::where('location_area_id', $locationModel->id)
-            ->where('logbookID', $id) // Ganti 'logbook_id' dengan nama kolom primary key yang benar jika bukan 'id'
-            // ->with('location_area_id') // Eager load the location area
+        $logbook = Logbook::with('locationArea') // Eager load relasi location
+            ->where('logbookID', $id)
             ->first();
 
-        $uraianKegiatan = LogbookDetail::where('logbookID', $id)->get();
-        if (!$logbooks) {
+        if (!$logbook) {
             abort(404, 'Logbook tidak ditemukan.');
         }
 
+        $uraianKegiatan = LogbookDetail::where('logbookID', $id)->get();
+
         return view('logbook.posjaga.detailPosJaga', [
-            'location' => $location,
-            'location_id' => $locationModel->id,
-            'logbook' => $logbooks,
+            'logbook' => $logbook,
             'uraianKegiatan' => $uraianKegiatan,
+            'location' => $logbook->locationArea->name, // Ambil nama location dari relasi
+            'location_id' => $logbook->location_area_id,
         ]);
     }
 

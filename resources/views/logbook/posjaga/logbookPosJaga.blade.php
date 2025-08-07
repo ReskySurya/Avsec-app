@@ -53,7 +53,7 @@
         <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-6 py-6 text-white">
             <div class="flex flex-col sm:flex-row justify-between items-start">
                 <div>
-                    <h3 class="text-2xl font-bold mb-1">{{ 'Logbook Pos Jaga ' . $location }}</h3>
+                    <h3 class="text-2xl font-bold mb-1">{{ 'Logbook Pos Jaga ' }}</h3>
                     <p class="text-blue-100">Catatan aktivitas pos jaga harian</p>
                 </div>
                 <button @click="openLogbook = true"
@@ -69,7 +69,7 @@
         <!-- Mobile Card View -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6 md:hidden">
             @forelse($logbooks ?? [] as $logbook)
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200" @click="window.location.href='{{ route('logbook.detail', ['location' => $location,'id' => $logbook->logbookID]) }}'">
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200" @click="window.location.href='{{ route('logbook.detail', ['id' => $logbook->logbookID]) }}'">
                 <div class="p-5">
                     <div class="flex items-center justify-between mb-3">
                         <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">{{ \Carbon\Carbon::parse($logbook->date)->format('d M Y') }}</span>
@@ -138,7 +138,7 @@
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     @forelse($logbooks ?? [] as $index => $logbook)
-                    <tr @click="window.location.href='{{ route('logbook.detail', ['location' => $location,'id' => $logbook->logbookID]) }}'"
+                    <tr @click="window.location.href='{{ route('logbook.detail', ['id' => $logbook->logbookID]) }}'"
                         class="hover:bg-gray-50 transition-colors duration-200 cursor-pointer">
 
                         <td class="px-5 py-4 text-blue-600 font-bold">{{ $index + 1 }}</td>
@@ -170,6 +170,7 @@
                                     openEditLogbook = true;
                                     editLogbookData.logbookID = '{{ $logbook->logbookID }}';
                                     editLogbookData.date = '{{ $logbook->date->format('Y-m-d') }}';
+                                    editLogbookData.location_area_id = '{{ $logbook->location_area_id }}';
                                     editLogbookData.grup = '{{ addslashes($logbook->grup ?? '') }}';
                                     editLogbookData.shift = '{{ addslashes($logbook->shift ?? '') }}';
                                 ">
@@ -236,7 +237,6 @@
             </div>
             <form action="{{ route('logbook.store') }}" method="POST" class="p-6">
                 @csrf
-                <input type="hidden" name="location_area_id" value="{{ $location_id }}">
                 <div class="mb-6">
                     <label for="date" class="block text-sm font-semibold text-gray-700 mb-2">Tanggal</label>
                     <input type="date" id="date" name="date" required
@@ -246,12 +246,26 @@
                     <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
                     @enderror
                 </div>
+
+                <!-- Dropdown Location -->
                 <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Area Pos Jaga</label>
-                    <input type="text"
-                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 bg-gray-100"
-                        value="{{ $location }}" readonly>
+                    <label for="location_area_id" class="block text-sm font-semibold text-gray-700 mb-2">Area Pos Jaga</label>
+                    <select id="location_area_id" name="location_area_id" required
+                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
+                        <option value="">Pilih Lokasi</option>
+                        @if(isset($locations))
+                        @foreach($locations as $location)
+                        <option value="{{ $location->id }}">
+                            {{ $location->name }}
+                        </option>
+                        @endforeach
+                        @endif
+                    </select>
+                    @error('location_area_id')
+                    <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
+                    @enderror
                 </div>
+
                 <div class="mb-6">
                     <label for="grup" class="block text-sm font-semibold text-gray-700 mb-2">Grup</label>
                     <select id="grup" name="grup" required
@@ -302,20 +316,36 @@
                 <h2 class="text-2xl font-bold">Edit Entry Logbook</h2>
                 <p class="text-blue-100">Ubah informasi logbook</p>
             </div>
-            <form :action="'{{ url('/logbook/posjaga') }}/' + '{{ $location }}' + '/' + editLogbookData.logbookID" method="POST" class="p-6">
+            <form :action="'{{ url('/logbook/posjaga') }}/' + editLogbookData.logbookID" method="POST" class="p-6">
                 @csrf
                 @method('PATCH')
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal</label>
                     <input type="date" name="date" required x-model="editLogbookData.date"
                         class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
+                    @error('date')
+                    <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
+                    @enderror
                 </div>
+                
                 <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Area</label>
-                    <input type="text"
-                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 bg-gray-100"
-                        value="{{ $location }}" readonly>
+                    <label for="edit_location_area_id" class="block text-sm font-semibold text-gray-700 mb-2">Area Pos Jaga</label>
+                    <select id="edit_location_area_id" name="location_area_id" required x-model="editLogbookData.location_area_id"
+                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
+                        <option value="">Pilih Lokasi</option>
+                        @if(isset($locations))
+                        @foreach($locations as $location)
+                        <option value="{{ $location->id }}">
+                            {{ $location->name }}
+                        </option>
+                        @endforeach
+                        @endif
+                    </select>
+                    @error('location_area_id')
+                    <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
+                    @enderror
                 </div>
+
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Grup</label>
                     <select name="grup" required x-model="editLogbookData.grup"
@@ -325,6 +355,9 @@
                         <option value="B">B</option>
                         <option value="C">C</option>
                     </select>
+                    @error('grup')
+                    <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
+                    @enderror
                 </div>
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Dinas / Shift</label>
@@ -334,6 +367,9 @@
                         <option value="Pagi">Pagi</option>
                         <option value="Malam">Malam</option>
                     </select>
+                    @error('shift')
+                    <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
+                    @enderror
                 </div>
                 <div class="flex justify-end space-x-3">
                     <button type="button" @click="openEditLogbook = false"
