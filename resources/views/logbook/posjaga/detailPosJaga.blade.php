@@ -103,6 +103,7 @@
         </a>
     </div>
 
+    <!-- Tampilan Information -->
     <div class="overflow-hidden mb-8">
         <!-- Mobile Card View -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 md:hidden">
@@ -137,7 +138,7 @@
             @endif
         </div>
 
-        <!-- Desktop Table View -->
+        <!-- Desktop Table View  -->
         <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hidden md:block">
             <h3 class="text-lg font-semibold text-blue-800 mb-2">Informasi Logbook</h3>
             <div class="grid grid-cols-1 md:grid-cols-2">
@@ -164,7 +165,39 @@
         </div>
     </div>
 
+    <div class="bg-white shadow-xl rounded-2xl overflow-hidden mb-8 border border-gray-100">
+        <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-4 py-4 sm:px-6 sm:py-6 text-white">
+            <div class="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
+                <div>
+                    <h3 class="text-xl sm:text-2xl font-bold mb-1">{{ 'Personil'}}</h3>
+                </div>
+                <div class="flex flex-col gap-2 sm:flex-row sm:gap-2 w-full sm:w-auto">
+                    <button @click="openAddDetail = true"
+                        class="w-full sm:w-auto px-4 py-2 bg-green-500 hover:bg-blue-600 text-white rounded-xl text-sm font-semibold shadow transition">
+                        + Tambah Personil
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <div class="bg-white shadow-xl rounded-2xl overflow-hidden mb-8 border border-gray-100">
+        <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-4 py-4 sm:px-6 sm:py-6 text-white">
+            <div class="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
+                <div>
+                    <h3 class="text-xl sm:text-2xl font-bold mb-1">{{ 'Fasilitas'}}</h3>
+                </div>
+                <div class="flex flex-col gap-2 sm:flex-row sm:gap-2 w-full sm:w-auto">
+                    <button @click="openAddDetail = true"
+                        class="w-full sm:w-auto px-4 py-2 bg-green-500 hover:bg-blue-600 text-white rounded-xl text-sm font-semibold shadow transition">
+                        + Tambah Fasilitas
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Uraian Kegiatan Section -->
     <div class="bg-white shadow-xl rounded-2xl overflow-hidden mb-8 border border-gray-100">
         <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-4 py-4 sm:px-6 sm:py-6 text-white">
             <div class="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
@@ -284,7 +317,7 @@
             </div>
         </div>
 
-        <!-- Mobile Card View -->
+        <!-- Mobile Card View Uraian Kegiatan -->
         <div class="grid grid-cols-1 gap-2 md:hidden p-4">
             @forelse($uraianKegiatan ?? [] as $index => $items)
             <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
@@ -345,7 +378,7 @@
             @endforelse
         </div>
 
-        <!-- Desktop Table View -->
+        <!-- Desktop Table View Uraian Kegiatan -->
         <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hidden md:block">
             <table class="min-w-full">
                 <thead class="bg-gray-50">
@@ -414,7 +447,6 @@
                 </tbody>
             </table>
         </div>
-
 
         <!-- Modal Tambah Uraian Kegiatan -->
         <div x-show="openAddDetail" x-transition:enter="transition ease-out duration-300"
@@ -488,7 +520,6 @@
             </div>
         </div>
 
-
         <!-- Modal Edit Uraian Kegiatan -->
         <div x-show="openEditDetail" x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 transform scale-95"
@@ -546,6 +577,7 @@
                 </form>
             </div>
         </div>
+
     </div>
 </div>
 
