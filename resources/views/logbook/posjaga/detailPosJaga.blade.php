@@ -176,7 +176,7 @@
                         class="w-full sm:w-auto px-4 py-2 bg-green-500 hover:bg-blue-600 text-white rounded-xl text-sm font-semibold shadow transition">
                         + Tambah Uraian Kegiatan
                     </button>
-                    <button @click="openFinishDialog = true"
+                    <button @click="openFinishDialog = true; $nextTick(() => initializeSignaturePad())"
                         class="w-full sm:w-auto px-4 py-2 bg-gray-200 hover:bg-gray-300 text-blue-800 rounded-xl text-sm font-semibold shadow transition text-center">
                         Selesai
                     </button>
@@ -185,8 +185,7 @@
         </div>
 
         <!-- Modal Konfirmasi Selesai -->
-        <div x-show="openFinishDialog"
-            x-transition:enter="transition ease-out duration-300"
+        <div x-show="openFinishDialog" x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 transform scale-95"
             x-transition:enter-end="opacity-100 transform scale-100"
             x-transition:leave="transition ease-in duration-200"
@@ -201,8 +200,9 @@
                     <p class="text-blue-100">Konfirmasi penyelesaian logbook shift hari ini</p>
                 </div>
 
-                <form action="#" method="POST" class="p-6" @submit.prevent="handleFinishSubmit">
+                <form action="{{ route('logbook.signature.send', ['location' => $location, 'logbookID' => $logbook->logbookID]) }}" method="POST" class="p-6" onsubmit="return handleSignatureSubmit(event)">
                     @csrf
+                    @method('POST')
                     <div class="mb-6">
                         <p class="text-gray-700 text-lg mb-4">Apakah Anda yakin sudah menyelesaikan logbook shift hari
                             ini?</p>
@@ -211,16 +211,8 @@
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Tanda Tangan Digital</label>
 
                             <!-- Container untuk signature pad -->
-                            <div class="relative">
-                                <div id="signature-pad"
-                                    class="w-full h-48 border border-gray-300 rounded-lg bg-white relative overflow-hidden">
-                                    <!-- Placeholder text - akan dihapus oleh JavaScript -->
-                                    <div id="signature-placeholder"
-                                        class="absolute inset-0 flex flex-col items-center justify-center text-gray-500 pointer-events-none">
-                                        <p class="text-sm">Tanda tangan di sini</p>
-                                        <p class="text-xs">(Gunakan jari atau mouse untuk menandatangani)</p>
-                                    </div>
-                                </div>
+                            <div class="relative w-full h-48 border border-gray-300 rounded-lg bg-white">
+                                <canvas id="signature-canvas" class="w-full h-full"></canvas>
                             </div>
 
                             <input type="hidden" name="signature" id="signature-data">
@@ -234,6 +226,48 @@
                                 </button>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="mb-2 sm:mb-4">
+                        <label for="receivedID"
+                            class="block text-gray-700 font-bold text-xs sm:text-base mb-1 sm:mb-2">Pilih
+                            Officer yang Menerima:
+                        </label>
+
+                        @php
+                        $officers = \App\Models\User::whereHas('role', function ($query) {
+                        $query->where('name', \App\Models\Role::OFFICER);
+                        })->get();
+                        @endphp
+
+                        <select name="receivedID" id="receivedID"
+                            class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base" required>
+                            <option value="">Pilih Officer</option>
+                            @foreach($officers as $officer)
+                            <option value="{{ $officer->id }}">{{ $officer->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-2 sm:mb-4">
+                        <label for="approvedID"
+                            class="block text-gray-700 font-bold text-xs sm:text-base mb-1 sm:mb-2">Pilih
+                            Supervisor yang Mengetahui:
+                        </label>
+
+                        @php
+                        $supervisors = \App\Models\User::whereHas('role', function ($query) {
+                        $query->where('name', \App\Models\Role::SUPERVISOR);
+                        })->get();
+                        @endphp
+
+                        <select name="approvedID" id="approvedID"
+                            class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base" required>
+                            <option value="">Pilih Supervisor</option>
+                            @foreach($supervisors as $supervisor)
+                            <option value="{{ $supervisor->id }}">{{ $supervisor->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <div class="flex justify-end space-x-3">
@@ -516,216 +550,116 @@
 </div>
 
 <script>
-    let signaturePad;
-    let isDrawing = false;
-    let lastX = 0;
-    let lastY = 0;
+    let signaturePadInstance;
 
-    function initSignaturePad() {
-        const signatureDiv = document.getElementById('signature-pad');
-        const placeholder = document.getElementById('signature-placeholder');
-        const statusEl = document.getElementById('signature-status');
-
-        if (!signatureDiv) {
-            console.error('Element signature-pad tidak ditemukan');
+    function initializeSignaturePad() {
+        // Hindari inisialisasi ulang jika sudah ada
+        if (signaturePadInstance) {
+            signaturePadInstance.clear();
             return;
         }
 
-        // Hapus placeholder
-        if (placeholder) {
-            placeholder.remove();
+        const canvas = document.getElementById('signature-canvas');
+        if (!canvas) {
+            console.error('Elemen canvas untuk tanda tangan tidak ditemukan!');
+            return;
         }
 
-        // Buat canvas
-        const canvas = document.createElement('canvas');
-        canvas.style.position = 'absolute';
-        canvas.style.top = '0';
-        canvas.style.left = '0';
-        canvas.style.width = '100%';
-        canvas.style.height = '100%';
-        canvas.style.touchAction = 'none';
-        canvas.style.cursor = 'crosshair';
+        // Sesuaikan ukuran canvas untuk layar HiDPI (Retina)
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext("2d").scale(ratio, ratio);
 
-        signatureDiv.appendChild(canvas);
+        // Inisialisasi SignaturePad
+        signaturePadInstance = new SignaturePad(canvas, {
+            backgroundColor: 'rgb(255, 255, 255)' // Penting agar background tidak transparan
+        });
 
-        // Set canvas size dengan benar
-        const rect = signatureDiv.getBoundingClientRect();
-        const dpr = window.devicePixelRatio || 1;
+        const statusEl = document.getElementById('signature-status');
 
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
-
-        const ctx = canvas.getContext('2d');
-        ctx.scale(dpr, dpr);
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 2;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-
-        // Event listeners
-        canvas.addEventListener('touchstart', handleStart, { passive: false });
-        canvas.addEventListener('touchmove', handleMove, { passive: false });
-        canvas.addEventListener('touchend', handleEnd, { passive: false });
-        canvas.addEventListener('mousedown', handleStart);
-        canvas.addEventListener('mousemove', handleMove);
-        canvas.addEventListener('mouseup', handleEnd);
-        canvas.addEventListener('mouseout', handleEnd);
-
-        function handleStart(e) {
-            e.preventDefault();
-            isDrawing = true;
-            const pos = getPosition(e);
-            lastX = pos.x;
-            lastY = pos.y;
-
-            ctx.beginPath();
-            ctx.moveTo(lastX, lastY);
-            updateStatus();
-        }
-
-        function handleMove(e) {
-            e.preventDefault();
-            if (!isDrawing) return;
-
-            const pos = getPosition(e);
-            ctx.lineTo(pos.x, pos.y);
-            ctx.stroke();
-            lastX = pos.x;
-            lastY = pos.y;
-        }
-
-        function handleEnd(e) {
-            e.preventDefault();
-            if (isDrawing) {
-                isDrawing = false;
-                ctx.closePath();
-                updateStatus();
-            }
-        }
-
-        function getPosition(e) {
-            const rect = canvas.getBoundingClientRect();
-            let x, y;
-
-            if (e.type.includes('touch')) {
-                const touch = e.touches[0] || e.changedTouches[0];
-                x = touch.clientX - rect.left;
-                y = touch.clientY - rect.top;
-            } else {
-                x = e.clientX - rect.left;
-                y = e.clientY - rect.top;
-            }
-
-            return { x, y };
-        }
-
-        function updateStatus() {
+        // Update status saat pengguna selesai menulis
+        signaturePadInstance.addEventListener("endStroke", () => {
             if (statusEl) {
-                statusEl.textContent = isEmpty() ? 'Belum ada tanda tangan' : 'Tanda tangan tersimpan';
-                statusEl.className = isEmpty() ? 'text-xs text-gray-500' : 'text-xs text-green-600';
+                statusEl.textContent = 'Tanda tangan tersimpan';
+                statusEl.className = 'text-xs text-green-600 font-semibold';
             }
-        }
-
-        function isEmpty() {
-            const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-            return !pixels.some(pixel => pixel !== 0);
-        }
-
-        // Simpan ke global scope
-        signaturePad = {
-            canvas: canvas,
-            ctx: ctx,
-            clear: function() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                updateStatus();
-            },
-            isEmpty: isEmpty,
-            toDataURL: function() {
-                return canvas.toDataURL('image/png');
-            }
-        };
-
-        console.log('Signature pad initialized successfully');
+        });
     }
 
+    // Fungsi clear signature yang akan dipanggil dari HTML
     function clearSignature() {
-        if (signaturePad) {
-            signaturePad.clear();
+        // Jika signature pad belum diinisialisasi, inisialisasi dulu
+        if (!signaturePadInstance) {
+            initializeSignaturePad();
+        }
+
+        if (signaturePadInstance) {
+            signaturePadInstance.clear();
+            const statusEl = document.getElementById('signature-status');
+            if (statusEl) {
+                statusEl.textContent = 'Belum ada tanda tangan';
+                statusEl.className = 'text-xs text-gray-500';
+            }
         }
     }
 
-    // Initialize when Alpine is ready
-    document.addEventListener('alpine:initialized', () => {
-        console.log('Alpine initialized');
-
-        // Watch for modal changes
-        const modalElement = document.querySelector('[x-data]');
-        if (modalElement) {
-            // Use MutationObserver to watch for style changes
-            const observer = new MutationObserver(() => {
-                const modal = document.querySelector('[x-show="openFinishDialog"]');
-                if (modal && modal.style.display !== 'none') {
-                    setTimeout(() => {
-                        initSignaturePad();
-                    }, 300);
-                }
-            });
-
-            observer.observe(modalElement, {
-                attributes: true,
-                attributeFilter: ['style']
-            });
-        }
-    });
-
-    // Form submit handler
-    async function handleFinishSubmit(e) {
-        e.preventDefault();
-        console.log('Form submit triggered');
-
-        if (!signaturePad) {
-            alert('Signature pad belum diinisialisasi. Silakan coba lagi.');
-            return false;
+    function handleSignatureSubmit(event) {
+        // Jika signature pad belum diinisialisasi, inisialisasi dulu
+        if (!signaturePadInstance) {
+            initializeSignaturePad();
         }
 
-        if (signaturePad.isEmpty()) {
+        // Validasi tanda tangan
+        if (!signaturePadInstance || signaturePadInstance.isEmpty()) {
             alert('Mohon berikan tanda tangan Anda sebelum melanjutkan.');
+            event.preventDefault();
             return false;
         }
+
+        // Validasi pemilihan officer dan supervisor
+        const receivedID = document.getElementById('receivedID').value;
+        const approvedID = document.getElementById('approvedID').value;
+
+        if (!receivedID) {
+            alert('Mohon pilih Officer yang akan menerima logbook.');
+            event.preventDefault();
+            return false;
+        }
+
+        if (!approvedID) {
+            alert('Mohon pilih Supervisor yang mengetahui.');
+            event.preventDefault();
+            return false;
+        }
+
+        // Dapatkan data tanda tangan dan proses
+        const signatureData = signaturePadInstance.toDataURL('image/png');
 
         try {
-            const signatureData = signaturePad.toDataURL();
-            const hiddenInput = document.getElementById('signature-data');
-            const form = e.target;
-            const formData = new FormData(form);
-
-            if (hiddenInput) {
-                hiddenInput.value = signatureData;
-                formData.append('signature', signatureData);
+            // Validasi format data
+            if (!signatureData.startsWith('data:image/png;base64,')) {
+                throw new Error('Format tanda tangan tidak valid');
             }
 
-            const response = await fetch(form.action, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: formData
-            });
+            // Simpan data tanda tangan ke input tersembunyi
+            document.getElementById('signature-data').value = signatureData;
 
-            const result = await response.json();
-
-            if (response.ok) {
-                window.location.href = "{{ route('logbook.index', ['location' => $location]) }}";
-            } else {
-                alert(result.message || 'Terjadi kesalahan saat menyimpan tanda tangan');
+            // Tampilkan konfirmasi
+            const confirmSubmit = confirm('Apakah Anda yakin ingin menyelesaikan logbook ini? Tindakan ini tidak dapat dibatalkan.');
+            if (!confirmSubmit) {
+                event.preventDefault();
+                return false;
             }
         } catch (error) {
-            console.error('Error:', error);
-            alert('Terjadi kesalahan saat memproses tanda tangan');
+            alert('Terjadi kesalahan saat memproses tanda tangan: ' + error.message);
+            event.preventDefault();
+            return false;
         }
+
+        return true; // Lanjutkan pengiriman form
     }
 
-    // Definisikan function di global scope
     async function submitDetail(event) {
         event.preventDefault();
 
@@ -737,7 +671,7 @@
         const logbookID = document.getElementById('logbookID').value;
 
         // Validasi sederhana
-        if (!waktu || !uraian || !keterangan || !logbookID) {
+        if (!waktuMulai || !uraian || !keterangan || !logbookID) {
             alert("Semua field wajib diisi.");
             return;
         }
@@ -757,8 +691,8 @@
                 },
                 body: JSON.stringify({
                     logbookID: logbookID,
-                    start_time: waktuMulai, // Jika hanya pakai 1 input waktu, bisa pakai sama
-                    end_time: waktuSelesai, // Jika hanya pakai 1 input waktu, bisa pakai sama
+                    start_time: waktuMulai,
+                    end_time: waktuSelesai,
                     summary: uraian,
                     description: keterangan
                 })
@@ -789,7 +723,6 @@
         // Ambil data dari Alpine.js
         const alpineData = document.querySelector('[x-data]').__x.$data;
         const editData = alpineData.editDetailData;
-        // const id = editData.id;
 
         // Validasi sederhana
         if (!editData.start_time || !editData.summary || !editData.description || !editData.id) {
@@ -809,7 +742,6 @@
             const originalText = submitButton.textContent;
             submitButton.textContent = 'Memperbarui...';
             submitButton.disabled = true;
-
 
             const response = await fetch(`/logbook/detail/update/${editData.id}`, {
                 method: "POST",
@@ -856,7 +788,6 @@
     function confirmDelete(message) {
         return confirm(message);
     }
-
 </script>
 
 @endsection

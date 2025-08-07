@@ -8,6 +8,8 @@ use App\Models\Logbook;
 use App\Models\Location;
 use App\Models\LogbookDetail;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+
 \Carbon\Carbon::setLocale('id');
 
 
@@ -250,6 +252,56 @@ class LogbookPosJagaController extends Controller
             return redirect()->back()->with('error', 'Data yang ingin diupdate tidak ditemukan');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan saat mengupdate data. Silakan coba lagi.');
+        }
+    }
+
+    public function signatureSend(Request $request, $location, $logbookID)
+    {
+        // Validasi input
+        $request->validate([
+            'signature' => 'required|string',
+            'receivedID' => 'required|exists:users,id',
+            'approvedID' => 'required|exists:users,id',
+        ], [
+            'signature.required' => 'Tanda tangan wajib diberikan',
+            'receivedID.required' => 'Officer penerima wajib dipilih',
+            'receivedID.exists' => 'Officer penerima tidak valid',
+            'approvedID.required' => 'Supervisor wajib dipilih',
+            'approvedID.exists' => 'Supervisor tidak valid',
+        ]);
+
+        try {
+            // Cari logbook berdasarkan primary key yang benar
+            $logbook = Logbook::find($logbookID);
+
+            if (!$logbook) {
+                return redirect()->back()->with('error', 'Logbook tidak ditemukan');
+            }
+
+            // Update dengan menggunakan fill dan save untuk menghindari masalah timestamps
+            $logbook->fill([
+                'senderSignature' => $request->signature,
+                'receivedID' => $request->receivedID,
+                'approvedID' => $request->approvedID,
+                'status' => 'submitted' // sesuai dengan enum yang ada di migration
+            ]);
+
+            $logbook->save();
+
+            return redirect()->route('logbook.index', ['location' => $location])
+                ->with('success', 'Logbook berhasil diserahkan dan menunggu konfirmasi dari Officer penerima.');
+        } catch (\Exception $e) {
+            Log::error('Signature Send Error: ' . $e->getMessage(), [
+                'logbookID' => $logbookID,
+                'signature_length' => strlen($request->signature ?? ''),
+                'receivedID' => $request->receivedID,
+                'approvedID' => $request->approvedID,
+                'stack_trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan saat menyimpan tanda tangan: ' . $e->getMessage())
+                ->withInput();
         }
     }
 }
