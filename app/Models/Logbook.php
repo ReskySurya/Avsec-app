@@ -35,6 +35,7 @@ class Logbook extends Model
         'location_area_id',
         'grup',
         'shift',
+        'status', 
         'senderID',
         'receivedID',
         'approvedID',

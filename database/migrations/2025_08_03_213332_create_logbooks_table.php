@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('location_area_id');
             $table->string('grup');
             $table->string('shift');
+            $table->enum('status', ['draft', 'submitted', 'approved'])->default('draft'); // Status of the logbook
             $table->unsignedBigInteger('senderID');
             $table->unsignedBigInteger('receivedID')->nullable();
             $table->unsignedBigInteger('approvedID')->nullable();
