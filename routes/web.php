@@ -132,14 +132,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/logbook-sweppingpi', [LogbookSweppingPIController::class, 'index'])->name('logbookSweppingPI.index');
 
     // Logbook Pos Jaga
-    Route::get('/logbook/posjaga/{location}', [LogbookPosJagaController::class, 'index'])->name('logbook.index');
+    Route::get('/logbook/posjaga', [LogbookPosJagaController::class, 'index'])->name('logbook.index');
     Route::post('/logbook/posjaga', [LogbookPosJagaController::class, 'store'])->name('logbook.store');
-    Route::patch('/logbook/posjaga/{location}/{logbookID}', [LogbookPosJagaController::class, 'update'])->name('logbook.update');
+    Route::patch('/logbook/posjaga/{logbookID}', [LogbookPosJagaController::class, 'update'])->name('logbook.update');
     Route::delete('/logbook/posjaga/{logbook}', [LogbookPosJagaController::class, 'destroy'])->name('logbook.destroy');
     Route::post('/logbook/{location}/signature/send/{logbookID}', [LogbookPosJagaController::class, 'signatureSend'])->name('logbook.signature.send');
 
     // Logbook Detail Pos Jaga
-    Route::get('/logbook/posjaga/detail{location}/{id}', [LogbookPosJagaController::class, 'detail'])->name('logbook.detail');
+    Route::get('/logbook/posjaga/detail/{id}', [LogbookPosJagaController::class, 'detail'])->name('logbook.detail');
     Route::post('/logbook/detail/store', [LogbookPosJagaController::class, 'storeDetail'])->name('logbook.detail.store');
     Route::post('/logbook/detail/update/{id}', [LogbookPosJagaController::class, 'updateDetail'])->name('logbook.detail.update');
     Route::delete('/logbook/detail/delete/{id}', [LogbookPosJagaController::class, 'deleteDetail'])->name('logbook.detail.delete');
