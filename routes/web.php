@@ -11,6 +11,7 @@ use App\Http\Controllers\DailyTest\XrayController;
 use App\Http\Controllers\LogBook\LogbookPosJagaController;
 use App\Http\Controllers\LogBook\LogbookRotasiHBSCPController;
 use App\Http\Controllers\LogBook\LogbookRotasiPSCPController;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -42,7 +43,7 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
 Route::middleware(['auth', 'role:officer'])->group(function () {
     Route::get('/dashboard/officer', function () {
         $rejectedReports = \App\Models\Report::rejected()
-            ->where('submittedByID', auth()->id())
+            ->where('submittedByID', Auth::id())
             ->with([
                 'status:id,name',
                 'equipmentLocation.location:id,name',
@@ -51,7 +52,15 @@ Route::middleware(['auth', 'role:officer'])->group(function () {
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('officer.dashboardOfficer', compact('rejectedReports'));
+        $logbookEntries = \App\Models\Logbook::where('receivedID', Auth::id())
+            ->whereNull('receivedSignature')
+            ->with([
+            'locationArea:id,name',
+            'senderBy:id,name',
+            ])
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return view('officer.dashboardOfficer', compact('rejectedReports', 'logbookEntries'));
     })->name('dashboard.officer');
 
     Route::get('officer/edit-rejected-report/hhmd/{id}', [HhmdController::class, 'editRejectedReport'])->name('officer.hhmd.editRejectedReport');
@@ -137,11 +146,12 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/logbook/posjaga/{logbookID}', [LogbookPosJagaController::class, 'update'])->name('logbook.update');
     Route::delete('/logbook/posjaga/{logbook}', [LogbookPosJagaController::class, 'destroy'])->name('logbook.destroy');
     Route::post('/logbook/{location}/signature/send/{logbookID}', [LogbookPosJagaController::class, 'signatureSend'])->name('logbook.signature.send');
+    Route::post('/logbook/{location}/signature/receive/{logbookID}', [LogbookPosJagaController::class, 'signatureReceive'])->name('logbook.signature.receive');
 
     // Logbook Detail Pos Jaga
     Route::get('/logbook/posjaga/detail/{id}', [LogbookPosJagaController::class, 'detail'])->name('logbook.detail');
     Route::post('/logbook/detail/store', [LogbookPosJagaController::class, 'storeDetail'])->name('logbook.detail.store');
     Route::post('/logbook/detail/update/{id}', [LogbookPosJagaController::class, 'updateDetail'])->name('logbook.detail.update');
     Route::delete('/logbook/detail/delete/{id}', [LogbookPosJagaController::class, 'deleteDetail'])->name('logbook.detail.delete');
-
+    Route::get('/officer/received/{location}/{logbookID}', [LogbookPosJagaController::class, 'showReceivedLogbook'])->name('officer.received.show');
 });
