@@ -44,12 +44,8 @@
                     <h4 class="font-semibold text-green-700">Daily Test Formulir</h4>
                     <p class="text-sm text-green-600">Lihat dan verifikasi laporan</p>
                 </a>
-                <a href="#" class="bg-white p-3 rounded shadow hover:shadow-md transition-shadow">
+                <a href="{{ route('supervisor.logbook-form') }}" class="bg-white p-3 rounded shadow hover:shadow-md transition-shadow">
                     <h4 class="font-semibold text-green-700">Logbook Pos Jaga</h4>
-                    <p class="text-sm text-green-600">Lihat dan verifikasi laporan</p>
-                </a>
-                <a href="#" class="bg-white p-3 rounded shadow hover:shadow-md transition-shadow">
-                    <h4 class="font-semibold text-green-700">Check List CCTV</h4>
                     <p class="text-sm text-green-600">Lihat dan verifikasi laporan</p>
                 </a>
             </div>

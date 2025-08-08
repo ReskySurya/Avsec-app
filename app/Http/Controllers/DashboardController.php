@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Report;
+use App\Models\Logbook;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class DailyTestController extends Controller
+class DashboardController extends Controller
 {
-    public function showData(Request $request)
+    public function showDataDailyTest(Request $request)
     {
         $equipmentTypes = ['hhmd', 'wtmd', 'xraycabin', 'xraybagasi'];
 
@@ -56,6 +57,34 @@ class DailyTestController extends Controller
         return view('supervisor.dailyTestForm', [
             'reports' => $reports,
             'defaultStatus' => $statusFilter, // dikirim ke view
+        ]);
+    }
+
+    public function showDataLogbook(Request $request)
+    {
+        $statusFilter = $request->query('status', 'approved');
+
+        $logbookEntries = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy'])
+            ->where('status', $statusFilter)
+            ->orderBy('date', 'desc')
+            ->get()
+            ->map(function ($logbook) {
+                return [
+                    'id' => $logbook->logbookID,
+                    'date' => $logbook->date->format('d/m/Y'),
+                    'location' => $logbook->locationArea->name ?? '',
+                    'group' => $logbook->grup,
+                    'shift' => $logbook->shift,
+                    'status' => $logbook->status,
+                    'sender' => $logbook->senderBy->name ?? '',
+                    'receiver' => $logbook->receiverBy->name ?? '',
+                    'approver' => $logbook->approverBy->name ?? '',
+                ];
+            });
+
+        return view('supervisor.logbookForm', [
+            'logbookEntries' => $logbookEntries,
+            'defaultStatus' => $statusFilter,
         ]);
     }
 }

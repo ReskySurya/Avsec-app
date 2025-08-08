@@ -8,7 +8,9 @@ use App\Models\Logbook;
 use App\Models\Location;
 use App\Models\LogbookDetail;
 use Illuminate\Support\Facades\Auth;
+
 \Carbon\Carbon::setLocale('id');
+
 use Illuminate\Support\Facades\Log;
 
 

@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\DailyTest\HhmdController;
-use App\Http\Controllers\DailyTestController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LogBook\LogbookSweppingPIController;
 use App\Http\Controllers\MasterDataController;
 use Illuminate\Support\Facades\Route;
@@ -36,7 +36,8 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
         return view('supervisor.dashboardSupervisor');
     })->name('dashboard.supervisor');
 
-    Route::get('/dashboard/supervisor/dailytest-form',  [DailyTestController::class, 'showData'])->name('supervisor.dailytest-form');
+    Route::get('/supervisor/dailytest-form',  [DashboardController::class, 'showDataDailyTest'])->name('supervisor.dailytest-form');
+    Route::get('/supervisor/logbook-form',  [DashboardController::class, 'showDataLogbook'])->name('supervisor.logbook-form');
 });
 
 // Officer Routes
