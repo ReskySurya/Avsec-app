@@ -34,12 +34,14 @@
             </tr>
         </thead>
         <tbody>
+            @foreach($personil as $index => $personil)
             <tr>
-                <td class="border border-black px-2 py-1 text-center">-</td>
-                <td class="border border-black px-2 py-1">-</td>
-                <td class="border border-black px-2 py-1 text-center">-</td>
-                <td class="border border-black px-2 py-1 text-center">-</td>
+                <td class="border border-black px-2 py-1 text-center">{{ $index + 1 }}</td>
+                <td class="border border-black px-2 py-1">{{ $personil->user->name }}</td>
+                <td class="border border-black px-2 py-1 text-center">{{ $personil->classification }}</td>
+                <td class="border border-black px-2 py-1 text-center">{{ $personil->description }}</td>
             </tr>
+            @endforeach
         </tbody>
     </table>
 
@@ -57,12 +59,14 @@
             </tr>
         </thead>
         <tbody>
+            @foreach($facility as $index => $facility)
             <tr>
-                <td class="border border-black px-2 py-1 text-center">-</td>
-                <td class="border border-black px-2 py-1">-</td>
-                <td class="border border-black px-2 py-1 text-center">-</td>
-                <td class="border border-black px-2 py-1 text-center">-</td>
+                <td class="border border-black px-2 py-1 text-center">{{ $index + 1 }}</td>
+                <td class="border border-black px-2 py-1">{{ $facility->equipments->name }}</td>
+                <td class="border border-black px-2 py-1 text-center">{{ $facility->quantity }}</td>
+                <td class="border border-black px-2 py-1 text-center">{{ $facility->description }}</td>
             </tr>
+            @endforeach
         </tbody>
     </table>
 
@@ -99,27 +103,27 @@
             <div>
                 <p>Yang Menerima</p>
                 @if($logbook->receivedSignature)
-                    <div class="h-16 flex items-center justify-center">
-                        <img src="data:image/png;base64,{!! $logbook->receivedSignature !!}" class="h-16 mt-5" alt="Tanda Tangan Penerima">
-                    </div>
-                    <p class="font-semibold mt-1">{{ $logbook->receiverBy->name ?? '-' }}</p>
+                <div class="h-16 flex items-center justify-center">
+                    <img src="data:image/png;base64,{!! $logbook->receivedSignature !!}" class="h-16 mt-5" alt="Tanda Tangan Penerima">
+                </div>
+                <p class="font-semibold mt-1">{{ $logbook->receiverBy->name ?? '-' }}</p>
                 @else
-                    <form action="{{ route('logbook.signature.receive', ['location' => $logbook->locationArea->name, 'logbookID' => $logbook->logbookID]) }}" method="POST" onsubmit="return handleSignatureSubmit(event)">
-                        @csrf
-                        <div class="border-2 border-gray-200 rounded-xl p-4 my-2">
-                            <div class="relative w-full h-32 border border-gray-300 rounded-lg bg-white">
-                                <canvas id="signature-canvas-receiver" class="w-full h-full"></canvas>
-                            </div>
-                            <input type="hidden" name="signature" id="signature-data-receiver">
-                            <div class="flex justify-between items-center mt-2">
-                                <span id="signature-status-receiver" class="text-xs text-gray-500">Belum ada tanda tangan</span>
-                                <button type="button" class="text-sm text-blue-600 hover:text-blue-800" onclick="clearSignatureReceiver()">Clear</button>
-                            </div>
+                <form action="{{ route('logbook.signature.receive', ['location' => $logbook->locationArea->name, 'logbookID' => $logbook->logbookID]) }}" method="POST" onsubmit="return handleSignatureSubmit(event)">
+                    @csrf
+                    <div class="border-2 border-gray-200 rounded-xl p-4 my-2">
+                        <div class="relative w-full h-32 border border-gray-300 rounded-lg bg-white">
+                            <canvas id="signature-canvas-receiver" class="w-full h-full"></canvas>
                         </div>
-                        <button type="submit" class="w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-semibold shadow transition">
-                            Konfirmasi & Terima
-                        </button>
-                    </form>
+                        <input type="hidden" name="signature" id="signature-data-receiver">
+                        <div class="flex justify-between items-center mt-2">
+                            <span id="signature-status-receiver" class="text-xs text-gray-500">Belum ada tanda tangan</span>
+                            <button type="button" class="text-sm text-blue-600 hover:text-blue-800" onclick="clearSignatureReceiver()">Clear</button>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-semibold shadow transition">
+                        Konfirmasi & Terima
+                    </button>
+                </form>
                 @endif
             </div>
 
@@ -159,7 +163,7 @@
     let signaturePadReceiver;
 
     // Inisialisasi hanya jika canvas ada (jika tanda tangan belum ada)
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const canvas = document.getElementById('signature-canvas-receiver');
         if (canvas) {
             initializeSignaturePadReceiver();
@@ -217,39 +221,39 @@
         const formData = new FormData(form);
 
         fetch(form.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                if (data.redirect) {
-                    window.location.href = data.redirect;
-                } else {
-                    window.location.reload();
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
                 }
-            } else if (data.error) {
-                alert('Error: ' + data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            // Jika data berhasil disimpan tapi response bukan JSON, redirect ke halaman index
-            if (error.message.includes('JSON')) {
-                alert('Berhasil menyimpan tanda tangan!!');
-            } else {
-                alert('Terjadi kesalahan saat menyimpan tanda tangan. Silakan coba lagi.');
-            }
-        });
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                    } else {
+                        window.location.reload();
+                    }
+                } else if (data.error) {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Jika data berhasil disimpan tapi response bukan JSON, redirect ke halaman index
+                if (error.message.includes('JSON')) {
+                    alert('Berhasil menyimpan tanda tangan!!');
+                } else {
+                    alert('Terjadi kesalahan saat menyimpan tanda tangan. Silakan coba lagi.');
+                }
+            });
 
         return false;
     }

@@ -1,14 +1,13 @@
 <?php
-
 namespace App\Http\Controllers\LogBook;
 
 use App\Http\Controllers\Controller;
 use App\Models\Equipment;
+use App\Models\LogbookFacility;
 use Illuminate\Http\Request;
 use App\Models\Logbook;
 use App\Models\Location;
 use App\Models\LogbookDetail;
-use App\Models\LogbookFacility;
 use App\Models\LogbookStaff;
 use Illuminate\Support\Facades\Auth;
 
@@ -468,8 +467,17 @@ class LogbookPosJagaController extends Controller
 
             $logbookDetails = LogbookDetail::where('logbookID', $logbookID)->get();
 
+            $personil = LogbookStaff::with('user') // Tambahkan eager loading
+                ->where('logbookID', $logbookID)
+                ->get();
+            $facility = LogbookFacility::with('equipments') // Eager load facility relation
+                ->where('logbookID', $logbookID)->get();
+
+            
             return view('officer.receivedLogbook', [
                 'logbook' => $logbook,
+                'personil' => $personil,
+                'facility' => $facility,
                 'logbookDetails' => $logbookDetails
             ]);
         } catch (\Exception $e) {
