@@ -63,9 +63,10 @@ class DashboardController extends Controller
     public function showDataLogbook(Request $request)
     {
         $statusFilter = $request->query('status', 'approved');
+        $userId = Auth::id(); // ID user yang sedang login
 
         $logbookEntries = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy'])
-            ->where('status', $statusFilter)
+            ->where('approvedID', $userId) // hanya data dengan approver/supervisor sesuai ID user
             ->orderBy('date', 'desc')
             ->get()
             ->map(function ($logbook) {
