@@ -34,4 +34,6 @@ class Equipment extends Model
     {
         return $this->hasMany(EquipmentLocation::class);
     }
+
+    
 }

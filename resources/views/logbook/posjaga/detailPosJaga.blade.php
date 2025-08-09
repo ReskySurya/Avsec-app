@@ -50,8 +50,12 @@
 @endif
 
 <div class="mx-auto p-0 sm:p-6 min-h-screen pt-5 sm:pt-20" x-data="{
-        openEditDetail: false,
-        openAddDetail: false,
+        openAddPersonil: false,
+        openEditPersonil: false,
+        openAddFasilitas: false,
+        openEditFasilitas: false,
+        openEditDetailUraian: false,
+        openAddDetailUraian: false,
         openFinishDialog: false,
         editDetailData: {
             id: null,
@@ -60,11 +64,23 @@
             summary: '',
             description: ''
         },
-         openEditDetailFn(id, startTime, endTime, summary, description) {
+        editPersonilData: {
+            id: null,
+            staffID: null, 
+            nama: '',
+            classification: '',
+            description: ''
+        },
+        editFacilityData: {
+            id: null,
+            facilityID: null,
+            quantity: '',
+            description: ''
+        },
+        openEditDetailFn(id, startTime, endTime, summary, description) {
+            // Function yang sudah ada...
             this.editDetailData.id = id;
-            // Handle berbagai format waktu yang mungkin
             if (startTime) {
-                // Jika format datetime (2024-01-01 08:30:00) atau time (08:30:00)
                 if (startTime.includes(' ')) {
                     this.editDetailData.start_time = startTime.split(' ')[1].substring(0, 5);
                 } else if (startTime.length > 5) {
@@ -76,7 +92,6 @@
                 this.editDetailData.start_time = '';
             }
             if (endTime) {
-                // Jika format datetime (2024-01-01 17:30:00) atau time (17:30:00)
                 if (endTime.includes(' ')) {
                     this.editDetailData.end_time = endTime.split(' ')[1].substring(0, 5);
                 } else if (endTime.length > 5) {
@@ -87,12 +102,26 @@
             } else {
                 this.editDetailData.end_time = '';
             }
-
             this.editDetailData.summary = summary;
             this.editDetailData.description = description;
-            this.openEditDetail = true;
+            this.openEditDetailUraian = true;
+        },
+        openEditPersonilFn(id, staffID, nama, classification, description) {  // Tambahkan parameter staffID
+            this.editPersonilData.id = id;
+            this.editPersonilData.staffID = staffID; 
+            this.editPersonilData.nama = nama || '';
+            this.editPersonilData.classification = classification || '';
+            this.editPersonilData.description = description || '';
+            this.openEditPersonil = true;
+        },
+        openEditFasilitasFn(id, facilityID, quantity, description) {
+            this.editFacilityData.id = id;
+            this.editFacilityData.facilityID = facilityID;
+            this.editFacilityData.quantity = quantity;
+            this.editFacilityData.description = description;
+            this.openEditFasilitas = true;
         }
-     }">
+    }">
     <div class="mb-4">
         <a href="{{ route('logbook.index',['location'=> $location])}}"
             class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-semibold rounded-lg shadow transition">
@@ -165,48 +194,648 @@
         </div>
     </div>
 
+    <!-- SECTION PERSONIL -->
     <div class="bg-white shadow-xl rounded-2xl overflow-hidden mb-8 border border-gray-100">
-        <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-4 py-4 sm:px-6 sm:py-6 text-white">
+        <div class="bg-gradient-to-r from-sky-500 to-indigo-600 px-4 py-4 sm:px-6 sm:py-6 text-white">
             <div class="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
                 <div>
-                    <h3 class="text-xl sm:text-2xl font-bold mb-1">{{ 'Personil'}}</h3>
+                    <h3 class="text-xl sm:text-2xl font-bold mb-1">Personil</h3>
                 </div>
                 <div class="flex flex-col gap-2 sm:flex-row sm:gap-2 w-full sm:w-auto">
-                    <button @click="openAddDetail = true"
-                        class="w-full sm:w-auto px-4 py-2 bg-green-500 hover:bg-blue-600 text-white rounded-xl text-sm font-semibold shadow transition">
+                    <button @click="openAddPersonil = true"
+                        class="w-full sm:w-auto px-4 py-2 bg-blue-400 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold shadow transition">
                         + Tambah Personil
                     </button>
                 </div>
             </div>
         </div>
+
+        <!-- Mobile Card View Personil -->
+        <div class="grid grid-cols-1 gap-3 md:hidden p-4">
+            @forelse($personil ?? [] as $index => $items)
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow duration-200">
+                <!-- Header -->
+                <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-4 text-white">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                                </path>
+                            </svg>
+                            <span class="font-semibold">{{  $items->classification  }}</span>
+                        </div>
+                        <span class="text-blue-200 text-sm">#{{ $index + 1 }}</span>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <span class="px-3 py-1 text-sm font-medium text-blue-800 bg-blue-100 rounded-lg">
+                                {{$items->user->name}}
+                            </span>
+                        </div>
+                        <div class="text-right">
+                            <span class="px-3 py-1 text-sm font-medium text-indigo-800 bg-indigo-100 rounded-lg">
+                                {{ $items->description }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-end space-x-2">
+                        <!-- Edit Button -->
+                        <button type="button"
+                            class="flex items-center space-x-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors duration-200"
+                            @click="openEditPersonilFn({{ $items->id }}, {{ $items->staffID }}, '{{ addslashes($items->user->name ?? 'N/A') }}', '{{ addslashes($items->classification ?? 'N/A') }}', '{{ $items->description }}')">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                </path>
+                            </svg>
+                            <span class="text-sm">Edit</span>
+                        </button>
+
+                        <!-- Delete Button -->
+                        <form action="{{ route('logbook.staff.delete', $items->id) }}" method="POST" class="inline-block"
+                            onsubmit="return confirmDelete('Apakah Anda yakin ingin menghapus personil ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                class="flex items-center space-x-1 px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors duration-200">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                    </path>
+                                </svg>
+                                <span class="text-sm">Hapus</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            @empty
+            <div class="text-center py-12">
+                <div class="bg-blue-100 p-6 rounded-2xl mb-4 inline-block">
+                    <svg class="w-12 h-12 text-blue-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                        </path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">Belum Ada Personil</h3>
+                <p class="text-gray-500 mb-4">Tambahkan personil untuk logbook ini</p>
+                <button @click="openAddPersonil = true"
+                    class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-md">
+                    Tambah Personil
+                </button>
+            </div>
+            @endforelse
+        </div>
+
+        <!-- Desktop Table View Personil -->
+        <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hidden md:block">
+            <table class="min-w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">No</th>
+                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Nama</th>
+                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Klasifikasi</th>
+                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Keterangan</th>
+                        <th class="px-5 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @forelse($personil ?? [] as $index => $items)
+                    <tr class="hover:bg-gray-50 transition-colors duration-200 cursor-pointer">
+                        <td class="px-5 py-4 text-sky-600 font-bold">{{ $index + 1 }}</td>
+                        <td class="px-5 py-4">{{ $items->user->name ?? 'N/A' }}</td>
+                        <td class="px-5 py-4">{{ $items->classification ?? 'N/A' }}</td>
+                        <td class="px-5 py-4">
+                            <span class="px-3 py-1 rounded-full text-sm font-medium 
+                                @if($items->description == 'hadir') bg-green-100 text-green-800
+                                @elseif($items->description == 'izin') bg-yellow-100 text-yellow-800
+                                @elseif($items->description == 'sakit') bg-red-100 text-red-800
+                                @elseif($items->description == 'cuti') bg-blue-100 text-blue-800
+                                @endif">
+                                {{ ucfirst($items->description) }}
+                            </span>
+                        </td>
+                        <td class="px-5 py-4 flex justify-center space-x-2" @click.stop>
+                            <!-- Edit button -->
+                            <button type="button"
+                                class="p-2 bg-yellow-100 text-yellow-700 rounded-full hover:bg-yellow-200 transition-colors duration-200"
+                                title="Edit Personil"
+                                @click="openEditPersonilFn({{ $items->id }}, {{ $items->staffID }}, '{{ addslashes($items->user->name ?? 'N/A') }}', '{{ addslashes($items->classification ?? 'N/A') }}', '{{ $items->description }}')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                    </path>
+                                </svg>
+                            </button>
+                            <!-- Delete button -->
+                            <form action="{{ route('logbook.staff.delete',$items->id) }}" method="POST"
+                                class="inline-block"
+                                onsubmit="return confirmDelete('Apakah Anda yakin ingin menghapus personil ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                    class="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors duration-200"
+                                    title="Hapus Personil">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="text-center py-12">
+                            <p class="text-gray-500 text-lg">Belum ada personil</p>
+                            <p class="text-gray-400">Tambahkan personil pertama Anda</p>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 
+    <!-- Modal Tambah Personil -->
+    <div x-show="openAddPersonil" x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform scale-95"
+        x-transition:enter-end="opacity-100 transform scale-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 transform scale-100"
+        x-transition:leave-end="opacity-0 transform scale-95"
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+        style="display: none;">
+        <div @click.away="openAddPersonil = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
+            <div class="bg-gradient-to-r from-sky-500 to-indigo-600 text-white p-6 rounded-t-2xl">
+                <h2 class="text-2xl font-bold">Tambah Personil</h2>
+                <p class="text-blue-100">Masukkan data personil baru</p>
+            </div>
+
+            <form action="{{ route('logbook.staff.store') }}" method="POST" class="p-6">
+                @csrf
+                <input type="hidden" name="logbookID" value="{{ $logbook->logbookID ?? '' }}">
+
+                <div class="mb-2 sm:mb-4">
+                    <label for="staffID"
+                        class="block text-gray-700 font-semibold text-sm sm:text-sm mb-1 sm:mb-2">
+                        Nama
+                    </label>
+
+                    @php
+                    $officers = \App\Models\User::whereHas('role', function ($query) {
+                    $query->where('name', \App\Models\Role::OFFICER);
+                    })->get();
+                    @endphp
+
+                    <select name="staffID" id="staffID" class="w-full border-2 px-4 py-3 rounded-xl focus:border-sky-500 focus:outline-none transition-colors duration-200 @error('staffID') border-red-500 @enderror" required>
+                        <option value="">Pilih Officer</option>
+                        @foreach($officers as $officer)
+                        <option value="{{ $officer->id }}" data-lisensi="{{ $officer->lisensi }}">
+                            {{ $officer->name }} - {{ $officer->lisensi }}
+                        </option>
+                        @endforeach
+                    </select>
+                    @error('staffID')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+
+                <div class="mb-6">
+                    <label class="block text-gray-700 font-semibold text-sm sm:text-sm mb-1 sm:mb-2">Keterangan</label>
+                    <select name="description" id="description"
+                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-sky-500 focus:outline-none transition-colors duration-200 @error('description') border-red-500 @enderror"
+                        required>
+                        <option value="">Pilih Keterangan</option>
+                        <option value="hadir" {{ old('description') == 'hadir' ? 'selected' : '' }}>Hadir</option>
+                        <option value="izin" {{ old('description') == 'izin' ? 'selected' : '' }}>Izin</option>
+                        <option value="sakit" {{ old('description') == 'sakit' ? 'selected' : '' }}>Sakit</option>
+                        <option value="cuti" {{ old('description') == 'cuti' ? 'selected' : '' }}>Cuti</option>
+                    </select>
+                    @error('description')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="flex justify-end space-x-3">
+                    <button type="button" @click="openAddPersonil = false"
+                        class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium">
+                        Batal
+                    </button>
+                    <button type="submit"
+                        class="px-6 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-xl hover:from-sky-600 hover:to-indigo-700 transition-all duration-200 font-medium shadow-lg">
+                        Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Edit Personil -->
+    <div x-show="openEditPersonil" x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform scale-95"
+        x-transition:enter-end="opacity-100 transform scale-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 transform scale-100"
+        x-transition:leave-end="opacity-0 transform scale-95"
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+        style="display: none;">
+        <div @click.away="openEditPersonil = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
+            <div class="bg-gradient-to-r from-sky-500 to-indigo-600 text-white p-6 rounded-t-2xl">
+                <h2 class="text-2xl font-bold">Edit Personil</h2>
+                <p class="text-blue-100">Ubah informasi personil</p>
+            </div>
+
+            <form x-bind:action="`{{ url('/logbook/staff/update') }}/${editPersonilData.id}`" method="POST" class="p-6">
+                @csrf
+                @method('POST')
+                <input type="hidden" name="logbookID" value="{{ $logbook->logbookID ?? '' }}">
+
+                <div class="mb-2 sm:mb-4">
+                    <label for="edit_staffID" class="block text-gray-700 font-semibold text-sm sm:text-sm mb-1 sm:mb-2">
+                        Nama
+                    </label>
+
+                    @php
+                    $officers = \App\Models\User::whereHas('role', function ($query) {
+                    $query->where('name', \App\Models\Role::OFFICER);
+                    })->get();
+                    @endphp
+
+                    <select name="staffID" id="edit_staffID" x-model="editPersonilData.staffID"
+                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-sky-500 focus:outline-none transition-colors duration-200" required>
+                        <option value="">Pilih Officer</option>
+                        @foreach($officers as $officer)
+                        <option value="{{ $officer->id }}" data-lisensi="{{ $officer->lisensi }}">
+                            {{ $officer->name }} - {{ $officer->lisensi }}
+                        </option>
+                        @endforeach
+                    </select>
+                    @error('staffID')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Keterangan</label>
+                    <select name="description" id="edit_description" x-model="editPersonilData.description"
+                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-sky-500 focus:outline-none transition-colors duration-200"
+                        required>
+                        <option value="">Pilih Keterangan</option>
+                        <option value="hadir">Hadir</option>
+                        <option value="izin">Izin</option>
+                        <option value="sakit">Sakit</option>
+                        <option value="cuti">Cuti</option>
+                    </select>
+                    @error('description')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="flex justify-end space-x-3">
+                    <button type="button" @click="openEditPersonil = false"
+                        class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium">
+                        Batal
+                    </button>
+                    <button type="submit"
+                        class="px-6 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-xl hover:from-sky-600 hover:to-indigo-700 transition-all duration-200 font-medium shadow-lg">
+                        Perbarui
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SECTION FASILITAS -->
     <div class="bg-white shadow-xl rounded-2xl overflow-hidden mb-8 border border-gray-100">
-        <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-4 py-4 sm:px-6 sm:py-6 text-white">
+        <div class="bg-gradient-to-r from-sky-500 to-indigo-600 px-4 py-4 sm:px-6 sm:py-6 text-white">
             <div class="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
                 <div>
-                    <h3 class="text-xl sm:text-2xl font-bold mb-1">{{ 'Fasilitas'}}</h3>
+                    <h3 class="text-xl sm:text-2xl font-bold mb-1">Fasilitas</h3>
                 </div>
                 <div class="flex flex-col gap-2 sm:flex-row sm:gap-2 w-full sm:w-auto">
-                    <button @click="openAddDetail = true"
-                        class="w-full sm:w-auto px-4 py-2 bg-green-500 hover:bg-blue-600 text-white rounded-xl text-sm font-semibold shadow transition">
+                    <button @click="openAddFasilitas = true"
+                        class="w-full sm:w-auto px-4 py-2 bg-blue-400 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold shadow transition">
                         + Tambah Fasilitas
                     </button>
                 </div>
             </div>
         </div>
+
+        <!-- Mobile Card View Fasilitas -->
+        <div class="grid grid-cols-1 gap-3 md:hidden p-4">
+            @forelse($facility ?? [] as $index => $items)
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow duration-200">
+                <!-- Header Card -->
+                <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-4">
+                    <div class="flex items-center justify-between text-white">
+                        <div class="flex items-center space-x-3">
+                            <div class="bg-white bg-opacity-20 p-2 rounded-lg">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 008 10.172V5L8 4z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg">{{ $items->equipments->name ?? 'Unknown Equipment' }}</h3>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="bg-white bg-opacity-25 px-3 py-1 rounded-full">
+                                <span class="font-bold text-lg">{{ $items->quantity }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="p-4">
+                    <!-- Description -->
+                    <div class="mb-4">
+                        <p class="text-gray-800 text-sm">{{ $items->description ?: 'Tidak ada keterangan' }}</p>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-end space-x-2">
+                        <!-- Edit Button -->
+                        <button type="button"
+                            class="flex items-center space-x-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors duration-200"
+                            @click="openEditFasilitasFn({{ $items->id }}, {{ $items->facilityID }}, {{ $items->quantity }}, '{{ addslashes($items->description ?? '') }}')">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                </path>
+                            </svg>
+                            <span class="text-sm">Edit</span>
+                        </button>
+
+                        <!-- Delete Button -->
+                        <form action="{{ route('logbook.facility.delete', $items->id) }}" method="POST" class="inline-block"
+                            onsubmit="return confirmDelete('Apakah Anda yakin ingin menghapus fasilitas ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                class="flex items-center space-x-1 px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors duration-200">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                    </path>
+                                </svg>
+                                <span class="text-sm">Hapus</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            @empty
+            <div class="text-center py-12">
+                <div class="bg-blue-100 p-6 rounded-2xl mb-4 inline-block">
+                    <svg class="w-12 h-12 text-blue-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 008 10.172V5L8 4z">
+                        </path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">Belum Ada Fasilitas</h3>
+                <p class="text-gray-500 mb-4">Tambahkan fasilitas untuk logbook ini</p>
+                <button @click="openAddFasilitas = true"
+                    class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-md">
+                    Tambah Fasilitas
+                </button>
+            </div>
+            @endforelse
+        </div>
+
+        <!-- Desktop Table View Fasilitas -->
+        <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hidden md:block">
+            <table class="min-w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">No</th>
+                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Fasilitas</th>
+                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Jumlah</th>
+                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Keterangan</th>
+                        <th class="px-5 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @forelse($facility ?? [] as $index => $items)
+                    <tr class="hover:bg-gray-50 transition-colors duration-200 cursor-pointer">
+                        <td class="px-5 py-4 text-sky-600 font-bold">{{ $index + 1 }}</td>
+                        <td class="px-5 py-4">{{ $items->equipments->name ?? 'N/A'  }}</td>
+                        <td class="px-5 py-4">{{ $items->quantity }}</td>
+                        <td class="px-5 py-4">{{ $items->description }}</td>
+                        <td class="px-5 py-4 flex justify-center space-x-2" @click.stop>
+                            <!-- Edit button -->
+                            <button type="button"
+                                class="p-2 bg-yellow-100 text-yellow-700 rounded-full hover:bg-yellow-200 transition-colors duration-200"
+                                title="Edit Fasilitas"
+                                @click="openEditFasilitasFn({{ $items->id }}, {{ $items->facilityID }}, {{ $items->quantity }}, '{{ addslashes($items->description ?? '') }}')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                    </path>
+                                </svg>
+                            </button>
+
+                            <!-- Delete button -->
+                            <form action="{{ route('logbook.facility.delete',$items->id) }}" method="POST"
+                                class="inline-block"
+                                onsubmit="return confirmDelete('Apakah Anda yakin ingin menghapus fasilitas ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                    class="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors duration-200"
+                                    title="Hapus Fasilitas">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="text-center py-12">
+                            <p class="text-gray-500 text-lg">Belum ada fasilitas</p>
+                            <p class="text-gray-400">Tambahkan fasilitas pertama Anda</p>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
+
+    <!-- Modal Tambah Fasilitas -->
+    <div x-show="openAddFasilitas" x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform scale-95"
+        x-transition:enter-end="opacity-100 transform scale-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 transform scale-100"
+        x-transition:leave-end="opacity-0 transform scale-95"
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+        style="display: none;">
+        <div @click.away="openAddFasilitas = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
+            <div class="bg-gradient-to-r from-sky-500 to-indigo-600 text-white p-6 rounded-t-2xl">
+                <h2 class="text-2xl font-bold">Tambah Fasilitas</h2>
+                <p class="text-blue-100">Masukkan data fasilitas baru</p>
+            </div>
+
+            <form action="{{ route('logbook.facility.store') }}" method="POST" class="p-6">
+                @csrf
+                <input type="hidden" name="logbookID" value="{{ $logbook->logbookID ?? '' }}">
+
+                <div class="mb-2 sm:mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Fasilitas</label>
+                    <select name="facilityID"
+                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('facilityID') border-red-500 @enderror"
+                        required>
+                        <option value="">Pilih Fasilitas</option>
+                        @foreach($equipments as $equipment)
+                        <option value="{{ $equipment->id }}" {{ old('facilityID') == $equipment->id ? 'selected' : '' }}>
+                            {{ $equipment->name }}
+                        </option>
+                        @endforeach
+                    </select>
+                    @error('facilityID')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mb-2 sm:mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Jumlah</label>
+                    <input type="number" name="quantity" value="{{ old('quantity') }}"
+                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('quantity') border-red-500 @enderror"
+                        placeholder="Masukkan jumlah fasilitas" required>
+                    @error('quantity')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mb-2 sm:mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Keterangan</label>
+                    <textarea name="description" rows="3"
+                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('description') border-red-500 @enderror"
+                        placeholder="Masukkan keterangan fasilitas" required>{{ old('description') }}</textarea>
+                    @error('description')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="flex justify-end space-x-3">
+                    <button type="button" @click="openAddFasilitas = false"
+                        class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium">
+                        Batal
+                    </button>
+                    <button type="submit"
+                        class="px-6 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-xl hover:from-sky-600 hover:to-indigo-700 transition-all duration-200 font-medium shadow-lg">
+                        Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Edit Fasilitas -->
+    <div x-show="openEditFasilitas" x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform scale-95"
+        x-transition:enter-end="opacity-100 transform scale-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 transform scale-100"
+        x-transition:leave-end="opacity-0 transform scale-95"
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+        style="display: none;">
+        <div @click.away="openEditFasilitas = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
+            <div class="bg-gradient-to-r from-sky-500 to-indigo-600 text-white p-6 rounded-t-2xl">
+                <h2 class="text-2xl font-bold">Edit Fasilitas</h2>
+                <p class="text-blue-100">Perbarui data fasilitas</p>
+            </div>
+
+            <form x-bind:action="`{{ url('/logbook/facility/update') }}/${editFacilityData.id}`" method="POST" class="p-6">
+                @csrf
+                @method('POST')
+                <input type="hidden" name="logbookID" value="{{ $logbook->logbookID ?? '' }}">
+
+                <div class="mb-2 sm:mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Fasilitas</label>
+                    <select name="facilityID"
+                        x-model="editFacilityData.facilityID"
+                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('facilityID') border-red-500 @enderror"
+                        required>
+                        <option value="">-- Pilih Fasilitas --</option>
+                        @foreach($equipments as $equipment)
+                        <option value="{{ $equipment->id }}">
+                            {{ $equipment->name }}
+                        </option>
+                        @endforeach
+                    </select>
+                    @error('facilityID')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mb-2 sm:mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Jumlah</label>
+                    <input type="number" name="quantity"
+                        x-model="editFacilityData.quantity"
+                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('quantity') border-red-500 @enderror"
+                        placeholder="Masukkan jumlah fasilitas" required>
+                    @error('quantity')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mb-2 sm:mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Keterangan</label>
+                    <textarea name="description" rows="3"
+                        x-model="editFacilityData.description"
+                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('description') border-red-500 @enderror"
+                        placeholder="Masukkan keterangan fasilitas" required></textarea>
+                    @error('description')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="flex justify-end space-x-3">
+                    <button type="button" @click="openEditFasilitas = false"
+                        class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium">
+                        Batal
+                    </button>
+                    <button type="submit"
+                        class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 font-medium shadow-lg">
+                        Update
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
 
     <!-- Uraian Kegiatan Section -->
     <div class="bg-white shadow-xl rounded-2xl overflow-hidden mb-8 border border-gray-100">
-        <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-4 py-4 sm:px-6 sm:py-6 text-white">
+        <div class="bg-gradient-to-r from-sky-500 to-indigo-600 px-4 py-4 sm:px-6 sm:py-6 text-white">
             <div class="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
                 <div>
                     <h3 class="text-xl sm:text-2xl font-bold mb-1">{{ 'Uraian Kegiatan'}}</h3>
                 </div>
                 <div class="flex flex-col gap-2 sm:flex-row sm:gap-2 w-full sm:w-auto">
-                    <button @click="openAddDetail = true"
-                        class="w-full sm:w-auto px-4 py-2 bg-green-500 hover:bg-blue-600 text-white rounded-xl text-sm font-semibold shadow transition">
+                    <button @click="openAddDetailUraian = true"
+                        class="w-full sm:w-auto px-4 py-2 bg-blue-400 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold shadow transition">
                         + Tambah Uraian Kegiatan
                     </button>
                     <button @click="openFinishDialog = true; $nextTick(() => initializeSignaturePad())"
@@ -318,62 +947,77 @@
         </div>
 
         <!-- Mobile Card View Uraian Kegiatan -->
-        <div class="grid grid-cols-1 gap-2 md:hidden p-4">
+        <div class="grid grid-cols-1 gap-3 md:hidden p-4">
             @forelse($uraianKegiatan ?? [] as $index => $items)
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow duration-200">
+                <!-- Header -->
+                <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-4 text-white">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="font-medium">
+                                {{ \Carbon\Carbon::parse($items->start_time)->format('H:i') }}
+                                {{ $items->end_time ? ' - ' . \Carbon\Carbon::parse($items->end_time)->format('H:i') : '' }}
+                            </span>
+                        </div>
+                        <span class="text-blue-200 text-sm">#{{ $index + 1 }}</span>
+                    </div>
+                </div>
+
+                <!-- Content -->
                 <div class="p-4">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">
-                            {{ \Carbon\Carbon::parse($items->start_time)->format('H:i') }}
-                            {{ $items->end_time ? ' - ' . \Carbon\Carbon::parse($items->end_time)->format('H:i') : '' }}
-                        </span>
-                        <span class="text-xs text-gray-400">#{{ $index+1 }}</span>
-                    </div>
-                    <div class="mb-2">
-                        <p class="font-semibold text-gray-800 mb-1">{{ $items->summary }}</p>
-                        <p class="text-gray-600 text-sm">{{ $items->description }}</p>
-                    </div>
-                    <div class="flex justify-end space-x-2 mt-3">
-                        <!-- Edit button for mobile -->
+                    <h3 class="font-semibold text-gray-800 mb-2">{{ $items->summary }}</h3>
+                    <p class="text-gray-600 text-sm mb-4">{{ $items->description }}</p>
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-end space-x-2">
+                        <!-- Edit Button -->
                         <button type="button"
-                            class="p-2 bg-yellow-100 text-yellow-700 rounded-full hover:bg-yellow-200 transition-colors duration-200"
-                            title="Edit Uraian Kegiatan"
+                            class="flex items-center space-x-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors duration-200"
                             @click="openEditDetailFn({{ $items->id }}, '{{ \Carbon\Carbon::parse($items->start_time)->format('H:i') }}', '{{ $items->end_time ? \Carbon\Carbon::parse($items->end_time)->format('H:i') : '' }}', '{{ addslashes($items->summary ?? '') }}', '{{ addslashes($items->description ?? '') }}')">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
                                 </path>
                             </svg>
+                            <span class="text-sm">Edit</span>
                         </button>
 
-                        <!-- Delete button for mobile -->
-                        <form action="{{ route('logbook.detail.delete', $items->id) }}" method="POST"
-                            class="inline-block"
+                        <!-- Delete Button -->
+                        <form action="{{ route('logbook.detail.delete', $items->id) }}" method="POST" class="inline-block"
                             onsubmit="return confirmDelete('Apakah Anda yakin ingin menghapus uraian kegiatan ini?')">
                             @csrf
                             @method('DELETE')
                             <button type="submit"
-                                class="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors duration-200"
-                                title="Hapus Uraian Kegiatan">
+                                class="flex items-center space-x-1 px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors duration-200">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
                                     </path>
                                 </svg>
+                                <span class="text-sm">Hapus</span>
                             </button>
                         </form>
                     </div>
                 </div>
             </div>
             @empty
-            <div class="col-span-1 text-center py-12">
-                <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                    </path>
-                </svg>
-                <p class="text-gray-500 text-lg">Belum ada uraian kegiatan</p>
-                <p class="text-gray-400">Tambahkan uraian kegiatan pertama Anda</p>
+            <div class="text-center py-12">
+                <div class="bg-blue-100 p-6 rounded-2xl mb-4 inline-block">
+                    <svg class="w-12 h-12 text-blue-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">Belum Ada Uraian Kegiatan</h3>
+                <p class="text-gray-500 mb-4">Tambahkan uraian kegiatan untuk logbook ini</p>
+                <button @click="openAddDetailUraian = true"
+                    class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-md">
+                    Tambah Uraian Kegiatan
+                </button>
             </div>
             @endforelse
         </div>
@@ -383,22 +1027,19 @@
             <table class="min-w-full">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">No
-                        </th>
-                        <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                             Waktu</th>
-                        <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                             Uraian Kegiatan</th>
-                        <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                             Keterangan</th>
-                        <th class="px-5 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        <th class="px-5 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">
                             Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     @forelse($uraianKegiatan ?? [] as $index => $items)
                     <tr class="hover:bg-gray-50 transition-colors duration-200 cursor-pointer">
-                        <td class="px-5 py-4 text-blue-600 font-bold">{{ $index + 1 }}</td>
                         <td class="px-5 py-4">
                             {{ \Carbon\Carbon::parse($items->start_time)->format('H:i') }}
                             {{ $items->end_time ? ' - ' . \Carbon\Carbon::parse($items->end_time)->format('H:i') : '' }}
@@ -447,137 +1088,136 @@
                 </tbody>
             </table>
         </div>
+    </div>
 
-        <!-- Modal Tambah Uraian Kegiatan -->
-        <div x-show="openAddDetail" x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 transform scale-95"
-            x-transition:enter-end="opacity-100 transform scale-100"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100 transform scale-100"
-            x-transition:leave-end="opacity-0 transform scale-95"
-            class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-            style="display: none;">
-            <div @click.away="openAddDetail = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
-                <div class="bg-gradient-to-r from-blue-500 to-emerald-600 text-white p-6 rounded-t-2xl">
-                    <h2 class="text-2xl font-bold">Tambah Uraian Kegiatan</h2>
-                    <p class="text-blue-100">Masukkan uraian kegiatan baru</p>
+    <!-- Modal Tambah Uraian Kegiatan -->
+    <div x-show="openAddDetailUraian" x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform scale-95"
+        x-transition:enter-end="opacity-100 transform scale-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 transform scale-100"
+        x-transition:leave-end="opacity-0 transform scale-95"
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+        style="display: none;">
+        <div @click.away="openAddDetailUraian = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
+            <div class="bg-gradient-to-r from-sky-500 to-indigo-600 text-white p-6 rounded-t-2xl">
+                <h2 class="text-2xl font-bold">Tambah Uraian Kegiatan</h2>
+                <p class="text-blue-100">Masukkan uraian kegiatan baru</p>
+            </div>
+
+            <form action="{{ route('logbook.detail.store') }}" method="POST" class="p-6">
+                @csrf
+                <input type="hidden" name="logbookID" value="{{ $logbook->logbookID ?? '' }}">
+
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Waktu</label>
+                    <div class="flex space-x-4">
+                        <input type="time" name="start_time" value="{{ old('start_time') }}"
+                            class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('start_time') border-red-500 @enderror"
+                            required>
+
+                        <input type="time" name="end_time" value="{{ old('end_time') }}"
+                            class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('start_time') border-red-500 @enderror"
+                            required>
+                    </div>
+                    @error('start_time')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                    @error('end_time')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                <form action="{{ route('logbook.detail.store') }}" method="POST" class="p-6">
-                    @csrf
-                    <input type="hidden" name="logbookID" value="{{ $logbook->logbookID ?? '' }}">
-
-                    <div class="mb-6">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Waktu</label>
-                        <div class="flex space-x-4">
-                            <input type="time" name="start_time" value="{{ old('start_time') }}"
-                                class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('start_time') border-red-500 @enderror"
-                                required>
-
-                            <input type="time" name="end_time" value="{{ old('end_time') }}"
-                                class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('start_time') border-red-500 @enderror"
-                                required>
-                        </div>
-                        @error('start_time')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                        @error('end_time')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="mb-6">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Uraian Kegiatan</label>
-                        <input type="text" name="summary" value="{{ old('summary') }}"
-                            class="w-full border-2 px-4 py-3 rounded-xl focus:border-green-500 focus:outline-none transition-colors duration-200 @error('summary') border-red-500 @enderror"
-                            placeholder="Masukkan uraian kegiatan" required>
-                        @error('summary')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="mb-6">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Keterangan</label>
-                        <textarea name="description" rows="3"
-                            class="w-full border-2 px-4 py-3 rounded-xl focus:border-green-500 focus:outline-none transition-colors duration-200 @error('description') border-red-500 @enderror"
-                            placeholder="Masukkan keterangan" required>{{ old('description') }}</textarea>
-                        @error('description')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="flex justify-end space-x-3">
-                        <button type="button" @click="openAddDetail = false"
-                            class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium">
-                            Batal
-                        </button>
-                        <button type="submit"
-                            class="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 font-medium shadow-lg">
-                            Simpan
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Modal Edit Uraian Kegiatan -->
-        <div x-show="openEditDetail" x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 transform scale-95"
-            x-transition:enter-end="opacity-100 transform scale-100"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100 transform scale-100"
-            x-transition:leave-end="opacity-0 transform scale-95"
-            class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-            style="display: none;">
-            <div @click.away="openEditDetail = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
-                <div class="bg-gradient-to-r from-blue-500 to-teal-600 text-white p-6 rounded-t-2xl">
-                    <h2 class="text-2xl font-bold">Edit Uraian Kegiatan</h2>
-                    <p class="text-blue-100">Ubah informasi uraian kegiatan</p>
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Uraian Kegiatan</label>
+                    <input type="text" name="summary" value="{{ old('summary') }}"
+                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('summary') border-red-500 @enderror"
+                        placeholder="Masukkan uraian kegiatan" required>
+                    @error('summary')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
-                <form x-bind:action="`/logbook/detail/update/${editDetailData.id}`" method="POST" class="p-6">
-                    @csrf
-                    @method('POST')
-                    <div class="mb-6">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Waktu</label>
-                        <div class="flex space-x-4">
-                            <div class="w-full">
-                                <label class="block text-xs text-gray-500 mb-1">Waktu Mulai</label>
-                                <input type="time" name="start_time" required x-model="editDetailData.start_time"
-                                    class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
-                            </div>
-                            <div class="w-full">
-                                <label class="block text-xs text-gray-500 mb-1">Waktu Selesai</label>
-                                <input type="time" name="end_time" x-model="editDetailData.end_time"
-                                    class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
-                            </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Keterangan</label>
+                    <textarea name="description" rows="3"
+                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('description') border-red-500 @enderror"
+                        placeholder="Masukkan keterangan" required>{{ old('description') }}</textarea>
+                    @error('description')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="flex justify-end space-x-3">
+                    <button type="button" @click="openAddDetailUraian = false"
+                        class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium">
+                        Batal
+                    </button>
+                    <button type="submit"
+                        class="px-6 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-xl hover:from-sky-600 hover:to-indigo-700 transition-all duration-200 font-medium shadow-lg">
+                        Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Edit Uraian Kegiatan -->
+    <div x-show="openEditDetailUraian" x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform scale-95"
+        x-transition:enter-end="opacity-100 transform scale-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 transform scale-100"
+        x-transition:leave-end="opacity-0 transform scale-95"
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+        style="display: none;">
+        <div @click.away="openEditDetailUraian = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
+            <div class="bg-gradient-to-r from-sky-500 to-indigo-600 text-white p-6 rounded-t-2xl">
+                <h2 class="text-2xl font-bold">Edit Uraian Kegiatan</h2>
+                <p class="text-blue-100">Ubah informasi uraian kegiatan</p>
+            </div>
+            <form x-bind:action="`/logbook/detail/update/${editDetailData.id}`" method="POST" class="p-6">
+                @csrf
+                @method('POST')
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Waktu</label>
+                    <div class="flex space-x-4">
+                        <div class="w-full">
+                            <label class="block text-xs text-gray-500 mb-1">Waktu Mulai</label>
+                            <input type="time" name="start_time" required x-model="editDetailData.start_time"
+                                class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
+                        </div>
+                        <div class="w-full">
+                            <label class="block text-xs text-gray-500 mb-1">Waktu Selesai</label>
+                            <input type="time" name="end_time" x-model="editDetailData.end_time"
+                                class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
                         </div>
                     </div>
-                    <div class="mb-6">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Uraian Kegiatan</label>
-                        <input type="text" name="summary" required x-model="editDetailData.summary"
-                            class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200"
-                            placeholder="Masukkan uraian kegiatan">
-                    </div>
-                    <div class="mb-6">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Keterangan</label>
-                        <textarea name="description" required x-model="editDetailData.description"
-                            class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200"
-                            placeholder="Masukkan keterangan" rows="3"></textarea>
-                    </div>
-                    <div class="flex justify-end space-x-3">
-                        <button type="button" @click="openEditDetail = false"
-                            class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium">
-                            Batal
-                        </button>
-                        <button type="submit"
-                            class="px-6 py-3 bg-gradient-to-r from-blue-500 to-teal-600 text-white rounded-xl hover:from-blue-600 hover:to-teal-700 transition-all duration-200 font-medium shadow-lg">
-                            Perbarui
-                        </button>
-                    </div>
-                </form>
-            </div>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Uraian Kegiatan</label>
+                    <input type="text" name="summary" required x-model="editDetailData.summary"
+                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200"
+                        placeholder="Masukkan uraian kegiatan">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Keterangan</label>
+                    <textarea name="description" required x-model="editDetailData.description"
+                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200"
+                        placeholder="Masukkan keterangan" rows="3"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" @click="openEditDetailUraian = false"
+                        class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium">
+                        Batal
+                    </button>
+                    <button type="submit"
+                        class="px-6 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-xl hover:from-sky-600 hover:to-indigo-700 transition-all duration-200 font-medium shadow-lg">
+                        Perbarui
+                    </button>
+                </div>
+            </form>
         </div>
-
     </div>
 </div>
 
@@ -692,130 +1332,6 @@
         return true; // Lanjutkan pengiriman form
     }
 
-    async function submitDetail(event) {
-        event.preventDefault();
-
-        // Gunakan ID yang sesuai dengan HTML
-        const waktuMulai = document.getElementById('start_time').value;
-        const waktuSelesai = document.getElementById('end_time').value;
-        const uraian = document.getElementById('summary').value;
-        const keterangan = document.getElementById('description').value;
-        const logbookID = document.getElementById('logbookID').value;
-
-        // Validasi sederhana
-        if (!waktuMulai || !uraian || !keterangan || !logbookID) {
-            alert("Semua field wajib diisi.");
-            return;
-        }
-
-        try {
-            // Ambil CSRF token dari form atau meta tag
-            let csrfToken = document.querySelector('input[name="_token"]')?.value;
-            if (!csrfToken) {
-                csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            }
-
-            const response = await fetch("{{ route('logbook.detail.store') }}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": csrfToken
-                },
-                body: JSON.stringify({
-                    logbookID: logbookID,
-                    start_time: waktuMulai,
-                    end_time: waktuSelesai,
-                    summary: uraian,
-                    description: keterangan
-                })
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                // Reset form
-                document.getElementById('formDetail').reset();
-                document.querySelector('[x-data]').__x.$data.openAddDetail = false;
-
-                // Atau reload halaman untuk menampilkan data baru
-                window.location.reload();
-            } else {
-                alert("Gagal menyimpan data: " + (result.message ?? 'Terjadi kesalahan.'));
-            }
-
-        } catch (error) {
-            console.error("Error:", error);
-            alert("Terjadi kesalahan pada server.");
-        }
-    }
-
-    async function submitEditDetail(event) {
-        event.preventDefault();
-
-        // Ambil data dari Alpine.js
-        const alpineData = document.querySelector('[x-data]').__x.$data;
-        const editData = alpineData.editDetailData;
-
-        // Validasi sederhana
-        if (!editData.start_time || !editData.summary || !editData.description || !editData.id) {
-            alert("Semua field wajib diisi.");
-            return;
-        }
-
-        try {
-            // Ambil CSRF token dari form atau meta tag
-            let csrfToken = document.querySelector('input[name="_token"]')?.value;
-            if (!csrfToken) {
-                csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            }
-
-            // Show loading state
-            const submitButton = event.target.querySelector('button[type="submit"]');
-            const originalText = submitButton.textContent;
-            submitButton.textContent = 'Memperbarui...';
-            submitButton.disabled = true;
-
-            const response = await fetch(`/logbook/detail/update/${editData.id}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": csrfToken,
-                },
-                body: JSON.stringify({
-                    start_time: editData.start_time,
-                    end_time: editData.end_time,
-                    summary: editData.summary,
-                    description: editData.description
-                })
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                // Reset form dan tutup modal
-                alpineData.openEditDetail = false;
-
-                // Show success message
-                alert("Data berhasil diupdate!");
-
-                // Reload halaman untuk menampilkan data terbaru
-                window.location.reload();
-            } else {
-                alert("Gagal mengupdate data: " + (result.message ?? 'Terjadi kesalahan.'));
-            }
-
-        } catch (error) {
-            console.error("Error:", error);
-            alert("Terjadi kesalahan pada server.");
-        } finally {
-            // Reset button state
-            const submitButton = event.target.querySelector('button[type="submit"]');
-            if (submitButton) {
-                submitButton.textContent = originalText;
-                submitButton.disabled = false;
-            }
-        }
-    }
 
     function confirmDelete(message) {
         return confirm(message);

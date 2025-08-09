@@ -3,12 +3,17 @@
 namespace App\Http\Controllers\LogBook;
 
 use App\Http\Controllers\Controller;
+use App\Models\Equipment;
 use Illuminate\Http\Request;
 use App\Models\Logbook;
 use App\Models\Location;
 use App\Models\LogbookDetail;
+use App\Models\LogbookFacility;
+use App\Models\LogbookStaff;
 use Illuminate\Support\Facades\Auth;
+
 \Carbon\Carbon::setLocale('id');
+
 use Illuminate\Support\Facades\Log;
 
 
@@ -74,9 +79,6 @@ class LogbookPosJagaController extends Controller
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $logbookID)
     {
         // Validasi apakah user yang login adalah pemilik logbook
@@ -110,9 +112,6 @@ class LogbookPosJagaController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Logbook $logbook)
     {
         try {
@@ -125,7 +124,7 @@ class LogbookPosJagaController extends Controller
         }
     }
 
-
+    // Uraian Kegiatan
     public function storeDetail(Request $request)
     {
         $request->validate([
@@ -163,15 +162,25 @@ class LogbookPosJagaController extends Controller
         }
 
         $uraianKegiatan = LogbookDetail::where('logbookID', $id)->get();
+        $personil = LogbookStaff::with('user') // Tambahkan eager loading
+            ->where('logbookID', $id)
+            ->get();
+        $facility = LogbookFacility::with('equipments') // Eager load facility relation
+            ->where('logbookID', $id)->get();
+
+        // Tambahkan data equipments untuk dropdown form
+        $equipments = Equipment::orderBy('name', 'asc')->get();
 
         return view('logbook.posjaga.detailPosJaga', [
             'logbook' => $logbook,
             'uraianKegiatan' => $uraianKegiatan,
+            'personil' => $personil,
+            'facility' => $facility,
+            'equipments' => $equipments,
             'location' => $logbook->locationArea->name, // Ambil nama location dari relasi
             'location_id' => $logbook->location_area_id,
         ]);
     }
-
 
     public function deleteDetail($id)
     {
@@ -200,12 +209,6 @@ class LogbookPosJagaController extends Controller
                 'end_time' => 'nullable|string',
                 'summary' => 'required|string|max:255',
                 'description' => 'required|string|max:1000',
-            ], [
-                'start_time.required' => 'Waktu mulai wajib diisi',
-                'summary.required' => 'Uraian kegiatan wajib diisi',
-                'description.required' => 'Keterangan wajib diisi',
-                'summary.max' => 'Uraian kegiatan maksimal 255 karakter',
-                'description.max' => 'Keterangan maksimal 1000 karakter',
             ]);
 
             // Cari record berdasarkan ID
@@ -220,7 +223,7 @@ class LogbookPosJagaController extends Controller
             ]);
 
             // Redirect kembali dengan pesan sukses
-            return redirect()->back()->with('success', 'Uraian kegiatan berhasil diupdate');
+            return redirect()->back()->with('success', 'Uraian kegiatan berhasil diperbarui');
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Handle validation errors
             return redirect()->back()
@@ -229,9 +232,172 @@ class LogbookPosJagaController extends Controller
                 ->with('error', 'Terjadi kesalahan validasi data');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             // Handle record not found
-            return redirect()->back()->with('error', 'Data yang ingin diupdate tidak ditemukan');
+            return redirect()->back()->with('error', 'Data yang ingin diperbarui tidak ditemukan');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengupdate data. Silakan coba lagi.');
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat memperbarui data. Silakan coba lagi.');
+        }
+    }
+
+    // personil
+    public function storeStaff(Request $request)
+    {
+        $request->validate([
+            'logbookID'   => 'required|exists:logbooks,logbookID',
+            'staffID'     => 'required|exists:users,id',
+            'classification' => 'nullable|string|max:255',
+            'description'  => 'required|in:hadir,izin,sakit,cuti',
+        ]);
+
+        try {
+            $user = \App\Models\User::find($request->staffID);
+            LogbookStaff::create([
+                'logbookID' => $request->logbookID,
+                'staffID' => $request->staffID,
+                'classification' => $user->lisensi,
+                'description' => $request->description,
+            ]);
+
+            return redirect()->back()->with('success', 'Personil berhasil ditambahkan!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Gagal menambahkan personil. Silakan coba lagi.')
+                ->withInput();
+        }
+    }
+
+    public function updateStaff(Request $request, $id)
+    {
+        try {
+            // Validasi input
+            $validatedData = $request->validate([
+                'logbookID'   => 'required|exists:logbooks,logbookID',
+                'staffID'     => 'required|exists:users,id',
+                'classification' => 'nullable|string|max:255',
+                'description'  => 'required|in:hadir,izin,sakit,cuti',
+            ]);
+
+            // Cari record berdasarkan ID
+            $logbookStaff = LogbookStaff::findOrFail($id);
+
+            // Ambil lisensi dari user yang dipilih (konsisten dengan store)
+            $user = \App\Models\User::find($validatedData['staffID']);
+
+            // Update data
+            $updateData = [
+                'logbookID' => $validatedData['logbookID'],
+                'staffID' => $validatedData['staffID'],
+                'classification' => $user ? $user->lisensi : $validatedData['classification'], // Konsisten dengan store
+                'description' => $validatedData['description'],
+            ];
+
+            $logbookStaff->update($updateData);
+
+            return redirect()->back()->with('success', 'Personil berhasil diperbarui');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan validasi data');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return redirect()->back()->with('error', 'Data yang ingin diperbarui tidak ditemukan');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+    public function deleteStaff($id)
+    {
+        try {
+            // Cari detail berdasarkan ID
+            $logbookDetail = LogbookStaff::findOrFail($id);
+            // Hapus data
+            $logbookDetail->delete();
+            // Redirect kembali ke halaman detail dengan pesan sukses
+            return redirect()->back()->with([
+                'success' => 'Personil berhasil dihapus.',
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+            return redirect()
+                ->back()
+                ->with('error', 'Data tidak ditemukan!');
+        }
+    }
+
+    // fasilitas
+    public function storeFacility(Request $request)
+    {
+        $request->validate([
+            'logbookID'   => 'required|exists:logbooks,logbookID',
+            'facilityID'  => 'required|exists:equipment,id',
+            'quantity'  => 'required|integer|min:1',
+            'description'   => 'required|string|max:1000',
+        ]);
+
+        try {
+            // $facility = \App\Models\Equipment::find($request->facilityID);
+            LogbookFacility::create([
+                'logbookID' => $request->logbookID,
+                'facilityID'  => $request->facilityID,
+                'quantity'  => $request->quantity,
+                'description'   => $request->description,
+            ]);
+
+            return redirect()->back()->with('success', 'Fasilitas berhasil ditambahkan!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Gagal menambahkan personil. Silakan coba lagi.')
+                ->withInput();
+        }
+    }
+    public function updateFacility(Request $request, $id)
+    {
+        try {
+            // Validasi input - sesuai dengan struktur database Anda
+            $validatedData = $request->validate([
+                'logbookID'   => 'required|exists:logbooks,logbookID',
+                'facilityID'  => 'required|exists:equipment,id', // Ubah dari facility ke facilityID
+                'quantity'    => 'required|integer|min:1',
+                'description' => 'required|string|max:1000',
+            ]);
+
+            // Cari record berdasarkan ID
+            $logbookFacility = LogbookFacility::findOrFail($id);
+
+            // Update data sesuai dengan struktur database
+            $logbookFacility->update([
+                'logbookID'   => $validatedData['logbookID'],
+                'facilityID'  => $validatedData['facilityID'],
+                'quantity'    => $validatedData['quantity'],
+                'description' => $validatedData['description'],
+            ]);
+
+            return redirect()->back()->with('success', 'Fasilitas berhasil diperbarui');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan validasi data');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return redirect()->back()->with('error', 'Data yang ingin diperbarui tidak ditemukan');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteFacility($id)
+    {
+        try {
+            // Cari detail berdasarkan ID
+            $logbookDetail = LogbookFacility::findOrFail($id);
+            // Hapus data
+            $logbookDetail->delete();
+            // Redirect kembali ke halaman detail dengan pesan sukses
+            return redirect()->back()->with([
+                'success' => 'Fasilitas berhasil dihapus.',
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+            return redirect()
+                ->back()
+                ->with('error', 'Data tidak ditemukan!');
         }
     }
 

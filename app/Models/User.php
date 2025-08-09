@@ -13,6 +13,7 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
+        'id',
         'name',
         'nip',
         'lisensi',
@@ -70,5 +71,11 @@ class User extends Authenticatable
     public function locations(): HasMany
     {
         return $this->hasMany(Location::class, 'creationID');
-    }   
+    }
+
+
+    public function logbookStaff(): HasMany
+    {
+        return $this->hasMany(LogbookStaff::class, 'staffID', 'id');
+    }
 }
