@@ -424,9 +424,17 @@ class LogbookPosJagaController extends Controller
                 return redirect()->back()->with('error', 'Logbook tidak ditemukan');
             }
 
+            // Ambil data base64 dari request
+            $signature = $request->signature;
+
+            // Hapus prefix data URL jika ada, untuk menyimpan base64 murni
+            if (preg_match('/^data:image\/(\w+);base64,/', $signature, $type)) {
+                $signature = substr($signature, strpos($signature, ',') + 1);
+            }
+
             // Update dengan menggunakan fill dan save untuk menghindari masalah timestamps
             $logbook->fill([
-                'senderSignature' => $request->signature,
+                'senderSignature' => $signature,
                 'receivedID' => $request->receivedID,
                 'approvedID' => $request->approvedID,
                 'status' => 'submitted' // sesuai dengan enum yang ada di migration
@@ -442,6 +450,92 @@ class LogbookPosJagaController extends Controller
                 'signature_length' => strlen($request->signature ?? ''),
                 'receivedID' => $request->receivedID,
                 'approvedID' => $request->approvedID,
+                'stack_trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan saat menyimpan tanda tangan: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+
+    public function showReceivedLogbook($location, $logbookID)
+    {
+        try {
+            $logbook = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy'])
+                ->where('logbookID', $logbookID)
+                ->firstOrFail();
+
+            $logbookDetails = LogbookDetail::where('logbookID', $logbookID)->get();
+
+            return view('officer.receivedLogbook', [
+                'logbook' => $logbook,
+                'logbookDetails' => $logbookDetails
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Logbook tidak ditemukan');
+        }
+    }
+
+    public function signatureReceive(Request $request, $location, $logbookID)
+    {
+        Log::info('Signature Receive Request:', [
+            'logbookID' => $logbookID,
+            'location' => $location,
+            'has_signature' => $request->has('signature'),
+            'signature_length' => strlen($request->signature ?? '')
+        ]);
+
+        // Validasi input
+        $request->validate([
+            'signature' => 'required|string',
+        ], [
+            'signature.required' => 'Tanda tangan wajib diberikan',
+        ]);
+
+        try {
+            // Cari logbook berdasarkan primary key yang benar
+            $logbook = Logbook::find($logbookID);
+
+            if (!$logbook) {
+                return redirect()->back()->with('error', 'Logbook tidak ditemukan');
+            }
+
+            // Ambil data base64 dari request
+            $signature = $request->signature;
+
+            // Hapus prefix data URL jika ada, untuk menyimpan base64 murni
+            if (preg_match('/^data:image\/(\w+);base64,/', $signature, $type)) {
+                $signature = substr($signature, strpos($signature, ',') + 1);
+            }
+
+            // Update dengan menggunakan fill dan save untuk menghindari masalah timestamps
+            Log::info('Before saving signature:', [
+                'logbookID' => $logbookID,
+                'signature_length' => strlen($signature),
+                'current_status' => $logbook->status
+            ]);
+
+            $logbook->fill([
+                'receivedSignature' => $signature,
+                'status' => 'approved' // sesuai dengan enum yang ada di migration
+            ]);
+
+            $logbook->save();
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Logbook berhasil diterima.',
+                ]);
+            }
+
+            return redirect()->route('logbook.index', ['location' => $location])
+                ->with('success', 'Logbook berhasil diterima.');
+        } catch (\Exception $e) {
+            Log::error('Signature Receive Error: ' . $e->getMessage(), [
+                'logbookID' => $logbookID,
+                'signature_length' => strlen($request->signature ?? ''),
                 'stack_trace' => $e->getTraceAsString()
             ]);
 

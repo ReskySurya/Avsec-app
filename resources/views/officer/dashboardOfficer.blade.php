@@ -143,6 +143,84 @@
                 @endforelse
             </div>
         </div>
+
+        <div class="bg-green-50 p-4 rounded-lg mb-6 shadow-sm">
+            <h3 class="text-lg font-semibold text-green-800 mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+                List Logbook yang Diterima
+            </h3>
+
+            <!-- Desktop Table View (hidden on mobile) -->
+            <div class="hidden md:block overflow-x-auto">
+                <table class="min-w-full bg-white rounded-lg shadow-sm">
+                    <thead>
+                        <tr class="bg-green-100">
+                            <th class="px-4 py-3 text-left text-green-700 font-semibold">Tanggal</th>
+                            <th class="px-4 py-3 text-left text-green-700 font-semibold">Area</th>
+                            <th class="px-4 py-3 text-left text-green-700 font-semibold">Grup</th>
+                            <th class="px-4 py-3 text-left text-green-700 font-semibold">Shift</th>
+                            <th class="px-4 py-3 text-left text-green-700 font-semibold">Pengirim</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($logbookEntries as $logbook)
+                        <tr class="border-b hover:bg-green-50 transition-colors cursor-pointer" onclick="window.location.href='{{ route('officer.received.show', ['location' => $logbook->locationArea->name, 'logbookID' => $logbook->logbookID]) }}'">
+                            <td class="px-4 py-3">{{ $logbook->created_at->format('d/m/Y') }}</td>
+                            <td class="px-4 py-3">{{ $logbook->locationArea->name ?? '-' }}</td>
+                            <td class="px-4 py-3">{{ $logbook->grup }}</td>
+                            <td class="px-4 py-3">{{ $logbook->shift }}</td>
+                            <td class="px-4 py-3">{{ $logbook->senderBy->name ?? '-' }}</td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="5" class="px-4 py-8 text-center text-gray-500">
+                                <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                <p>Tidak ada Logbook yang Diterima</p>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Card View (visible on mobile only) -->
+            <div class="md:hidden space-y-4">
+                @forelse($logbookEntries as $logbook)
+                <div class="bg-white rounded-lg shadow-sm border-l-4 border-green-400 overflow-hidden cursor-pointer" onclick="window.location.href='{{ route('officer.received.show', ['location' => $logbook->locationArea->name, 'logbookID' => $logbook->logbookID]) }}'">
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900 uppercase">{{ $logbook->locationArea->name ?? '-' }}</p>
+                                    <p class="text-xs text-gray-500">Grup: {{ $logbook->grup }} | Shift: {{ $logbook->shift }}</p>
+                                </div>
+                            </div>
+                            <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">{{ $logbook->created_at->format('d/m/Y') }}</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <p class="text-sm font-medium text-gray-700 mb-1">Pengirim:</p>
+                            <p class="text-sm text-gray-600 bg-green-50 p-2 rounded">{{ $logbook->senderBy->name ?? '-' }}</p>
+                        </div>
+                    </div>
+                </div>
+                @empty
+                <div class="bg-white rounded-lg shadow-sm p-8 text-center">
+                    <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <p class="text-gray-500 text-sm">Tidak ada Logbook yang Diterima</p>
+                </div>
+                @endforelse
+            </div>
+        </div>
     </div>
 </div>
 @endsection

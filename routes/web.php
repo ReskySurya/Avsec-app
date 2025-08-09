@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\DailyTest\HhmdController;
-use App\Http\Controllers\DailyTestController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LogBook\LogbookSweppingPIController;
 use App\Http\Controllers\MasterDataController;
 use Illuminate\Support\Facades\Route;
@@ -36,7 +36,8 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
         return view('supervisor.dashboardSupervisor');
     })->name('dashboard.supervisor');
 
-    Route::get('/dashboard/supervisor/dailytest-form',  [DailyTestController::class, 'showData'])->name('supervisor.dailytest-form');
+    Route::get('/supervisor/dailytest-form',  [DashboardController::class, 'showDataDailyTest'])->name('supervisor.dailytest-form');
+    Route::get('/supervisor/logbook-form',  [DashboardController::class, 'showDataLogbook'])->name('supervisor.logbook-form');
 });
 
 // Officer Routes
@@ -52,7 +53,15 @@ Route::middleware(['auth', 'role:officer'])->group(function () {
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('officer.dashboardOfficer', compact('rejectedReports'));
+        $logbookEntries = \App\Models\Logbook::where('receivedID', Auth::id())
+            ->whereNull('receivedSignature')
+            ->with([
+                'locationArea:id,name',
+                'senderBy:id,name',
+            ])
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return view('officer.dashboardOfficer', compact('rejectedReports', 'logbookEntries'));
     })->name('dashboard.officer');
 
     Route::get('officer/edit-rejected-report/hhmd/{id}', [HhmdController::class, 'editRejectedReport'])->name('officer.hhmd.editRejectedReport');
@@ -70,7 +79,6 @@ Route::middleware(['auth'])->group(function () {
     // Daily Test HHMD Routes
     Route::get('/daily-test/hhmd', [HhmdController::class, 'hhmdLayout'])->name('daily-test.hhmd');
     Route::post('/daily-test/hhmd/check-submission', [HhmdController::class, 'checkSubmission'])->name('daily-test.hhmd.check-submission');
-    // Route::post('/daily-test/hhmd/check-location', [HhmdController::class, 'checkLocation'])->name('daily-test.hhmd.check-location');
     Route::post('/daily-test/hhmd/store', [HhmdController::class, 'store'])->name('daily-test.hhmd.store');
     Route::get('/daily-test/hhmd/get/{id}', [HhmdController::class, 'get'])->name('hhmd.get');
     Route::get('/daily-test/hhmd/review/{id}', [HhmdController::class, 'reviewForm'])->name('hhmd.reviewForm');
@@ -79,7 +87,6 @@ Route::middleware(['auth'])->group(function () {
 
     // Daily Test WTMD Routes
     Route::get('/daily-test/wtmd', [WtmdController::class, 'wtmdLayout'])->name('daily-test.wtmd');
-    // Route::post('/daily-test/wtmd/check-location', [WtmdController::class, 'checkLocation'])->name('daily-test.wtmd.check-location');
     Route::post('/daily-test/wtmd/store', [WtmdController::class, 'store'])->name('daily-test.wtmd.store');
     Route::get('/daily-test/wtmd/review/{id}', [WtmdController::class, 'reviewForm'])->name('wtmd.reviewForm');
     Route::patch('/daily-test/wtmd/update-status/{id}', [WtmdController::class, 'updateStatus'])->name('wtmd.updateStatus');
@@ -88,7 +95,6 @@ Route::middleware(['auth'])->group(function () {
 
     // Daily Test XRAY Routes
     Route::get('/daily-test/xraycabin', [XrayController::class, 'xrayCabinLayout'])->name('daily-test.xraycabin');
-    // Route::post('/daily-test/xray/check-location', [XrayController::class, 'checkLocation'])->name('daily-test.xrayCabin.check-location');
     Route::post('/daily-test/xraycabin/store', [XrayController::class, 'storeXrayCabin'])->name('daily-test.xrayCabin.store');
 
     Route::get('/daily-test/xraybagasi', [XrayController::class, 'xrayBagasiLayout'])->name('daily-test.xraybagasi');
@@ -138,18 +144,20 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/logbook/posjaga/{logbookID}', [LogbookPosJagaController::class, 'update'])->name('logbook.update');
     Route::delete('/logbook/posjaga/{logbook}', [LogbookPosJagaController::class, 'destroy'])->name('logbook.destroy');
     Route::post('/logbook/{location}/signature/send/{logbookID}', [LogbookPosJagaController::class, 'signatureSend'])->name('logbook.signature.send');
+    Route::post('/logbook/{location}/signature/receive/{logbookID}', [LogbookPosJagaController::class, 'signatureReceive'])->name('logbook.signature.receive');
 
     // Logbook Detail Pos Jaga
     Route::get('/logbook/posjaga/detail/{id}', [LogbookPosJagaController::class, 'detail'])->name('logbook.detail');
     Route::post('/logbook/detail/store', [LogbookPosJagaController::class, 'storeDetail'])->name('logbook.detail.store');
     Route::post('/logbook/detail/update/{id}', [LogbookPosJagaController::class, 'updateDetail'])->name('logbook.detail.update');
     Route::delete('/logbook/detail/delete/{id}', [LogbookPosJagaController::class, 'deleteDetail'])->name('logbook.detail.delete');
-    
-    Route::post('/logbook/staff/store', [LogbookPosJagaController::class, 'storeStaff'])->name('logbook.staff.store');
     Route::post('/logbook/staff/update/{id}', [LogbookPosJagaController::class, 'updateStaff'])->name('logbook.staff.update');
     Route::delete('/logbook/staff/delete/{id}', [LogbookPosJagaController::class, 'deleteStaff'])->name('logbook.staff.delete');
-    
+
     Route::post('/logbook/facility/store', [LogbookPosJagaController::class, 'storeFacility'])->name('logbook.facility.store');
     Route::post('/logbook/facility/update/{id}', [LogbookPosJagaController::class, 'updateFacility'])->name('logbook.facility.update');
     Route::delete('/logbook/facility/delete/{id}', [LogbookPosJagaController::class, 'deleteFacility'])->name('logbook.facility.delete');
+
+    // logbook Review
+    Route::get('/officer/received/{location}/{logbookID}', [LogbookPosJagaController::class, 'showReceivedLogbook'])->name('officer.received.show');
 });
