@@ -158,7 +158,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <div class="flex items-center justify-center space-x-2">
-                                    <a href="#"
+                                    <a href="{{ route('supervisor.logbook.detail', $logbook['id']) }}"
                                         class="inline-flex items-center px-3 py-1.5 border border-blue-300 text-sm font-medium rounded-md text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors duration-200">
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -255,7 +255,7 @@
 
                     <!-- Action Buttons -->
                     <div class="flex w-full">
-                        <a href="#"
+                        <a href="{{ route('supervisor.logbook.detail', $logbook['id']) }}"
                             class="inline-flex items-center justify-center w-full px-3 py-2 border border-blue-300 text-sm font-medium rounded-md text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors duration-200">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

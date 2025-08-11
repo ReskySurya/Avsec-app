@@ -10,6 +10,7 @@ use App\Models\Location;
 use App\Models\LogbookDetail;
 use App\Models\LogbookStaff;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 \Carbon\Carbon::setLocale('id');
 
@@ -33,22 +34,22 @@ class LogbookPosJagaController extends Controller
     public function index()
     {
         // Ambil ID user yang sedang login
-        $currentUserId =  Auth::id();
+        $currentUserId = Auth::id();
 
-        $logbooks = Logbook::with('locationArea') // Eager load the location area
-            ->where('senderID', $currentUserId) // Filter berdasarkan user yang login
+        $logbooks = Logbook::with('locationArea')
+            ->where('senderID', $currentUserId)
+            ->whereNull('senderSignature') // Hanya tampilkan jika senderSignature belum diisi
             ->orderBy('date', 'desc')
-            ->orderBy('created_at', 'desc') // Secondary ordering jika diperlukan
-            ->paginate(10); // Paginate the results
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
 
-        // Ambil semua locations untuk dropdown
         $locations = Location::whereIn('name', $this->allowedLocations)
             ->orderBy('name', 'asc')
             ->get();
 
         return view('logbook.posjaga.logbookPosJaga', [
             'logbooks' => $logbooks,
-            'locations' => $locations, // Pass locations to view
+            'locations' => $locations,
         ]);
     }
 
@@ -248,7 +249,7 @@ class LogbookPosJagaController extends Controller
         ]);
 
         try {
-            $user = \App\Models\User::find($request->staffID);
+            $user = User::find($request->staffID);
             LogbookStaff::create([
                 'logbookID' => $request->logbookID,
                 'staffID' => $request->staffID,
@@ -279,7 +280,7 @@ class LogbookPosJagaController extends Controller
             $logbookStaff = LogbookStaff::findOrFail($id);
 
             // Ambil lisensi dari user yang dipilih (konsisten dengan store)
-            $user = \App\Models\User::find($validatedData['staffID']);
+            $user = User::find($validatedData['staffID']);
 
             // Update data
             $updateData = [
@@ -462,23 +463,48 @@ class LogbookPosJagaController extends Controller
     {
         try {
             $logbook = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy'])
-                ->where('logbookID', $logbookID)
-                ->firstOrFail();
+            ->where('logbookID', $logbookID)
+            ->firstOrFail();
 
             $logbookDetails = LogbookDetail::where('logbookID', $logbookID)->get();
+            $personil = LogbookStaff::with('user')
+            ->where('logbookID', $logbookID)
+            ->get();
+            $facility = LogbookFacility::with('equipments')
+            ->where('logbookID', $logbookID)->get();
 
-            $personil = LogbookStaff::with('user') // Tambahkan eager loading
-                ->where('logbookID', $logbookID)
-                ->get();
-            $facility = LogbookFacility::with('equipments') // Eager load facility relation
-                ->where('logbookID', $logbookID)->get();
-
-            
             return view('officer.receivedLogbook', [
                 'logbook' => $logbook,
                 'personil' => $personil,
                 'facility' => $facility,
                 'logbookDetails' => $logbookDetails
+            ]);
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Logbook tidak ditemukan');
+        }
+    }
+
+    public function supervisorReviewLogbook($logbookID)
+    {
+        try {
+            $logbook = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy'])
+                ->where('logbookID', $logbookID)
+                ->firstOrFail();
+
+            $logbookDetails = LogbookDetail::where('logbookID', $logbookID)->get();
+
+            $personil = LogbookStaff::with('user')
+            ->where('logbookID', $logbookID)
+            ->get();
+            $facility = LogbookFacility::with('equipments')
+            ->where('logbookID', $logbookID)->get();
+
+            return view('supervisor.logbookReview', [
+                'logbook' => $logbook,
+                'logbookDetails' => $logbookDetails,
+                'personil' => $personil,
+                'facility' => $facility
             ]);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Logbook tidak ditemukan');
@@ -551,5 +577,77 @@ class LogbookPosJagaController extends Controller
                 ->with('error', 'Terjadi kesalahan saat menyimpan tanda tangan: ' . $e->getMessage())
                 ->withInput();
         }
+    }
+
+    public function signatureApprove(Request $request, $logbookID)
+    {
+        Log::info('Signature Receive Request:', [
+            'logbookID' => $logbookID,
+            'has_signature' => $request->has('signature'),
+            'signature_length' => strlen($request->signature ?? '')
+        ]);
+
+        // Validasi input
+        $request->validate([
+            'signature' => 'required|string',
+        ], [
+            'signature.required' => 'Tanda tangan wajib diberikan',
+        ]);
+
+        try {
+            // Cari logbook berdasarkan primary key yang benar
+            $logbook = Logbook::find($logbookID);
+
+            if (!$logbook) {
+                return redirect()->back()->with('error', 'Logbook tidak ditemukan');
+            }
+
+            // Ambil data base64 dari request
+            $signature = $request->signature;
+
+            // Hapus prefix data URL jika ada, untuk menyimpan base64 murni
+            if (preg_match('/^data:image\/(\w+);base64,/', $signature, $type)) {
+                $signature = substr($signature, strpos($signature, ',') + 1);
+            }
+
+            // Update dengan menggunakan fill dan save untuk menghindari masalah timestamps
+            Log::info('Before saving signature:', [
+                'logbookID' => $logbookID,
+                'signature_length' => strlen($signature),
+                'current_status' => $logbook->status
+            ]);
+
+            $logbook->fill([
+                'approvedSignature' => $signature,
+                'status' => 'approved' // sesuai dengan enum yang ada di migration
+            ]);
+
+            $logbook->save();
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Logbook berhasil diterima.',
+                ]);
+            }
+
+            return redirect()->route('supervisor.logbook-form', ['logbookID' => $logbookID])
+                ->with('success', 'Logbook berhasil diterima.');
+        } catch (\Exception $e) {
+            Log::error('Signature Receive Error: ' . $e->getMessage(), [
+                'logbookID' => $logbookID,
+                'signature_length' => strlen($request->signature ?? ''),
+                'stack_trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan saat menyimpan tanda tangan: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+
+    public function logbookReview()
+    {
+
     }
 }
