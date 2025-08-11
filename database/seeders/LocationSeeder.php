@@ -55,7 +55,10 @@ class LocationSeeder extends Seeder
             'PSCP',
             'CCTV',
             'Patroli',
-            'Walking Patrol'
+            'Walking Patrol',
+            'Sweeping PI',
+            'Rotasi HBSCP',
+            'Rotasi PSCP',
         ];
 
         foreach ($additionalLocations as $location) {

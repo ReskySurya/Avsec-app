@@ -66,7 +66,7 @@
         },
         editPersonilData: {
             id: null,
-            staffID: null, 
+            staffID: null,
             nama: '',
             classification: '',
             description: ''
@@ -108,7 +108,7 @@
         },
         openEditPersonilFn(id, staffID, nama, classification, description) {  // Tambahkan parameter staffID
             this.editPersonilData.id = id;
-            this.editPersonilData.staffID = staffID; 
+            this.editPersonilData.staffID = staffID;
             this.editPersonilData.nama = nama || '';
             this.editPersonilData.classification = classification || '';
             this.editPersonilData.description = description || '';
@@ -140,7 +140,8 @@
             <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 cursor-pointer">
                 <div class="p-5">
                     <div class="flex items-center justify-between mb-3">
-                        <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">{{ \Carbon\Carbon::parse($logbook->tanggal)->translatedFormat('l,
+                        <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">{{
+                            \Carbon\Carbon::parse($logbook->tanggal)->translatedFormat('l,
                             d F Y') }}</span>
                         <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-teal-100 rounded-full">{{
                             $logbook->shift ?? 'N/A' }}</span>
@@ -213,7 +214,8 @@
         <!-- Mobile Card View Personil -->
         <div class="grid grid-cols-1 gap-3 md:hidden p-4">
             @forelse($personil ?? [] as $index => $items)
-            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow duration-200">
+            <div
+                class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow duration-200">
                 <!-- Header -->
                 <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-4 text-white">
                     <div class="flex items-center justify-between">
@@ -223,7 +225,7 @@
                                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
                                 </path>
                             </svg>
-                            <span class="font-semibold">{{  $items->classification  }}</span>
+                            <span class="font-semibold">{{ $items->classification }}</span>
                         </div>
                         <span class="text-blue-200 text-sm">#{{ $index + 1 }}</span>
                     </div>
@@ -259,7 +261,8 @@
                         </button>
 
                         <!-- Delete Button -->
-                        <form action="{{ route('logbook.staff.delete', $items->id) }}" method="POST" class="inline-block"
+                        <form action="{{ route('logbook.staff.delete', $items->id) }}" method="POST"
+                            class="inline-block"
                             onsubmit="return confirmDelete('Apakah Anda yakin ingin menghapus personil ini?')">
                             @csrf
                             @method('DELETE')
@@ -301,10 +304,14 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">No</th>
-                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Nama</th>
-                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Klasifikasi</th>
-                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Keterangan</th>
-                        <th class="px-5 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Aksi</th>
+                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Nama
+                        </th>
+                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            Klasifikasi</th>
+                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            Keterangan</th>
+                        <th class="px-5 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Aksi
+                        </th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -314,7 +321,7 @@
                         <td class="px-5 py-4">{{ $items->user->name ?? 'N/A' }}</td>
                         <td class="px-5 py-4">{{ $items->classification ?? 'N/A' }}</td>
                         <td class="px-5 py-4">
-                            <span class="px-3 py-1 rounded-full text-sm font-medium 
+                            <span class="px-3 py-1 rounded-full text-sm font-medium
                                 @if($items->description == 'hadir') bg-green-100 text-green-800
                                 @elseif($items->description == 'izin') bg-yellow-100 text-yellow-800
                                 @elseif($items->description == 'sakit') bg-red-100 text-red-800
@@ -368,13 +375,10 @@
 
     <!-- Modal Tambah Personil -->
     <div x-show="openAddPersonil" x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0 transform scale-95"
-        x-transition:enter-end="opacity-100 transform scale-100"
-        x-transition:leave="transition ease-in duration-200"
-        x-transition:leave-start="opacity-100 transform scale-100"
+        x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100"
+        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform scale-100"
         x-transition:leave-end="opacity-0 transform scale-95"
-        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-        style="display: none;">
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
         <div @click.away="openAddPersonil = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
             <div class="bg-gradient-to-r from-sky-500 to-indigo-600 text-white p-6 rounded-t-2xl">
                 <h2 class="text-2xl font-bold">Tambah Personil</h2>
@@ -386,8 +390,7 @@
                 <input type="hidden" name="logbookID" value="{{ $logbook->logbookID ?? '' }}">
 
                 <div class="mb-2 sm:mb-4">
-                    <label for="staffID"
-                        class="block text-gray-700 font-semibold text-sm sm:text-sm mb-1 sm:mb-2">
+                    <label for="staffID" class="block text-gray-700 font-semibold text-sm sm:text-sm mb-1 sm:mb-2">
                         Nama
                     </label>
 
@@ -397,7 +400,9 @@
                     })->get();
                     @endphp
 
-                    <select name="staffID" id="staffID" class="w-full border-2 px-4 py-3 rounded-xl focus:border-sky-500 focus:outline-none transition-colors duration-200 @error('staffID') border-red-500 @enderror" required>
+                    <select name="staffID" id="staffID"
+                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-sky-500 focus:outline-none transition-colors duration-200 @error('staffID') border-red-500 @enderror"
+                        required>
                         <option value="">Pilih Officer</option>
                         @foreach($officers as $officer)
                         <option value="{{ $officer->id }}" data-lisensi="{{ $officer->lisensi }}">
@@ -417,10 +422,10 @@
                         class="w-full border-2 px-4 py-3 rounded-xl focus:border-sky-500 focus:outline-none transition-colors duration-200 @error('description') border-red-500 @enderror"
                         required>
                         <option value="">Pilih Keterangan</option>
-                        <option value="hadir" {{ old('description') == 'hadir' ? 'selected' : '' }}>Hadir</option>
-                        <option value="izin" {{ old('description') == 'izin' ? 'selected' : '' }}>Izin</option>
-                        <option value="sakit" {{ old('description') == 'sakit' ? 'selected' : '' }}>Sakit</option>
-                        <option value="cuti" {{ old('description') == 'cuti' ? 'selected' : '' }}>Cuti</option>
+                        <option value="hadir" {{ old('description')=='hadir' ? 'selected' : '' }}>Hadir</option>
+                        <option value="izin" {{ old('description')=='izin' ? 'selected' : '' }}>Izin</option>
+                        <option value="sakit" {{ old('description')=='sakit' ? 'selected' : '' }}>Sakit</option>
+                        <option value="cuti" {{ old('description')=='cuti' ? 'selected' : '' }}>Cuti</option>
                     </select>
                     @error('description')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -443,13 +448,10 @@
 
     <!-- Modal Edit Personil -->
     <div x-show="openEditPersonil" x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0 transform scale-95"
-        x-transition:enter-end="opacity-100 transform scale-100"
-        x-transition:leave="transition ease-in duration-200"
-        x-transition:leave-start="opacity-100 transform scale-100"
+        x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100"
+        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform scale-100"
         x-transition:leave-end="opacity-0 transform scale-95"
-        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-        style="display: none;">
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
         <div @click.away="openEditPersonil = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
             <div class="bg-gradient-to-r from-sky-500 to-indigo-600 text-white p-6 rounded-t-2xl">
                 <h2 class="text-2xl font-bold">Edit Personil</h2>
@@ -473,7 +475,8 @@
                     @endphp
 
                     <select name="staffID" id="edit_staffID" x-model="editPersonilData.staffID"
-                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-sky-500 focus:outline-none transition-colors duration-200" required>
+                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-sky-500 focus:outline-none transition-colors duration-200"
+                        required>
                         <option value="">Pilih Officer</option>
                         @foreach($officers as $officer)
                         <option value="{{ $officer->id }}" data-lisensi="{{ $officer->lisensi }}">
@@ -535,7 +538,8 @@
         <!-- Mobile Card View Fasilitas -->
         <div class="grid grid-cols-1 gap-3 md:hidden p-4">
             @forelse($facility ?? [] as $index => $items)
-            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow duration-200">
+            <div
+                class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow duration-200">
                 <!-- Header Card -->
                 <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-4">
                     <div class="flex items-center justify-between text-white">
@@ -548,7 +552,8 @@
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="font-semibold text-lg">{{ $items->equipments->name ?? 'Unknown Equipment' }}</h3>
+                                <h3 class="font-semibold text-lg">{{ $items->equipments->name ?? 'Unknown Equipment' }}
+                                </h3>
                             </div>
                         </div>
                         <div class="text-center">
@@ -581,7 +586,8 @@
                         </button>
 
                         <!-- Delete Button -->
-                        <form action="{{ route('logbook.facility.delete', $items->id) }}" method="POST" class="inline-block"
+                        <form action="{{ route('logbook.facility.delete', $items->id) }}" method="POST"
+                            class="inline-block"
                             onsubmit="return confirmDelete('Apakah Anda yakin ingin menghapus fasilitas ini?')">
                             @csrf
                             @method('DELETE')
@@ -623,17 +629,21 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">No</th>
-                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Fasilitas</th>
-                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Jumlah</th>
-                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Keterangan</th>
-                        <th class="px-5 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Aksi</th>
+                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            Fasilitas</th>
+                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Jumlah
+                        </th>
+                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            Keterangan</th>
+                        <th class="px-5 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Aksi
+                        </th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     @forelse($facility ?? [] as $index => $items)
                     <tr class="hover:bg-gray-50 transition-colors duration-200 cursor-pointer">
                         <td class="px-5 py-4 text-sky-600 font-bold">{{ $index + 1 }}</td>
-                        <td class="px-5 py-4">{{ $items->equipments->name ?? 'N/A'  }}</td>
+                        <td class="px-5 py-4">{{ $items->equipments->name ?? 'N/A' }}</td>
                         <td class="px-5 py-4">{{ $items->quantity }}</td>
                         <td class="px-5 py-4">{{ $items->description }}</td>
                         <td class="px-5 py-4 flex justify-center space-x-2" @click.stop>
@@ -682,13 +692,10 @@
 
     <!-- Modal Tambah Fasilitas -->
     <div x-show="openAddFasilitas" x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0 transform scale-95"
-        x-transition:enter-end="opacity-100 transform scale-100"
-        x-transition:leave="transition ease-in duration-200"
-        x-transition:leave-start="opacity-100 transform scale-100"
+        x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100"
+        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform scale-100"
         x-transition:leave-end="opacity-0 transform scale-95"
-        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-        style="display: none;">
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
         <div @click.away="openAddFasilitas = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
             <div class="bg-gradient-to-r from-sky-500 to-indigo-600 text-white p-6 rounded-t-2xl">
                 <h2 class="text-2xl font-bold">Tambah Fasilitas</h2>
@@ -706,7 +713,7 @@
                         required>
                         <option value="">Pilih Fasilitas</option>
                         @foreach($equipments as $equipment)
-                        <option value="{{ $equipment->id }}" {{ old('facilityID') == $equipment->id ? 'selected' : '' }}>
+                        <option value="{{ $equipment->id }}" {{ old('facilityID')==$equipment->id ? 'selected' : '' }}>
                             {{ $equipment->name }}
                         </option>
                         @endforeach
@@ -752,28 +759,25 @@
 
     <!-- Modal Edit Fasilitas -->
     <div x-show="openEditFasilitas" x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0 transform scale-95"
-        x-transition:enter-end="opacity-100 transform scale-100"
-        x-transition:leave="transition ease-in duration-200"
-        x-transition:leave-start="opacity-100 transform scale-100"
+        x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100"
+        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform scale-100"
         x-transition:leave-end="opacity-0 transform scale-95"
-        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-        style="display: none;">
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
         <div @click.away="openEditFasilitas = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
             <div class="bg-gradient-to-r from-sky-500 to-indigo-600 text-white p-6 rounded-t-2xl">
                 <h2 class="text-2xl font-bold">Edit Fasilitas</h2>
                 <p class="text-blue-100">Perbarui data fasilitas</p>
             </div>
 
-            <form x-bind:action="`{{ url('/logbook/facility/update') }}/${editFacilityData.id}`" method="POST" class="p-6">
+            <form x-bind:action="`{{ url('/logbook/facility/update') }}/${editFacilityData.id}`" method="POST"
+                class="p-6">
                 @csrf
                 @method('POST')
                 <input type="hidden" name="logbookID" value="{{ $logbook->logbookID ?? '' }}">
 
                 <div class="mb-2 sm:mb-4">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Fasilitas</label>
-                    <select name="facilityID"
-                        x-model="editFacilityData.facilityID"
+                    <select name="facilityID" x-model="editFacilityData.facilityID"
                         class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('facilityID') border-red-500 @enderror"
                         required>
                         <option value="">-- Pilih Fasilitas --</option>
@@ -790,8 +794,7 @@
 
                 <div class="mb-2 sm:mb-4">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Jumlah</label>
-                    <input type="number" name="quantity"
-                        x-model="editFacilityData.quantity"
+                    <input type="number" name="quantity" x-model="editFacilityData.quantity"
                         class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('quantity') border-red-500 @enderror"
                         placeholder="Masukkan jumlah fasilitas" required>
                     @error('quantity')
@@ -801,8 +804,7 @@
 
                 <div class="mb-2 sm:mb-4">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Keterangan</label>
-                    <textarea name="description" rows="3"
-                        x-model="editFacilityData.description"
+                    <textarea name="description" rows="3" x-model="editFacilityData.description"
                         class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('description') border-red-500 @enderror"
                         placeholder="Masukkan keterangan fasilitas" required></textarea>
                     @error('description')
@@ -862,7 +864,9 @@
                     <p class="text-blue-100">Konfirmasi penyelesaian logbook shift hari ini</p>
                 </div>
 
-                <form action="{{ route('logbook.signature.send', ['location' => $location, 'logbookID' => $logbook->logbookID]) }}" method="POST" class="p-6" onsubmit="return handleSignatureSubmit(event)">
+                <form
+                    action="{{ route('logbook.signature.send', ['location' => $location, 'logbookID' => $logbook->logbookID]) }}"
+                    method="POST" class="p-6" onsubmit="return handleSignatureSubmit(event)">
                     @csrf
                     @method('POST')
                     <div class="mb-6">
@@ -899,7 +903,9 @@
                         @php
                         $officers = \App\Models\User::whereHas('role', function ($query) {
                         $query->where('name', \App\Models\Role::OFFICER);
-                        })->get();
+                        })
+                        ->where('id', '!=', auth()->id()) // Mengecualikan user yang sedang login
+                        ->get();
                         @endphp
 
                         <select name="receivedID" id="receivedID"
@@ -949,17 +955,20 @@
         <!-- Mobile Card View Uraian Kegiatan -->
         <div class="grid grid-cols-1 gap-3 md:hidden p-4">
             @forelse($uraianKegiatan ?? [] as $index => $items)
-            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow duration-200">
+            <div
+                class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow duration-200">
                 <!-- Header -->
                 <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-4 text-white">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                             <span class="font-medium">
                                 {{ \Carbon\Carbon::parse($items->start_time)->format('H:i') }}
-                                {{ $items->end_time ? ' - ' . \Carbon\Carbon::parse($items->end_time)->format('H:i') : '' }}
+                                {{ $items->end_time ? ' - ' . \Carbon\Carbon::parse($items->end_time)->format('H:i') :
+                                '' }}
                             </span>
                         </div>
                         <span class="text-blue-200 text-sm">#{{ $index + 1 }}</span>
@@ -986,7 +995,8 @@
                         </button>
 
                         <!-- Delete Button -->
-                        <form action="{{ route('logbook.detail.delete', $items->id) }}" method="POST" class="inline-block"
+                        <form action="{{ route('logbook.detail.delete', $items->id) }}" method="POST"
+                            class="inline-block"
                             onsubmit="return confirmDelete('Apakah Anda yakin ingin menghapus uraian kegiatan ini?')">
                             @csrf
                             @method('DELETE')
@@ -1092,13 +1102,10 @@
 
     <!-- Modal Tambah Uraian Kegiatan -->
     <div x-show="openAddDetailUraian" x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0 transform scale-95"
-        x-transition:enter-end="opacity-100 transform scale-100"
-        x-transition:leave="transition ease-in duration-200"
-        x-transition:leave-start="opacity-100 transform scale-100"
+        x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100"
+        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform scale-100"
         x-transition:leave-end="opacity-0 transform scale-95"
-        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-        style="display: none;">
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
         <div @click.away="openAddDetailUraian = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
             <div class="bg-gradient-to-r from-sky-500 to-indigo-600 text-white p-6 rounded-t-2xl">
                 <h2 class="text-2xl font-bold">Tambah Uraian Kegiatan</h2>
@@ -1164,13 +1171,10 @@
 
     <!-- Modal Edit Uraian Kegiatan -->
     <div x-show="openEditDetailUraian" x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0 transform scale-95"
-        x-transition:enter-end="opacity-100 transform scale-100"
-        x-transition:leave="transition ease-in duration-200"
-        x-transition:leave-start="opacity-100 transform scale-100"
+        x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100"
+        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform scale-100"
         x-transition:leave-end="opacity-0 transform scale-95"
-        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-        style="display: none;">
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
         <div @click.away="openEditDetailUraian = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
             <div class="bg-gradient-to-r from-sky-500 to-indigo-600 text-white p-6 rounded-t-2xl">
                 <h2 class="text-2xl font-bold">Edit Uraian Kegiatan</h2>

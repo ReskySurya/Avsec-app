@@ -5,7 +5,16 @@
 @endpush
 
 @section('content')
-<div class="max-w-4xl mx-auto bg-white p-6 mt-10 lg:mt-20 shadow-md border text-sm">
+<div class="max-w-4xl mx-auto lg:mt-20 mt-5">
+    <a href="{{ route('supervisor.logbook-form') }}"
+        class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-semibold rounded-lg shadow transition">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Kembali
+    </a>
+</div>
+<div class="max-w-4xl mx-auto bg-white p-6 mt-6 shadow-md border text-sm">
     {{-- Logo dan Header --}}
     <div class="flex justify-between items-start mb-4">
         <div>
