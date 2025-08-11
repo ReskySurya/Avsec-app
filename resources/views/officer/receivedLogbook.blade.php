@@ -5,12 +5,23 @@
 @endpush
 
 @section('content')
-<div class="max-w-4xl mx-auto bg-white p-6 mt-10 lg:mt-20 shadow-md border text-sm">
+<div class="max-w-4xl mx-auto lg:mt-20 mt-5">
+    <a href="{{ route('dashboard.officer') }}"
+        class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-semibold rounded-lg shadow transition">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Kembali
+    </a>
+</div>
+<div class="max-w-4xl mx-auto bg-white p-6 mt-6 shadow-md border text-sm">
+
     {{-- Logo dan Header --}}
     <div class="flex justify-between items-start mb-4">
         <div>
             <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo" class="h-10 mb-2">
-            <p class="text-xs text-gray-500">LOKASI: <span class="font-semibold">{{ $logbook->locationArea->name }}</span></p>
+            <p class="text-xs text-gray-500">LOKASI: <span class="font-semibold">{{ $logbook->locationArea->name
+                    }}</span></p>
             <p class="text-xs text-gray-500">HARI / TANGGAL: <span class="font-semibold">{{
                     \Carbon\Carbon::parse($logbook->created_at)->translatedFormat('l, d F Y') }}</span></p>
             <p class="text-xs text-gray-500">DINAS / SHIFT: <span class="font-semibold">{{ $logbook->shift }}</span></p>
@@ -104,11 +115,14 @@
                 <p>Yang Menerima</p>
                 @if($logbook->receivedSignature)
                 <div class="h-16 flex items-center justify-center">
-                    <img src="data:image/png;base64,{!! $logbook->receivedSignature !!}" class="h-16 mt-5" alt="Tanda Tangan Penerima">
+                    <img src="data:image/png;base64,{!! $logbook->receivedSignature !!}" class="h-16 mt-5"
+                        alt="Tanda Tangan Penerima">
                 </div>
                 <p class="font-semibold mt-1">{{ $logbook->receiverBy->name ?? '-' }}</p>
                 @else
-                <form action="{{ route('logbook.signature.receive', ['location' => $logbook->locationArea->name, 'logbookID' => $logbook->logbookID]) }}" method="POST" onsubmit="return handleSignatureSubmit(event)">
+                <form
+                    action="{{ route('logbook.signature.receive', ['location' => $logbook->locationArea->name, 'logbookID' => $logbook->logbookID]) }}"
+                    method="POST" onsubmit="return handleSignatureSubmit(event)">
                     @csrf
                     <div class="border-2 border-gray-200 rounded-xl p-4 my-2">
                         <div class="relative w-full h-32 border border-gray-300 rounded-lg bg-white">
@@ -116,11 +130,14 @@
                         </div>
                         <input type="hidden" name="signature" id="signature-data-receiver">
                         <div class="flex justify-between items-center mt-2">
-                            <span id="signature-status-receiver" class="text-xs text-gray-500">Belum ada tanda tangan</span>
-                            <button type="button" class="text-sm text-blue-600 hover:text-blue-800" onclick="clearSignatureReceiver()">Clear</button>
+                            <span id="signature-status-receiver" class="text-xs text-gray-500">Belum ada tanda
+                                tangan</span>
+                            <button type="button" class="text-sm text-blue-600 hover:text-blue-800"
+                                onclick="clearSignatureReceiver()">Clear</button>
                         </div>
                     </div>
-                    <button type="submit" class="w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-semibold shadow transition">
+                    <button type="submit"
+                        class="w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-semibold shadow transition">
                         Konfirmasi & Terima
                     </button>
                 </form>
@@ -147,8 +164,7 @@
             <p>Mengetahui,</p>
             <div class="h-16 flex items-center justify-center">
                 @if($logbook->approvedSignature)
-                <img src="data:image/png;base64,{!! $logbook->approvedSignature !!}" class="h-12"
-                    alt="Tanda Tangan">
+                <img src="data:image/png;base64,{!! $logbook->approvedSignature !!}" class="h-12" alt="Tanda Tangan">
                 @else
                 <span class="italic text-gray-400">Belum tanda tangan</span>
                 @endif
