@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\LogBook;
 
 use App\Http\Controllers\Controller;
@@ -38,7 +39,8 @@ class LogbookPosJagaController extends Controller
 
         $logbooks = Logbook::with('locationArea')
             ->where('senderID', $currentUserId)
-            ->whereNull('senderSignature') // Hanya tampilkan jika senderSignature belum diisi
+            // ->whereNull('senderSignature') 
+            ->where('status', 'draft') // Hanya tampilkan logbook dengan status draft
             ->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -463,15 +465,15 @@ class LogbookPosJagaController extends Controller
     {
         try {
             $logbook = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy'])
-            ->where('logbookID', $logbookID)
-            ->firstOrFail();
+                ->where('logbookID', $logbookID)
+                ->firstOrFail();
 
             $logbookDetails = LogbookDetail::where('logbookID', $logbookID)->get();
             $personil = LogbookStaff::with('user')
-            ->where('logbookID', $logbookID)
-            ->get();
+                ->where('logbookID', $logbookID)
+                ->get();
             $facility = LogbookFacility::with('equipments')
-            ->where('logbookID', $logbookID)->get();
+                ->where('logbookID', $logbookID)->get();
 
             return view('officer.receivedLogbook', [
                 'logbook' => $logbook,
@@ -479,7 +481,6 @@ class LogbookPosJagaController extends Controller
                 'facility' => $facility,
                 'logbookDetails' => $logbookDetails
             ]);
-
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Logbook tidak ditemukan');
         }
@@ -495,10 +496,10 @@ class LogbookPosJagaController extends Controller
             $logbookDetails = LogbookDetail::where('logbookID', $logbookID)->get();
 
             $personil = LogbookStaff::with('user')
-            ->where('logbookID', $logbookID)
-            ->get();
+                ->where('logbookID', $logbookID)
+                ->get();
             $facility = LogbookFacility::with('equipments')
-            ->where('logbookID', $logbookID)->get();
+                ->where('logbookID', $logbookID)->get();
 
             return view('supervisor.logbookReview', [
                 'logbook' => $logbook,
@@ -646,8 +647,26 @@ class LogbookPosJagaController extends Controller
         }
     }
 
-    public function logbookReview()
+    public function rejectLogbook(Request $request, $logbookID)
     {
+        try {
+            // Validasi input untuk alasan reject (opsional)
+            $request->validate([
+                'reject_reason' => 'nullable|string|max:1000'
+            ]);
 
+            $logbook = Logbook::where('logbookID', $logbookID)->firstOrFail();
+
+            $logbook->update([
+                'status' => 'draft',
+                'reject_reason' => $request->reject_reason,
+            ]);
+
+            return redirect()->back()->with('success', 'Logbook berhasil ditolak dan dikembalikan ke status draft. Alasan penolakan: ' . $request->reject_reason);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return redirect()->back()->with('error', 'Logbook tidak ditemukan');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat melakukan reject logbook: ' . $e->getMessage());
+        }
     }
 }

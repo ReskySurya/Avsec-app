@@ -24,6 +24,7 @@ return new class extends Migration
             $table->text('senderSignature')->nullable();
             $table->text('receivedSignature')->nullable();
             $table->text('approvedSignature')->nullable();
+            $table->text('rejected_reason')->nullable(); // Reason for rejection, if applicable
             $table->timestamps();
 
             // Foreign key constraints

@@ -42,6 +42,7 @@ class Logbook extends Model
         'senderSignature',
         'receivedSignature',
         'approvedSignature',
+        'rejected_reason',
     ];
 
     /**

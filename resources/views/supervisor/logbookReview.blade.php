@@ -138,6 +138,12 @@
                     alt="Tanda Tangan Mengetahui">
             </div>
             <p class="font-semibold mt-1">{{ $logbook->approverBy->name ?? '-' }}</p>
+            <div class="flex justify-between items-center mt-8 ">
+                <button type="button" onclick="openRejectModal()"
+                    class="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-semibold shadow transition">
+                    Tolak Logbook
+                </button>
+            </div>
             @else
             <form
                 action="{{ route('supervisor.logbook.signature', [ 'logbookID' => $logbook->logbookID]) }}"
@@ -154,17 +160,73 @@
                             onclick="clearSignatureReceiver()">Clear</button>
                     </div>
                 </div>
-                <button type="submit"
-                    class="w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-semibold shadow transition">
-                    Konfirmasi & Terima
-                </button>
+                <div class="flex gap-3">
+                    <button type="submit"
+                        class="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-semibold shadow transition">
+                        Setujui & Tanda Tangan
+                    </button>
+                    @if($logbook->status === 'submitted')
+                    <button type="button" onclick="openRejectModal()"
+                        class="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-semibold shadow transition">
+                        Tolak Logbook
+                    </button>
+                    @endif
+                </div>
             </form>
             @endif
         </div>
     </div>
+    <div id="rejectModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Tolak Logbook</h3>
+
+            <form action="{{ route('supervisor.logbook.reject', $logbook->logbookID) }}" method="POST">
+                @csrf
+                <div class="mb-4">
+                    <label for="reject_reason" class="block text-sm font-medium text-gray-700 mb-2">
+                        Alasan Penolakan <span class="text-red-500">*</span>
+                    </label>
+                    <textarea
+                        name="reject_reason"
+                        id="reject_reason"
+                        rows="4"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                        placeholder="Masukkan alasan penolakan logbook..."
+                        required></textarea>
+                </div>
+
+                <div class="flex justify-end gap-3">
+                    <button
+                        type="button"
+                        onclick="closeRejectModal()"
+                        class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg font-medium transition">
+                        Batal
+                    </button>
+                    <button
+                        type="submit"
+                        class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition">
+                        Tolak Logbook
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
+
 <script>
+    function openRejectModal() {
+        document.getElementById('rejectModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeRejectModal() {
+        document.getElementById('rejectModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        document.getElementById('reject_reason').value = '';
+    }
+
+
     let signaturePadReceiver;
 
     // Inisialisasi hanya jika canvas ada (jika tanda tangan belum ada)

@@ -39,32 +39,12 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
     Route::get('/supervisor/dailytest-form',  [DashboardController::class, 'showDataDailyTest'])->name('supervisor.dailytest-form');
     Route::get('/supervisor/logbook-form',  [DashboardController::class, 'showDataLogbook'])->name('supervisor.logbook-form');
     Route::post('/logbook/signature/approve/{logbookID}', [LogbookPosJagaController::class, 'signatureApprove'])->name('supervisor.logbook.signature');
-
 });
 
 // Officer Routes
 Route::middleware(['auth', 'role:officer'])->group(function () {
-    Route::get('/dashboard/officer', function () {
-        $rejectedReports = \App\Models\Report::rejected()
-            ->where('submittedByID', Auth::id())
-            ->with([
-                'status:id,name',
-                'equipmentLocation.location:id,name',
-                'equipmentLocation.equipment:id,name',
-            ])
-            ->orderBy('created_at', 'desc')
-            ->get();
 
-        $logbookEntries = \App\Models\Logbook::where('receivedID', Auth::id())
-            ->whereNull('receivedSignature')
-            ->with([
-                'locationArea:id,name',
-                'senderBy:id,name',
-            ])
-            ->orderBy('created_at', 'desc')
-            ->get();
-        return view('officer.dashboardOfficer', compact('rejectedReports', 'logbookEntries'));
-    })->name('dashboard.officer');
+    Route::get('/dashboard/officer', [DashboardController::class, 'index'])->name('dashboard.officer');
 
     Route::get('officer/edit-rejected-report/hhmd/{id}', [HhmdController::class, 'editRejectedReport'])->name('officer.hhmd.editRejectedReport');
     Route::put('officer/edit-rejected-report/hhmd/{id}', [HhmdController::class, 'update'])->name('officer.hhmd.update');
@@ -166,4 +146,5 @@ Route::middleware(['auth'])->group(function () {
     // logbook Review
     Route::get('/officer/received/{location}/{logbookID}', [LogbookPosJagaController::class, 'showReceivedLogbook'])->name('officer.received.show');
     Route::get('/supervisor/posjaga/detail/{logbookID}', [LogbookPosJagaController::class, 'supervisorReviewLogbook'])->name('supervisor.logbook.detail');
+    Route::post('/supervisor/posjaga/detail/reject/{logbookID}', [LogbookPosJagaController::class, 'rejectLogbook'])->name('supervisor.logbook.reject');
 });

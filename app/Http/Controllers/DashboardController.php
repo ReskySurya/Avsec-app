@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Location;
 use App\Models\Report;
 use App\Models\Logbook;
 use Illuminate\Http\Request;
@@ -9,6 +10,16 @@ use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
+    // protected $allowedLocations = [
+    //     'Pos Kedatangan',
+    //     'Pos Barat',
+    //     'Pos Timur',
+    //     'HBSCP',
+    //     'PSCP',
+    //     'CCTV',
+    //     'Patroli',
+    //     'Walking Patrol'
+    // ];
     public function showDataDailyTest(Request $request)
     {
         $equipmentTypes = ['hhmd', 'wtmd', 'xraycabin', 'xraybagasi'];
@@ -59,7 +70,6 @@ class DashboardController extends Controller
             'defaultStatus' => $statusFilter, // dikirim ke view
         ]);
     }
-
     public function showDataLogbook(Request $request)
     {
         $statusFilter = $request->query('status', 'approved');
@@ -86,6 +96,47 @@ class DashboardController extends Controller
         return view('supervisor.logbookForm', [
             'logbookEntries' => $logbookEntries,
             'defaultStatus' => $statusFilter,
+        ]);
+    }
+    public function index()
+    {
+        // Ambil ID user yang sedang login
+        $currentUserId = Auth::id();
+
+        $rejectedlogbooks = Logbook::with('locationArea')
+            ->where('senderID', $currentUserId)
+            ->whereNotNull('senderSignature') // Changed to check if senderSignature is not null
+            ->where('status', 'draft') // Hanya tampilkan logbook dengan status draft
+            ->orderBy('date', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        $locations = Location::all();
+        // ->get();
+        $rejectedReports = \App\Models\Report::rejected()
+            ->where('submittedByID', Auth::id())
+            ->with([
+                'status:id,name',
+                'equipmentLocation.location:id,name',
+                'equipmentLocation.equipment:id,name',
+            ])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $logbookEntries = \App\Models\Logbook::where('receivedID', Auth::id())
+            ->whereNull('receivedSignature')
+            ->with([
+                'locationArea:id,name',
+                'senderBy:id,name',
+            ])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('officer.dashboardOfficer', [
+            'rejectedlogbooks' => $rejectedlogbooks,
+            'locations' => $locations,
+            'rejectedReports' => $rejectedReports,
+            'logbookEntries' => $logbookEntries,
         ]);
     }
 }

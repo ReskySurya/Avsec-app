@@ -20,10 +20,11 @@
             </ul>
         </div>
 
+        @if($rejectedReports->count() > 0)
         <div class="bg-red-50 p-4 rounded-lg mb-6 shadow-sm">
-            <h3 class="text-lg font-semibold text-red-800 mb-4 flex items-center">
+            <h3 class="text-lg font-semibo</div>ld text-red-800 mb-4 flex items-center">
                 <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                    <path fill-rule="e</svg>venodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                 </svg>
                 List Laporan Ditolak
             </h3>
@@ -108,25 +109,26 @@
                             <p class="text-sm text-gray-600 bg-red-50 p-2 rounded">{{ $report->approvalNote }}</p>
                         </div>
 
-                        <div class="flex justify-end">
+                        <div class="flex space-x-2">
+
                             @if($report->equipmentLocation->equipment->name == 'hhmd')
                             <a href="{{ route('officer.hhmd.editRejectedReport', $report->reportID) }}"
-                                class="text-blue-600 hover:text-blue-800">
+                                class="flex-1 text-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors">
                                 Lihat Detail
                             </a>
                             @elseif($report->equipmentLocation->equipment->name == 'wtmd')
                             <a href="{{ route('officer.wtmd.editRejectedReport', $report->reportID) }}"
-                                class="text-blue-600 hover:text-blue-800">
+                                class="flex-1 text-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors">
                                 Lihat Detail
                             </a>
                             @elseif($report->equipmentLocation->equipment->name == 'xraycabin')
                             <a href="{{ route('officer.xraycabin.editRejectedReport', $report->reportID) }}"
-                                class="text-blue-600 hover:text-blue-800">
+                                class="flex-1 text-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors">
                                 Lihat Detail
                             </a>
                             @elseif($report->equipmentLocation->equipment->name == 'xraybagasi')
                             <a href="{{ route('officer.xraybagasi.editRejectedReport', $report->reportID) }}"
-                                class="text-blue-600 hover:text-blue-800">
+                                class="flex-1 text-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors">
                                 Lihat Detail
                             </a>
                             @endif
@@ -143,6 +145,142 @@
                 @endforelse
             </div>
         </div>
+        @endif
+
+        {{-- Section Logbook yang Ditolak --}}
+        @if($rejectedlogbooks->count() > 0)
+        <div class="bg-red-50 p-4 rounded-lg mb-6 shadow-sm">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-lg font-semibold text-red-800 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                    Logbook yang Ditolak
+                </h2>
+            </div>
+
+            {{-- Desktop Table View --}}
+            <div class="hidden md:block">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-lg shadow-sm">
+                        <thead class="bg-red-100">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-red-700 font-semibold">
+                                    Lokasi & Tanggal
+                                </th>
+                                <th class="px-4 py-3 text-left text-red-700 font-semibold">
+                                    Shift
+                                </th>
+                                <th class="px-4 py-3 text-left text-red-700 font-semibold">
+                                    Status
+                                </th>
+                                <th class="px-4 py-3 text-left text-red-700 font-semibold">
+                                    Alasan Penolakan
+                                </th>
+                                <th class="px-4 py-3 text-left text-red-700 font-semibold">
+                                    Aksi
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            @foreach($rejectedlogbooks as $logbook)
+                            <tr class="hover:bg-red-50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-900">
+                                                {{ $logbook->locationArea->name }}
+                                            </div>
+                                            <div class="text-sm text-gray-500">
+                                                {{ \Carbon\Carbon::parse($logbook->date)->format('d M Y') }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                    @if($logbook->shift == 'pagi') bg-yellow-100 text-yellow-800
+                                    @elseif($logbook->shift == 'siang') bg-orange-100 text-orange-800
+                                    @else bg-purple-100 text-purple-800 @endif">
+                                        {{ ucfirst($logbook->shift) }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                        Ditolak
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    @if($logbook->rejected_reason)
+                                    <div class="max-w-xs">
+                                        <p class="text-sm text-gray-900 truncate" title="{{ $logbook->rejected_reason }}">
+                                            {{ $logbook->rejected_reason }}
+                                        </p>
+                                    </div>
+                                    @else
+                                    <span class="text-sm text-gray-400 italic">Tidak ada alasan</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <a href="{{ route('logbook.index',  $logbook->logbookID) }}"
+                                        class="text-blue-600 hover:text-blue-800">
+                                        Lihat Detail
+                                    </a>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {{-- Mobile Card View --}}
+            <div class="block md:hidden space-y-4">
+                @foreach($rejectedlogbooks as $logbook)
+                <div class="border-l-4 border-red-400 bg-white p-4 rounded-lg shadow-sm">
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="flex-1">
+                            <h3 class="text-base font-medium text-gray-900">
+                                {{ $logbook->locationArea->name }}
+                            </h3>
+                            <p class="text-sm text-gray-500">{{ \Carbon\Carbon::parse($logbook->date)->format('d M Y') }}</p>
+                        </div>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            Ditolak
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 text-sm text-gray-600 mb-3">
+                        <div><strong>Shift:</strong> {{ ucfirst($logbook->shift) }}</div>
+                    </div>
+
+                    @if($logbook->rejected_reason)
+                    <div class="bg-red-100 border border-red-200 rounded-lg p-2 mb-3">
+                        <p class="text-xs text-red-800"><strong>Alasan:</strong> {{ $logbook->rejected_reason }}</p>
+                    </div>
+                    @endif
+
+                    <div class="flex space-x-2">
+                        <a href="{{ route('logbook.index',  $logbook->logbookID) }}"
+                            class="flex-1 text-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors">
+                            Lihat Detail
+                        </a>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+
+            {{-- Pagination --}}
+            <div class="mt-6">
+                {{ $rejectedlogbooks->links() }}
+            </div>
+        </div>
+        @endif
+
 
         <div class="bg-green-50 p-4 rounded-lg mb-6 shadow-sm">
             <h3 class="text-lg font-semibold text-green-800 mb-4 flex items-center">
@@ -195,7 +333,9 @@
                         <div class="flex justify-between items-start mb-3">
                             <div class="flex items-center">
                                 <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                                    </svg>
                                 </div>
                                 <div>
                                     <p class="text-sm font-medium text-gray-900 uppercase">{{ $logbook->locationArea->name ?? '-' }}</p>
