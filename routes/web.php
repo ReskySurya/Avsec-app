@@ -33,6 +33,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::get('/export', [ExportController::class, 'index'])->name('export.index');
     Route::get('/export/dailytest', [ExportController::class, 'exportPdfDailyTest'])->name('export.dailytest');
     Route::get('/export/logbook', [ExportController::class, 'exportPdfLogbook'])->name('export.logbook');
+    Route::post('/export/logbook/filter', [ExportController::class, 'filterLogbook'])->name('export.logbook.filter');
 });
 
 // Supervisor Routes
