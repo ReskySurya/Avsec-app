@@ -37,11 +37,9 @@
                     <select name="status" id="status"
                         class="block w-36 py-1.5 px-3 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                         onchange="document.getElementById('filterForm').submit()">
-                        <option value="" {{ $defaultStatus=='' ? 'selected' : '' }}>-- All --</option>
-                        <option value="submitted" {{ $defaultStatus=='submitted' ? 'selected' : '' }}>Menunggu Diterima
-                        </option>
-                        <option value="received" {{ $defaultStatus=='received' ? 'selected' : '' }}>Diterima</option>
-                        <option value="approved" {{ $defaultStatus=='approved' ? 'selected' : '' }}>Menunggu</option>
+                        <option value="" {{ $defaultStatus=='' ? 'selected' : '' }}>-- Semua --</option>
+                        <option value="submitted" {{ $defaultStatus=='submitted' ? 'selected' : '' }}>Diajukan</option>
+                        <option value="approved" {{ $defaultStatus=='approved' ? 'selected' : '' }}>Disetujui</option>
                     </select>
 
                 </div>
@@ -125,34 +123,31 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($logbook['status'] == 'submitted')
-                                <span
-                                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                     <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd"
                                             d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
                                             clip-rule="evenodd" />
                                     </svg>
-                                    Menunggu Diterima
-                                </span>
-                                @elseif($logbook['status'] == 'received')
-                                <span
-                                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd"
-                                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                            clip-rule="evenodd" />
-                                    </svg>
-                                    Diterima
+                                    Diajukan
                                 </span>
                                 @elseif($logbook['status'] == 'approved')
-                                <span
-                                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                     <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd"
                                             d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                                             clip-rule="evenodd" />
                                     </svg>
-                                    Menunggu Ditandatangani
+                                    Disetujui
+                                </span>
+                                @else
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                    {{ ucfirst($logbook['status']) }}
                                 </span>
                                 @endif
                             </td>
@@ -198,23 +193,25 @@
                             </span>
                         </div>
                         <div class="ml-4">
-                            @if($logbook['status'] == 'pending')
-                            <span
-                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            @if($logbook['status'] == 'submitted')
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                 <div class="w-2 h-2 bg-yellow-400 rounded-full mr-1"></div>
-                                Pending
+                                Menunggu Diterima
+                            </span>
+                            @elseif($logbook['status'] == 'received')
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                <div class="w-2 h-2 bg-blue-400 rounded-full mr-1"></div>
+                                Diterima
                             </span>
                             @elseif($logbook['status'] == 'approved')
-                            <span
-                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                 <div class="w-2 h-2 bg-green-400 rounded-full mr-1"></div>
-                                Approved
+                                Disetujui
                             </span>
                             @else
-                            <span
-                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                <div class="w-2 h-2 bg-red-400 rounded-full mr-1"></div>
-                                Rejected
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                <div class="w-2 h-2 bg-gray-400 rounded-full mr-1"></div>
+                                {{ ucfirst($logbook['status']) }}
                             </span>
                             @endif
                         </div>

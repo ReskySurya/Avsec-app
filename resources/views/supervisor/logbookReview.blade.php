@@ -111,7 +111,7 @@
         <div class="grid grid-cols-2 gap-4">
             {{-- Kiri: Yang Menerima --}}
             <div>
-                <p>Yang Menyerahkan</p>
+                <p>Yang Menerima</p>
                 <div class="h-16 flex items-center justify-center">
                     @if($logbook->receivedSignature)
                     <img src="data:image/png;base64,{!! $logbook->receivedSignature !!}" class="h-16 mt-5"
@@ -147,12 +147,6 @@
                     alt="Tanda Tangan Mengetahui">
             </div>
             <p class="font-semibold mt-1">{{ $logbook->approverBy->name ?? '-' }}</p>
-            <div class="flex justify-between items-center mt-8 ">
-                <button type="button" onclick="openRejectModal()"
-                    class="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-semibold shadow transition">
-                    Tolak Logbook
-                </button>
-            </div>
             @else
             <form
                 action="{{ route('supervisor.logbook.signature', [ 'logbookID' => $logbook->logbookID]) }}"
@@ -196,8 +190,8 @@
                         Alasan Penolakan <span class="text-red-500">*</span>
                     </label>
                     <textarea
-                        name="reject_reason"
-                        id="reject_reason"
+                        name="rejected_reason"
+                        id="rejected_reason"
                         rows="4"
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                         placeholder="Masukkan alasan penolakan logbook..."

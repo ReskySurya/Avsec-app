@@ -553,7 +553,6 @@ class LogbookPosJagaController extends Controller
 
             $logbook->fill([
                 'receivedSignature' => $signature,
-                'status' => 'approved' // sesuai dengan enum yang ada di migration
             ]);
 
             $logbook->save();
@@ -652,17 +651,18 @@ class LogbookPosJagaController extends Controller
         try {
             // Validasi input untuk alasan reject (opsional)
             $request->validate([
-                'reject_reason' => 'nullable|string|max:1000'
+                'rejected_reason' => 'nullable|string|max:1000'
             ]);
 
             $logbook = Logbook::where('logbookID', $logbookID)->firstOrFail();
 
             $logbook->update([
                 'status' => 'draft',
-                'reject_reason' => $request->reject_reason,
+                'rejected_reason' => $request->rejected_reason,
             ]);
 
-            return redirect()->back()->with('success', 'Logbook berhasil ditolak dan dikembalikan ke status draft. Alasan penolakan: ' . $request->reject_reason);
+            return redirect()->route('supervisor.showDataLogbook')
+                ->with('success', 'Logbook berhasil ditolak dan dikembalikan ke status draft. Alasan penolakan: ' . ($request->rejected_reason ?? 'Tidak ada alasan'));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return redirect()->back()->with('error', 'Logbook tidak ditemukan');
         } catch (\Exception $e) {

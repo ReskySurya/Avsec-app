@@ -72,13 +72,20 @@ class DashboardController extends Controller
     }
     public function showDataLogbook(Request $request)
     {
-        $statusFilter = $request->query('status', 'approved');
+        $statusFilter = $request->query('status', ''); // Default kosong untuk menampilkan semua
         $userId = Auth::id(); // ID user yang sedang login
 
-        $logbookEntries = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy'])
+        $logbookQuery = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy'])
             ->where('approvedID', $userId) // hanya data dengan approver/supervisor sesuai ID user
-            ->orderBy('date', 'desc')
-            ->get()
+            ->whereIn('status', ['submitted', 'approved']) 
+            ->orderBy('date', 'desc');
+
+        // Filter berdasarkan status jika dipilih
+        if ($statusFilter) {
+            $logbookQuery->where('status', $statusFilter);
+        }
+
+        $logbookEntries = $logbookQuery->get()
             ->map(function ($logbook) {
                 return [
                     'id' => $logbook->logbookID,
@@ -86,10 +93,13 @@ class DashboardController extends Controller
                     'location' => $logbook->locationArea->name ?? '',
                     'group' => $logbook->grup,
                     'shift' => $logbook->shift,
-                    'status' => $logbook->status,
+                    'status' => $logbook->status, // Status asli dari database
                     'sender' => $logbook->senderBy->name ?? '',
                     'receiver' => $logbook->receiverBy->name ?? '',
                     'approver' => $logbook->approverBy->name ?? '',
+                    'sender_signature' => $logbook->sender_signature ?? null,
+                    'received_signature' => $logbook->received_signature ?? null,
+                    'approved_signature' => $logbook->approved_signature ?? null,
                 ];
             });
 
@@ -98,6 +108,7 @@ class DashboardController extends Controller
             'defaultStatus' => $statusFilter,
         ]);
     }
+
     public function index()
     {
         // Ambil ID user yang sedang login
