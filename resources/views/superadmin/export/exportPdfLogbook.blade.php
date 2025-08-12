@@ -165,7 +165,7 @@
             return;
         }
 
-        alert(Preview data untuk ${selectedReports.length} item yang dipilih);
+        // alert(Preview data untuk ${selectedReports.length} item yang dipilih);
         // Implementasi preview logic di sini
     }
 
