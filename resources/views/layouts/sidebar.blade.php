@@ -177,7 +177,7 @@ $isLogbookPosJagaOpen = request()->is('logbook/posjaga*');
 
             @if(auth()->user()->role->name === 'superadmin')
             <li>
-                <a href="#" class="flex items-center p-2 rounded hover:bg-gray-700">
+                <a href="{{ route('export.index') }}" class="flex items-center p-2 rounded hover:bg-gray-700">
                     <svg class="h-5 w-5 mr-3" ...></svg>
                     <span>Export PDF</span>
                 </a>

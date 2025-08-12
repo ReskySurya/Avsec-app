@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DailyTest\HhmdController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\LogBook\LogbookSweppingPIController;
 use App\Http\Controllers\MasterDataController;
 use Illuminate\Support\Facades\Route;
@@ -28,6 +29,8 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::get('/dashboard/superadmin', function () {
         return view('superadmin.dashboardSuperadmin');
     })->name('dashboard.superadmin');
+
+    Route::get('/export', [ExportController::class, 'index'])->name('export.index');
 });
 
 // Supervisor Routes
