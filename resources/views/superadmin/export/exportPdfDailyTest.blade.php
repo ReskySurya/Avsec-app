@@ -6,32 +6,7 @@
 <div class="flex justify-content-between ps-8 mb-8 mt-20">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {{-- Daily Test Card --}}
-        <div class="document-card group border-2 border-gray-200 rounded-lg p-5 cursor-pointer transition-all duration-300 hover:border-blue-500 hover:-translate-y-1 hover:shadow-lg bg-white"
-             onclick="window.location.href='{{ route('export.dailytest') }}'">
-            <div class="text-center">
-                <span class="text-3xl mb-3 block">📝</span>
-                <h3 class="font-semibold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
-                    Daily Test
-                </h3>
-                <p class="text-sm text-gray-600 group-hover:text-gray-700">
-                    Dokumen hasil tes harian
-                </p>
-            </div>
-        </div>
-
-        {{-- Logbook Card --}}
-        <div class="document-card group border-2 border-gray-200 rounded-lg p-5 cursor-pointer transition-all duration-300 hover:border-blue-500 hover:-translate-y-1 hover:shadow-lg bg-white"
-             onclick="window.location.href='{{ route('export.logbook') }}'">
-            <div class="text-center">
-                <span class="text-3xl mb-3 block">📚</span>
-                <h3 class="font-semibold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
-                    Logbook Harian
-                </h3>
-                <p class="text-sm text-gray-600 group-hover:text-gray-700">
-                    Catatan aktivitas harian
-                </p>
-            </div>
-        </div>
+       
 
         {{-- Vehicle Checklist Card --}}
         <div class="document-card group border-2 border-gray-200 rounded-lg p-5 cursor-pointer transition-all duration-300 hover:border-blue-500 hover:-translate-y-1 hover:shadow-lg bg-white"

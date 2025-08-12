@@ -31,6 +31,8 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     })->name('dashboard.superadmin');
 
     Route::get('/export', [ExportController::class, 'index'])->name('export.index');
+    Route::get('/export/dailytest', [ExportController::class, 'exportPdfDailyTest'])->name('export.dailytest');
+    Route::get('/export/logbook', [ExportController::class, 'exportPdfLogbook'])->name('export.logbook');
 });
 
 // Supervisor Routes
