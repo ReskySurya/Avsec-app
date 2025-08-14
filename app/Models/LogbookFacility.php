@@ -10,18 +10,13 @@ class LogbookFacility extends Model
     protected $table = 'logbook_facility';
     protected $fillable = [
         'logbookID',
-        'facilityID',
+        'facility',
         'quantity',
-        'description', 
+        'description',
     ];
 
     public function logbook(): BelongsTo
     {
         return $this->belongsTo(Logbook::class, 'logbookID', 'logbookID');
-    }
-
-    public function equipments(): BelongsTo
-    {
-        return $this->belongsTo(Equipment::class, 'facilityID', 'id'); // Foreign key: staffID, Local key: id
     }
 }

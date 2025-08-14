@@ -14,16 +14,14 @@ return new class extends Migration
         Schema::create('logbook_facility', function (Blueprint $table) {
             $table->id();
             $table->string('logbookID', 10);
-            $table->unsignedBigInteger('facilityID')->nullable();
+            $table->string('facility')->nullable();
             $table->integer('quantity')->nullable();
             $table->text('description')->nullable();
             $table->timestamps();
 
             $table->foreign('logbookID')->references('logbookID')->on('logbooks')->onDelete('cascade');
-            $table->foreign('facilityID')->references('id')->on('equipment')->onDelete('cascade');
 
             $table->index('logbookID');
-            $table->index('facilityID');
         });
     }
 
