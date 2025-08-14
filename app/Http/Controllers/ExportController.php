@@ -147,8 +147,6 @@ class ExportController extends Controller
 
     public function exportPdfLogbook(Request $request)
     {
-
-        return view('superadmin.export.exportPdfLogbook');
         // Ambil data lokasi dari model Location
         $locations = Location::whereIn('name', $this->allowedLocationLogbook)
             ->orderBy('name')
