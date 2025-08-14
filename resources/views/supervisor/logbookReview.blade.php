@@ -72,7 +72,7 @@
             @foreach($facility as $index => $facility)
             <tr>
                 <td class="border border-black px-2 py-1 text-center">{{ $index + 1 }}</td>
-                <td class="border border-black px-2 py-1">{{ $facility->equipments->name }}</td>
+                <td class="border border-black px-2 py-1">{{ $facility->facility }}</td>
                 <td class="border border-black px-2 py-1 text-center">{{ $facility->quantity }}</td>
                 <td class="border border-black px-2 py-1 text-center">{{ $facility->description }}</td>
             </tr>

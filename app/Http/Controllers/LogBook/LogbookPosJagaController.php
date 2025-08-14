@@ -10,6 +10,7 @@ use App\Models\Logbook;
 use App\Models\Location;
 use App\Models\LogbookDetail;
 use App\Models\LogbookStaff;
+use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
@@ -39,7 +40,7 @@ class LogbookPosJagaController extends Controller
 
         $logbooks = Logbook::with('locationArea')
             ->where('senderID', $currentUserId)
-            // ->whereNull('senderSignature') 
+            // ->whereNull('senderSignature')
             ->where('status', 'draft') // Hanya tampilkan logbook dengan status draft
             ->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
@@ -167,8 +168,25 @@ class LogbookPosJagaController extends Controller
         $personil = LogbookStaff::with('user') // Tambahkan eager loading
             ->where('logbookID', $id)
             ->get();
-        $facility = LogbookFacility::with('equipments') // Eager load facility relation
-            ->where('logbookID', $id)->get();
+        $facility = LogbookFacility::where('logbookID', $id)->get();
+
+        // Dapatkan daftar staff yang sudah terdaftar
+        $existingStaffIds = $personil->pluck('staffID')->toArray();
+
+        // Dapatkan officer yang tersedia (belum ditambahkan)
+        $availableOfficers = User::whereHas('role', function ($query) {
+            $query->where('name', Role::OFFICER);
+        })
+            ->whereNotIn('id', $existingStaffIds)
+            ->orderBy('name', 'asc')
+            ->get();
+
+        // Dapatkan semua officer untuk modal edit
+        $allOfficers = User::whereHas('role', function ($query) {
+            $query->where('name', Role::OFFICER);
+        })
+            ->orderBy('name', 'asc')
+            ->get();
 
         // Tambahkan data equipments untuk dropdown form
         $equipments = Equipment::orderBy('name', 'asc')->get();
@@ -179,6 +197,8 @@ class LogbookPosJagaController extends Controller
             'personil' => $personil,
             'facility' => $facility,
             'equipments' => $equipments,
+            'availableOfficers' => $availableOfficers, // Officer yang tersedia untuk ditambahkan
+            'allOfficers' => $allOfficers, // Semua officer untuk modal edit
             'location' => $logbook->locationArea->name, // Ambil nama location dari relasi
             'location_id' => $logbook->location_area_id,
         ]);
@@ -329,16 +349,15 @@ class LogbookPosJagaController extends Controller
     {
         $request->validate([
             'logbookID'   => 'required|exists:logbooks,logbookID',
-            'facilityID'  => 'required|exists:equipment,id',
+            'facility'  => 'required|string|max:255',
             'quantity'  => 'required|integer|min:1',
             'description'   => 'required|string|max:1000',
         ]);
 
         try {
-            // $facility = \App\Models\Equipment::find($request->facilityID);
             LogbookFacility::create([
                 'logbookID' => $request->logbookID,
-                'facilityID'  => $request->facilityID,
+                'facility'  => $request->facility,
                 'quantity'  => $request->quantity,
                 'description'   => $request->description,
             ]);
@@ -356,7 +375,7 @@ class LogbookPosJagaController extends Controller
             // Validasi input - sesuai dengan struktur database Anda
             $validatedData = $request->validate([
                 'logbookID'   => 'required|exists:logbooks,logbookID',
-                'facilityID'  => 'required|exists:equipment,id', // Ubah dari facility ke facilityID
+                'facility'  => 'required|string|max:255',
                 'quantity'    => 'required|integer|min:1',
                 'description' => 'required|string|max:1000',
             ]);
@@ -367,7 +386,7 @@ class LogbookPosJagaController extends Controller
             // Update data sesuai dengan struktur database
             $logbookFacility->update([
                 'logbookID'   => $validatedData['logbookID'],
-                'facilityID'  => $validatedData['facilityID'],
+                'facility'  => $validatedData['facility'],
                 'quantity'    => $validatedData['quantity'],
                 'description' => $validatedData['description'],
             ]);
@@ -472,8 +491,7 @@ class LogbookPosJagaController extends Controller
             $personil = LogbookStaff::with('user')
                 ->where('logbookID', $logbookID)
                 ->get();
-            $facility = LogbookFacility::with('equipments')
-                ->where('logbookID', $logbookID)->get();
+            $facility = LogbookFacility::where('logbookID', $logbookID)->get();
 
             return view('officer.receivedLogbook', [
                 'logbook' => $logbook,
@@ -498,8 +516,7 @@ class LogbookPosJagaController extends Controller
             $personil = LogbookStaff::with('user')
                 ->where('logbookID', $logbookID)
                 ->get();
-            $facility = LogbookFacility::with('equipments')
-                ->where('logbookID', $logbookID)->get();
+            $facility = LogbookFacility::where('logbookID', $logbookID)->get();
 
             return view('supervisor.logbookReview', [
                 'logbook' => $logbook,

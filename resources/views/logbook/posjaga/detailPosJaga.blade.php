@@ -73,7 +73,7 @@
         },
         editFacilityData: {
             id: null,
-            facilityID: null,
+            facility: '',
             quantity: '',
             description: ''
         },
@@ -114,9 +114,9 @@
             this.editPersonilData.description = description || '';
             this.openEditPersonil = true;
         },
-        openEditFasilitasFn(id, facilityID, quantity, description) {
+        openEditFasilitasFn(id, facility, quantity, description) {
             this.editFacilityData.id = id;
-            this.editFacilityData.facilityID = facilityID;
+            this.editFacilityData.facility = facility;
             this.editFacilityData.quantity = quantity;
             this.editFacilityData.description = description;
             this.openEditFasilitas = true;
@@ -394,22 +394,18 @@
                         Nama
                     </label>
 
-                    @php
-                    $officers = \App\Models\User::whereHas('role', function ($query) {
-                    $query->where('name', \App\Models\Role::OFFICER);
-                    })->get();
-                    @endphp
-
                     <select name="staffID" id="staffID"
                         class="w-full border-2 px-4 py-3 rounded-xl focus:border-sky-500 focus:outline-none transition-colors duration-200 @error('staffID') border-red-500 @enderror"
                         required>
                         <option value="">Pilih Officer</option>
-                        @foreach($officers as $officer)
-                        <option value="{{ $officer->id }}" data-lisensi="{{ $officer->lisensi }}">
+                        @foreach($availableOfficers as $officer)
+                        <option value="{{ $officer->id }}" data-lisensi="{{ $officer->lisensi }}"
+                            @if(old('staffID')==$officer->id) selected @endif>
                             {{ $officer->name }} - {{ $officer->lisensi }}
                         </option>
                         @endforeach
                     </select>
+
                     @error('staffID')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
@@ -468,22 +464,26 @@
                         Nama
                     </label>
 
-                    @php
-                    $officers = \App\Models\User::whereHas('role', function ($query) {
-                    $query->where('name', \App\Models\Role::OFFICER);
-                    })->get();
-                    @endphp
-
                     <select name="staffID" id="edit_staffID" x-model="editPersonilData.staffID"
                         class="w-full border-2 px-4 py-3 rounded-xl focus:border-sky-500 focus:outline-none transition-colors duration-200"
                         required>
                         <option value="">Pilih Officer</option>
-                        @foreach($officers as $officer)
-                        <option value="{{ $officer->id }}" data-lisensi="{{ $officer->lisensi }}">
+                        @foreach($allOfficers as $officer)
+                        @php
+                        $isCurrentOfficer = isset($editPersonilData['staffID']) &&
+                        $editPersonilData['staffID'] == $officer->id;
+                        $isAvailable = !in_array($officer->id, $personil->pluck('staffID')->toArray());
+                        @endphp
+
+                        @if($isCurrentOfficer || $isAvailable)
+                        <option value="{{ $officer->id }}" data-lisensi="{{ $officer->lisensi }}"
+                            :selected="$isCurrentOfficer">
                             {{ $officer->name }} - {{ $officer->lisensi }}
                         </option>
+                        @endif
                         @endforeach
                     </select>
+
                     @error('staffID')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
@@ -552,7 +552,7 @@
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="font-semibold text-lg">{{ $items->equipments->name ?? 'Unknown Equipment' }}
+                                <h3 class="font-semibold text-lg">{{ $items->facility ?? 'Unknown Equipment' }}
                                 </h3>
                             </div>
                         </div>
@@ -576,7 +576,7 @@
                         <!-- Edit Button -->
                         <button type="button"
                             class="flex items-center space-x-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors duration-200"
-                            @click="openEditFasilitasFn({{ $items->id }}, {{ $items->facilityID }}, {{ $items->quantity }}, '{{ addslashes($items->description ?? '') }}')">
+                            @click="openEditFasilitasFn({{ $items->id }}, '{{ $items->facility ?? '' }}', {{ $items->quantity }}, '{{ addslashes($items->description ?? '') }}')">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
@@ -643,7 +643,7 @@
                     @forelse($facility ?? [] as $index => $items)
                     <tr class="hover:bg-gray-50 transition-colors duration-200 cursor-pointer">
                         <td class="px-5 py-4 text-sky-600 font-bold">{{ $index + 1 }}</td>
-                        <td class="px-5 py-4">{{ $items->equipments->name ?? 'N/A' }}</td>
+                        <td class="px-5 py-4">{{ $items->facility ?? 'N/A' }}</td>
                         <td class="px-5 py-4">{{ $items->quantity }}</td>
                         <td class="px-5 py-4">{{ $items->description }}</td>
                         <td class="px-5 py-4 flex justify-center space-x-2" @click.stop>
@@ -651,7 +651,7 @@
                             <button type="button"
                                 class="p-2 bg-yellow-100 text-yellow-700 rounded-full hover:bg-yellow-200 transition-colors duration-200"
                                 title="Edit Fasilitas"
-                                @click="openEditFasilitasFn({{ $items->id }}, {{ $items->facilityID }}, {{ $items->quantity }}, '{{ addslashes($items->description ?? '') }}')">
+                                @click="openEditFasilitasFn({{ $items->id }}, '{{ $items->facility ?? '' }}', {{ $items->quantity }}, '{{ addslashes($items->description ?? '') }}')">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
@@ -707,18 +707,12 @@
                 <input type="hidden" name="logbookID" value="{{ $logbook->logbookID ?? '' }}">
 
                 <div class="mb-2 sm:mb-4">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Fasilitas</label>
-                    <select name="facilityID"
-                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('facilityID') border-red-500 @enderror"
-                        required>
-                        <option value="">Pilih Fasilitas</option>
-                        @foreach($equipments as $equipment)
-                        <option value="{{ $equipment->id }}" {{ old('facilityID')==$equipment->id ? 'selected' : '' }}>
-                            {{ $equipment->name }}
-                        </option>
-                        @endforeach
-                    </select>
-                    @error('facilityID')
+                    <label for="facility" class="block text-sm font-semibold text-gray-700 mb-2">Nama
+                        Fasilitas</label>
+                    <input type="text" name="facility" id="facility"
+                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('facilityName') border-red-500 @enderror"
+                        value="{{ old('facility') }}" placeholder="Masukkan nama fasilitas" required>
+                    @error('facility')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -776,18 +770,12 @@
                 <input type="hidden" name="logbookID" value="{{ $logbook->logbookID ?? '' }}">
 
                 <div class="mb-2 sm:mb-4">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Fasilitas</label>
-                    <select name="facilityID" x-model="editFacilityData.facilityID"
-                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('facilityID') border-red-500 @enderror"
-                        required>
-                        <option value="">-- Pilih Fasilitas --</option>
-                        @foreach($equipments as $equipment)
-                        <option value="{{ $equipment->id }}">
-                            {{ $equipment->name }}
-                        </option>
-                        @endforeach
-                    </select>
-                    @error('facilityID')
+                    <label for="facility" class="block text-sm font-semibold text-gray-700 mb-2">Nama
+                        Fasilitas</label>
+                    <input type="text" name="facility" x-model="editFacilityData.facility"
+                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('facility') border-red-500 @enderror"
+                        value="{{ old('facility') }}" placeholder="Masukkan nama fasilitas" required>
+                    @error('facility')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -825,8 +813,6 @@
             </form>
         </div>
     </div>
-
-
 
     <!-- Uraian Kegiatan Section -->
     <div class="bg-white shadow-xl rounded-2xl overflow-hidden mb-8 border border-gray-100">
@@ -878,18 +864,31 @@
 
                             <!-- Container untuk signature pad -->
                             <div class="relative w-full h-48 border border-gray-300 rounded-lg bg-white">
+                                @if($logbook->senderSignature)
+                                <!-- Tampilkan tanda tangan yang sudah ada -->
+                                <img src="data:image/png;base64,{{ $logbook->senderSignature }}"
+                                    alt="Tanda tangan sudah ada" class="w-full h-full object-contain">
+                                @else
+                                <!-- Canvas untuk tanda tangan baru -->
                                 <canvas id="signature-canvas" class="w-full h-full"></canvas>
+                                @endif
                             </div>
 
-                            <input type="hidden" name="signature" id="signature-data">
+                            <input type="hidden" name="signature" id="signature-data"
+                                value="{{ $logbook->senderSignature ?? '' }}">
 
                             <div class="flex justify-between items-center mt-2">
-                                <span id="signature-status" class="text-xs text-gray-500">Belum ada tanda tangan</span>
+                                <span id="signature-status" class="text-xs text-gray-500">
+                                    {{ $logbook->senderSignature ? 'Tanda tangan sudah ada' : 'Belum ada tanda tangan'
+                                    }}
+                                </span>
+                                @if(!$logbook->senderSignature)
                                 <button type="button"
                                     class="text-sm text-blue-600 hover:text-blue-800 transition-colors"
                                     onclick="clearSignature()">
                                     Clear
                                 </button>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -912,7 +911,10 @@
                             class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base" required>
                             <option value="">Pilih Officer</option>
                             @foreach($officers as $officer)
-                            <option value="{{ $officer->id }}">{{ $officer->name }}</option>
+                            <option value="{{ $officer->id }}" {{ old('receivedID', $logbook->receivedID ?? '') ==
+                                $officer->id ? 'selected' : '' }}>
+                                {{ $officer->name }}
+                            </option>
                             @endforeach
                         </select>
                     </div>
@@ -933,7 +935,10 @@
                             class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base" required>
                             <option value="">Pilih Supervisor</option>
                             @foreach($supervisors as $supervisor)
-                            <option value="{{ $supervisor->id }}">{{ $supervisor->name }}</option>
+                            <option value="{{ $supervisor->id }}" {{ old('approvedID', $logbook->approvedID ?? '') ==
+                                $supervisor->id ? 'selected' : '' }}>
+                                {{ $supervisor->name }}
+                            </option>
                             @endforeach
                         </select>
                     </div>
@@ -945,7 +950,7 @@
                         </button>
                         <button type="submit"
                             class="px-6 py-3 bg-gradient-to-r from-blue-500 to-teal-600 text-white rounded-xl hover:from-blue-600 hover:to-teal-700 transition-all duration-200 font-medium shadow-lg">
-                            Konfirmasi & Kirim
+                            {{ $logbook->senderSignature ? 'Update Konfirmasi' : 'Konfirmasi & Kirim' }}
                         </button>
                     </div>
                 </form>
@@ -1229,6 +1234,12 @@
     let signaturePadInstance;
 
     function initializeSignaturePad() {
+        // Jika sudah ada tanda tangan di database, tidak perlu inisialisasi
+        const existingSignature = document.getElementById('signature-data').value;
+        if (existingSignature && existingSignature.startsWith('data:image')) {
+            return;
+        }
+
         // Hindari inisialisasi ulang jika sudah ada
         if (signaturePadInstance) {
             signaturePadInstance.clear();
@@ -1263,7 +1274,6 @@
         });
     }
 
-    // Fungsi clear signature yang akan dipanggil dari HTML
     function clearSignature() {
         // Jika signature pad belum diinisialisasi, inisialisasi dulu
         if (!signaturePadInstance) {
@@ -1277,23 +1287,15 @@
                 statusEl.textContent = 'Belum ada tanda tangan';
                 statusEl.className = 'text-xs text-gray-500';
             }
+            document.getElementById('signature-data').value = '';
         }
     }
 
     function handleSignatureSubmit(event) {
-        // Jika signature pad belum diinisialisasi, inisialisasi dulu
-        if (!signaturePadInstance) {
-            initializeSignaturePad();
-        }
+        const signatureDataEl = document.getElementById('signature-data');
+        const existingSignature = signatureDataEl.value;
 
-        // Validasi tanda tangan
-        if (!signaturePadInstance || signaturePadInstance.isEmpty()) {
-            alert('Mohon berikan tanda tangan Anda sebelum melanjutkan.');
-            event.preventDefault();
-            return false;
-        }
-
-        // Validasi pemilihan officer dan supervisor
+        // 1. Validasi pemilihan officer dan supervisor (selalu dilakukan)
         const receivedID = document.getElementById('receivedID').value;
         const approvedID = document.getElementById('approvedID').value;
 
@@ -1309,37 +1311,68 @@
             return false;
         }
 
-        // Dapatkan data tanda tangan dan proses
-        const signatureData = signaturePadInstance.toDataURL('image/png');
+        // 2. Cek apakah sudah ada tanda tangan di database
+        if (existingSignature && existingSignature.trim() !== '') {
+            // Jika sudah ada tanda tangan di database, langsung submit
+            const confirmSubmit = confirm('Apakah Anda yakin ingin memperbarui konfirmasi logbook ini?');
+            if (!confirmSubmit) {
+                event.preventDefault();
+            }
+            return confirmSubmit;
+        }
 
+        // 3. Jika tidak ada tanda tangan di database, validasi signature pad
+        if (!signaturePadInstance) {
+            initializeSignaturePad();
+        }
+
+        if (signaturePadInstance.isEmpty()) {
+            alert('Mohon berikan tanda tangan Anda sebelum melanjutkan.');
+            event.preventDefault();
+            return false;
+        }
+
+        // 4. Proses tanda tangan baru
         try {
-            // Validasi format data
+            const signatureData = signaturePadInstance.toDataURL('image/png');
             if (!signatureData.startsWith('data:image/png;base64,')) {
                 throw new Error('Format tanda tangan tidak valid');
             }
 
-            // Simpan data tanda tangan ke input tersembunyi
-            document.getElementById('signature-data').value = signatureData;
+            signatureDataEl.value = signatureData;
 
-            // Tampilkan konfirmasi
             const confirmSubmit = confirm('Apakah Anda yakin ingin menyelesaikan logbook ini? Tindakan ini tidak dapat dibatalkan.');
             if (!confirmSubmit) {
                 event.preventDefault();
-                return false;
             }
+            return confirmSubmit;
         } catch (error) {
             alert('Terjadi kesalahan saat memproses tanda tangan: ' + error.message);
             event.preventDefault();
             return false;
         }
-
-        return true; // Lanjutkan pengiriman form
     }
-
 
     function confirmDelete(message) {
         return confirm(message);
     }
+
+    // Inisialisasi saat modal dibuka
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('logbook', () => ({
+            openFinishDialog: false,
+            // ... data alpine lainnya
+
+            initFinishDialog() {
+                this.$watch('openFinishDialog', (value) => {
+                    if (value) {
+                        // Tunggu hingga modal selesai render
+                        setTimeout(initializeSignaturePad, 100);
+                    }
+                });
+            }
+        }));
+    });
 </script>
 
 @endsection
