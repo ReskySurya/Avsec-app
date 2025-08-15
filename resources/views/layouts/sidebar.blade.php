@@ -52,6 +52,11 @@ $isLogbookPosJagaOpen = request()->is('logbook/posjaga*');
                             <span>Equipment location</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('tenant-management.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                            <span>Tenant Management</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
             @endif

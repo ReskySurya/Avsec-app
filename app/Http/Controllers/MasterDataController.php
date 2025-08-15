@@ -5,36 +5,39 @@ namespace App\Http\Controllers;
 use App\Models\Equipment;
 use App\Models\EquipmentLocation;
 use App\Models\Location;
+use App\Models\ProhibitedItem;
+use App\Models\Tenant;
 use App\Models\User;
 use App\Models\Role;
-use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class MasterDataController extends Controller
 {
+    //EquipmentLocation management
     public function indexEquipmentLocation(Request $request)
     {
         $searchTable = $request->input('search_table');
 
-       $equipmentLocations = EquipmentLocation::with(['equipment', 'location'])
-        ->whereHas('equipment')
-        ->whereHas('location')
-        ->when($searchTable, function($query) use ($searchTable) {
-            $query->where(function($q) use ($searchTable) {
-                $q->whereHas('equipment', function($subQ) use ($searchTable) {
-                    $subQ->where('name', 'like', "%{$searchTable}%");
-                })
-                ->orWhereHas('location', function($subQ) use ($searchTable) {
-                    $subQ->where('name', 'like', "%{$searchTable}%");
-                })
-                ->orWhere('merkType', 'like', "%{$searchTable}%")
-                ->orWhere('description', 'like', "%{$searchTable}%");
-            });
-        })
-        ->paginate(5, ['*'], 'equipmentLocationsPage') // paginate with custom page query string
-        ->appends(request()->query());
+        $equipmentLocations = EquipmentLocation::with(['equipment', 'location'])
+            ->whereHas('equipment')
+            ->whereHas('location')
+            ->when($searchTable, function ($query) use ($searchTable) {
+                $query->where(function ($q) use ($searchTable) {
+                    $q->whereHas('equipment', function ($subQ) use ($searchTable) {
+                        $subQ->where('name', 'like', "%{$searchTable}%");
+                    })
+                        ->orWhereHas('location', function ($subQ) use ($searchTable) {
+                            $subQ->where('name', 'like', "%{$searchTable}%");
+                        })
+                        ->orWhere('merkType', 'like', "%{$searchTable}%")
+                        ->orWhere('description', 'like', "%{$searchTable}%");
+                });
+            })
+            ->paginate(5, ['*'], 'equipmentLocationsPage') // paginate with custom page query string
+            ->appends(request()->query());
         // $equipmentList = Equipment::with('creator')->orderBy('name')->get();
 
         // $locationList = Location::with('creator')->orderBy('name')->get();
@@ -46,7 +49,7 @@ class MasterDataController extends Controller
                     ->orWhere('description', 'like', "%{$searchTable}%");
             })
             ->orderBy('id')
-            ->paginate(5, ['*'], 'equipmentPage') 
+            ->paginate(5, ['*'], 'equipmentPage')
             ->appends(request()->query());
 
         // Location
@@ -56,7 +59,7 @@ class MasterDataController extends Controller
                     ->orWhere('description', 'like', "%{$searchTable}%");
             })
             ->orderBy('id')
-            ->paginate(5, ['*'], 'locationPage') 
+            ->paginate(5, ['*'], 'locationPage')
             ->appends(request()->query());
 
         return view('master-data.equipment-locations.index', compact(
@@ -281,7 +284,8 @@ class MasterDataController extends Controller
         }
     }
 
-    public function indexUserManagement() //Add commentMore actions
+    // User Management
+    public function indexUserManagement()
     { {
             // Ambil data officer dan supervisor dari database
             $officers = User::whereHas('role', function ($query) {
@@ -447,7 +451,6 @@ class MasterDataController extends Controller
             return redirect()
                 ->route('user-management.index')
                 ->with('success', 'User deleted successfully.');
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Failed to delete user: ' . $e->getMessage());
@@ -463,6 +466,159 @@ class MasterDataController extends Controller
             return redirect()
                 ->back()
                 ->with('error', 'Failed to delete user. Please try again.');
+        }
+    }
+
+    // Tenant Management
+    public function indexTenantManagement()
+    {
+        $tenantList = Tenant::orderBy('tenantID')->get();
+        return view(
+            'master-data.tenant-management.index',
+            compact('tenantList')
+        );
+    }
+
+    public function storeTenant(Request $request)
+    {
+        $request->validate([
+            'tenant_name' => 'required|string|max:255|unique:tenants,tenant_name',
+        ]);
+
+        try {
+            $tenantID = Tenant::generateTenantID();
+
+            Tenant::create([
+                'tenantID' => $tenantID,
+                'tenant_name' => $request->tenant_name,
+                'supervisorSignature' => $request->null,
+            ]);
+
+            return redirect()->back()->with('success', 'Tenant berhasil ditambahkan!');
+        } catch (\Exception $e) {
+            Log::error('Error creating tenant: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menambahkan tenant: ' . $e->getMessage());
+        }
+    }
+
+    public function updateTenant(Request $request, $tenantID)
+    {
+        $request->validate([
+            'tenant_name' => 'required|string|max:255|unique:tenants,tenant_name,' . $tenantID,
+        ]);
+
+        try {
+            $tenant = Tenant::findOrFail($tenantID);
+            $tenant->update([
+                'tenant_name' => $request->tenant_name,
+                'supervisorSignature' => $request->null,
+            ]);
+
+            return redirect()->back()->with('success', 'Tenant berhasil diperbarui!');
+        } catch (\Exception $e) {
+            Log::error('Error updating tenant: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal memperbarui tenant: ' . $e->getMessage());
+        }
+    }
+
+    public function destroyTenant($id)
+    {
+        try {
+            $tenant = Tenant::find($id);
+            if (!$tenant) {
+                return redirect()->back()->with('error', 'Tenant tidak ditemukan.');
+            }
+            $tenant->delete();
+
+            return redirect()->back()->with('success', 'Tenant berhasil dihapus!');
+        } catch (\Exception $e) {
+            Log::error('Error deleting tenant: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menghapus tenant: ' . $e->getMessage());
+        }
+    }
+
+    public function indexProhibitedItem($tenantID)
+    {
+        $tenant = Tenant::all()
+            ->where('tenantID', $tenantID)
+            ->first();
+        $prohibitedItems = ProhibitedItem::where('tenantID', $tenantID)
+            ->orderBy('items_name')
+            ->get();
+
+        return view('master-data.tenant-management.prohibitedItems', [
+            'tenant' => $tenant,
+            'tenantID' => $tenantID,
+            'prohibitedItems' => $prohibitedItems,
+        ]);
+    }
+
+    public function storeProhibitedItem(Request $request)
+    {
+        $request->validate([
+            'tenantID'   => 'required|exists:tenants,tenantID',
+            'items_name'  => 'required|string|max:255',
+            'quantity'  => 'required|integer|min:1',
+        ]);
+
+        try {
+            ProhibitedItem::create([
+                'tenantID' => $request->tenantID,
+                'items_name'  => $request->items_name,
+                'quantity'  => $request->quantity,
+            ]);
+
+            return redirect()->back()->with('success', 'Prohibited Item berhasil ditambahkan!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Gagal menambahkan Prohibited Item. Silakan coba lagi.')
+                ->withInput();
+        }
+    }
+
+    public function updateProhibitedItem(Request $request, $id)
+    {
+        try {
+            // Validasi input - sesuai dengan struktur database Anda
+            $validatedData = $request->validate([
+                'tenantID'   => 'required|exists:tenants,tenantID',
+                'items_name'  => 'required|string|max:255',
+                'quantity'  => 'required|integer|min:1',
+            ]);
+
+            // Cari record berdasarkan ID
+            $prohibitedItem = ProhibitedItem::findOrFail($id);
+
+            // Update data sesuai dengan struktur database
+            $prohibitedItem->update([
+                'tenantID'   => $validatedData['tenantID'],
+                'items_name'  => $validatedData['items_name'],
+                'quantity'    => $validatedData['quantity'],
+            ]);
+
+            return redirect()->back()->with('success', 'Item berhasil diperbarui');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan validasi data');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return redirect()->back()->with('error', 'Data yang ingin diperbarui tidak ditemukan');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function destroyProhibitedItem($id)
+    {
+        try {
+            $prohibitedItem = ProhibitedItem::findOrFail($id);
+            $prohibitedItem->delete();
+
+            return redirect()->back()->with('success', 'Prohibited Item berhasil dihapus!');
+        } catch (\Exception $e) {
+            Log::error('Error deleting prohibited item: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menghapus Prohibited Item: ' . $e->getMessage());
         }
     }
 }
