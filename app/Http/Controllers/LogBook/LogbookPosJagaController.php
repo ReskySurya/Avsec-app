@@ -365,7 +365,7 @@ class LogbookPosJagaController extends Controller
             return redirect()->back()->with('success', 'Fasilitas berhasil ditambahkan!');
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Gagal menambahkan personil. Silakan coba lagi.')
+                ->with('error', 'Gagal menambahkan Fasilitas. Silakan coba lagi.')
                 ->withInput();
         }
     }
