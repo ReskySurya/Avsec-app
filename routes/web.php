@@ -106,25 +106,25 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::post('/equipment/update/{id}', [MasterDataController::class, 'updateEquipment'])->name('equipment.update');
     Route::post('/location/update/{id}', [MasterDataController::class, 'updateLocation'])->name('location.update');
     Route::patch('/equipment-location/update/{equipment_id}/{location_id}', [MasterDataController::class, 'updateEquipmentLocation'])->name('equipment-location.update');
-    
+
     // Route untuk menghapus equipment location relationship
     Route::delete('/equipment/{id}/destroy', [MasterDataController::class, 'destroyEquipment'])->name('equipment.destroy');
     Route::delete('/location/{id}/destroy', [MasterDataController::class, 'destroyLocation'])->name('location.destroy');
     Route::delete('/equipment-location/destroy/{id}', [MasterDataController::class, 'destroyEquipmentLocation'])->name('equipment-location.destroy');
-    
+
     //Route untuk UserManagement
     Route::get('/users-management', [MasterDataController::class, 'indexUserManagement'])->name('users-management.index');
     Route::post('/users-management/tambah', [MasterDataController::class, 'storeUserManagement'])->name('users-management.store');
     Route::get('/users-management/update/{id}', [MasterDataController::class, 'getUserManagement'])->name('users-management.get');
     Route::put('/users-management/update/{id}', [MasterDataController::class, 'updateUserManagement'])->name('users-management.update');
     Route::delete('/users-management/hapus/{id}', [MasterDataController::class, 'destroyUserManagement'])->name('users-management.destroy');
-    
+
     // Route untuk Tenant Management
     Route::get('/tenant-management', [MasterDataController::class, 'indexTenantManagement'])->name('tenant-management.index');
     Route::post('/tenant-management/store', [MasterDataController::class, 'storeTenant'])->name('tenant.store');
     Route::post('/tenant-management/update/{id}', [MasterDataController::class, 'updateTenant'])->name('tenant.update');
     Route::delete('/tenant-management/destroy/{id}', [MasterDataController::class, 'destroyTenant'])->name('tenant.destroy');
-    
+
     // Route untuk Tenant Items
     Route::get('/tenant-management/items/{tenantID}', [MasterDataController::class, 'indexProhibitedItem'])->name('tenant.items');
     Route::post('/tenant-management/items/store', [MasterDataController::class, 'storeProhibitedItem'])->name('prohibited-items.store');
@@ -136,6 +136,9 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/logbook-rotasihbscp', [LogbookRotasiHBSCPController::class, 'index'])->name('logbookRotasiHBSCP.index');
     Route::get('/logbook-rotasipscp', [LogbookRotasiPSCPController::class, 'index'])->name('logbookRotasiPSCP.index');
+    Route::post('logbook/rotasi-pscp/autosave', [LogbookRotasiPSCPController::class, 'autosave'])->name('logbook.rotasi-pscp.autosave');
+    Route::get('logbook/rotasi-pscp/load-draft', [LogbookRotasiPSCPController::class, 'loadDraft'])->name('logbook.rotasi-pscp.load-draft');
+    Route::post('logbook/rotasi-pscp/submit', [LogbookRotasiPSCPController::class, 'submit'])->name('logbook.rotasi-pscp.submit');
     Route::get('/logbook-sweppingpi', [LogbookSweppingPIController::class, 'index'])->name('logbookSweppingPI.index');
 
     // Logbook Pos Jaga
