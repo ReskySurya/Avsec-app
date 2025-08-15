@@ -107,7 +107,7 @@ class DashboardController extends Controller
             'logbookEntries' => $logbookEntries,
             'defaultStatus' => $statusFilter,
         ]);
-    }
+    }   
 
     public function index()
     {

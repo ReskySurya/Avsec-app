@@ -463,7 +463,7 @@ class LogbookPosJagaController extends Controller
 
             $logbook->save();
 
-            return redirect()->route('logbook.index', ['location' => $location])
+            return redirect()->route('officer.logbook.detail', ['logbookID' => $logbookID])
                 ->with('success', 'Logbook berhasil diserahkan dan menunggu konfirmasi dari Officer penerima.');
         } catch (\Exception $e) {
             Log::error('Signature Send Error: ' . $e->getMessage(), [
@@ -684,6 +684,31 @@ class LogbookPosJagaController extends Controller
             return redirect()->back()->with('error', 'Logbook tidak ditemukan');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan saat melakukan reject logbook: ' . $e->getMessage());
+        }
+    }
+
+    public function officerReviewLogbook($logbookID)
+    {
+        try {
+            $logbook = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy'])
+                ->where('logbookID', $logbookID)
+                ->firstOrFail();
+
+            $logbookDetails = LogbookDetail::where('logbookID', $logbookID)->get();
+
+            $personil = LogbookStaff::with('user')
+                ->where('logbookID', $logbookID)
+                ->get();
+            $facility = LogbookFacility::where('logbookID', $logbookID)->get();
+
+            return view('logbook.posjaga.logbookReviewPosJaga', [
+                'logbook' => $logbook,
+                'logbookDetails' => $logbookDetails,
+                'personil' => $personil,
+                'facility' => $facility
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Logbook tidak ditemukan');
         }
     }
 }

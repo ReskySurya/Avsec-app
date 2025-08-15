@@ -211,25 +211,25 @@
             const formData = new FormData(document.getElementById('exportForm'));
 
             fetch('{{ route("export.logbook.filter") }}', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    form_type: formData.get('form_type'),
-                    location: formData.get('location'),
-                    start_date: formData.get('start_date'),
-                    end_date: formData.get('end_date')
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        form_type: formData.get('form_type'),
+                        location: formData.get('location'),
+                        start_date: formData.get('start_date'),
+                        end_date: formData.get('end_date')
+                    })
                 })
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Update tabel dengan data baru
-                updateTable(data.logbooks);
-            })
-            .catch(error => console.error('Error:', error));
+                .then(response => response.json())
+                .then(data => {
+                    // Update tabel dengan data baru
+                    updateTable(data.logbooks);
+                })
+                .catch(error => console.error('Error:', error));
         }
 
         function updateTable(logbooks) {

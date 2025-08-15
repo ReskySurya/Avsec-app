@@ -153,4 +153,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/officer/received/{location}/{logbookID}', [LogbookPosJagaController::class, 'showReceivedLogbook'])->name('officer.received.show');
     Route::get('/supervisor/posjaga/detail/{logbookID}', [LogbookPosJagaController::class, 'supervisorReviewLogbook'])->name('supervisor.logbook.detail');
     Route::post('/supervisor/posjaga/detail/reject/{logbookID}', [LogbookPosJagaController::class, 'rejectLogbook'])->name('supervisor.logbook.reject');
+    Route::get('/officer/posjaga/detail/{logbookID}', [LogbookPosJagaController::class, 'officerReviewLogbook'])->name('officer.logbook.detail');
 });
