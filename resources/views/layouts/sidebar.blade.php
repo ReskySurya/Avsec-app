@@ -156,6 +156,7 @@ $isLogbookPosJagaOpen = request()->is('logbook/posjaga*');
                             <span>Logbook Sweeping PI</span>
                         </a>
                     </li>
+                    @if(auth()->user()->role->name === 'officer')
                     <li>
                         <a href="{{ route('logbookRotasiHBSCP.index') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook-rotasihbscp') ? 'bg-gray-700' : '' }}">
@@ -168,6 +169,14 @@ $isLogbookPosJagaOpen = request()->is('logbook/posjaga*');
                             <span>Logbook Rotasi PSCP</span>
                         </a>
                     </li>
+                    @else
+                    <li>
+                        <a href="{{ route('supervisor.logbook-rotasi.list') }}"
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook-rotasi/list') ? 'bg-gray-700' : '' }}">
+                            <span>Logbook Rotasi</span>
+                        </a>
+                    </li>
+                    @endif
                 </ul>
             </li>
 

@@ -78,4 +78,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(LogbookStaff::class, 'staffID', 'id');
     }
+
+    public function getDisplayNameAttribute()
+{
+    return substr($this->nip, -4) . ' - ' . $this->name;
+}
 }

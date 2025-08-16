@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Location;
 use App\Models\Report;
 use App\Models\Logbook;
+use App\Models\LogbookRotasiHBSCP;
+use App\Models\LogbookRotasiPSCP;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -77,7 +79,7 @@ class DashboardController extends Controller
 
         $logbookQuery = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy'])
             ->where('approvedID', $userId) // hanya data dengan approver/supervisor sesuai ID user
-            ->whereIn('status', ['submitted', 'approved']) 
+            ->whereIn('status', ['submitted', 'approved'])
             ->orderBy('date', 'desc');
 
         // Filter berdasarkan status jika dipilih
@@ -107,7 +109,7 @@ class DashboardController extends Controller
             'logbookEntries' => $logbookEntries,
             'defaultStatus' => $statusFilter,
         ]);
-    }   
+    }
 
     public function index()
     {
@@ -149,5 +151,14 @@ class DashboardController extends Controller
             'rejectedReports' => $rejectedReports,
             'logbookEntries' => $logbookEntries,
         ]);
+    }
+
+    public function showDataLogbookRotasi()
+    {
+        $logbooksHBSCP = LogbookRotasiHBSCP::with('details')->get();
+
+        $logbooksPSCP = LogbookRotasiPSCP::with('details')->get();
+
+        return view('supervisor.listLogbookRotasi', compact('logbooksPSCP', 'logbooksHBSCP'));
     }
 }

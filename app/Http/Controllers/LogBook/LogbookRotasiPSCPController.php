@@ -241,7 +241,21 @@ class LogbookRotasiPSCPController extends Controller
         $logbook->approved_by = $userId;
         $logbook->save();
 
-        return redirect()->route('logbookRotasiPSCP.index') // Asumsi nama route untuk view adalah 'logbook.rotasi-pscp.index'
+        return redirect()->route('logbookRotasiPSCP.index')
             ->with('success', 'Logbook Rotasi PSCP berhasil disubmit.');
+    }
+
+    public function showDetailLogbook($logbookId)
+    {
+        // Ambil logbook utama beserta semua detail + officer terkait
+        $logbook = LogbookRotasiPSCP::with([
+            'details.pemeriksaanDokumenOfficer',
+            'details.pengaturFlowOfficer',
+            'details.operatorXrayOfficer',
+            'details.hhmdOfficer',
+            'details.manualKabinOfficer',
+        ])->findOrFail($logbookId);
+
+        return view('supervisor.detailLogbookRotasi', compact('logbook'));
     }
 }
