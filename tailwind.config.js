@@ -4,9 +4,10 @@ module.exports = {
         "./resources/**/*.blade.php",
         "./resources/**/*.js",
         "./resources/**/*.vue",
+        './resources/views/superadmin/export/pdf/**/*.blade.php',
     ],
     theme: {
-        
+
     },
     plugins: [],
 }

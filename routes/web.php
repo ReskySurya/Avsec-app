@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\DailyTest\HhmdController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ExportController;
+use App\Http\Controllers\ExportPdfController;
 use App\Http\Controllers\LogBook\LogbookSweppingPIController;
 use App\Http\Controllers\MasterDataController;
 use Illuminate\Support\Facades\Route;
@@ -30,10 +30,10 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
         return view('superadmin.dashboardSuperadmin');
     })->name('dashboard.superadmin');
 
-    Route::get('/export', [ExportController::class, 'index'])->name('export.index');
-    Route::get('/export/dailytest', [ExportController::class, 'exportPdfDailyTest'])->name('export.dailytest');
-    Route::get('/export/logbook', [ExportController::class, 'exportPdfLogbook'])->name('export.logbook');
-    Route::post('/export/logbook/filter', [ExportController::class, 'filterLogbook'])->name('export.logbook.filter');
+    Route::get('/export', [ExportPdfController::class, 'index'])->name('export.index');
+    Route::get('/export/dailytest', [ExportPdfController::class, 'exportPdfDailyTest'])->name('export.dailytest');
+    Route::get('/export/logbook', [ExportPdfController::class, 'exportPdfLogbook'])->name('export.logbook');
+    Route::post('/export/logbook/filter', [ExportPdfController::class, 'filterLogbook'])->name('export.logbook.filter');
 });
 
 // Supervisor Routes
@@ -47,7 +47,7 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
     Route::post('/logbook/signature/approve/{logbookID}', [LogbookPosJagaController::class, 'signatureApprove'])->name('supervisor.logbook.signature');
 
     // Review Logbook Rotasi PSCP
-    Route::get('/logbook-rotasipscp/list', [DashboardController::class, 'showDataLogbookRotasi'])->name('supervisor.logbook-rotasi.list');
+    Route::get('/logbook-rotasi/list', [DashboardController::class, 'showDataLogbookRotasi'])->name('supervisor.logbook-rotasi.list');
     Route::get('/logbook-rotasipscp/detail/{logbookID}', [LogbookRotasiPSCPController::class, 'showDetailLogbook'])->name('supervisor.logbook-rotasipscp.detail');
     Route::get('/logbook-rotasihbscp/detail/{logbookID}', [LogbookRotasiHBSCPController::class, 'showDetailLogbook'])->name('supervisor.logbook-rotasihbscp.detail');
 });

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Export PDF Form')
+@section('title', 'Export PDF Form Daily Test')
 
 @section('content')
 <div class="bg-gray-50 lg:my-20 py-6 px-4 sm:px-6 lg:px-8">
@@ -9,7 +9,7 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200">
             <!-- Header -->
             <div class="px-6 py-4 border-b border-gray-200">
-                <h2 class="text-xl font-bold text-gray-900">Export PDF Form</h2>
+                <h2 class="text-xl font-bold text-gray-900">Export PDF Form Daily Test</h2>
             </div>
 
             <!-- Form Content -->
@@ -18,12 +18,11 @@
                     <!-- Filter Section -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <!-- Jenis Form -->
-                        <!-- Jenis Form -->
                         <div>
                             <label for="form_type" class="block text-sm font-medium text-gray-700 mb-2">
                                 Jenis Form
                             </label>
-                            <select name="form_type" id="form_type" 
+                            <select name="form_type" id="form_type"
                                 class="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                                 <option value="">Semua Form</option>
                                 @foreach($availableEquipments as $equipment)
@@ -76,13 +75,6 @@
 
                     <!-- Filter Button -->
                     <div class="mb-6">
-                        <!-- <button type="submit"
-                            class="inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"></path>
-                            </svg>
-                            Filter Data
-                        </button> -->
                         <button type="button" onclick="resetFilters()"
                             class="ml-2 inline-flex justify-center items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             Reset Filter

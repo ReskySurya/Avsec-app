@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\DB;
 
 class Report extends Model
@@ -182,9 +183,9 @@ class Report extends Model
     /**
      * Relationship: Report has many Report Details
      */
-    public function reportDetails(): HasMany
+    public function reportDetails(): HasOne
     {
-        return $this->hasMany(ReportDetail::class, 'reportID', 'reportID');
+        return $this->hasOne(ReportDetail::class, 'reportID', 'reportID');
     }
 
     /**

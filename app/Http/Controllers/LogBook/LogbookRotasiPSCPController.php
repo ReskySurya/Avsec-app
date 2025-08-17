@@ -256,6 +256,6 @@ class LogbookRotasiPSCPController extends Controller
             'details.manualKabinOfficer',
         ])->findOrFail($logbookId);
 
-        return view('supervisor.detailLogbookRotasi', compact('logbook'));
+        return view('supervisor.detailLogbookRotasiPSCP', compact('logbook'));
     }
 }

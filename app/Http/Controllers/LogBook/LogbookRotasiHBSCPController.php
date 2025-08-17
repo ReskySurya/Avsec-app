@@ -239,6 +239,6 @@ class LogbookRotasiHBSCPController extends Controller
             'details.reunitedOfficer',
         ])->findOrFail($logbookId);
 
-        return view('supervisor.detailLogbookRotasi', compact('logbook'));
+        return view('supervisor.detailLogbookRotasiHBSCP', compact('logbook'));
     }
 }
