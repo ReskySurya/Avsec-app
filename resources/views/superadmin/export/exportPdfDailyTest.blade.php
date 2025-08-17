@@ -191,7 +191,7 @@
         const locationSelect = document.getElementById('location');
 
         // Data lokasi berdasarkan equipment dari PHP
-        const locationsByEquipment = @json($locationsByEquipment ?? []);
+         const locationsByEquipment = JSON.parse(`{!! json_encode($locationsByEquipment ?? []) !!}`);
 
         // Simpan semua opsi lokasi
         const allLocationOptions = Array.from(locationSelect.options).slice(1); // Kecuali "Semua Lokasi"

@@ -34,4 +34,24 @@ class Tenant extends Model
     {
         return $this->hasMany(ProhibitedItem::class, 'tenantID', 'tenantID');
     }
+    // public function sweepingPI(): HasMany
+    // {
+    //     return $this->hasMany(LogbookSweepingPI::class, 'tenantID', 'tenantID');
+    // }
+    public function logbookSweepingPI(): HasMany
+    {
+        return $this->hasMany(LogbookSweepingPI::class, 'tenantID', 'tenantID');
+    }
+
+    /**
+     * Get or create logbook for specific month/year
+     */
+    public function getOrCreateLogbook(int $bulan, int $tahun): LogbookSweepingPI
+    {
+        return $this->logbookSweepingPI()
+                   ->firstOrCreate([
+                       'bulan' => $bulan,
+                       'tahun' => $tahun,
+                   ]);
+    }
 }
