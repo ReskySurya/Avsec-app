@@ -169,25 +169,149 @@ class LogbookSweppingPIController extends Controller
     }
 
     // superadmin tampilan sweeping PI detail
-    public function indexSweepingPIDetail($tenantID)
+    //    public function indexSweepingPIDetail($tenantID)
+    // {
+    //     // Validate tenant exists
+    //     $tenant = Tenant::where('tenantID', $tenantID)->first();
+    //     if (!$tenant) {
+    //         return redirect()->back()->with('error', 'Tenant tidak ditemukan!');
+    //     }
+
+    //     // Get prohibited items for this tenant
+    //     $prohibitedItems = ProhibitedItem::where('tenantID', $tenantID)
+    //         ->orderBy('items_name')
+    //         ->get();
+
+    //     // Get all sweeping PI logbooks for this tenant (for navigation/history)
+    //     $sweepingPI = LogbookSweepingPI::where('tenantID', $tenantID)
+    //         ->orderBy('tahun', 'desc')
+    //         ->orderBy('bulan', 'desc')
+    //         ->get();
+
+    //     return view('sweeping-pi.detailSweepingPI', [
+    //         'tenant' => $tenant,
+    //         'prohibitedItems' => $prohibitedItems,
+    //         'sweepingPI' => $sweepingPI,
+    //     ]);
+    // }
+
+    public function indexSweepingPIDetail(Request $request, $tenantID, $month)
     {
-        $tenant = Tenant::where('tenantID', $tenantID)->first();
-        if (!$tenant) {
-            return redirect()->back()->with('error', 'Tenant tidak ditemukan!');
-        }
+        // Get parameters with defaults
+        // $month = (int) ($request->get('month', date('n')));
+        $year = (int) ($request->get('year', date('Y')));
+
+        // Validate tenant exists
+        $tenant = Tenant::where('tenantID', $tenantID)->firstOrFail();
+
+        // Find existing logbook for this month/year
+        $logbook = LogbookSweepingPI::where([
+            'tenantID' => $tenantID,
+            'bulan' => $month,
+            'tahun' => $year,
+        ])->first();
+
+        // Get prohibited items from master data for this tenant
         $prohibitedItems = ProhibitedItem::where('tenantID', $tenantID)
             ->orderBy('items_name')
-            ->get();
+            ->get(['id', 'items_name']);
 
+        // If no prohibited items found for this tenant, show error
+        if ($prohibitedItems->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada prohibited items yang dikonfigurasi untuk tenant ini. Silakan hubungi administrator.');
+        }
+
+        // Get all sweeping PI records for this tenant (for history/navigation)
         $sweepingPI = LogbookSweepingPI::where('tenantID', $tenantID)
             ->orderBy('tahun', 'desc')
             ->orderBy('bulan', 'desc')
             ->get();
 
+        // Initialize variables
+        $checklistData = [];
+        $daysInMonth = \Carbon\Carbon::createFromDate($year, $month, 1)->daysInMonth;
+        $totalMissed = 0;
+
+        // If logbook exists, load the checklist data
+        if ($logbook) {
+            // Get existing detail records
+            $existingDetails = LogbookSweepingPIDetail::where('sweepingpiID', $logbook->sweepingpiID)->get();
+
+            Log::info("Loading existing checklist data for logbook: {$logbook->sweepingpiID}");
+
+            // Build checklist data from existing records
+            foreach ($existingDetails as $detail) {
+                $itemIndex = $prohibitedItems->search(function ($item) use ($detail) {
+                    return $item->items_name === $detail->item_name_pi;
+                });
+
+                if ($itemIndex !== false) {
+                    $checklistData[$itemIndex] = [];
+                    for ($day = 1; $day <= $daysInMonth; $day++) {
+                        $field = 'tanggal_' . $day;
+                        // Convert database value to boolean
+                        $checklistData[$itemIndex][$day - 1] = (bool) $detail->$field;
+                    }
+                } else {
+                    // Item exists in detail but not in current prohibited items
+                    Log::warning("Found detail for item '{$detail->item_name_pi}' but item not found in current prohibited items list");
+                }
+            }
+
+            // Calculate missed items (for statistics)
+            $today = now();
+            $currentDate = \Carbon\Carbon::createFromDate($year, $month, 1);
+
+            if ($currentDate->month <= $today->month && $currentDate->year <= $today->year) {
+                $maxDay = ($currentDate->month == $today->month && $currentDate->year == $today->year)
+                    ? min($today->day, $daysInMonth)
+                    : $daysInMonth;
+
+                foreach ($prohibitedItems as $index => $item) {
+                    if (isset($checklistData[$index])) {
+                        for ($day = 0; $day < $maxDay; $day++) {
+                            if (!($checklistData[$index][$day] ?? false)) {
+                                $totalMissed++;
+                            }
+                        }
+                    } else {
+                        // If no data for this item, count all days as missed
+                        $totalMissed += $maxDay;
+                    }
+                }
+            }
+        } else {
+            // No logbook exists, initialize empty checklist data
+            foreach ($prohibitedItems as $index => $item) {
+                $checklistData[$index] = [];
+                for ($day = 0; $day < $daysInMonth; $day++) {
+                    $checklistData[$index][$day] = false;
+                }
+            }
+
+            // Calculate missed items for empty logbook
+            $today = now();
+            $currentDate = \Carbon\Carbon::createFromDate($year, $month, 1);
+
+            if ($currentDate->month <= $today->month && $currentDate->year <= $today->year) {
+                $maxDay = ($currentDate->month == $today->month && $currentDate->year == $today->year)
+                    ? min($today->day, $daysInMonth)
+                    : $daysInMonth;
+
+                $totalMissed = $prohibitedItems->count() * $maxDay;
+            }
+        }
+
         return view('sweeping-pi.detailSweepingPI', [
             'tenant' => $tenant,
+            'logbook' => $logbook,
             'prohibitedItems' => $prohibitedItems,
             'sweepingPI' => $sweepingPI,
+            'checklistData' => $checklistData,
+            'month' => $month,
+            'year' => $year,
+            'daysInMonth' => $daysInMonth,
+            'totalMissed' => $totalMissed,
         ]);
     }
 

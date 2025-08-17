@@ -73,7 +73,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $item->tahun }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <a href="{{ route('sweepingPI.detail.index', ['tenantID' => $tenant->tenantID]) }}"
+                            <a href="{{ route('sweepingPI.detail.index', ['tenantID' => $tenant->tenantID,'month' => $item->bulan]) }}"
                                 class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">
                                 Detail
                             </a>
