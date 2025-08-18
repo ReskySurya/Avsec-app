@@ -294,7 +294,6 @@
                         <div class="flex justify-center items-center h-full">
                             <button
                                 type="button"
-                                disabled
                                 class="w-6 h-6 border-2 rounded cursor-pointer transition-all duration-200 hover:scale-110 relative ${checkboxClass}"
                                 onclick="toggleCheck(${itemIndex}, ${day})"
                                 title="Toggle checklist ${item.items_name} tanggal ${day + 1}">
@@ -329,7 +328,7 @@
         if (isChecked) {
             return 'border-green-500 bg-green-500';
         } else if (isMissed) {
-            return 'border-yellow-500 bg-yellow-100';
+            return 'border-yellow-500 bg-yellow-100' ;
         } else {
             return 'border-gray-300 bg-white hover:border-blue-400';
         }

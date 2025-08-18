@@ -130,7 +130,7 @@
         border-collapse: separate;
         border-spacing: 0;
     }
-    
+
     .checklist-cell {
         width: 45px;
         min-width: 45px;
@@ -139,7 +139,7 @@
         border-right: 1px solid #e5e7eb;
         background-color: white;
     }
-    
+
     .item-name-cell {
         min-width: 250px;
         width: 250px;
@@ -149,22 +149,22 @@
         line-height: 1.4;
         vertical-align: middle;
     }
-    
+
     /* Ensure sticky positioning works properly */
     .sticky {
         position: -webkit-sticky;
         position: sticky;
     }
-    
+
     /* Fix for table borders */
     .checklist-table td {
         border-bottom: 1px solid #f3f4f6;
     }
-    
+
     .checklist-table tr:hover td {
         background-color: #f9fafb;
     }
-    
+
     .checklist-table tr:hover .sticky {
         background-color: #f9fafb;
     }
@@ -178,7 +178,7 @@
     let currentYear = '{{ $year }}';
     let prohibitedItems = @json($prohibitedItems);
     let checklist = @json($checklistData ?? []);
-    let notes = '{!! addslashes($logbook->notes ?? '') !!}';
+    let notes = '{!! addslashes($logbook->notes ?? "") !!}';
     let saveTimeout = null;
     let currentModalItem = null;
     let currentModalDay = null;
@@ -196,28 +196,46 @@
     });
 
     function initializeApp() {
+        console.log('=== DEBUG INFO ===');
         console.log('Prohibited Items:', prohibitedItems);
+        console.log('Prohibited Items Length:', prohibitedItems?.length);
         console.log('Checklist Data:', checklist);
-        
+        console.log('Current Month:', currentMonth);
+        console.log('Current Year:', currentYear);
+        console.log('Days in Month:', getDaysInMonth());
+
+        // Check if data exists
+        if (!prohibitedItems || prohibitedItems.length === 0) {
+            console.error('❌ PROHIBITED ITEMS IS EMPTY OR NULL!');
+            document.getElementById('checklist-tbody').innerHTML = `
+            <tr>
+                <td colspan="32" class="text-center py-8 text-gray-500">
+                    No prohibited items data found. Please check your data source.
+                </td>
+            </tr>
+        `;
+            return;
+        }
+
         // Set month/year
         const months = [
             'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
             'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
         ];
         document.getElementById('current-month-year').textContent = `${months[currentMonth - 1]} ${currentYear}`;
-        
+
         // Set notes
         document.getElementById('notes-input').value = notes;
-        
+
         // Initialize checklist
         initializeChecklist();
-        
+
         // Render table
         renderTable();
-        
+
         // Update statistics
         updateStats();
-        
+
         // Add notes change listener
         document.getElementById('notes-input').addEventListener('input', function() {
             notes = this.value;
@@ -252,17 +270,43 @@
         console.log('Checklist initialized:', checklist);
     }
 
+    // function getCheckboxClass(itemIndex, dayIndex) {
+    //     const isChecked = checklist[itemIndex] && checklist[itemIndex][dayIndex];
+    //     const currentDate = new Date();
+    //     const checkDate = new Date(currentYear, currentMonth - 1, dayIndex + 1);
+    //     const today = new Date();
+    //     today.setHours(0, 0, 0, 0);
+    //     checkDate.setHours(0, 0, 0, 0);
+
+    //     const isMissed = checkDate < today && !isChecked;
+
+    //     if (isChecked) {
+    //         return 'border-green-500 bg-green-500';
+    //     } else if (isMissed) {
+    //         return 'border-yellow-500 bg-yellow-100 cursor-not-allowed opacity-60';
+    //     } else {
+    //         return 'border-gray-300 bg-white hover:border-blue-400';
+    //     }
+    // }
+
     function renderTable() {
+        console.log('🔄 Starting renderTable...');
+
         const daysInMonth = getDaysInMonth();
-        
+        console.log('Days in month:', daysInMonth);
+
         // First, add day headers to the existing header row
         const headerRow = document.querySelector('thead tr');
-        
+        if (!headerRow) {
+            console.error('❌ Header row not found!');
+            return;
+        }
+
         // Remove existing day headers (keep only the first th)
         while (headerRow.children.length > 1) {
             headerRow.removeChild(headerRow.lastChild);
         }
-        
+
         // Add day headers
         for (let day = 1; day <= daysInMonth; day++) {
             const th = document.createElement('th');
@@ -272,66 +316,75 @@
             th.style.minWidth = '45px';
             headerRow.appendChild(th);
         }
-        
+
         // Render checklist items
         const tbody = document.getElementById('checklist-tbody');
+        if (!tbody) {
+            console.error('❌ Tbody not found!');
+            return;
+        }
+
         let tbodyHtml = '';
-        
+
+        console.log('📝 Rendering', prohibitedItems.length, 'items...');
+
         prohibitedItems.forEach((item, itemIndex) => {
+            console.log(`Rendering item ${itemIndex}:`, item.items_name);
+
             tbodyHtml += `
-                <tr class="hover:bg-gray-50 transition-colors duration-150">
-                    <td class="sticky left-0 bg-white item-name-cell text-sm font-medium text-gray-900 border-r-2 border-gray-300 z-10">
-                        ${item.items_name}
-                    </td>
-            `;
-            
+            <tr class="hover:bg-gray-50 transition-colors duration-150">
+                <td class="sticky left-0 bg-white item-name-cell text-sm font-medium text-gray-900 border-r-2 border-gray-300 z-10">
+                    ${item.items_name}
+                </td>
+        `;
+
             for (let day = 0; day < daysInMonth; day++) {
-                const checkboxClass = getCheckboxClass(itemIndex, day);
                 const isChecked = checklist[itemIndex] && checklist[itemIndex][day];
-                
+
+                // Calculate isMissed for this specific day and item
+                const checkDate = new Date(currentYear, currentMonth - 1, day + 1);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                checkDate.setHours(0, 0, 0, 0);
+                const isMissed = checkDate < today && !isChecked;
+
+                // Get checkbox class
+                let checkboxClass;
+                if (isChecked) {
+                    checkboxClass = 'border-green-500 bg-green-500';
+                } else if (isMissed) {
+                    checkboxClass = 'border-yellow-500 bg-yellow-100 cursor-not-allowed opacity-60';
+                } else {
+                    checkboxClass = 'border-gray-300 bg-white hover:border-blue-400';
+                }
+
                 tbodyHtml += `
-                    <td class="checklist-cell">
-                        <div class="flex justify-center items-center h-full">
-                            <button
-                                type="button"
-                                class="w-6 h-6 border-2 rounded cursor-pointer transition-all duration-200 hover:scale-110 relative ${checkboxClass}"
-                                onclick="toggleCheck(${itemIndex}, ${day})"
-                                title="Toggle checklist ${item.items_name} tanggal ${day + 1}">
-                                
-                                ${isChecked ? `
-                                <svg class="w-4 h-4 text-white absolute inset-0 m-auto" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                                </svg>
-                                ` : ''}
-                            </button>
-                        </div>
-                    </td>
-                `;
+                <td class="checklist-cell">
+                    <div class="flex justify-center items-center h-full">
+                        <button
+                            type="button"
+                            class="w-6 h-6 border-2 rounded transition-all duration-200 ${!isMissed ? 'hover:scale-110' : ''} relative ${checkboxClass}"
+                            ${isMissed ? 'disabled' : ''}
+                            onclick="${isMissed ? '' : `toggleCheck(${itemIndex}, ${day})`}"
+                            title="${isMissed ? `Terlewat - ${item.items_name} tanggal ${day + 1}` : `Toggle checklist ${item.items_name} tanggal ${day + 1}`}">
+                        
+                            ${isChecked ? `
+                            <svg class="w-4 h-4 text-white absolute inset-0 m-auto" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            ` : ''}
+                        </button>
+                    </div>
+                </td>
+            `;
             }
-            
+
             tbodyHtml += '</tr>';
         });
-        
+
+        console.log('📄 Generated HTML length:', tbodyHtml.length);
         tbody.innerHTML = tbodyHtml;
-    }
-
-    function getCheckboxClass(itemIndex, dayIndex) {
-        const isChecked = checklist[itemIndex] && checklist[itemIndex][dayIndex];
-        const currentDate = new Date();
-        const checkDate = new Date(currentYear, currentMonth - 1, dayIndex + 1);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        checkDate.setHours(0, 0, 0, 0);
-        
-        const isMissed = checkDate < today && !isChecked;
-
-        if (isChecked) {
-            return 'border-green-500 bg-green-500';
-        } else if (isMissed) {
-            return 'border-yellow-500 bg-yellow-100';
-        } else {
-            return 'border-gray-300 bg-white hover:border-blue-400';
-        }
+        console.log('✅ Table rendered successfully');
     }
 
     function toggleCheck(itemIndex, dayIndex) {
@@ -378,13 +431,13 @@
 
     async function saveProgress() {
         const loadingOverlay = document.getElementById('loading-overlay');
-        
+
         try {
             loadingOverlay.classList.remove('hidden');
             console.log('Saving progress...');
 
             const saveUrl = `{{ route('logbookSweppingPI.store') }}`; // Adjust route name as needed
-            
+
             const response = await fetch(saveUrl, {
                 method: 'POST',
                 headers: {

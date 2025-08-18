@@ -150,13 +150,13 @@ $isLogbookPosJagaOpen = request()->is('logbook/posjaga*');
                     </li>
 
                     <!-- Menu Lainnya -->
+                    @if(auth()->user()->role->name === 'officer')
                     <li>
                         <a href="{{ route('logbookSweppingPI.index') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook-sweppingpi') ? 'bg-gray-700' : '' }}">
                             <span>Logbook Sweeping PI</span>
                         </a>
                     </li>
-                    @if(auth()->user()->role->name === 'officer')
                     <li>
                         <a href="{{ route('logbookRotasiHBSCP.index') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook-rotasihbscp') ? 'bg-gray-700' : '' }}">
@@ -171,6 +171,11 @@ $isLogbookPosJagaOpen = request()->is('logbook/posjaga*');
                     </li>
                     @else
                     <li>
+                        <a href="{{ route('sweepingPI.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('sweepingpi') ? 'bg-gray-700' : '' }}">
+                            <span>Logbook Sweeping PI</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="{{ route('supervisor.logbook-rotasi.list') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook-rotasi/list') ? 'bg-gray-700' : '' }}">
                             <span>Logbook Rotasi</span>
@@ -181,14 +186,8 @@ $isLogbookPosJagaOpen = request()->is('logbook/posjaga*');
             </li>
 
 
-            
+
             @if(auth()->user()->role->name === 'superadmin')
-            <li>
-                <a href="{{ route('sweepingPI.index') }}" class="flex items-center p-2 rounded hover:bg-gray-700">
-                    <svg class="h-5 w-5 mr-3" ...></svg>
-                    <span>Sweeping PI</span>
-                </a>
-            </li>
             <li>
                 <a href="{{ route('export.index') }}" class="flex items-center p-2 rounded hover:bg-gray-700">
                     <svg class="h-5 w-5 mr-3" ...></svg>
@@ -203,7 +202,7 @@ $isLogbookPosJagaOpen = request()->is('logbook/posjaga*');
                     <span>PM dan IK</span>
                 </a>
             </li>
-            
+
             <li class="hidden lg:block">
                 <form method="GET" action="{{ route('logout') }}">
                     @csrf

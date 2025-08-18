@@ -163,6 +163,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('logbook/rotasi-pscp/autosave', [LogbookRotasiPSCPController::class, 'autosave'])->name('logbook.rotasi-pscp.autosave');
     Route::get('logbook/rotasi-pscp/load-draft', [LogbookRotasiPSCPController::class, 'loadDraft'])->name('logbook.rotasi-pscp.load-draft');
     Route::post('logbook/rotasi-pscp/submit', [LogbookRotasiPSCPController::class, 'submit'])->name('logbook.rotasi-pscp.submit');
+    
     // Logbook Sweeping PI
     Route::get('/logbook-sweppingpi', [LogbookSweppingPIController::class, 'index'])->name('logbookSweppingPI.index');
     Route::get('/logbook/sweepingpi/detail/{tenantID}', [LogbookSweppingPIController::class, 'indexLogbookSweepingPIDetail'])->name('logbookSweppingPI.detail.index');
