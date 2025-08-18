@@ -12,6 +12,7 @@ use App\Http\Controllers\DailyTest\XrayController;
 use App\Http\Controllers\LogBook\LogbookPosJagaController;
 use App\Http\Controllers\LogBook\LogbookRotasiHBSCPController;
 use App\Http\Controllers\LogBook\LogbookRotasiPSCPController;
+use App\Models\LogbookSweepingPI;
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
@@ -29,6 +30,16 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::get('/dashboard/superadmin', function () {
         return view('superadmin.dashboardSuperadmin');
     })->name('dashboard.superadmin');
+
+    Route::get('/sweepingpi', [LogbookSweppingPIController::class, 'indexSweepingPI'])->name('sweepingPI.index');
+
+    Route::get('/sweepingpi/manage/{tenantID}', [LogbookSweppingPIController::class, 'indexSweepingPIManage'])->name('sweepingPI.manage.index');
+    Route::post('/sweepingpi/manage/store', [LogbookSweppingPIController::class, 'storeSweepingPI'])->name('sweepingPI.manage.store');
+    Route::delete('/sweepingpi/manage/destroy/{sweepingpiID}', [LogbookSweppingPIController::class, 'deleteSweepingPI'])->name('sweepingPI.manage.destroy');
+
+    Route::get('/sweepingpi/manage/detail/{tenantID}/{month}', [LogbookSweppingPIController::class, 'indexSweepingPIDetail'])->name('sweepingPI.detail.index');
+
+
 
     Route::get('/export', [ExportPdfController::class, 'index'])->name('export.index');
     Route::get('/export/dailytest', [ExportPdfController::class, 'exportPdfDailyTest'])->name('export.dailytest');
@@ -152,6 +163,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('logbook/rotasi-pscp/autosave', [LogbookRotasiPSCPController::class, 'autosave'])->name('logbook.rotasi-pscp.autosave');
     Route::get('logbook/rotasi-pscp/load-draft', [LogbookRotasiPSCPController::class, 'loadDraft'])->name('logbook.rotasi-pscp.load-draft');
     Route::post('logbook/rotasi-pscp/submit', [LogbookRotasiPSCPController::class, 'submit'])->name('logbook.rotasi-pscp.submit');
+    // Logbook Sweeping PI
+    Route::get('/logbook-sweppingpi', [LogbookSweppingPIController::class, 'index'])->name('logbookSweppingPI.index');
+    Route::get('/logbook/sweepingpi/detail/{tenantID}', [LogbookSweppingPIController::class, 'indexLogbookSweepingPIDetail'])->name('logbookSweppingPI.detail.index');
+    Route::post('/logbook/sweepingpi/store', [LogbookSweppingPIController::class, 'saveProgressSweepingPI'])->name('logbookSweppingPI.store');
 
     // Logbook Pos Jaga
     Route::get('/logbook/posjaga', [LogbookPosJagaController::class, 'index'])->name('logbook.index');
