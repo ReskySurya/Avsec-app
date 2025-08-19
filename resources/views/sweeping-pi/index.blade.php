@@ -27,7 +27,8 @@
         <!-- Mobile Card View -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8 md:hidden">
             @forelse($tenantList ?? [] as $index => $tenant)
-            <div class="group bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200/70 overflow-hidden hover:border-gray-300/70">
+            <div class="group bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200/70 overflow-hidden hover:border-gray-300/70"
+            @click="window.location.href='{{ route('sweepingPI.manage.index', ['tenantID' => $tenant->tenantID]) }}'">
                 <div class="p-6">
                     <div class="space-y-3">
                         <div class="flex items-center justify-between mb-4">

@@ -31,13 +31,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
         return view('superadmin.dashboardSuperadmin');
     })->name('dashboard.superadmin');
 
-    Route::get('/sweepingpi', [LogbookSweppingPIController::class, 'indexSweepingPI'])->name('sweepingPI.index');
-
-    Route::get('/sweepingpi/manage/{tenantID}', [LogbookSweppingPIController::class, 'indexSweepingPIManage'])->name('sweepingPI.manage.index');
-    Route::post('/sweepingpi/manage/store', [LogbookSweppingPIController::class, 'storeSweepingPI'])->name('sweepingPI.manage.store');
-    Route::delete('/sweepingpi/manage/destroy/{sweepingpiID}', [LogbookSweppingPIController::class, 'deleteSweepingPI'])->name('sweepingPI.manage.destroy');
-
-    Route::get('/sweepingpi/manage/detail/{tenantID}/{month}', [LogbookSweppingPIController::class, 'indexSweepingPIDetail'])->name('sweepingPI.detail.index');
+    
 
 
 
@@ -138,7 +132,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     // Route untuk Tenant Management
     Route::get('/tenant-management', [MasterDataController::class, 'indexTenantManagement'])->name('tenant-management.index');
     Route::post('/tenant-management/store', [MasterDataController::class, 'storeTenant'])->name('tenant.store');
-    Route::post('/tenant-management/update/{id}', [MasterDataController::class, 'updateTenant'])->name('tenant.update');
+    Route::post('/tenant-management/update/{tenantID}', [MasterDataController::class, 'updateTenant'])->name('tenant.update');
     Route::delete('/tenant-management/destroy/{id}', [MasterDataController::class, 'destroyTenant'])->name('tenant.destroy');
 
     // Route untuk Tenant Items
@@ -150,7 +144,14 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
 
 // Logbook Routes
 Route::middleware(['auth'])->group(function () {
-    Route::get('/logbook-sweppingpi', [LogbookSweppingPIController::class, 'index'])->name('logbookSweppingPI.index');
+    // Logbook Sweeping PI Supervisor & Superadmin
+    Route::get('/sweepingpi', [LogbookSweppingPIController::class, 'indexSweepingPI'])->name('sweepingPI.index');
+
+    Route::get('/sweepingpi/manage/{tenantID}', [LogbookSweppingPIController::class, 'indexSweepingPIManage'])->name('sweepingPI.manage.index');
+    Route::post('/sweepingpi/manage/store', [LogbookSweppingPIController::class, 'storeSweepingPI'])->name('sweepingPI.manage.store');
+    Route::delete('/sweepingpi/manage/destroy/{sweepingpiID}', [LogbookSweppingPIController::class, 'deleteSweepingPI'])->name('sweepingPI.manage.destroy');
+
+    Route::get('/sweepingpi/manage/detail/{tenantID}/{month}', [LogbookSweppingPIController::class, 'indexSweepingPIDetail'])->name('sweepingPI.detail.index');
 
     // Logbook Rotasi HBSCP
     Route::get('/logbook-rotasihbscp', [LogbookRotasiHBSCPController::class, 'index'])->name('logbookRotasiHBSCP.index');

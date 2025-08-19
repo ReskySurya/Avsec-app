@@ -9,7 +9,9 @@
             openEditTenant: false, 
             editTenantData: { 
                     tenantID: '', 
-                    tenant_name: '' 
+                    tenant_name: '',
+                    supervisorSignature: '',
+                    supervisorName: ''
                 },
             }" class="mx-auto  p-6 min-h-screen" class=" mx-auto sm:mt-6 lg:mt-20 px-4 sm:px-6 lg:px-8 py-8">
     <!-- Header -->
@@ -73,7 +75,8 @@
         <!-- Mobile Card View -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6 md:hidden">
             @forelse($tenantList ?? [] as $index => $tenant)
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200"
+            @click="window.location.href='{{ route('tenant.items', ['tenantID' => $tenant->tenantID]) }}'">
                 <div class="p-5 flex justify-between">
                     <h4 class="text-lg font-bold text-gray-800 truncate">{{ $tenant->tenantID }}</h4>
                     <p class="text-gray-500 mt-2"># {{ $index + 1 }}</p>
@@ -82,10 +85,12 @@
                     <span class="px-5 py-3 text-gray-700">{{ $tenant->tenant_name }}</span>
                 </div>
                 <div class="bg-gray-50 px-5 py-3 flex justify-end space-x-2">
-                    <button type="button" @click="
+                    <button type="button" @click.stop="
                         openEditTenant = true;
                         editTenantData.tenantID = '{{ $tenant->tenantID }}';
                         editTenantData.tenant_name = '{{ $tenant->tenant_name }}';
+                        editTenantData.supervisorSignature = '{{ $tenant->supervisorSignature }}';
+                        editTenantData.supervisorName = '{{ $tenant->supervisorName }}';
                         "
                         class="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 transition-colors duration-200">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -128,9 +133,8 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-100">
                     @forelse($tenantList ?? [] as $index => $tenant)
-                    <tr class="hover:bg-gray-50 transition-all duration-200 cursor-pointer" 
-                    @click="window.location.href='{{ route('tenant.items', ['tenantID' => $tenant->tenantID]) }}'"
-                    >
+                    <tr class="hover:bg-gray-50 transition-all duration-200 cursor-pointer"
+                        @click="window.location.href='{{ route('tenant.items', ['tenantID' => $tenant->tenantID]) }}'">
                         <td class="px-6 py-4 whitespace-nowrap  font-medium">{{ $index + 1 }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-gray-900">{{ $tenant->tenantID }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-gray-900">{{ $tenant->tenant_name }}</td>
@@ -141,6 +145,8 @@
                                         openEditTenant = true;
                                         editTenantData.tenantID = '{{ $tenant->tenantID }}';
                                         editTenantData.tenant_name = '{{ $tenant->tenant_name }}';
+                                        editTenantData.supervisorSignature = '{{ $tenant->supervisorSignature }}';
+                                        editTenantData.supervisorName = '{{ $tenant->supervisorName }}';
                                     ">
                                 <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -152,7 +158,7 @@
                             <form action="{{ route('tenant.destroy',$tenant->tenantID) }}" method="POST" class="inline-block">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit"  onclick="return confirm('Yakin ingin menghapus?')"
+                                <button type="submit" onclick="return confirm('Yakin ingin menghapus?')"
                                     class="bg-red-100 text-red-600 hover:bg-red-200 px-4 py-2 rounded-lg font-medium transition-colors duration-200">
                                     <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
@@ -181,20 +187,24 @@
         </div>
     </div>
 
-    <!-- add Tenant -->
+    <!-- Modal Tambah Tenant -->
     <div x-show="openTenant" x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100"
         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform scale-100"
         x-transition:leave-end="opacity-0 transform scale-95"
         class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
-        <div @click.away="openTenant = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
-            <div class="bg-gradient-to-r from-blue-500 to-cyan-600 text-white p-6 rounded-t-2xl">
+
+        <div @click.away="openTenant = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl max-h-[100vh] overflow-y-auto">
+            <div class="bg-gradient-to-r from-blue-500 to-cyan-600 text-white p-4 rounded-t-2xl">
                 <h2 class="text-2xl font-bold">Tambah Tenant</h2>
                 <p class="text-blue-100">Tambahkan Tenant baru</p>
             </div>
+
             <form action="{{ route('tenant.store') }}" method="POST" class="p-6">
                 @csrf
-                <div class="mb-6">
+
+                <!-- Input Nama Tenant -->
+                <div class="">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Tenant</label>
                     <input type="text" name="tenant_name" required
                         class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200"
@@ -203,7 +213,43 @@
                     <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="flex justify-end space-x-3">
+
+                <!-- Signature Pad -->
+                <div class="">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Tanda Tangan Supervisor</label>
+                    <div class="relative w-full h-48 border-2 border-gray-300 rounded-lg bg-gray-50">
+                        <canvas id="signature-canvas" class="w-full h-full rounded-lg"></canvas>
+                        <div id="signature-placeholder" class="absolute inset-0 flex items-center justify-center text-gray-400 text-sm pointer-events-none">
+                            Tanda tangan di sini
+                        </div>
+                    </div>
+
+                    <!-- Signature Controls -->
+                    <div class=" mt-2">
+                        <button type="button" id="clear-signature"
+                            class="text-sm text-red-600 hover:text-red-800 font-medium">
+                            Hapus Tanda Tangan
+                        </button>
+                    </div>
+
+                    <input type="hidden" name="signature" id="signature-data">
+                    @error('signature')
+                    <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Supervisor</label>
+                    <input type="text" name="supervisorName" required
+                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200"
+                        value="{{ old('supervisorName') }}" placeholder="Masukkan nama supervisor">
+                    @error('supervisorName')
+                    <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end space-x-3 pt-4 border-t">
                     <button type="button" @click="openTenant = false"
                         class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium">
                         Batal
@@ -216,35 +262,73 @@
             </form>
         </div>
     </div>
-    <!-- edit Tenant -->
+
+
+    <!-- Modal Edit Tenant -->
     <div x-show="openEditTenant" x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100"
         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform scale-100"
         x-transition:leave-end="opacity-0 transform scale-95"
         class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
-        <div @click.away="openEditTenant = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
-            <div class="bg-gradient-to-r from-blue-500 to-cyan-600 text-white p-6 rounded-t-2xl">
+        <div @click.away="openEditTenant = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 rounded-t-2xl">
                 <h2 class="text-2xl font-bold">Edit Tenant</h2>
-                <p class="text-blue-100">Ubah informasi tenant</p>
+                <p class="text-green-100">Perbarui nama tenant</p>
             </div>
-            <form
-                :action="'/tenant-management/update/' + editTenantData.tenantID"
-                method="POST" class="p-6">
+            <form :action="`{{ url('/tenant-management/update') }}/${editTenantData.tenantID}`" method="POST" class="p-6">
                 @csrf
                 @method('POST')
-                <div class="mb-6">
+
+                <!-- Input Nama Tenant -->
+                <div class="">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Tenant</label>
-                    <input type="text" name="tenant_name" required x-model="editTenantData.tenant_name"
-                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200"
-                        placeholder="Masukkan nama tenant">
+                    <input type="text" name="tenant_name" required
+                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-green-500 focus:outline-none transition-colors duration-200"
+                        :value="editTenantData.tenant_name" placeholder="Masukkan nama tenant">
+                    @error('tenant_name')
+                    <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
+                    @enderror
                 </div>
-                <div class="flex justify-end space-x-3">
+
+                <!-- Display Existing Signature -->
+                <div class="" x-show="editTenantData.supervisorSignature">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Tanda Tangan Supervisor</label>
+                    <div class="relative w-full h-48 border-2 border-gray-200 rounded-lg bg-gray-50 p-2">
+                        <img :src="`data:image/png;base64,${editTenantData.supervisorSignature}`"
+                            alt="Tanda tangan supervisor"
+                            class="w-full h-full object-contain rounded">
+                    </div>
+                </div>
+
+                <!-- No Signature Message -->
+                <div class="" x-show="!editTenantData.supervisorSignature">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Tanda Tangan Supervisor</label>
+                    <div class="relative w-full h-24 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
+                        <p class="text-gray-500 text-sm">
+                            <i class="fas fa-signature mr-2"></i>
+                            Belum ada tanda tangan tersimpan
+                        </p>
+                    </div>
+                </div>
+
+                <div class="">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Supervisor</label>
+                    <input type="text" name="supervisorName"
+                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-green-500 focus:outline-none transition-colors duration-200"
+                        :value="editTenantData.supervisorName" readonly>
+                    @error('supervisorName')
+                    <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end space-x-3 pt-4 border-t">
                     <button type="button" @click="openEditTenant = false"
                         class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium">
                         Batal
                     </button>
                     <button type="submit"
-                        class="px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-xl hover:from-blue-600 hover:to-cyan-700 transition-all duration-200 font-medium shadow-lg">
+                        class="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 font-medium shadow-lg">
                         Perbarui
                     </button>
                 </div>
@@ -253,4 +337,120 @@
     </div>
 
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let canvas, ctx, isDrawing = false,
+            hasSignature = false;
+
+        function initSignaturePad() {
+            canvas = document.getElementById('signature-canvas');
+            if (!canvas) return;
+
+            ctx = canvas.getContext('2d');
+            const placeholder = document.getElementById('signature-placeholder');
+
+            // Set canvas size
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+            // Set drawing styles
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            // Mouse events
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+
+            // Touch events
+            canvas.addEventListener('touchstart', handleTouch);
+            canvas.addEventListener('touchmove', handleTouch);
+            canvas.addEventListener('touchend', stopDrawing);
+
+            function startDrawing(e) {
+                isDrawing = true;
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+
+                if (placeholder) placeholder.style.display = 'none';
+                hasSignature = true;
+            }
+
+            function draw(e) {
+                if (!isDrawing) return;
+
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                ctx.lineTo(x, y);
+                ctx.stroke();
+            }
+
+            function stopDrawing() {
+                if (isDrawing) {
+                    isDrawing = false;
+                    ctx.beginPath();
+                    updateSignatureData();
+                }
+            }
+
+            function handleTouch(e) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' :
+                    e.type === 'touchmove' ? 'mousemove' : 'mouseup', {
+                        clientX: touch.clientX,
+                        clientY: touch.clientY
+                    });
+                canvas.dispatchEvent(mouseEvent);
+            }
+
+            function updateSignatureData() {
+                if (hasSignature) {
+                    const signatureData = canvas.toDataURL('image/png');
+                    document.getElementById('signature-data').value = signatureData;
+                }
+            }
+
+            // Clear signature
+            const clearBtn = document.getElementById('clear-signature');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    document.getElementById('signature-data').value = '';
+                    if (placeholder) placeholder.style.display = 'flex';
+                    hasSignature = false;
+                });
+            }
+        }
+
+        // Initialize when modal opens
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                    const modal = mutation.target;
+                    if (modal.style.display !== 'none') {
+                        setTimeout(initSignaturePad, 100); // Small delay to ensure modal is fully rendered
+                    }
+                }
+            });
+        });
+
+        const modal = document.querySelector('[x-show="openTenant"]');
+        if (modal) {
+            observer.observe(modal, {
+                attributes: true
+            });
+        }
+    });
+</script>
 @endsection

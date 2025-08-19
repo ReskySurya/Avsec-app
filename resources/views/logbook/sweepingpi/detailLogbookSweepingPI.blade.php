@@ -335,6 +335,7 @@
             <tr class="hover:bg-gray-50 transition-colors duration-150">
                 <td class="sticky left-0 bg-white item-name-cell text-sm font-medium text-gray-900 border-r-2 border-gray-300 z-10">
                     ${item.items_name}
+                    <span class="text-sm text-gray-500">(${item.quantity} item)</span>
                 </td>
         `;
 

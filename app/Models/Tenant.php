@@ -18,6 +18,7 @@ class Tenant extends Model
         'tenantID',
         'tenant_name',
         'supervisorSignature',
+        'supervisorName',
     ];
 
     public static function generateTenantID(): string

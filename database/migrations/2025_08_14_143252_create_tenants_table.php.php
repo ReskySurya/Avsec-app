@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('tenantID', 10)->primary();
             $table->string('tenant_name')->nullable();
             $table->text('supervisorSignature')->nullable();
+            $table->string('supervisorName')->nullable();
             $table->timestamps();
 
             $table->index('tenantID');

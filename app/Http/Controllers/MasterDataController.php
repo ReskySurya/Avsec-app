@@ -475,7 +475,7 @@ class MasterDataController extends Controller
         $tenantList = Tenant::orderBy('tenantID')->get();
         return view(
             'master-data.tenant-management.index',
-            compact('tenantList')
+            ['tenantList' => $tenantList]
         );
     }
 
@@ -483,15 +483,24 @@ class MasterDataController extends Controller
     {
         $request->validate([
             'tenant_name' => 'required|string|max:255|unique:tenants,tenant_name',
+            'signature' => 'nullable|string', // Validasi untuk signature
         ]);
 
         try {
             $tenantID = Tenant::generateTenantID();
 
+            // Process signature data jika ada
+            $signatureData = null;
+            if ($request->signature && $request->signature !== '') {
+                // Remove data:image/png;base64, prefix jika ada
+                $signatureData = str_replace('data:image/png;base64,', '', $request->signature);
+            }
+
             Tenant::create([
                 'tenantID' => $tenantID,
                 'tenant_name' => $request->tenant_name,
-                'supervisorSignature' => $request->null,
+                'supervisorName' => $request->supervisorName, // Simpan nama supervisor
+                'supervisorSignature' => $signatureData, // Simpan signature
             ]);
 
             return redirect()->back()->with('success', 'Tenant berhasil ditambahkan!');
@@ -504,14 +513,15 @@ class MasterDataController extends Controller
     public function updateTenant(Request $request, $tenantID)
     {
         $request->validate([
-            'tenant_name' => 'required|string|max:255|unique:tenants,tenant_name,' . $tenantID,
+            'tenant_name' => 'required|string|max:255|unique:tenants,tenant_name,' . $tenantID . ',tenantID',
         ]);
 
         try {
             $tenant = Tenant::findOrFail($tenantID);
+
+            // Hanya update nama tenant saja
             $tenant->update([
                 'tenant_name' => $request->tenant_name,
-                'supervisorSignature' => $request->null,
             ]);
 
             return redirect()->back()->with('success', 'Tenant berhasil diperbarui!');
@@ -529,7 +539,6 @@ class MasterDataController extends Controller
                 return redirect()->back()->with('error', 'Tenant tidak ditemukan.');
             }
             $tenant->delete();
-
             return redirect()->back()->with('success', 'Tenant berhasil dihapus!');
         } catch (\Exception $e) {
             Log::error('Error deleting tenant: ' . $e->getMessage());

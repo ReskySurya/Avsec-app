@@ -100,7 +100,7 @@ class LogbookSweppingPIController extends Controller
         // Get prohibited items from master data for this tenant
         $prohibitedItems = ProhibitedItem::where('tenantID', $tenantID)
             ->orderBy('items_name')
-            ->get(['id', 'items_name']);
+            ->get(['id', 'items_name', 'quantity']);
 
         // If no prohibited items found for this tenant, use default items or throw error
         if ($prohibitedItems->isEmpty()) {
@@ -214,7 +214,7 @@ class LogbookSweppingPIController extends Controller
         // Get prohibited items from master data for this tenant
         $prohibitedItems = ProhibitedItem::where('tenantID', $tenantID)
             ->orderBy('items_name')
-            ->get(['id', 'items_name']);
+            ->get(['id', 'items_name', 'quantity']);
 
         // If no prohibited items found for this tenant, show error
         if ($prohibitedItems->isEmpty()) {
@@ -343,7 +343,7 @@ class LogbookSweppingPIController extends Controller
         // Get prohibited items from master data for this tenant
         $prohibitedItems = ProhibitedItem::where('tenantID', $tenantID)
             ->orderBy('items_name')
-            ->get(['id', 'items_name']);
+            ->get(['id', 'items_name','quantity']);
 
         // If no prohibited items found for this tenant, use default items or throw error
         if ($prohibitedItems->isEmpty()) {
