@@ -21,15 +21,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- <div class="flex flex-col sm:flex-row gap-3">
-                <button onclick="saveProgress()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200">
-                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    Simpan
-                </button>
-            </div> -->
         </div>
 
         <!-- Progress Summary -->
@@ -46,10 +37,6 @@
                 <div class="text-2xl font-bold text-yellow-600" id="total-pending">0</div>
                 <div class="text-sm text-yellow-800">Pending</div>
             </div>
-            <!-- <div class="bg-red-50 p-4 rounded-xl">
-                <div class="text-2xl font-bold text-red-600" id="total-violations">0</div>
-                <div class="text-sm text-red-800">Violations</div>
-            </div> -->
         </div>
     </div>
 
@@ -76,40 +63,51 @@
                 </tbody>
             </table>
 
-            <!-- Notes Section -->
-            <div class="border-t border-gray-200 bg-white">
-                <div class="flex items-stretch">
-                    <div class="sticky left-0 bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-700 border-r-2 border-gray-300 z-10 flex items-center" style="min-width: 250px; width: 250px;">
-                        CATATAN:
+            <!-- Note Modal -->
+            <div id="note-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+                <div class="bg-white rounded-xl shadow-xl max-w-md mx-auto mt-40 p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold">Catatan</h2>
+                        <span class="text-sm text-gray-500" id="modal-info"></span>
                     </div>
-                    <div class="flex-1 p-2">
-                        <input
-                            type="text"
-                            id="notes-input"
-                            class="w-full h-8 text-sm border border-gray-300 rounded px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="Tambahkan catatan untuk bulan ini..."
-                            value="{{ $logbook->notes ?? '' }}">
+                    <textarea id="note-textarea" rows="4" class="w-full border rounded p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Masukkan catatan untuk hari ini..."></textarea>
+                    <div class="mt-4 flex justify-end space-x-2">
+                        <button onclick="closeNoteModal()" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 transition-colors">Batal</button>
+                        <button onclick="saveNote()" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors">Simpan</button>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 
     <!-- Legend -->
     <div class="mt-6 bg-white rounded-xl shadow-lg p-6">
         <h4 class="text-lg font-semibold text-gray-800 mb-4">Keterangan:</h4>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 text-sm">
             <div class="flex items-center">
-                <div class="w-4 h-4 bg-green-500 rounded mr-3"></div>
+                <div class="w-6 h-6 bg-green-500 rounded mr-3"></div>
                 <span>Sudah dicek hari ini</span>
             </div>
             <div class="flex items-center">
-                <div class="w-4 h-4 bg-gray-300 rounded mr-3"></div>
+                <div class="w-6 h-6 bg-gray-300 rounded mr-3"></div>
                 <span>Belum dicek</span>
             </div>
             <div class="flex items-center">
-                <div class="w-4 h-4 bg-yellow-500 rounded mr-3"></div>
+                <div class="w-6 h-6 bg-yellow-500 rounded mr-3"></div>
                 <span>Terlewat (hari sebelumnya)</span>
+            </div>
+            <div class="flex items-center">
+                <svg class="bg-[#3b82f6] w-6 h-6 mr-3 p-1" fill="none" stroke="#ffffff" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                <span>Ada catatan harian</span>
+            </div>
+            <div class="flex items-center">
+                <svg class="w-6 h-6 text-gray-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                <span>Tombol catatan harian</span>
             </div>
         </div>
     </div>
@@ -132,12 +130,13 @@
     }
 
     .checklist-cell {
-        width: 45px;
-        min-width: 45px;
+        width: 60px;
+        min-width: 60px;
         padding: 8px 4px;
         text-align: center;
         border-right: 1px solid #e5e7eb;
         background-color: white;
+        vertical-align: middle;
     }
 
     .item-name-cell {
@@ -148,6 +147,32 @@
         white-space: normal;
         line-height: 1.4;
         vertical-align: middle;
+    }
+
+    .note-button {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        border: 1px solid #d1d5db;
+        background: white;
+        color: #6b7280;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        font-size: 12px;
+    }
+
+    .note-button:hover {
+        border-color: #3b82f6;
+        color: #3b82f6;
+        background: #eff6ff;
+    }
+
+    .note-button.has-note {
+        background: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
     }
 
     /* Ensure sticky positioning works properly */
@@ -168,6 +193,13 @@
     .checklist-table tr:hover .sticky {
         background-color: #f9fafb;
     }
+
+    .cell-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+    }
 </style>
 
 <script>
@@ -178,7 +210,8 @@
     let currentYear = '{{ $year }}';
     let prohibitedItems = @json($prohibitedItems);
     let checklist = @json($checklistData ?? []);
-    let notes = '{!! addslashes($logbook->notes ?? "") !!}';
+    let dailyNotes = @json($dailyNotes ?? []); // Notes per hari saja
+
     let saveTimeout = null;
     let currentModalItem = null;
     let currentModalDay = null;
@@ -200,6 +233,7 @@
         console.log('Prohibited Items:', prohibitedItems);
         console.log('Prohibited Items Length:', prohibitedItems?.length);
         console.log('Checklist Data:', checklist);
+        console.log('Daily Notes:', dailyNotes);
         console.log('Current Month:', currentMonth);
         console.log('Current Year:', currentYear);
         console.log('Days in Month:', getDaysInMonth());
@@ -210,7 +244,7 @@
             document.getElementById('checklist-tbody').innerHTML = `
             <tr>
                 <td colspan="32" class="text-center py-8 text-gray-500">
-                    No prohibited items data found. Please check your data source.
+                    tidak ada prohibited items yang ditemukan. Tolong cek kembali data.
                 </td>
             </tr>
         `;
@@ -224,23 +258,15 @@
         ];
         document.getElementById('current-month-year').textContent = `${months[currentMonth - 1]} ${currentYear}`;
 
-        // Set notes
-        document.getElementById('notes-input').value = notes;
-
-        // Initialize checklist
+        // Initialize checklist and notes
         initializeChecklist();
+        initializeNotes();
 
         // Render table
         renderTable();
 
         // Update statistics
         updateStats();
-
-        // Add notes change listener
-        document.getElementById('notes-input').addEventListener('input', function() {
-            notes = this.value;
-            autoSave();
-        });
     }
 
     function getDaysInMonth() {
@@ -270,24 +296,27 @@
         console.log('Checklist initialized:', checklist);
     }
 
-    // function getCheckboxClass(itemIndex, dayIndex) {
-    //     const isChecked = checklist[itemIndex] && checklist[itemIndex][dayIndex];
-    //     const currentDate = new Date();
-    //     const checkDate = new Date(currentYear, currentMonth - 1, dayIndex + 1);
-    //     const today = new Date();
-    //     today.setHours(0, 0, 0, 0);
-    //     checkDate.setHours(0, 0, 0, 0);
+    function initializeNotes() {
+        console.log('🔄 Initializing notes...');
+        console.log('📝 dailyNotes from server:', dailyNotes);
 
-    //     const isMissed = checkDate < today && !isChecked;
+        if (!dailyNotes) {
+            console.log('📝 dailyNotes is null/undefined, creating empty object');
+            dailyNotes = {};
+        }
 
-    //     if (isChecked) {
-    //         return 'border-green-500 bg-green-500';
-    //     } else if (isMissed) {
-    //         return 'border-yellow-500 bg-yellow-100 cursor-not-allowed opacity-60';
-    //     } else {
-    //         return 'border-gray-300 bg-white hover:border-blue-400';
-    //     }
-    // }
+        const daysInMonth = getDaysInMonth();
+
+        for (let day = 0; day < daysInMonth; day++) {
+            if (dailyNotes[day] === undefined) {
+                dailyNotes[day] = '';
+            } else if (dailyNotes[day]) {
+                console.log(`📝 Found existing note for day ${day + 1}:`, dailyNotes[day]);
+            }
+        }
+
+        console.log('📝 Daily notes after initialization:', dailyNotes);
+    }
 
     function renderTable() {
         console.log('🔄 Starting renderTable...');
@@ -312,8 +341,8 @@
             const th = document.createElement('th');
             th.className = 'checklist-cell px-2 py-3 text-center text-sm font-semibold text-gray-700 border-r border-gray-200 bg-gray-100';
             th.textContent = day;
-            th.style.width = '45px';
-            th.style.minWidth = '45px';
+            th.style.width = '60px';
+            th.style.minWidth = '60px';
             headerRow.appendChild(th);
         }
 
@@ -341,6 +370,7 @@
 
             for (let day = 0; day < daysInMonth; day++) {
                 const isChecked = checklist[itemIndex] && checklist[itemIndex][day];
+                const hasNote = dailyNotes[day] && dailyNotes[day].trim() !== '';
 
                 // Calculate isMissed for this specific day and item
                 const checkDate = new Date(currentYear, currentMonth - 1, day + 1);
@@ -361,7 +391,7 @@
 
                 tbodyHtml += `
                 <td class="checklist-cell">
-                    <div class="flex justify-center items-center h-full">
+                    <div class="cell-content">
                         <button
                             type="button"
                             class="w-6 h-6 border-2 rounded transition-all duration-200 ${!isMissed ? 'hover:scale-110' : ''} relative ${checkboxClass}"
@@ -375,6 +405,19 @@
                             </svg>
                             ` : ''}
                         </button>
+                        
+                        ${itemIndex === prohibitedItems.length - 1 ? `
+                        <button
+                            type="button"
+                            class="note-button mt-2 ${hasNote ? 'has-note' : ''}"
+                            onclick="openNoteModal(${day})"
+                            title="Tambah catatan untuk tanggal ${day + 1}${hasNote ? ' - Ada catatan' : ''}">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </button>
+                        ` : ''
+                        }
                     </div>
                 </td>
             `;
@@ -399,6 +442,45 @@
         autoSave();
     }
 
+    function openNoteModal(dayIndex) {
+        console.log(`🔄 Opening note modal for day ${dayIndex + 1}`);
+        console.log(`📝 Existing note:`, dailyNotes[dayIndex]);
+
+        currentModalDay = dayIndex;
+        currentModalItem = null;
+
+        const dayNumber = dayIndex + 1;
+
+        document.getElementById('modal-info').textContent = `Catatan Tanggal ${dayNumber}`;
+        document.getElementById('note-textarea').value = dailyNotes[dayIndex] ? dailyNotes[dayIndex] : '';
+        document.getElementById('note-modal').classList.remove('hidden');
+
+        // Focus on textarea
+        setTimeout(() => {
+            document.getElementById('note-textarea').focus();
+        }, 100);
+    }
+
+
+    function closeNoteModal() {
+        document.getElementById('note-modal').classList.add('hidden');
+        currentModalItem = null;
+        currentModalDay = null;
+    }
+
+    function saveNote() {
+        if (currentModalDay === null) return;
+
+        const noteText = document.getElementById('note-textarea').value;
+        dailyNotes[currentModalDay] = noteText;
+
+        closeNoteModal();
+        renderTable(); // Re-render to update note button styles
+        autoSave();
+
+        showNotification('Catatan berhasil disimpan', 'success');
+    }
+
     function updateStats() {
         let totalChecked = 0;
         const daysInMonth = getDaysInMonth();
@@ -420,7 +502,6 @@
         document.getElementById('completion-rate').textContent = statistics.completion_rate + '%';
         document.getElementById('total-checked').textContent = statistics.total_checked;
         document.getElementById('total-pending').textContent = statistics.total_pending;
-        // document.getElementById('total-violations').textContent = statistics.total_violations;
     }
 
     function autoSave() {
@@ -437,7 +518,7 @@
             loadingOverlay.classList.remove('hidden');
             console.log('Saving progress...');
 
-            const saveUrl = `{{ route('logbookSweppingPI.store') }}`; // Adjust route name as needed
+            const saveUrl = `{{ route('logbookSweppingPI.store') }}`;
 
             const response = await fetch(saveUrl, {
                 method: 'POST',
@@ -448,8 +529,9 @@
                 body: JSON.stringify({
                     logbook_id: logbookId,
                     items_name: prohibitedItems.map(item => item.items_name),
+                    quantity: prohibitedItems.map(item => item.quantity),
                     checklist_data: checklist,
-                    notes: notes
+                    daily_notes: formatDailyNotesForBackend(dailyNotes), // Fungsi baru
                 })
             });
 
@@ -489,13 +571,45 @@
     document.addEventListener('keydown', function(e) {
         // Escape key to close modal
         if (e.key === 'Escape') {
-            closeModal();
+            closeNoteModal();
         }
         // Ctrl+S to save
         if (e.ctrlKey && e.key === 's') {
             e.preventDefault();
             saveProgress();
         }
+        // Enter key to save note when modal is open
+        if (e.key === 'Enter' && e.ctrlKey && currentModalDay !== null) {
+            e.preventDefault();
+            saveNote();
+        }
     });
+
+   function formatDailyNotesForBackend(dailyNotes) {
+    console.log('🐛 formatDailyNotesForBackend input:', dailyNotes);
+    console.log('🐛 currentYear:', currentYear, 'currentMonth:', currentMonth);
+    
+    const formattedNotes = [];
+    const daysInMonth = getDaysInMonth();
+
+    for (let day = 0; day < daysInMonth; day++) {
+        if (dailyNotes[day] && dailyNotes[day].trim() !== '') {
+            // PERBAIKAN: Gunakan format tanggal yang lebih explicit
+            const dayNumber = day + 1; // Convert 0-based to 1-based
+            const dateString = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
+            
+            const noteItem = {
+                tanggal: dateString,
+                notes: dailyNotes[day]
+            };
+
+            console.log(`🐛 Day ${dayNumber} (index ${day}) - Adding note:`, noteItem);
+            formattedNotes.push(noteItem);
+        }
+    }
+
+    console.log('🐛 formatDailyNotesForBackend output:', formattedNotes);
+    return formattedNotes;
+}
 </script>
 @endsection

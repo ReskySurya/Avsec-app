@@ -7,8 +7,10 @@ use App\Models\Logbook;
 use App\Models\Location;
 use App\Models\LogbookSweepingPI;
 use App\Models\LogbookSweepingPIDetail;
+use App\Models\NoteSweepingPI;
 use App\Models\ProhibitedItem;
 use App\Models\Tenant;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
@@ -18,34 +20,6 @@ use Illuminate\View\View;
 
 class LogbookSweppingPIController extends Controller
 {
-    // public function indexLogbookSweepingPIDetail($tenantID)
-    // {
-    //     $tenant = Tenant::where('tenantID', $tenantID)->first();
-    //     if (!$tenant) {
-    //         return redirect()->back()->with('error', 'Tenant tidak ditemukan!');
-    //     }
-    //     $prohibitedItems = ProhibitedItem::where('tenantID', $tenantID)
-    //         ->orderBy('items_name')
-    //         ->get();
-
-    //     $currentMonth = date('n'); // Gets current month (1-12)
-    //     $currentYear = date('Y');  // Gets current year
-
-    //     $sweepingPI = LogbookSweepingPI::where('tenantID', $tenantID)
-    //         ->where('bulan', $currentMonth)
-    //         ->where('tahun', $currentYear)
-    //         ->orderBy('tahun', 'desc')
-    //         ->orderBy('bulan', 'desc')
-    //         ->get();
-
-    //     return view('logbook.sweepingpi.detailLogbookSweepingPI', [
-    //         'tenant' => $tenant,
-    //         'prohibitedItems' => $prohibitedItems,
-    //         'sweepingPI' => $sweepingPI
-    //     ]);
-    // }
-
-
     //superadmin tampilan sweeping PI
     public function indexSweepingPI()
     {
@@ -124,6 +98,7 @@ class LogbookSweppingPIController extends Controller
                 $detailData = [
                     'sweepingpiID' => $logbook->sweepingpiID,
                     'item_name_pi' => $item->items_name,
+                    'quantity' => $item->quantity
                 ];
 
                 // Initialize all days for this month as unchecked (0)
@@ -153,7 +128,6 @@ class LogbookSweppingPIController extends Controller
             return redirect()->back()->with('error', 'Gagal menginisialisasi data checklist. Silakan coba lagi.');
         }
     }
-
     public function deleteSweepingPI($sweepingpiID)
     {
         $sweepingPI = LogbookSweepingPI::find($sweepingpiID);
@@ -167,34 +141,7 @@ class LogbookSweppingPIController extends Controller
 
         return redirect()->route('sweepingPI.manage.index', ['tenantID' => $tenantID])->with('success', 'Data berhasil dihapus!');
     }
-
     // superadmin tampilan sweeping PI detail
-    //    public function indexSweepingPIDetail($tenantID)
-    // {
-    //     // Validate tenant exists
-    //     $tenant = Tenant::where('tenantID', $tenantID)->first();
-    //     if (!$tenant) {
-    //         return redirect()->back()->with('error', 'Tenant tidak ditemukan!');
-    //     }
-
-    //     // Get prohibited items for this tenant
-    //     $prohibitedItems = ProhibitedItem::where('tenantID', $tenantID)
-    //         ->orderBy('items_name')
-    //         ->get();
-
-    //     // Get all sweeping PI logbooks for this tenant (for navigation/history)
-    //     $sweepingPI = LogbookSweepingPI::where('tenantID', $tenantID)
-    //         ->orderBy('tahun', 'desc')
-    //         ->orderBy('bulan', 'desc')
-    //         ->get();
-
-    //     return view('sweeping-pi.detailSweepingPI', [
-    //         'tenant' => $tenant,
-    //         'prohibitedItems' => $prohibitedItems,
-    //         'sweepingPI' => $sweepingPI,
-    //     ]);
-    // }
-
     public function indexSweepingPIDetail(Request $request, $tenantID, $month)
     {
         // Get parameters with defaults
@@ -302,12 +249,35 @@ class LogbookSweppingPIController extends Controller
             }
         }
 
+        $dailyNotes = [];
+        $notesFromDB = NoteSweepingPI::where('sweepingpiID', $logbook->sweepingpiID)
+            ->orderBy('tanggal')
+            ->get();
+
+        // Convert notes dari database ke format yang diharapkan frontend
+        foreach ($notesFromDB as $note) {
+            // Extract day dari tanggal database
+            $date = Carbon::parse($note->tanggal);
+            if ($date->month == $month && $date->year == $year) {
+                $dayIndex = $date->day - 1; // Convert ke 0-based index
+                $dailyNotes[$dayIndex] = $note->notes;
+            }
+        }
+
+        // Initialize empty notes untuk hari yang tidak ada notes
+        for ($day = 0; $day < $daysInMonth; $day++) {
+            if (!isset($dailyNotes[$day])) {
+                $dailyNotes[$day] = '';
+            }
+        }
+
         return view('sweeping-pi.detailSweepingPI', [
             'tenant' => $tenant,
             'logbook' => $logbook,
             'prohibitedItems' => $prohibitedItems,
             'sweepingPI' => $sweepingPI,
             'checklistData' => $checklistData,
+            'dailyNotes' => $dailyNotes,
             'month' => $month,
             'year' => $year,
             'daysInMonth' => $daysInMonth,
@@ -343,7 +313,7 @@ class LogbookSweppingPIController extends Controller
         // Get prohibited items from master data for this tenant
         $prohibitedItems = ProhibitedItem::where('tenantID', $tenantID)
             ->orderBy('items_name')
-            ->get(['id', 'items_name','quantity']);
+            ->get(['id', 'items_name', 'quantity']);
 
         // If no prohibited items found for this tenant, use default items or throw error
         if ($prohibitedItems->isEmpty()) {
@@ -369,6 +339,7 @@ class LogbookSweppingPIController extends Controller
                     $detailData = [
                         'sweepingpiID' => $logbook->sweepingpiID,
                         'item_name_pi' => $item->items_name,
+                        'quantity' => $item->quantity
                     ];
 
                     // Initialize all days for this month as unchecked (0)
@@ -426,6 +397,7 @@ class LogbookSweppingPIController extends Controller
                     $detailData = [
                         'sweepingpiID' => $logbook->sweepingpiID,
                         'item_name_pi' => $item->items_name,
+                        'quantity' => $item->quantity
                     ];
 
                     // Initialize all days as unchecked
@@ -442,6 +414,28 @@ class LogbookSweppingPIController extends Controller
                         $checklistData[$index][$day] = false;
                     }
                 }
+            }
+        }
+
+        $dailyNotes = [];
+        $notesFromDB = NoteSweepingPI::where('sweepingpiID', $logbook->sweepingpiID)
+            ->orderBy('tanggal')
+            ->get();
+
+        // Convert notes dari database ke format yang diharapkan frontend
+        foreach ($notesFromDB as $note) {
+            // Extract day dari tanggal database
+            $date = Carbon::parse($note->tanggal);
+            if ($date->month == $month && $date->year == $year) {
+                $dayIndex = $date->day - 1; // Convert ke 0-based index
+                $dailyNotes[$dayIndex] = $note->notes;
+            }
+        }
+
+        // Initialize empty notes untuk hari yang tidak ada notes
+        for ($day = 0; $day < $daysInMonth; $day++) {
+            if (!isset($dailyNotes[$day])) {
+                $dailyNotes[$day] = '';
             }
         }
 
@@ -462,6 +456,7 @@ class LogbookSweppingPIController extends Controller
             'year',
             'prohibitedItems',
             'checklistData',
+            'dailyNotes', 
             'daysInMonth'
         ));
     }
@@ -474,8 +469,14 @@ class LogbookSweppingPIController extends Controller
                 'logbook_id' => 'required|string|exists:logbook_sweeping_pi,sweepingpiID',
                 'items_name' => 'required|array|min:1',
                 'items_name.*' => 'required|string|max:255',
+                'quantity' => 'required|array|min:1',
+                'quantity.*' => 'required|integer|min:1',
                 'checklist_data' => 'required|array',
-                'notes' => 'nullable|string|max:1000'
+                'notes' => 'nullable|string|max:1000',
+                // New validation for daily notes
+                'daily_notes' => 'nullable|array',
+                // 'daily_notes.*.tanggal' => 'required|date',
+                // 'daily_notes.*.notes' => 'required|string|max:2000'
             ]);
 
             if ($validator->fails()) {
@@ -491,15 +492,63 @@ class LogbookSweppingPIController extends Controller
             // Get logbook
             $logbook = LogbookSweepingPI::where('sweepingpiID', $request->logbook_id)->firstOrFail();
 
-            // Update notes
+            // Update main notes (existing functionality)
             $logbook->update([
                 'notes' => $request->notes
             ]);
 
-            // Validate checklist data structure
+            // Process daily notes (new functionality)
+            // Process daily notes (FIXED VERSION)
+            $savedNotes = 0;
+            if ($request->has('daily_notes') && is_array($request->daily_notes)) {
+                Log::info('Daily notes received:', ['daily_notes' => $request->daily_notes]);
+
+                foreach ($request->daily_notes as $dailyNote) {
+                    // Pastikan ini adalah array dengan key 'tanggal' dan 'notes'
+                    if (
+                        is_array($dailyNote) &&
+                        isset($dailyNote['tanggal']) &&
+                        isset($dailyNote['notes']) &&
+                        !empty($dailyNote['notes'])
+                    ) {
+
+                        // Check if note already exists for this date
+                        $existingNote = NoteSweepingPI::where('sweepingpiID', $logbook->sweepingpiID)
+                            ->where('tanggal', $dailyNote['tanggal'])
+                            ->first();
+
+                        if ($existingNote) {
+                            // Update existing note
+                            $existingNote->update([
+                                'notes' => $dailyNote['notes']
+                            ]);
+                            Log::info('Updated existing note', [
+                                'date' => $dailyNote['tanggal'],
+                                'note' => $dailyNote['notes']
+                            ]);
+                        } else {
+                            // Create new note
+                            NoteSweepingPI::create([
+                                'sweepingpiID' => $logbook->sweepingpiID,
+                                'tanggal' => $dailyNote['tanggal'],
+                                'notes' => $dailyNote['notes']
+                            ]);
+                            Log::info('Created new note', [
+                                'date' => $dailyNote['tanggal'],
+                                'note' => $dailyNote['notes']
+                            ]);
+                        }
+                        $savedNotes++;
+                    }
+                }
+            }
+
+            Log::info('Total notes saved:', ['count' => $savedNotes]);
+
+            // Validate checklist data structure (existing functionality)
             $this->validateChecklistData($request->checklist_data, $request->items_name);
 
-            // Process checklist data
+            // Process checklist data (existing functionality)
             $savedItems = 0;
             foreach ($request->items_name as $index => $itemName) {
                 if (isset($request->checklist_data[$index])) {
@@ -514,6 +563,7 @@ class LogbookSweppingPIController extends Controller
                         $detailData = [
                             'sweepingpiID' => $logbook->sweepingpiID,
                             'item_name_pi' => $itemName,
+                            'quantity' => $request->quantity[$index] ?? 0
                         ];
 
                         // Initialize all days as unchecked first
@@ -551,6 +601,7 @@ class LogbookSweppingPIController extends Controller
                 'logbook_id' => $logbook->sweepingpiID,
                 'tenant_id' => $logbook->tenantID,
                 'saved_items' => $savedItems,
+                'saved_notes' => $savedNotes,
                 'month' => $logbook->bulan,
                 'year' => $logbook->tahun
             ]);
@@ -560,6 +611,7 @@ class LogbookSweppingPIController extends Controller
                 'message' => 'Data berhasil disimpan',
                 'data' => [
                     'saved_items' => $savedItems,
+                    'saved_notes' => $savedNotes,
                     // 'statistics' => $statistics,
                     'last_updated' => now()->format('Y-m-d H:i:s')
                 ]

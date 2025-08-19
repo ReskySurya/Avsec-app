@@ -31,7 +31,7 @@ class LogbookSweepingPI extends Model
     protected static function boot()
     {
         parent::boot();
-        
+       
         // Auto-generate sweepingpiID when creating
         static::creating(function ($sweepingPI) {
             if (empty($sweepingPI->sweepingpiID)) {
@@ -44,7 +44,7 @@ class LogbookSweepingPI extends Model
     {
         $prefix = 'SPI-';
         $date = now()->format('ymd'); // 6 digit date (YYMMDD)
-        
+       
         // Get the last sweepingpi for today to determine sequence
         $lastSweepingPI = static::whereDate('created_at', today())
             ->where('sweepingpiID', 'like', $prefix . $date . '%')
@@ -73,13 +73,21 @@ class LogbookSweepingPI extends Model
     }
 
     /**
+     * Relationship to Notes
+     */
+    public function notesSweepingPI(): HasMany
+    {
+        return $this->hasMany(NoteSweepingPI::class, 'sweepingpiID', 'sweepingpiID');
+    }
+
+    /**
      * Get completion statistics for this logbook
      */
     public function getCompletionStats()
     {
         $details = $this->sweepingPIDetails;
         $daysInMonth = \Carbon\Carbon::createFromDate($this->tahun, $this->bulan, 1)->daysInMonth;
-        
+       
         $totalChecked = 0;
         $totalItems = $details->count();
         $totalCells = $totalItems * $daysInMonth;

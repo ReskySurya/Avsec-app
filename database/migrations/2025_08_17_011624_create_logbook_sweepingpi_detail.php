@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('detail_logbook_sweeping_pi', function (Blueprint $table) {
+        Schema::create('logbook_sweeping_pi_detail', function (Blueprint $table) {
             $table->id();
             $table->string('sweepingpiID', 20);
             $table->string('item_name_pi');
+            $table->integer('quantity');
             for ($i = 1; $i <= 31; $i++) {
                 $table->tinyInteger("tanggal_$i")->nullable();
             }
@@ -30,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('detail_logbook_sweeping_pi');
+        Schema::dropIfExists('logbook_sweeping_pi_detail');
     }
 };

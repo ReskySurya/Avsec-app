@@ -7,11 +7,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class LogbookSweepingPIDetail extends Model
 {
-    protected $table = 'detail_logbook_sweeping_pi';
+    protected $table = 'logbook_sweeping_pi_detail';
 
     protected $fillable = [
         'sweepingpiID',
         'item_name_pi',
+        'quantity',
         'tanggal_1',
         'tanggal_2',
         'tanggal_3',
