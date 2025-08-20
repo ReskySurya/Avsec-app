@@ -19,7 +19,8 @@ class DatabaseSeeder extends Seeder
             LocationSeeder::class,
             EquipmentSeeder::class,
             EquipmentLocationSeeder::class,
-            ReportStatusSeeder::class
+            ReportStatusSeeder::class,
+            ChecklistKendaraanSeeder::class
         ]);
     }
 }
