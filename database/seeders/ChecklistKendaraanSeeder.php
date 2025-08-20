@@ -26,7 +26,7 @@ class ChecklistKendaraanSeeder extends Seeder
             ['name' => 'Lampu Sein Kanan Depan', 'type' => 'motor', 'created_at' => $now, 'updated_at' => $now],
             ['name' => 'Lampu Sein Kiri Depan', 'type' => 'motor', 'created_at' => $now, 'updated_at' => $now],
             ['name' => 'Lampu Sein Kanan Belakang', 'type' => 'motor', 'created_at' => $now, 'updated_at' => $now],
-            ['name' => 'Lampu Sein Kanan Belakang', 'type' => 'motor', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Lampu Sein Kiri Belakang', 'type' => 'motor', 'created_at' => $now, 'updated_at' => $now],
             ['name' => 'Rem Depan', 'type' => 'motor', 'created_at' => $now, 'updated_at' => $now],
             ['name' => 'Rem Belakang', 'type' => 'motor', 'created_at' => $now, 'updated_at' => $now],
             ['name' => 'Kopling Tangan', 'type' => 'motor', 'created_at' => $now, 'updated_at' => $now],

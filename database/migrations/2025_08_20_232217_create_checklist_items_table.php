@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('checklist_items', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('category')->default('UNCATEGORIZED');
             $table->enum('type', ['motor', 'mobil'])->comment('Kategori item untuk jenis kendaraan');
             $table->timestamps();
         });
