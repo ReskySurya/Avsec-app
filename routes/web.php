@@ -137,6 +137,10 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::post('/tenant-management/items/store', [MasterDataController::class, 'storeProhibitedItem'])->name('prohibited-items.store');
     Route::post('/tenant-management/items/update/{id}', [MasterDataController::class, 'updateProhibitedItem'])->name('prohibited-items.update');
     Route::delete('/tenant-management/items/destroy/{id}', [MasterDataController::class, 'destroyProhibitedItem'])->name('prohibited-items.destroy');
+
+    //Route untuk Checklist Items
+    //Kendaraan
+    Route::get('/checklist-items-kendaraan', [MasterDataController::class, 'indexChecklistItemsKendaraan'])->name('checklist-items-kendaraan.index');
 });
 
 // Logbook Routes

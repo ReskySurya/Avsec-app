@@ -546,6 +546,7 @@ class MasterDataController extends Controller
         }
     }
 
+    // Prohibited Items
     public function indexProhibitedItem($tenantID)
     {
         $tenant = Tenant::all()
@@ -629,5 +630,15 @@ class MasterDataController extends Controller
             Log::error('Error deleting prohibited item: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal menghapus Prohibited Item: ' . $e->getMessage());
         }
+    }
+
+    //Checklist Items Kendaraan
+    public function indexChecklistItemsKendaraan()
+    {
+        
+
+        return view('master-data.checklist-items.index', [
+            
+        ]);
     }
 }
