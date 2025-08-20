@@ -203,15 +203,9 @@ $isChecklistOpen = request()->is('checklist*');
                     <!-- Submenu Checklist -->
                     @if(auth()->user()->role->name === 'officer')
                     <li>
-                        <a href="#"
+                        <a href="{{ route('checklist.kendaraan.index') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklist-motor-patroli') ? 'bg-gray-700' : '' }}">
-                            <span>Checklist Motor Patroli</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#"
-                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklist-perawatan-patroli') ? 'bg-gray-700' : '' }}">
-                            <span>Checklist Perawatan Patroli</span>
+                            <span>Checklist Kendaraan Patroli</span>
                         </a>
                     </li>
                     <li>

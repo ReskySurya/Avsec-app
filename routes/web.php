@@ -7,6 +7,7 @@ use App\Http\Controllers\LogBook\LogbookSweppingPIController;
 use App\Http\Controllers\MasterDataController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Checklist\ChecklistKendaraanController;
 use App\Http\Controllers\DailyTest\WtmdController;
 use App\Http\Controllers\DailyTest\XrayController;
 use App\Http\Controllers\LogBook\LogbookPosJagaController;
@@ -186,4 +187,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/supervisor/posjaga/detail/{logbookID}', [LogbookPosJagaController::class, 'supervisorReviewLogbook'])->name('supervisor.logbook.detail');
     Route::post('/supervisor/posjaga/detail/reject/{logbookID}', [LogbookPosJagaController::class, 'rejectLogbook'])->name('supervisor.logbook.reject');
     Route::get('/officer/posjaga/detail/{logbookID}', [LogbookPosJagaController::class, 'officerReviewLogbook'])->name('officer.logbook.detail');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/checklist-harian-kendaraan', [ChecklistKendaraanController::class, 'indexChecklistKendaraan'])->name('checklist.kendaraan.index');
+    
 });
