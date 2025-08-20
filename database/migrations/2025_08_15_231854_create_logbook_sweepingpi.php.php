@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('tenantID', 10);
             $table->integer('bulan'); // 1-12 untuk bulan
             $table->integer('tahun'); // tahun (misal: 2025)
-            $table->text('notes')->nullable(); // Catatan umum
             $table->timestamps();
 
             $table->foreign('tenantID')->references('tenantID')->on('tenants')->onDelete('cascade');

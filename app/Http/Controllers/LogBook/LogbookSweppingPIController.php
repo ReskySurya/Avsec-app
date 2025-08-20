@@ -24,7 +24,7 @@ class LogbookSweppingPIController extends Controller
     public function indexSweepingPI()
     {
         $tenantList = Tenant::orderBy('tenantID')->get();
-        return view('sweeping-pi.index', ['tenantList' => $tenantList]);
+        return view('superadmin.sweeping-pi.index', ['tenantList' => $tenantList]);
     }
     public function indexSweepingPIManage($tenantID)
     {
@@ -39,7 +39,7 @@ class LogbookSweppingPIController extends Controller
             ->orderBy('bulan', 'desc')
             ->get();
 
-        return view('sweeping-pi.sweepingPIManage', [
+        return view('superadmin.sweeping-pi.sweepingPIManage', [
             'tenant' => $tenant,
             'tenantID' => $tenantID,
             'prohibitedItems' => $prohibitedItems,
@@ -271,7 +271,7 @@ class LogbookSweppingPIController extends Controller
             }
         }
 
-        return view('sweeping-pi.detailSweepingPI', [
+        return view('.superadmin.sweeping-pi.detailSweepingPI', [
             'tenant' => $tenant,
             'logbook' => $logbook,
             'prohibitedItems' => $prohibitedItems,
@@ -460,7 +460,6 @@ class LogbookSweppingPIController extends Controller
             'daysInMonth'
         ));
     }
-
     public function saveProgressSweepingPI(Request $request)
     {
         try {
@@ -472,7 +471,7 @@ class LogbookSweppingPIController extends Controller
                 'quantity' => 'required|array|min:1',
                 'quantity.*' => 'required|integer|min:1',
                 'checklist_data' => 'required|array',
-                'notes' => 'nullable|string|max:1000',
+                // 'notes' => 'nullable|string|max:1000',
                 // New validation for daily notes
                 'daily_notes' => 'nullable|array',
                 // 'daily_notes.*.tanggal' => 'required|date',
@@ -493,9 +492,9 @@ class LogbookSweppingPIController extends Controller
             $logbook = LogbookSweepingPI::where('sweepingpiID', $request->logbook_id)->firstOrFail();
 
             // Update main notes (existing functionality)
-            $logbook->update([
-                'notes' => $request->notes
-            ]);
+            // $logbook->update([
+            //     'notes' => $request->notes
+            // ]);
 
             // Process daily notes (new functionality)
             // Process daily notes (FIXED VERSION)

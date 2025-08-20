@@ -31,10 +31,6 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
         return view('superadmin.dashboardSuperadmin');
     })->name('dashboard.superadmin');
 
-    
-
-
-
     Route::get('/export', [ExportPdfController::class, 'index'])->name('export.index');
     Route::get('/export/dailytest', [ExportPdfController::class, 'exportPdfDailyTest'])->name('export.dailytest');
     Route::get('/export/logbook', [ExportPdfController::class, 'exportPdfLogbook'])->name('export.logbook');
