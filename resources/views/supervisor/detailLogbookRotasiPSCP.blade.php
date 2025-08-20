@@ -1,16 +1,25 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 py-6 lg:pt-20">
-    <h1 class="text-xl font-bold mb-4">Detail Logbook Rotasi</h1>
+<div class="container-lg mx-auto px-4 py-6">
+    <div class="flex justify-between items-center mb-4">
+        <h1 class="text-2xl font-bold text-gray-800">Detail Logbook Rotasi HBSCP</h1>
+    </div>
 
-    {{-- Informasi Logbook Utama --}}
-    <div class="bg-white p-4 shadow rounded mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {{-- Informasi Logbook Utama (Sama seperti view lama) --}}
+    <div class="bg-white p-6 rounded-lg shadow-md mb-6 border border-gray-200">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
-                <p><span class="font-semibold">Tanggal:</span> {{ $logbook->date ? $logbook->date->format('d/m/Y') : '-' }}</p>
-                <p><span class="font-semibold">Status:</span>
-                    <span class="px-2 py-1 text-xs rounded
+                <p class="text-gray-600"><span class="font-semibold text-gray-900">ID Logbook:</span> {{ $logbook->id }}
+                </p>
+                <p class="text-gray-600"><span class="font-semibold text-gray-900">Tanggal:</span> {{
+                    \Carbon\Carbon::parse($logbook->date)->format('d F Y') }}</p>
+                <p class="text-gray-600"><span class="font-semibold text-gray-900">Dibuat oleh:</span> {{
+                    $logbook->creator?->display_name ?? '-' }}</p>
+            </div>
+            <div>
+                <p class="flex items-center text-gray-600"><span class="font-semibold text-gray-900 mr-2">Status:</span>
+                    <span class="px-3 py-1 text-xs font-medium rounded-full
                         @if($logbook->status === 'approved') bg-green-100 text-green-800
                         @elseif($logbook->status === 'submitted') bg-yellow-100 text-yellow-800
                         @else bg-gray-100 text-gray-800
@@ -18,175 +27,140 @@
                         {{ ucfirst($logbook->status) ?? '-' }}
                     </span>
                 </p>
-            </div>
-            <div>
-                <p><span class="font-semibold">Dibuat oleh:</span> {{ $logbook->creator?->display_name ?? '-' }}</p>
                 @if($logbook->approved_by)
-                    <p><span class="font-semibold">Diselesaikan oleh:</span> {{ $logbook->approver?->display_name ?? '-' }}</p>
+                <p class="text-gray-600"><span class="font-semibold text-gray-900">Disetujui oleh:</span> {{
+                    $logbook->approver?->display_name ?? '-' }}</p>
+                <p class="text-gray-600"><span class="font-semibold text-gray-900">Tgl Persetujuan:</span> {{
+                    $logbook->approved_at ? \Carbon\Carbon::parse($logbook->approved_at)->format('d/m/Y H:i') : '-' }}
+                </p>
                 @endif
             </div>
         </div>
-        @if($logbook->approved_at)
-            <p class="mt-2"><span class="font-semibold">Tanggal Persetujuan:</span> {{ $logbook->approved_at?->format('d/m/Y H:i') ?? '-' }}</p>
-        @endif
         @if($logbook->notes)
-            <p class="mt-2"><span class="font-semibold">Catatan:</span> {{ $logbook->notes }}</p>
+        <p class="mt-4 text-sm text-gray-600"><span class="font-semibold text-gray-900">Catatan:</span> {{
+            $logbook->notes }}</p>
         @endif
     </div>
 
-    {{-- Desktop Table View --}}
-    <div class="hidden md:block bg-white p-4 shadow rounded">
+    {{-- Tabel Detail Logbook Baru --}}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden border border-black">
         <div class="overflow-x-auto">
-            <table class="min-w-full border text-sm text-left">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="border p-2 whitespace-nowrap">Start</th>
-                        <th class="border p-2 whitespace-nowrap">End</th>
-                        <th class="border p-2 whitespace-nowrap">Pemeriksaan Dokumen</th>
-                        <th class="border p-2 whitespace-nowrap">Pengatur Flow</th>
-                        <th class="border p-2 whitespace-nowrap">Operator X-Ray</th>
-                        <th class="border p-2 whitespace-nowrap">HHMD Petugas</th>
-                        <th class="border p-2 whitespace-nowrap">HHMD Random</th>
-                        <th class="border p-2 whitespace-nowrap">HHMD Unpredictable</th>
-                        <th class="border p-2 whitespace-nowrap">Manual Kabin Petugas</th>
-                        <th class="border p-2 whitespace-nowrap">Cek Random Barang</th>
-                        <th class="border p-2 whitespace-nowrap">Barang Unpredictable</th>
-                        <th class="border p-2 whitespace-nowrap">Keterangan</th>
+            <table class="min-w-full text-sm text-center">
+                <thead class="bg-gray-50 border-b border-black">
+                    <tr class="border-b border-black">
+                        <th rowspan="2" class="p-3 font-semibold text-gray-600 tracking-wider border-r border-black align-middle">No</th>
+                        <th rowspan="2" class="p-3 font-semibold text-gray-600 tracking-wider border-x border-black align-middle">
+                            Nama Officer</th>
+                        <th colspan="2" class="p-3 font-semibold text-gray-600 tracking-wider border-x border-black">Pemeriksa Dokumen</th>
+                        <th colspan="2" class="p-3 font-semibold text-gray-600 tracking-wider border-x border-black">Pengatur Flow</th>
+                        <th colspan="2" class="p-3 font-semibold text-gray-600 tracking-wider border-x border-black">Operator X-Ray</th>
+                        <th colspan="4" class="p-3 font-semibold text-gray-600 tracking-wider border-x border-black">Pemeriksaan Orang
+                            Manual/HHMD</th>
+                        <th colspan="4" class="p-3 font-semibold text-gray-600 tracking-wider border-x border-black">Pemeriksa Manual Kabin
+                        </th>
+                        <th rowspan="2" class="p-3 font-semibold text-gray-600 tracking-wider border-l border-black align-middle">Keterangan
+                        </th>
+                    </tr>
+                    <tr class="bg-gray-100">
+                        {{-- Kolom untuk Peran dengan Start/End --}}
+                        <th class="p-2 font-medium text-gray-500 border-x border-black">Start</th>
+                        <th class="p-2 font-medium text-gray-500 border-x border-black">End</th>
+                        <th class="p-2 font-medium text-gray-500 border-x border-black">Start</th>
+                        <th class="p-2 font-medium text-gray-500 border-x border-black">End</th>
+                        <th class="p-2 font-medium text-gray-500 border-x border-black">Start</th>
+                        <th class="p-2 font-medium text-gray-500 border-x border-black">End</th>
+                        {{-- Kolom untuk HHMD --}}
+                        <th class="p-2 font-medium text-gray-500 border-x border-black">Start</th>
+                        <th class="p-2 font-medium text-gray-500 border-x border-black">End</th>
+                        <th class="p-2 font-medium text-gray-500 border-x border-black">R</th>
+                        <th class="p-2 font-medium text-gray-500 border-x border-black">U</th>
+                        {{-- Kolom untuk Manual Kabin --}}
+                        <th class="p-2 font-medium text-gray-500 border-x border-black">Start</th>
+                        <th class="p-2 font-medium text-gray-500 border-x border-black">End</th>
+                        <th class="p-2 font-medium text-gray-500 border-x border-black">R</th>
+                        <th class="p-2 font-medium text-gray-500 border-x border-black">U</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @forelse($logbook->details as $detail)
-                        <tr class="hover:bg-gray-50">
-                            <td class="border p-2">{{ $detail->start ?? '-' }}</td>
-                            <td class="border p-2">{{ $detail->end ?? '-' }}</td>
-                            <td class="border p-2">{{ $detail->pemeriksaanDokumenOfficer?->display_name ?? '-' }}</td>
-                            <td class="border p-2">{{ $detail->pengaturFlowOfficer?->display_name ?? '-' }}</td>
-                            <td class="border p-2">{{ $detail->operatorXrayOfficer?->display_name ?? '-' }}</td>
-                            <td class="border p-2">{{ $detail->hhmdOfficer?->display_name ?? '-' }}</td>
-                            <td class="border p-2 text-center">{{ $detail->hhmd_random ?? 0 }}</td>
-                            <td class="border p-2 text-center">{{ $detail->hhmd_unpredictable ?? 0 }}</td>
-                            <td class="border p-2">{{ $detail->manualKabinOfficer?->display_name ?? '-' }}</td>
-                            <td class="border p-2 text-center">{{ $detail->cek_random_barang ?? 0 }}</td>
-                            <td class="border p-2 text-center">{{ $detail->barang_unpredictable ?? 0 }}</td>
-                            <td class="border p-2">{{ $detail->keterangan ?? '-' }}</td>
-                        </tr>
+                <tbody class="divide-y divide-gray-200">
+                    @forelse($officerLog as $officerId => $data)
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="p-3 text-gray-500 border-r border-black">{{ $loop->iteration }}</td>
+                        <td class="p-3 text-gray-800 text-left font-medium border-x border-black">{{ $data['officer_name'] }}</td>
+
+                        {{-- Kolom Pemeriksaan Dokumen --}}
+                        @php $roleData = $data['roles']['pemeriksaan_dokumen'] ?? []; @endphp
+                        <td class="p-3 border-x border-black">@foreach($roleData as $slot) {!! $slot['start'] !!}<br> @endforeach</td>
+                        <td class="p-3 border-x border-black">@foreach($roleData as $slot) {!! $slot['end'] !!}<br> @endforeach</td>
+
+                        {{-- Kolom Pengatur Flow --}}
+                        @php $roleData = $data['roles']['pengatur_flow'] ?? []; @endphp
+                        <td class="p-3 border-x border-black">@foreach($roleData as $slot) {!! $slot['start'] !!}<br> @endforeach</td>
+                        <td class="p-3 border-x border-black">@foreach($roleData as $slot) {!! $slot['end'] !!}<br> @endforeach</td>
+
+                        {{-- Kolom Operator X-Ray --}}
+                        @php $roleData = $data['roles']['operator_xray'] ?? []; @endphp
+                        <td class="p-3 border-x border-black">@foreach($roleData as $slot) {!! $slot['start'] !!}<br> @endforeach</td>
+                        <td class="p-3 border-x border-black">@foreach($roleData as $slot) {!! $slot['end'] !!}<br> @endforeach</td>
+
+                        {{-- Kolom Pemeriksaan Orang Manual/HHMD (dengan Counter) --}}
+                        @php $roleData = $data['roles']['hhmd_petugas'] ?? []; @endphp
+                        <td class="p-3 border-x border-black">@foreach($roleData as $slot) {!! $slot['start'] !!}<br> @endforeach</td>
+                        <td class="p-3 border-x border-black">@foreach($roleData as $slot) {!! $slot['end'] !!}<br> @endforeach</td>
+                        <td class="p-3 border-x border-black font-semibold text-blue-600">
+                            @foreach($roleData as $slot)
+                            {{-- Ambil nilai counter dari slot --}}
+                            {{ $slot['hhmd_random'] ?? '-' }}<br>
+                            @endforeach
+                        </td>
+                        <td class="p-3 font-semibold text-blue-600">
+                            @foreach($roleData as $slot)
+                            {{ $slot['hhmd_unpredictable'] ?? '-' }}<br>
+                            @endforeach
+                        </td>
+
+                        {{-- Kolom Pemeriksa Manual Kabin (dengan Counter) --}}
+                        @php $roleData = $data['roles']['manual_kabin_petugas'] ?? []; @endphp
+                        <td class="p-3 border-x border-black">@foreach($roleData as $slot) {!! $slot['start'] !!}<br> @endforeach</td>
+                        <td class="p-3 border-x border-black">@foreach($roleData as $slot) {!! $slot['end'] !!}<br> @endforeach</td>
+                        <td class="p-3 border-x border-black font-semibold text-green-600">
+                            @foreach($roleData as $slot)
+                            {{-- Ambil nilai counter dari slot --}}
+                            {{ $slot['cek_random_barang'] ?? '-' }}<br>
+                            @endforeach
+                        </td>
+                        <td class="p-3 font-semibold text-green-600">
+                            @foreach($roleData as $slot)
+                            {{ $slot['barang_unpredictable'] ?? '-' }}<br>
+                            @endforeach
+                        </td>
+
+                        {{-- Kolom Keterangan --}}
+                        <td class="p-3 border-l border-black text-gray-600 text-left">
+                            {!! implode('<br>', array_unique(array_filter($data['keterangan']))) !!}
+                        </td>
+                    </tr>
                     @empty
-                        <tr>
-                            <td colspan="12" class="text-center text-gray-500 p-4">Tidak ada detail logbook</td>
-                        </tr>
+                    <tr>
+                        {{-- Sesuaikan colspan dengan jumlah total kolom di header --}}
+                        <td colspan="15" class="text-center text-gray-500 p-6">
+                            <p>Tidak ada detail entri untuk logbook ini.</p>
+                        </td>
+                    </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
     </div>
 
-    {{-- Mobile Card View --}}
-    <div class="md:hidden space-y-4">
-        @forelse($logbook->details as $index => $detail)
-            <div class="bg-white p-4 shadow rounded">
-                <div class="flex justify-between items-center mb-3">
-                    <h3 class="font-semibold text-lg">Detail #{{ $index + 1 }}</h3>
-                    <div class="text-sm text-gray-600">
-                        {{ $detail->start ?? '-' }} - {{ $detail->end ?? '-' }}
-                    </div>
-                </div>
-
-                {{-- Petugas Section --}}
-                <div class="mb-4">
-                    <h4 class="font-medium text-gray-700 mb-2 border-b pb-1">👥 Petugas</h4>
-                    <div class="grid grid-cols-1 gap-2 text-sm">
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Pemeriksaan Dokumen:</span>
-                            <span class="font-medium text-right">{{ $detail->pemeriksaanDokumenOfficer?->display_name ?? '-' }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Pengatur Flow:</span>
-                            <span class="font-medium text-right">{{ $detail->pengaturFlowOfficer?->display_name ?? '-' }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Operator X-Ray:</span>
-                            <span class="font-medium text-right">{{ $detail->operatorXrayOfficer?->display_name ?? '-' }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">HHMD Petugas:</span>
-                            <span class="font-medium text-right">{{ $detail->hhmdOfficer?->display_name ?? '-' }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Manual Kabin:</span>
-                            <span class="font-medium text-right">{{ $detail->manualKabinOfficer?->display_name ?? '-' }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Statistik Section --}}
-                <div class="mb-4">
-                    <h4 class="font-medium text-gray-700 mb-2 border-b pb-1">📊 Statistik</h4>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="bg-blue-50 p-2 rounded text-center">
-                            <div class="text-xl font-bold text-blue-600">{{ $detail->hhmd_random ?? 0 }}</div>
-                            <div class="text-xs text-blue-700">HHMD Random</div>
-                        </div>
-                        <div class="bg-green-50 p-2 rounded text-center">
-                            <div class="text-xl font-bold text-green-600">{{ $detail->hhmd_unpredictable ?? 0 }}</div>
-                            <div class="text-xs text-green-700">HHMD Unpredictable</div>
-                        </div>
-                        <div class="bg-yellow-50 p-2 rounded text-center">
-                            <div class="text-xl font-bold text-yellow-600">{{ $detail->cek_random_barang ?? 0 }}</div>
-                            <div class="text-xs text-yellow-700">Cek Random Barang</div>
-                        </div>
-                        <div class="bg-purple-50 p-2 rounded text-center">
-                            <div class="text-xl font-bold text-purple-600">{{ $detail->barang_unpredictable ?? 0 }}</div>
-                            <div class="text-xs text-purple-700">Barang Unpredictable</div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Keterangan Section --}}
-                @if($detail->keterangan)
-                    <div>
-                        <h4 class="font-medium text-gray-700 mb-2 border-b pb-1">📝 Keterangan</h4>
-                        <p class="text-sm text-gray-700 bg-gray-50 p-2 rounded">{{ $detail->keterangan }}</p>
-                    </div>
-                @endif
-            </div>
-        @empty
-            <div class="bg-white p-8 shadow rounded text-center">
-                <div class="text-gray-400 text-4xl mb-2">📋</div>
-                <p class="text-gray-500">Tidak ada detail logbook</p>
-            </div>
-        @endforelse
-    </div>
-
-    {{-- Back Button --}}
+    {{-- Tombol Kembali --}}
     <div class="mt-6">
-        <a href="{{ route('supervisor.logbook-rotasi.list') }}"
-           class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors">
+        <a href="{{ url()->previous() }}"
+            class="inline-flex items-center px-4 py-2 bg-white text-gray-700 rounded-lg border hover:bg-gray-100 transition-colors font-medium text-sm">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             Kembali
         </a>
     </div>
 </div>
-
-<style>
-    /* Custom scrollbar untuk tabel desktop */
-    .overflow-x-auto::-webkit-scrollbar {
-        height: 6px;
-    }
-
-    .overflow-x-auto::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 3px;
-    }
-
-    .overflow-x-auto::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 3px;
-    }
-
-    .overflow-x-auto::-webkit-scrollbar-thumb:hover {
-        background: #a8a8a8;
-    }
-</style>
 @endsection

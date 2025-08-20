@@ -10,6 +10,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DailyTest\WtmdController;
 use App\Http\Controllers\DailyTest\XrayController;
 use App\Http\Controllers\LogBook\LogbookPosJagaController;
+use App\Http\Controllers\LogBook\LogbookRotasiController;
 use App\Http\Controllers\LogBook\LogbookRotasiHBSCPController;
 use App\Http\Controllers\LogBook\LogbookRotasiPSCPController;
 use App\Models\LogbookSweepingPI;
@@ -57,10 +58,9 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
     Route::get('/supervisor/logbook-form',  [DashboardController::class, 'showDataLogbook'])->name('supervisor.logbook-form');
     Route::post('/logbook/signature/approve/{logbookID}', [LogbookPosJagaController::class, 'signatureApprove'])->name('supervisor.logbook.signature');
 
-    // Review Logbook Rotasi PSCP
+    // Review Logbook Rotasi
     Route::get('/logbook-rotasi/list', [DashboardController::class, 'showDataLogbookRotasi'])->name('supervisor.logbook-rotasi.list');
-    Route::get('/logbook-rotasipscp/detail/{logbookID}', [LogbookRotasiPSCPController::class, 'showDetailLogbook'])->name('supervisor.logbook-rotasipscp.detail');
-    Route::get('/logbook-rotasihbscp/detail/{logbookID}', [LogbookRotasiHBSCPController::class, 'showDetailLogbook'])->name('supervisor.logbook-rotasihbscp.detail');
+    Route::get('/logbook-rotasi/detail/{logbook}', [LogbookRotasiController::class, 'show'])->name('supervisor.logbook-rotasi.detail');
 });
 
 // Officer Routes
@@ -152,17 +152,10 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/logbook-sweppingpi', [LogbookSweppingPIController::class, 'index'])->name('logbookSweppingPI.index');
 
-    // Logbook Rotasi HBSCP
-    Route::get('/logbook-rotasihbscp', [LogbookRotasiHBSCPController::class, 'index'])->name('logbookRotasiHBSCP.index');
-    Route::post('logbook/rotasi-hbscp/autosave', [LogbookRotasiHBSCPController::class, 'autosave'])->name('logbook.rotasi-hbscp.autosave');
-    Route::get('logbook/rotasi-hbscp/load-draft', [LogbookRotasiHBSCPController::class, 'loadDraft'])->name('logbook.rotasi-hbscp.load-draft');
-    Route::post('logbook/rotasi-hbscp/submit', [LogbookRotasiHBSCPController::class, 'submit'])->name('logbook.rotasi-hbscp.submit');
+    // Logbook Rotasi
+    Route::get('/logbook-rotasi', [LogbookRotasiController::class, 'index'])->name('logbookRotasi.index');
+    Route::post('/logbook-rotasi/store', [LogbookRotasiController::class, 'store'])->name('logbookRotasi.store');
 
-    // Logbook Rotasi PSCP
-    Route::get('/logbook-rotasipscp', [LogbookRotasiPSCPController::class, 'index'])->name('logbookRotasiPSCP.index');
-    Route::post('logbook/rotasi-pscp/autosave', [LogbookRotasiPSCPController::class, 'autosave'])->name('logbook.rotasi-pscp.autosave');
-    Route::get('logbook/rotasi-pscp/load-draft', [LogbookRotasiPSCPController::class, 'loadDraft'])->name('logbook.rotasi-pscp.load-draft');
-    Route::post('logbook/rotasi-pscp/submit', [LogbookRotasiPSCPController::class, 'submit'])->name('logbook.rotasi-pscp.submit');
     // Logbook Sweeping PI
     Route::get('/logbook-sweppingpi', [LogbookSweppingPIController::class, 'index'])->name('logbookSweppingPI.index');
     Route::get('/logbook/sweepingpi/detail/{tenantID}', [LogbookSweppingPIController::class, 'indexLogbookSweepingPIDetail'])->name('logbookSweppingPI.detail.index');

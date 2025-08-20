@@ -158,15 +158,9 @@ $isLogbookPosJagaOpen = request()->is('logbook/posjaga*');
                     </li>
                     @if(auth()->user()->role->name === 'officer')
                     <li>
-                        <a href="{{ route('logbookRotasiHBSCP.index') }}"
-                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook-rotasihbscp') ? 'bg-gray-700' : '' }}">
-                            <span>Logbook Rotasi HBCCP</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('logbookRotasiPSCP.index') }}"
-                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook-rotasipscp') ? 'bg-gray-700' : '' }}">
-                            <span>Logbook Rotasi PSCP</span>
+                        <a href="{{ route('logbookRotasi.index') }}"
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook-rotasi') ? 'bg-gray-700' : '' }}">
+                            <span>Logbook Rotasi</span>
                         </a>
                     </li>
                     @else
@@ -180,8 +174,6 @@ $isLogbookPosJagaOpen = request()->is('logbook/posjaga*');
                 </ul>
             </li>
 
-
-            
             @if(auth()->user()->role->name === 'superadmin')
             <li>
                 <a href="{{ route('sweepingPI.index') }}" class="flex items-center p-2 rounded hover:bg-gray-700">
@@ -203,7 +195,7 @@ $isLogbookPosJagaOpen = request()->is('logbook/posjaga*');
                     <span>PM dan IK</span>
                 </a>
             </li>
-            
+
             <li class="hidden lg:block">
                 <form method="GET" action="{{ route('logout') }}">
                     @csrf

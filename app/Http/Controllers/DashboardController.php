@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Location;
 use App\Models\Report;
 use App\Models\Logbook;
+use App\Models\LogbookRotasi;
 use App\Models\LogbookRotasiHBSCP;
 use App\Models\LogbookRotasiPSCP;
 use Illuminate\Http\Request;
@@ -155,10 +156,27 @@ class DashboardController extends Controller
 
     public function showDataLogbookRotasi()
     {
-        $logbooksHBSCP = LogbookRotasiHBSCP::with('details')->get();
+        {
+            // 1. Tentukan jumlah item per halaman untuk pagination
+            $perPage = 10;
 
-        $logbooksPSCP = LogbookRotasiPSCP::with('details')->get();
+            // 2. Ambil data untuk PSCP dengan pagination
+            // Kita menggunakan eager loading 'creator' untuk efisiensi query
+            $logbooksPSCP = LogbookRotasi::with('creator')
+                ->where('type', 'pscp')
+                ->latest('date') // Urutkan berdasarkan tanggal terbaru
+                ->paginate($perPage, ['*'], 'pscp_page'); // Nama parameter halaman kustom
 
-        return view('supervisor.listLogbookRotasi', compact('logbooksPSCP', 'logbooksHBSCP'));
+            // 3. Ambil data untuk HBSCP dengan pagination
+            $logbooksHBSCP = LogbookRotasi::with('creator')
+                ->where('type', 'hbscp')
+                ->latest('date')
+                ->paginate($perPage, ['*'], 'hbscp_page'); // Nama parameter halaman kustom
+
+            // 4. Kirim kedua koleksi data ke view
+            // Nama variabel ($logbooksPSCP, $logbooksHBSCP) sengaja disamakan
+            // dengan view lama agar Anda tidak perlu mengubah kode di file Blade.
+            return view('supervisor.listLogbookRotasi', compact('logbooksPSCP', 'logbooksHBSCP'));
+        }
     }
 }
