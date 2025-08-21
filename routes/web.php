@@ -131,16 +131,19 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::post('/tenant-management/store', [MasterDataController::class, 'storeTenant'])->name('tenant.store');
     Route::post('/tenant-management/update/{tenantID}', [MasterDataController::class, 'updateTenant'])->name('tenant.update');
     Route::delete('/tenant-management/destroy/{id}', [MasterDataController::class, 'destroyTenant'])->name('tenant.destroy');
-
+    
     // Route untuk Tenant Items
     Route::get('/tenant-management/items/{tenantID}', [MasterDataController::class, 'indexProhibitedItem'])->name('tenant.items');
     Route::post('/tenant-management/items/store', [MasterDataController::class, 'storeProhibitedItem'])->name('prohibited-items.store');
     Route::post('/tenant-management/items/update/{id}', [MasterDataController::class, 'updateProhibitedItem'])->name('prohibited-items.update');
     Route::delete('/tenant-management/items/destroy/{id}', [MasterDataController::class, 'destroyProhibitedItem'])->name('prohibited-items.destroy');
-
+    
     //Route untuk Checklist Items
     //Kendaraan
-    Route::get('/checklist-items-kendaraan', [MasterDataController::class, 'indexChecklistItemsKendaraan'])->name('checklist-items-kendaraan.index');
+    Route::get('/checklist-items', [MasterDataController::class, 'indexChecklistItems'])->name('checklist-items.index');
+    Route::post('/checklist-items/store', [MasterDataController::class, 'storeChecklistItems'])->name('checklist-items.store');
+    Route::post('/checklist-items/update/{id}', [MasterDataController::class, 'updateChecklistItems'])->name('checklist-items.update');
+    Route::delete('/checklist-items/destroy/{id}', [MasterDataController::class, 'destroyChecklistItems'])->name('checklist-items.destroy');
 });
 
 // Logbook Routes

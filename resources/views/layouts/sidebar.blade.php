@@ -59,7 +59,7 @@ $isChecklistOpen = request()->is('checklist*');
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('checklist-items-kendaraan.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                        <a href="{{ route('checklist-items.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
                             <span>Checklist Items</span>
                         </a>
                     </li>

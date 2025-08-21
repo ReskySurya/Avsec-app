@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChecklistItem;
 use App\Models\Equipment;
 use App\Models\EquipmentLocation;
 use App\Models\Location;
@@ -633,12 +634,67 @@ class MasterDataController extends Controller
     }
 
     //Checklist Items Kendaraan
-    public function indexChecklistItemsKendaraan()
+    public function indexChecklistItems()
     {
-        
+        $checklistItems = ChecklistItem::all();
 
         return view('master-data.checklist-items.index', [
-            
+            'checklistItems' => $checklistItems
         ]);
+    }
+
+    public function storeChecklistItems(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:checklist_items,name',
+            'type' => 'required|string|max:50',
+        ]);
+
+        try {
+            ChecklistItem::create([
+                'name' => $request->name,
+                'type' => $request->type,
+            ]);
+
+            return redirect()->back()->with('success', 'Item berhasil ditambahkan!');
+        } catch (\Exception $e) {
+            Log::error('Error creating item: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menambahkan Item: ' . $e->getMessage());
+        }
+    }
+
+    public function updateChecklistItems(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:checklist_items,name,' . $id,
+            'type' => 'required|string|max:50',
+        ]);
+
+        try {
+            $item = ChecklistItem::findOrFail($id);
+
+            $item->update([
+                'name' => $request->name,
+                'type' => $request->type,
+            ]);
+
+            return redirect()->back()->with('success', 'Item berhasil diperbarui!');
+        } catch (\Exception $e) {
+            Log::error('Error updating item: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal memperbarui Item: ' . $e->getMessage());
+        }
+    }
+
+    public function destroyChecklistItems($id)
+    {
+        try {
+            $item = ChecklistItem::findOrFail($id);
+            $item->delete();
+
+            return redirect()->back()->with('success', 'Item berhasil dihapus!');
+        } catch (\Exception $e) {
+            Log::error('Error deleting item: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menghapus Item: ' . $e->getMessage());
+        }
     }
 }
