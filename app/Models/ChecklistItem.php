@@ -25,7 +25,7 @@ class ChecklistItem extends Model
     protected $fillable = [
         'name',
         'category',
-        'type',
+        'type'
     ];
 
     /**
