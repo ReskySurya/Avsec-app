@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChecklistKendaraan;
 use App\Models\Location;
 use App\Models\Report;
 use App\Models\Logbook;
@@ -13,16 +14,7 @@ use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    // protected $allowedLocations = [
-    //     'Pos Kedatangan',
-    //     'Pos Barat',
-    //     'Pos Timur',
-    //     'HBSCP',
-    //     'PSCP',
-    //     'CCTV',
-    //     'Patroli',
-    //     'Walking Patrol'
-    // ];
+
     public function showDataDailyTest(Request $request)
     {
         $equipmentTypes = ['hhmd', 'wtmd', 'xraycabin', 'xraybagasi'];
@@ -127,7 +119,7 @@ class DashboardController extends Controller
 
         $locations = Location::all();
         // ->get();
-        $rejectedReports = \App\Models\Report::rejected()
+        $rejectedReports = Report::rejected()
             ->where('submittedByID', Auth::id())
             ->with([
                 'status:id,name',
@@ -137,7 +129,7 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $logbookEntries = \App\Models\Logbook::where('receivedID', Auth::id())
+        $logbookEntries = Logbook::where('receivedID', Auth::id())
             ->whereNull('receivedSignature')
             ->with([
                 'locationArea:id,name',
@@ -146,11 +138,18 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $checklistKendaraan = ChecklistKendaraan::where('received_id', Auth::id())
+            ->whereNull('receivedSignature')
+            ->with(['checklistItems'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         return view('officer.dashboardOfficer', [
             'rejectedlogbooks' => $rejectedlogbooks,
             'locations' => $locations,
             'rejectedReports' => $rejectedReports,
             'logbookEntries' => $logbookEntries,
+            'checklistKendaraan' => $checklistKendaraan,
         ]);
     }
 
@@ -165,13 +164,13 @@ class DashboardController extends Controller
             $logbooksPSCP = LogbookRotasi::with('creator')
                 ->where('type', 'pscp')
                 ->latest('date') // Urutkan berdasarkan tanggal terbaru
-                ->paginate($perPage, ['*'], 'pscp_page'); // Nama parameter halaman kustom
+                ->paginate($perPage, ['*'], 'pscp_page');
 
             // 3. Ambil data untuk HBSCP dengan pagination
             $logbooksHBSCP = LogbookRotasi::with('creator')
                 ->where('type', 'hbscp')
                 ->latest('date')
-                ->paginate($perPage, ['*'], 'hbscp_page'); // Nama parameter halaman kustom
+                ->paginate($perPage, ['*'], 'hbscp_page');
 
             // 4. Kirim kedua koleksi data ke view
             // Nama variabel ($logbooksPSCP, $logbooksHBSCP) sengaja disamakan

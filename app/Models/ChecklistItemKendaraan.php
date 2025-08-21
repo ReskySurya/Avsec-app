@@ -24,7 +24,8 @@ class ChecklistItemKendaraan extends Model
      */
     protected $fillable = [
         'name',
-        'type',
+        'category',
+        'type'
     ];
 
     /**
