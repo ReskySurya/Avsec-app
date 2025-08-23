@@ -140,7 +140,7 @@ class DashboardController extends Controller
 
         $checklistKendaraan = ChecklistKendaraan::where('received_id', Auth::id())
             ->whereNull('receivedSignature')
-            ->with(['checklistItems'])
+            ->with(['sender']) // <-- UBAH INI: Muat relasi sender
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -154,8 +154,7 @@ class DashboardController extends Controller
     }
 
     public function showDataLogbookRotasi()
-    {
-        {
+    { {
             // 1. Tentukan jumlah item per halaman untuk pagination
             $perPage = 10;
 

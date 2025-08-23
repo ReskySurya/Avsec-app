@@ -85,7 +85,7 @@
                     <select name="shift" x-model="selectedShift"
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <option value="pagi">Shift Pagi</option>
-                        <option value="siang">Shift Siang</option>
+                        <option value="malam">Shift Malam</option>
                     </select>
                 </div>
             </div>
@@ -106,7 +106,7 @@
                                         <div class="grid grid-cols-1 gap-4">
                                             <div>
                                                 <div class="text-sm font-medium text-gray-600 mb-2"
-                                                    x-text="selectedShift === 'pagi' ? 'Kondisi Shift Pagi' : 'Kondisi Shift Siang'">
+                                                    x-text="selectedShift === 'pagi' ? 'Kondisi Shift Pagi' : 'Kondisi Shift Malam'">
                                                 </div>
                                                 <div class="flex space-x-4">
                                                     <label :for="`item_ok_${item.id}`" class="flex items-center">
@@ -146,7 +146,7 @@
                                 <th class="border border-gray-300 px-4 py-3 text-left font-semibold">NO</th>
                                 <th class="border border-gray-300 px-4 py-3 text-left font-semibold">KETERANGAN</th>
                                 <th class="border border-gray-300 px-4 py-3 text-center font-semibold" colspan="2"
-                                    x-text="selectedShift === 'pagi' ? 'KONDISI SHIFT PAGI' : 'KONDISI SHIFT SIANG'">
+                                    x-text="selectedShift === 'pagi' ? 'KONDISI SHIFT PAGI' : 'KONDISI SHIFT MALAM'">
                                 </th>
                                 <th class="border border-gray-300 px-4 py-3 text-left font-semibold">CATATAN</th>
                             </tr>

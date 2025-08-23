@@ -14,12 +14,13 @@ class ChecklistKendaraanSeeder extends Seeder
      */
     public function run(): void
     {
-        // Hapus data lama untuk menghindari duplikat saat seeder dijalankan ulang
+        // Hapus data lama untuk menghindari duplikat
         DB::table('checklist_items')->delete();
 
         $now = Carbon::now();
-        $items = [
-            // Motor Items
+
+        // 1. Definisikan item untuk motor (4 kolom)
+        $motorItems = [
             ['name' => 'Lampu Depan Pendek', 'type' => 'motor', 'created_at' => $now, 'updated_at' => $now],
             ['name' => 'Lampu Depan Jauh', 'type' => 'motor', 'created_at' => $now, 'updated_at' => $now],
             ['name' => 'Lampu Rem', 'type' => 'motor', 'created_at' => $now, 'updated_at' => $now],
@@ -35,23 +36,32 @@ class ChecklistKendaraanSeeder extends Seeder
             ['name' => 'Tekanan Ban Depan', 'type' => 'motor', 'created_at' => $now, 'updated_at' => $now],
             ['name' => 'Tekanan Ban Belakang', 'type' => 'motor', 'created_at' => $now, 'updated_at' => $now],
             ['name' => 'Kondisi Body Motor', 'type' => 'motor', 'created_at' => $now, 'updated_at' => $now],
-
-            // Mobil Items
-            ['name' => 'Oli Mesin', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
-            ['name' => 'Air Radiator', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
-            ['name' => 'Air Wiper', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
-            ['name' => 'Accu', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
-            ['name' => 'Rem Kaki dan Hand Rem', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
-            ['name' => 'Lampu (Utama, Kota, Sein, Rem, Rotari)', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
-            ['name' => 'Ban', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
-            ['name' => 'Radio Mobile', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
-            ['name' => 'Kebersihan Kursi', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
-            ['name' => 'Kebersihan Karpet Dasar', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
-            ['name' => 'Kebersihan Kabin', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
-            ['name' => 'Kebersihan Bak Belakang', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
-            ['name' => 'Data Service Rutin', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
         ];
 
-        DB::table('checklist_items')->insert($items);
+        // 2. Definisikan item untuk mobil (5 kolom, termasuk 'category')
+        $mobilItems = [
+            ['name' => 'Oli Mesin', 'category' => 'mesin', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Air Radiator', 'category' => 'mesin', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Air Wiper', 'category' => 'mesin', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Accu', 'category' => 'mesin', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Rem Kaki dan Hand Rem', 'category' => 'mekanik', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Lampu (Utama, Kota, Sein, Rem, Rotari)', 'category' => 'mekanik', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Ban', 'category' => 'mekanik', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Radio Mobile', 'category' => 'mekanik', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Kebersihan Kursi', 'category' => 'lainlain', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Kebersihan Karpet Dasar', 'category' => 'lainlain', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Kebersihan Kabin', 'category' => 'lainlain', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Kebersihan Bak Belakang', 'category' => 'lainlain', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Data Service Rutin', 'category' => 'lainlain', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
+        ];
+
+        // 3. Lakukan insert secara terpisah
+        if (!empty($motorItems)) {
+            DB::table('checklist_items')->insert($motorItems);
+        }
+
+        if (!empty($mobilItems)) {
+            DB::table('checklist_items')->insert($mobilItems);
+        }
     }
 }
