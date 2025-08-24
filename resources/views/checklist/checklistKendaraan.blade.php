@@ -32,16 +32,21 @@
     <div class="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
         <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-6 py-6 text-white">
             <div class="flex items-center justify-between">
-                <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo"
-                    class="w-20 h-20 mb-2 sm:mb-0">
-                <div class="text-center">
-                    <h1 class="text-2xl font-bold">CHECK LIST PENGECEKAN HARIAN</h1>
-                    <h2 class="text-xl font-semibold"
-                        x-text="selectedVehicle === 'mobil' ? 'KENDARAAN MOBIL PATROLI' : 'KENDARAAN MOTOR PATROLI'">
-                    </h2>
-                    <p class="text-blue-100">AIRPORT SECURITY BANDAR UDARA ADISUTJIPTO</p>
+                <div class="flex items-center space-x-4">
+                    <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo"
+                        class="w-20 h-20 mb-2 sm:mb-0">
+                    <div>
+                        <h1 class="text-2xl font-bold">CHECK LIST PENGECEKAN HARIAN</h1>
+                        <h2 class="text-xl font-semibold"
+                            x-text="selectedVehicle === 'mobil' ? 'KENDARAAN MOBIL PATROLI' : 'KENDARAAN MOTOR PATROLI'">
+                        </h2>
+                        <p class="text-blue-100">AIRPORT SECURITY BANDAR UDARA ADISUTJIPTO</p>
+                    </div>
                 </div>
-                <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo" class="w-24 h-24 mt-2 sm:mt-0">
+                <div class="text-right">
+                    <div class="text-sm font-medium">Adisutjipto</div>
+                    <div class="text-sm font-medium">Airport</div>
+                </div>
             </div>
         </div>
 
@@ -49,13 +54,13 @@
             @submit.prevent="submitForm" class="p-6 space-y-6">
             @csrf
             @if($checklist->exists)
-            @method('PUT')
+                @method('PUT')
             @endif
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-2">
                     <label class="block text-sm font-semibold text-gray-700">Nama Operator Penerbangan:</label>
-                    <input type="text" name="operator_name" value="Bandar Udara Adisutjipto Yogyakarta" readonly
+                    <input type="text" name="operator_name" value="Bandar Udara Adisutjipto Yogyakarta"
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 </div>
                 <div class="space-y-2">
@@ -80,7 +85,7 @@
                     <select name="shift" x-model="selectedShift"
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <option value="pagi">Shift Pagi</option>
-                        <option value="siang">Shift Siang</option>
+                        <option value="malam">Shift Malam</option>
                     </select>
                 </div>
             </div>
@@ -90,64 +95,64 @@
                     x-text="selectedVehicle === 'mobil' ? 'CHECK LIST PENGECEKAN HARIAN MOBIL PATROLI' : 'CHECK LIST PENGECEKAN HARIAN MOTOR PATROLI'">
                 </h3>
 
-                <!-- Mobile View -->
                 <div class="block md:hidden space-y-4">
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                        <div class="bg-blue-600 text-white px-4 py-3 font-semibold">Daftar Pemeriksaan</div>
-                        <div class="p-4 space-y-3">
-                            <template x-for="(item, itemIndex) in getCurrentChecklist()" :key="itemIndex">
-                                <div class="border-b border-gray-200 pb-3">
-                                    <div class="font-medium text-gray-800 mb-2" x-text="item.name"></div>
-                                    <div class="grid grid-cols-1 gap-4">
-                                        <div>
-                                            <div class="text-sm font-medium text-gray-600 mb-2"
-                                                x-text="selectedShift === 'pagi' ? 'Kondisi Shift Pagi' : 'Kondisi Shift Siang'">
+                    <template x-for="(category, categoryIndex) in getCurrentChecklist()" :key="categoryIndex">
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                            <div class="bg-blue-600 text-white px-4 py-3 font-semibold" x-text="category.name"></div>
+                            <div class="p-4 space-y-3">
+                                <template x-for="(item, itemIndex) in category.items" :key="itemIndex">
+                                    <div class="border-b border-gray-200 pb-3">
+                                        <div class="font-medium text-gray-800 mb-2" x-text="item.name"></div>
+                                        <div class="grid grid-cols-1 gap-4">
+                                            <div>
+                                                <div class="text-sm font-medium text-gray-600 mb-2"
+                                                    x-text="selectedShift === 'pagi' ? 'Kondisi Shift Pagi' : 'Kondisi Shift Malam'">
+                                                </div>
+                                                <div class="flex space-x-4">
+                                                    <label :for="`item_ok_${item.id}`" class="flex items-center">
+                                                        <input type="radio" :name="`items[${item.id}][is_ok]`"
+                                                            :id="`item_ok_${item.id}`" value="1"
+                                                            class="mr-2 text-green-600">
+                                                        <span class="text-sm text-green-600 font-medium">BAIK</span>
+                                                    </label>
+                                                    <label :for="`item_not_ok_${item.id}`" class="flex items-center">
+                                                        <input type="radio" :name="`items[${item.id}][is_ok]`"
+                                                            :id="`item_not_ok_${item.id}`" value="0"
+                                                            class="mr-2 text-red-600">
+                                                        <span class="text-sm text-red-600 font-medium">TIDAK</span>
+                                                    </label>
+                                                </div>
                                             </div>
-                                            <div class="flex space-x-4">
-                                                <label :for="`item_ok_${item.id}`" class="flex items-center">
-                                                    <input type="radio" :name="`items[${item.id}][is_ok]`"
-                                                        :id="`item_ok_${item.id}`" value="1"
-                                                        class="mr-2 text-green-600">
-                                                    <span class="text-sm text-green-600 font-medium">BAIK</span>
-                                                </label>
-                                                <label :for="`item_not_ok_${item.id}`" class="flex items-center">
-                                                    <input type="radio" :name="`items[${item.id}][is_ok]`"
-                                                        :id="`item_not_ok_${item.id}`" value="0"
-                                                        class="mr-2 text-red-600">
-                                                    <span class="text-sm text-red-600 font-medium">TIDAK</span>
-                                                </label>
+                                            <div>
+                                                <label :for="`notes_${item.id}`"
+                                                    class="text-sm font-medium text-gray-600">Catatan:</label>
+                                                <textarea :name="`items[${item.id}][notes]`" :id="`notes_${item.id}`"
+                                                    cols="2"
+                                                    class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                                    placeholder="Opsional..."></textarea>
                                             </div>
-                                        </div>
-                                        <div>
-                                            <label :for="`notes_${item.id}`"
-                                                class="text-sm font-medium text-gray-600">Catatan:</label>
-                                            <textarea :name="`items[${item.id}][notes]`" :id="`notes_${item.id}`"
-                                                cols="2"
-                                                class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
-                                                placeholder="Opsional..."></textarea>
                                         </div>
                                     </div>
-                                </div>
-                            </template>
+                                </template>
+                            </div>
                         </div>
-                    </div>
+                    </template>
                 </div>
 
-                <!-- Desktop View -->
                 <div class="hidden md:block overflow-x-auto">
                     <table class="w-full border-collapse border border-gray-300">
                         <thead>
                             <tr class="bg-blue-600 text-white">
-                                <th class="border border-gray-300 px-4 py-3 text-left font-semibold" rowspan="2">NO</th>
-                                <th class="border border-gray-300 px-4 py-3 text-left font-semibold"
-                                    x-text="selectedVehicle === 'mobil' ? 'KETERANGAN' : 'PEMERIKSAAN KONDISI KENDARAAN'" rowspan="2">
-                                </th>
+                                <th class="border border-gray-300 px-4 py-3 text-left font-semibold">NO</th>
+                                <th class="border border-gray-300 px-4 py-3 text-left font-semibold">KETERANGAN</th>
                                 <th class="border border-gray-300 px-4 py-3 text-center font-semibold" colspan="2"
-                                    x-text="selectedShift === 'pagi' ? 'KONDISI SHIFT PAGI' : 'KONDISI SHIFT SIANG'">
+                                    x-text="selectedShift === 'pagi' ? 'KONDISI SHIFT PAGI' : 'KONDISI SHIFT MALAM'">
                                 </th>
-                                <th class="border border-gray-300 px-4 py-3 text-left font-semibold" rowspan="2">CATATAN</th>
+                                <th class="border border-gray-300 px-4 py-3 text-left font-semibold">CATATAN</th>
                             </tr>
                             <tr class="bg-blue-500 text-white">
+                                <th class="border border-gray-300 px-4 py-2"></th>
+                                <th class="border border-gray-300 px-4 py-2"></th>
                                 <th class="border border-gray-300 px-4 py-2" colspan="2">
                                     <div class="grid grid-cols-2 gap-1">
                                         <div class="text-center font-semibold">BAIK</div>
@@ -158,28 +163,33 @@
                         </thead>
                         <tbody>
                             <template x-for="row in getFlattenedRows()" :key="`row-${row.index}`">
-                                <tr class="hover:bg-gray-50">
-                                    <td class="border border-gray-300 px-4 py-3 text-center" x-text="row.number"></td>
-                                    <td class="border border-gray-300 px-4 py-3" x-text="row.name"></td>
+                                <tr :class="row.isCategory ? 'bg-blue-100' : 'hover:bg-gray-50'">
+                                    <td class="border border-gray-300 px-4 py-3 text-center"
+                                        :class="row.isCategory ? 'font-bold' : ''"
+                                        x-text="row.isCategory ? (row.letter || '') : row.number"></td>
+                                    <td class="border border-gray-300 px-4 py-3"
+                                        :class="row.isCategory ? 'font-bold' : ''" x-text="row.name"></td>
                                     <td class="border border-gray-300 px-4 py-3" colspan="2">
-                                        <div class="grid grid-cols-2 gap-1">
-                                            <div class="text-center">
-                                                <input type="radio" :name="`items[${row.id}][is_ok]`"
-                                                    :id="`desktop_item_ok_${row.id}`" value="1"
-                                                    class="text-green-600 focus:ring-green-500">
+                                        <template x-if="!row.isCategory">
+                                            <div class="grid grid-cols-2 gap-1">
+                                                <div class="text-center"><input type="radio"
+                                                        :name="`items[${row.id}][is_ok]`"
+                                                        :id="`desktop_item_ok_${row.id}`" value="1"
+                                                        class="text-green-600 focus:ring-green-500"></div>
+                                                <div class="text-center"><input type="radio"
+                                                        :name="`items[${row.id}][is_ok]`"
+                                                        :id="`desktop_item_not_ok_${row.id}`" value="0"
+                                                        class="text-red-600 focus:ring-red-500"></div>
                                             </div>
-                                            <div class="text-center">
-                                                <input type="radio" :name="`items[${row.id}][is_ok]`"
-                                                    :id="`desktop_item_not_ok_${row.id}`" value="0"
-                                                    class="text-red-600 focus:ring-red-500">
-                                            </div>
-                                        </div>
+                                        </template>
                                     </td>
                                     <td class="border border-gray-300 px-4 py-3">
-                                        <textarea :name="`items[${row.id}][notes]`" :id="`desktop_notes_${row.id}`"
-                                            rows="1"
-                                            class="w-full px-2 py-1 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
-                                            placeholder="Opsional..."></textarea>
+                                        <template x-if="!row.isCategory">
+                                            <textarea :name="`items[${row.id}][notes]`" :id="`desktop_notes_${row.id}`"
+                                                rows="1"
+                                                class="w-full px-2 py-1 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                                placeholder="Opsional..."></textarea>
+                                        </template>
                                     </td>
                                 </tr>
                             </template>
@@ -303,20 +313,27 @@
             getFlattenedRows() {
                 const checklist = this.getCurrentChecklist();
                 if (!checklist || !Array.isArray(checklist)) return [];
-
                 const rows = [];
                 let itemNumber = 1;
-
-                // Langsung loop melalui semua items tanpa kategori
-                checklist.forEach((item, index) => {
+                checklist.forEach((category, categoryIndex) => {
                     rows.push({
-                        index: `item-${index}`,
-                        number: itemNumber++,
-                        name: item.name,
-                        id: item.id
+                        index: `cat-${categoryIndex}`,
+                        isCategory: true,
+                        letter: category.letter || '',
+                        name: category.name || 'UNCATEGORIZED'
                     });
+                    if (category.items && Array.isArray(category.items)) {
+                        category.items.forEach((item, itemIndex) => {
+                            rows.push({
+                                index: `item-${categoryIndex}-${itemIndex}`,
+                                isCategory: false,
+                                number: itemNumber++,
+                                name: item.name,
+                                id: item.id
+                            });
+                        });
+                    }
                 });
-
                 return rows;
             },
 

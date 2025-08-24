@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class ChecklistKendaraanController extends Controller
 {
@@ -116,5 +117,114 @@ class ChecklistKendaraanController extends Controller
             DB::rollBack();
             return redirect()->back()->with('error', 'Gagal menyimpan checklist: ' . $e->getMessage())->withInput();
         }
+    }
+
+    public function showReceivedChecklist($type, $id)
+    {
+        try {
+            // Validasi tipe kendaraan
+            if (!in_array($type, ['mobil', 'motor'])) {
+                abort(404, 'Tipe kendaraan tidak valid.');
+            }
+
+            // Ambil data checklist
+            $checklist = ChecklistKendaraan::with(['sender', 'receiver', 'approver', 'details.item'])
+                ->find($id);
+
+            // Cek apakah data ditemukan
+            if (!$checklist) {
+                return redirect()->back()->with('error', 'Checklist kendaraan tidak ditemukan.');
+            }
+
+            // Verifikasi tipe dari URL cocok dengan tipe di database
+            if ($checklist->type !== $type) {
+                abort(404, 'Tipe kendaraan tidak cocok.');
+            }
+
+            // Buat variabel untuk menampung item yang sudah dikelompokkan
+            $groupedItems = null;
+
+            // Hanya kelompokkan jika tipenya mobil
+            if ($type === 'mobil') {
+                // Mengelompokkan relasi 'details' berdasarkan 'item.category'
+                $groupedItems = $checklist->details->groupBy(function ($detail) {
+                    // Mengambil kategori dari relasi item
+                    return $detail->item->category;
+                });
+            }
+
+            // PERBAIKAN: Nama view yang sesuai dengan struktur file Anda
+            $viewName = 'officer.checklist.receivedChecklistKendaraan' . ucfirst($type);
+
+            // Debug: Cek nama view yang dibuat
+            Log::info('View name generated', [
+                'viewName' => $viewName,
+                'type' => $type,
+                'exists' => view()->exists($viewName)
+            ]);
+
+            // Cek apakah view ada
+            if (!view()->exists($viewName)) {
+                Log::error('View not found', ['viewName' => $viewName]);
+                return redirect()->back()->with('error', 'Template tidak ditemukan.');
+            }
+
+            return view($viewName, compact('checklist', 'groupedItems'));
+        } catch (\Exception $e) {
+            Log::error('Error in showReceivedChecklist', [
+                'error' => $e->getMessage(),
+                'type' => $type,
+                'id' => $id,
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat memuat data.');
+        }
+    }
+
+    public function storeSignatureReceived(Request $request, ChecklistKendaraan $checklist)
+    {
+        // 1. Validasi input
+        $request->validate([
+            'receivedSignature' => 'required|string',
+        ]);
+
+        // 2. Ambil dan proses data base64
+        $signature = $request->input('receivedSignature');
+        if (str_starts_with($signature, 'data:image/')) {
+            $signature = substr($signature, strpos($signature, ',') + 1);
+        }
+
+        // 3. Update signature dan status pada checklist
+        $checklist->receivedSignature = $signature;
+        $checklist->status = 'approved';
+        $checklist->save();
+
+        // 4. (PENTING) Muat relasi yang dibutuhkan oleh view
+        $checklist->load(['sender', 'receiver', 'approver', 'details.item']);
+
+        // --- TAMBAHKAN LOGIKA PENGELOMPOKAN DI SINI ---
+        $groupedItems = null;
+        $type = $checklist->type;
+
+        if ($type === 'mobil') {
+            // Mengelompokkan relasi 'details' berdasarkan 'item.category'
+            $groupedItems = $checklist->details->groupBy(function ($detail) {
+                return $detail->item->category;
+            });
+        }
+        // --- AKHIR DARI LOGIKA TAMBAHAN ---
+
+        // 5. Bangun nama view
+        $viewName = 'officer.checklist.receivedChecklistKendaraan' . ucfirst($type);
+
+        // 6. Cek apakah view ada
+        if (!view()->exists($viewName)) {
+            Log::error('View not found after saving signature', ['viewName' => $viewName]);
+            return redirect()->route('dashboard.officer')->with('error', 'Template tidak ditemukan, namun data berhasil disimpan.');
+        }
+
+        // 7. Ganti return view() untuk menyertakan KEDUA variabel
+        return view($viewName, compact('checklist', 'groupedItems'))
+            ->with('success', 'Tanda tangan berhasil disimpan dan checklist telah disetujui.');
     }
 }
