@@ -37,17 +37,22 @@ class ChecklistPenyisiranController extends Controller
         $checklist = new ChecklistPenyisiran();
 
         // 4. Ambil data user untuk dropdown
-        $officers = User::whereHas('role', fn($q) => $q->where('name', Role::OFFICER))
+        $currentOfficer = User::whereHas('role', fn($q) => $q->where('name', Role::OFFICER))
             ->where('id', Auth::id())
             ->first();
+        
+        // Ambil semua officer untuk dropdown "Diserahkan kepada"
+        $allOfficers = User::whereHas('role', fn($q) => $q->where('name', Role::OFFICER))->get();
 
+        // Ambil semua supervisor untuk dropdown "Diketahui oleh"
         $supervisors = User::whereHas('role', fn($q) => $q->where('name', Role::SUPERVISOR))
             ->get();
 
         // 5. Kirim data yang sudah diformat ke view
         return view('checklist.checklistPenyisiran', compact(
             'penyisiranChecklist',
-            'officers',
+            'currentOfficer',
+            'allOfficers',
             'supervisors',
             'checklist'
         ));
@@ -58,63 +63,60 @@ class ChecklistPenyisiranController extends Controller
         Log::info('Request data:', $request->all());
 
         // 1. Validasi input dengan field names yang sesuai
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'date' => 'required|date',
             'jam' => 'required|string',
             'grup' => 'required|in:A,B,C',
             'sender_id' => 'required|exists:users,id',
             'signature' => 'required|string',
-            'received_id' => 'required|exists:users,id',  // Fixed field name
-            'approved_id' => 'required|exists:users,id',   // Fixed field name
-            'items' => 'required|array',
-            'items.*.temuan_ya' => 'nullable|in:1',
-            'items.*.temuan_tidak' => 'nullable|in:0',
-            'items.*.kondisi_baik' => 'nullable|in:1',
-            'items.*.kondisi_rusak' => 'nullable|in:1',
-            'items.*.notes' => 'nullable|string|max:1000',
+            'received_id' => 'required|exists:users,id',
+            'approved_id' => 'required|exists:users,id',
+            'items' => 'required|array|min:1',
         ]);
 
-        Log::info('Validated data:', $validated);
-
-        // 2. Custom validation
-        $customValidator = Validator::make($request->all(), [], []);
-        $customValidator->after(function ($validator) use ($request) {
+        // Custom validation untuk items
+        $validator->after(function ($validator) use ($request) {
             if (!$request->has('items') || empty($request->items)) {
                 $validator->errors()->add('items', 'Tidak ada data checklist yang dikirim');
                 return;
             }
 
             foreach ($request->items as $itemId => $item) {
-                // Check temuan (findings)
-                $hasTemuan = (isset($item['temuan_ya']) && $item['temuan_ya'] == '1') ||
-                    (isset($item['temuan_tidak']) && $item['temuan_tidak'] == '0');
+                // Periksa apakah item memiliki data
+                $hasTemuan = isset($item['temuan']) && in_array($item['temuan'], ['ya', 'tidak']);
+                $hasKondisi = isset($item['kondisi']) && in_array($item['kondisi'], ['baik', 'rusak']);
 
-                // Check kondisi (condition)
-                $hasKondisi = (isset($item['kondisi_baik']) && $item['kondisi_baik'] == '1') ||
-                    (isset($item['kondisi_rusak']) && $item['kondisi_rusak'] == '1');
-
-                // Validation rules based on item number
-                // Items 1, 2, 3 must have temuan (findings)
-                if (in_array($itemId, ['1', '2', '3']) && !$hasTemuan) {
-                    $validator->errors()->add(
-                        "items.{$itemId}.temuan",
-                        "Item nomor {$itemId} harus memiliki pilihan temuan (YA/TIDAK)"
-                    );
+                // Berdasarkan aturan bisnis dari keterangan di form:
+                // No. 1, 2 dan 3 di isi tanda centang pada kolom TEMUAN
+                // No. 4 di isi tanda centang pada kolom KONDISI
+                
+                // Cari item di database untuk mengetahui urutannya
+                $checklistItem = ChecklistItem::find($itemId);
+                if (!$checklistItem) {
+                    $validator->errors()->add("items.{$itemId}", "Item dengan ID {$itemId} tidak ditemukan");
+                    continue;
                 }
 
-                // Item 4 must have kondisi (condition)
-                if ($itemId == '4' && !$hasKondisi) {
+                // Implementasi aturan validasi berdasarkan urutan item
+                // Anda perlu menyesuaikan logika ini dengan kebutuhan bisnis Anda
+                // Contoh: jika item 1-3 harus punya temuan, item 4 harus punya kondisi
+                
+                if (!$hasTemuan && !$hasKondisi) {
                     $validator->errors()->add(
-                        "items.{$itemId}.kondisi",
-                        "Item nomor {$itemId} harus memiliki pilihan kondisi (BAIK/RUSAK)"
+                        "items.{$itemId}",
+                        "Item '{$checklistItem->name}' harus memiliki pilihan temuan atau kondisi"
                     );
                 }
             }
         });
 
-        if ($customValidator->fails()) {
-            return redirect()->back()->withErrors($customValidator)->withInput();
+        if ($validator->fails()) {
+            Log::error('Validation failed:', $validator->errors()->toArray());
+            return redirect()->back()->withErrors($validator)->withInput();
         }
+
+        $validated = $validator->validated();
+        Log::info('Validated data:', $validated);
 
         DB::beginTransaction();
 
@@ -138,40 +140,44 @@ class ChecklistPenyisiranController extends Controller
                 $signature = substr($signature, strpos($signature, ',') + 1);
             }
 
-            // 5. Create main checklist record
+            // 5. Combine date and time
+            $dateTime = Carbon::parse($validated['date'] . ' ' . $validated['jam']);
+
+            // 6. Create main checklist record
             $checklist = ChecklistPenyisiran::create([
                 'id' => $id,
-                'date' => Carbon::parse($validated['date'])->format('Y-m-d'),
+                'date' => $dateTime->format('Y-m-d'),
+                'time' => $dateTime->format('H:i:s'),
                 'type' => 'penyisiran',
-                'time' => $validated['jam'],
                 'grup' => $validated['grup'],
                 'status' => 'submitted',
                 'sender_id' => $validated['sender_id'],
                 'senderSignature' => $signature,
-                'received_id' => $validated['received_id'],    // Fixed field name
-                'approved_id' => $validated['approved_id'],     // Fixed field name
+                'received_id' => $validated['received_id'],
+                'approved_id' => $validated['approved_id'],
             ]);
 
             Log::info('Checklist created:', $checklist->toArray());
 
-            // 6. Save checklist item details
+            // 7. Save checklist item details
             foreach ($validated['items'] as $itemId => $result) {
                 Log::info("Processing item {$itemId}:", $result);
 
-                // Determine findings value
-                $isfindings = null;
-                if (isset($result['temuan_ya']) && $result['temuan_ya'] == '1') {
-                    $isfindings = true; // Ya
-                } elseif (isset($result['temuan_tidak']) && $result['temuan_tidak'] == '0') {
-                    $isfindings = false; // Tidak
+                // Verify checklist item exists
+                if (!ChecklistItem::where('id', $itemId)->exists()) {
+                    throw new \Exception("Checklist item dengan ID {$itemId} tidak ditemukan di database");
                 }
 
-                // Determine condition value
+                // Determine findings and condition values
+                $isfindings = null;
                 $iscondition = null;
-                if (isset($result['kondisi_baik']) && $result['kondisi_baik'] == '1') {
-                    $iscondition = true; // Baik
-                } elseif (isset($result['kondisi_rusak']) && $result['kondisi_rusak'] == '1') {
-                    $iscondition = false; // Rusak
+
+                if (isset($result['temuan'])) {
+                    $isfindings = ($result['temuan'] === 'ya') ? true : false;
+                }
+
+                if (isset($result['kondisi'])) {
+                    $iscondition = ($result['kondisi'] === 'baik') ? true : false;
                 }
 
                 // Prepare detail data
@@ -185,11 +191,6 @@ class ChecklistPenyisiranController extends Controller
 
                 Log::info("Detail data for item {$itemId}:", $detailData);
 
-                // Verify checklist item exists
-                if (!DB::table('checklist_items')->where('id', $itemId)->exists()) {
-                    throw new \Exception("Checklist item dengan ID {$itemId} tidak ditemukan di database");
-                }
-
                 ChecklistPenyisiranDetail::create($detailData);
             }
 
@@ -198,6 +199,7 @@ class ChecklistPenyisiranController extends Controller
             return redirect()
                 ->route('checklist.penyisiran.index')
                 ->with('success', 'Checklist penyisiran berhasil disimpan dengan ID: ' . $id);
+
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error saving penyisiran checklist: ' . $e->getMessage());
@@ -209,73 +211,4 @@ class ChecklistPenyisiranController extends Controller
                 ->withInput();
         }
     }
-
-    // // Method untuk update (PUT)
-    // public function update(Request $request, $id)
-    // {
-    //     // 1. Cari checklist yang akan diupdate
-    //     $checklist = ChecklistPenyisiran::findOrFail($id);
-
-    //     // 2. Validasi yang sama seperti store
-    //     $validated = $request->validate([
-    //         'date' => 'required|date',
-    //         'jam' => 'required|string',
-    //         'grup' => 'required|in:A,B,C',
-    //         'sender_id' => 'required|exists:users,id',
-    //         'items' => 'required|array',
-    //         'items.*.temuan_ya' => 'nullable|boolean',
-    //         'items.*.temuan_tidak' => 'nullable|boolean',
-    //         'items.*.kondisi_baik' => 'nullable|boolean',
-    //         'items.*.kondisi_rusak' => 'nullable|boolean',
-    //         'items.*.notes' => 'nullable|string|max:1000',
-    //     ]);
-
-    //     DB::beginTransaction();
-
-    //     try {
-
-    //         // 4. Update record utama
-    //         $checklist->update([
-    //             'date' => $validated['date'],
-    //             'jam' => $validated['jam'],
-    //             'status' => 'submitted',
-    //             'grup' => $validated['grup'],
-    //             'sender_id' => $validated['sender_id'],
-    //         ]);
-
-    //         // 5. Hapus detail lama dan buat yang baru
-    //         $checklist->details()->delete();
-
-    //         foreach ($validated['items'] as $itemKey => $result) {
-    //             $temuanYa = isset($result['temuan_ya']) && $result['temuan_ya'] ? true : false;
-    //             $temuanTidak = isset($result['temuan_tidak']) && $result['temuan_tidak'] ? false : null;
-    //             $kondisiBaik = isset($result['kondisi_baik']) && $result['kondisi_baik'] ? true : false;
-    //             $kondisiRusak = isset($result['kondisi_rusak']) && $result['kondisi_rusak'] ? true : false;
-
-    //             ChecklistPenyisiranDetail::create([
-    //                 'penyisiran_checklist_id' => $checklist->id,
-    //                 'item_key' => $itemKey,
-    //                 'temuan_ya' => $temuanYa,
-    //                 'temuan_tidak' => $temuanTidak,
-    //                 'kondisi_baik' => $kondisiBaik,
-    //                 'kondisi_rusak' => $kondisiRusak,
-    //                 'notes' => $result['notes'] ?? null,
-    //             ]);
-    //         }
-
-    //         DB::commit();
-
-    //         return redirect()
-    //             ->route('penyisiran.checklist.index')
-    //             ->with('success', 'Checklist penyisiran berhasil diupdate.');
-    //     } catch (\Exception $e) {
-    //         DB::rollBack();
-    //         Log::error('Error updating penyisiran checklist: ' . $e->getMessage());
-
-    //         return redirect()
-    //             ->back()
-    //             ->with('error', 'Gagal mengupdate checklist: ' . $e->getMessage())
-    //             ->withInput();
-    //     }
-    // }
 }
