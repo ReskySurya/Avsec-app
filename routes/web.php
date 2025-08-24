@@ -206,4 +206,7 @@ Route::middleware(['auth'])->group(function () {
     
     Route::get('/officer/received-checklist-kendaraan/{type}/{id}', [ChecklistKendaraanController::class, 'showReceivedChecklist'])->name('officer.receivedChecklistKendaraan.show');
     Route::post('/checklist/received-signature/{checklist}', [ChecklistKendaraanController::class, 'storeSignatureReceived'])->name('checklist.receivedSignature');
+    
+    Route::get('/officer/received-checklist-penyisiran/{id}', [ChecklistPenyisiranController::class, 'showReceivedChecklistPenyisiran'])->name('officer.receivedChecklistPenyisiran.show');
+    Route::post('/checklist/received-signature/{checklist}', [ChecklistPenyisiranController::class, 'storeReceivedSignaturePenyisiran'])->name('checklist.receivedSignature.penyisiran');
 });

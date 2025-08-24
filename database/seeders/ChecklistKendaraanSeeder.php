@@ -55,6 +55,27 @@ class ChecklistKendaraanSeeder extends Seeder
             ['name' => 'Data Service Rutin', 'category' => 'lainlain', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
         ];
 
+        $penyisiranItems = [
+            // 1. RUANG TUNGGU DOMESTIK
+            ['name' => 'Area kursi ruang tunggu', 'category' => 'ruang tunggu domestik', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Area sudut - sudut ruangan', 'category' => 'ruang tunggu domestik', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Langit - langit ruangan', 'category' => 'ruang tunggu domestik', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Area toilet', 'category' => 'ruang tunggu domestik', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Area mushola', 'category' => 'ruang tunggu domestik', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Area nursery room', 'category' => 'ruang tunggu domestik', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Area Kid Zone', 'category' => 'ruang tunggu domestik', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            // 2. AREA SCP-2
+            ['name' => 'Area sekitar X-ray dan WTMD', 'category' => 'area scp2', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Kotak Prohibited Item', 'category' => 'area scp2', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Pembatas antara WTMD dan X-ray', 'category' => 'area scp2', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Area tambahan SCP-2', 'category' => 'area scp2', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            // 3. PEMBATAS FISIK RUANG TUNGGU
+            ['name' => 'Kondisi boarding gate (terkunci)', 'category' => 'pembatas fisik', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Kondisi dinding tembok', 'category' => 'pembatas fisik', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Kondisi pintu-pintu yang lain', 'category' => 'pembatas fisik', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Pembatas fisik lainnya', 'category' => 'pembatas fisik', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+        ];
+
         // 3. Lakukan insert secara terpisah
         if (!empty($motorItems)) {
             DB::table('checklist_items')->insert($motorItems);
@@ -62,6 +83,9 @@ class ChecklistKendaraanSeeder extends Seeder
 
         if (!empty($mobilItems)) {
             DB::table('checklist_items')->insert($mobilItems);
+        }
+        if (!empty($penyisiranItems)) {
+            DB::table('checklist_items')->insert($penyisiranItems);
         }
     }
 }

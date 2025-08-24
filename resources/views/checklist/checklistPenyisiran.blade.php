@@ -116,14 +116,19 @@
                     {{-- Bagian table form yang perlu diperbaiki --}}
                     <tbody>
                         @php $no = 1; @endphp
-                        @foreach($penyisiranChecklist as $item)
+                        @php $noCategory = 1; @endphp
+                        @foreach($penyisiranChecklist as $category => $items)
+                        <tr class="bg-blue-100">
+                            <td colspan="7" class="border-2 border-gray-400 px-4 py-2 font-bold text-blue-800 text-left">{{ $noCategory }}. {{ strtoupper($category) }}</td>
+                        </tr>
+                        @foreach($items as $item)
                         @php
-                        $itemKey = $item['id'];
+                        $itemKey = $item->id;
                         $existingDetail = $checklist->exists ? $checklist->details->firstWhere('checklist_item_id', $itemKey) : null;
                         @endphp
                         <tr class="hover:bg-blue-50/50 transition-colors duration-200 border-b border-gray-100">
                             <td class="border-2 border-gray-400 px-4 py-3 text-center font-bold">{{ $no }}.</td>
-                            <td class="border-2 border-gray-400 px-4 py-3 font-medium">{{ $item['name'] }}</td>
+                            <td class="border-2 border-gray-400 px-4 py-3 font-medium">{{ $item->name }}</td>
 
                             {{-- TEMUAN - Radio buttons dengan name yang sama untuk saling eksklusif --}}
                             <td class="border-2 border-gray-400 px-2 py-3 text-center">
@@ -157,6 +162,8 @@
                             </td>
                         </tr>
                         @php $no++; @endphp
+                        @endforeach
+                        @php $noCategory++; @endphp
                         @endforeach
                     </tbody>
                 </table>
@@ -198,8 +205,8 @@
                         {{-- Signature Pad --}}
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Tanda Tangan Petugas:</label>
-                            <div class="border border-gray-300 rounded-lg">
-                                <canvas id="signature-canvas" class="w-full h-48"></canvas>
+                            <div class="relative w-full h-48 border border-gray-300 rounded-lg bg-white">
+                                <canvas id="signature-canvas" class="w-full h-full"></canvas>
                             </div>
                             <div class="flex justify-between items-center mt-2">
                                 <span id="signature-status" class="text-xs text-gray-500">Belum ada tanda tangan</span>

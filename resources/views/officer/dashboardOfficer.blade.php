@@ -496,6 +496,105 @@
             </div>
         </div>
         @endif
+
+        
+        @if($checklistPenyisiran->count() > 0)
+        <div class="bg-green-50 p-4 rounded-lg mb-6 shadow-sm">
+            <h3 class="text-lg font-semibold text-green-800 mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clip-rule="evenodd"></path>
+                </svg>
+                List Checklist Kendaraan yang Diterima
+            </h3>
+
+            <div class="hidden md:block overflow-x-auto">
+                <table class="min-w-full bg-white rounded-lg shadow-sm">
+                    <thead>
+                        <tr class="bg-green-100">
+                            <th class="px-4 py-3 text-left text-green-700 font-semibold">Tanggal</th>
+                            <th class="px-4 py-3 text-left text-green-700 font-semibold">Jam</th>
+                            <th class="px-4 py-3 text-left text-green-700 font-semibold">Tipe Pengecekan</th>
+                            <th class="px-4 py-3 text-left text-green-700 font-semibold">Grup</th>
+                            <th class="px-4 py-3 text-left text-green-700 font-semibold">Pengirim</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($checklistPenyisiran as $checklist)
+                        {{-- PERBAIKAN 1: Gunakan $checklist->id untuk route --}}
+                        <tr class="border-b hover:bg-green-50 transition-colors cursor-pointer"
+                            onclick="window.location.href='{{ route('officer.receivedChecklistPenyisiran.show', ['id' => $checklist->id]) }}'">
+                            <td class="px-4 py-3">{{ $checklist->created_at->format('d/m/Y') }}</td>
+                            <td class="px-4 py-3">{{ $checklist->created_at->format('H:i') }}</td>
+                            <td class="px-4 py-3">{{ ucfirst($checklist->type) ?? '-' }}</td>
+                            <td class="px-4 py-3">{{ ucfirst($checklist->grup) }}</td>
+                            {{-- PERBAIKAN 2: Panggil nama pengirim melalui relasi 'sender' --}}
+                            <td class="px-4 py-3">{{ $checklist->sender->name ?? '-' }}</td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="4" class="px-4 py-8 text-center text-gray-500">
+                                <p>Tidak ada Checklist Kendaraan yang perlu ditinjau.</p>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="md:hidden space-y-4">
+                @forelse($checklistPenyisiran as $checklist)
+                {{-- PERBAIKAN 3: Gunakan $checklist->id untuk route di mobile view juga --}}
+                <div class="bg-white rounded-lg shadow-sm border-l-4 border-green-400 overflow-hidden cursor-pointer"
+                    onclick="window.location.href='{{ route('officer.receivedChecklistPenyisiran.show', ['id' => $checklist->id]) }}'">
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                                    {{-- Icon bisa disesuaikan berdasarkan tipe kendaraan --}}
+                                    @if($checklist->type == 'mobil')
+                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 20l-5.447-2.724A1 1 0 013 16.382V8.618a1 1 0 01.553-.894L9 5l6 2.724a1 1 0 01.447.894v7.764a1 1 0 01-.553.894L9 20z">
+                                        </path>
+                                    </svg>
+                                    @else
+                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m12 0a2 2 0 100-4m0 4a2 2 0 110-4M6 12a2 2 0 100-4m0 4a2 2 0 110-4m6 0a2 2 0 100-4m0 4a2 2 0 110-4m6 0a2 2 0 100-4m0 4a2 2 0 110-4">
+                                        </path>
+                                    </svg>
+                                    @endif
+                                </div>
+                                <div>
+                                    {{-- Sesuaikan dengan data yang ada di $checklist --}}
+                                    <p class="text-sm font-medium text-gray-900 uppercase">{{ $checklist->type }}
+                                        Terminal B</p>
+                                    <p class="text-xs text-gray-500">Grup: {{ $checklist->grup }}</p>
+                                </div>
+                            </div>
+                            <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">{{
+                                $checklist->created_at->format('d/m/Y') }}</span>
+                        </div>
+                        <div class="mb-3">
+                            <p class="text-sm font-medium text-gray-700 mb-1">Pengirim:</p>
+                            {{-- PERBAIKAN 4: Gunakan relasi 'sender' juga di mobile view --}}
+                            <p class="text-sm text-gray-600 bg-green-50 p-2 rounded">{{ $checklist->sender->name ?? '-'
+                                }}</p>
+                        </div>
+                    </div>
+                </div>
+                @empty
+                <div class="bg-white rounded-lg shadow-sm p-8 text-center">
+                    <p class="text-gray-500 text-sm">Tidak ada Checklist Kendaraan yang Diterima</p>
+                </div>
+                @endforelse
+            </div>
+        </div>
+        @endif
     </div>
 </div>
 @endsection

@@ -20,18 +20,11 @@ class ChecklistPenyisiranController extends Controller
 {
     public function indexChecklistPenyisiran()
     {
-        // 1. Ambil semua item dari database berdasarkan type penyisiran
-        $items = ChecklistItem::where('type', 'penyisiran')
+        // 1. Ambil semua item dari database, diurutkan berdasarkan ID, lalu kelompokkan berdasarkan kategori
+        $penyisiranChecklist = ChecklistItem::where('type', 'penyisiran')
             ->orderBy('id')
-            ->get();
-
-        // 2. Format data untuk checklist penyisiran - STRUKTUR YANG SESUAI DENGAN VIEW
-        $penyisiranChecklist = $items->map(function ($item) {
-            return [
-                'id' => $item->id,
-                'name' => $item->name
-            ];
-        })->values()->all();
+            ->get()
+            ->groupBy('category');
 
         // 3. Buat instance baru checklist
         $checklist = new ChecklistPenyisiran();
@@ -40,9 +33,11 @@ class ChecklistPenyisiranController extends Controller
         $currentOfficer = User::whereHas('role', fn($q) => $q->where('name', Role::OFFICER))
             ->where('id', Auth::id())
             ->first();
-        
+
         // Ambil semua officer untuk dropdown "Diserahkan kepada"
-        $allOfficers = User::whereHas('role', fn($q) => $q->where('name', Role::OFFICER))->get();
+        $allOfficers = User::whereHas('role', fn($q) => $q->where('name', Role::OFFICER))
+            ->where('id', '!=', Auth::id())
+            ->get();
 
         // Ambil semua supervisor untuk dropdown "Diketahui oleh"
         $supervisors = User::whereHas('role', fn($q) => $q->where('name', Role::SUPERVISOR))
@@ -89,7 +84,7 @@ class ChecklistPenyisiranController extends Controller
                 // Berdasarkan aturan bisnis dari keterangan di form:
                 // No. 1, 2 dan 3 di isi tanda centang pada kolom TEMUAN
                 // No. 4 di isi tanda centang pada kolom KONDISI
-                
+
                 // Cari item di database untuk mengetahui urutannya
                 $checklistItem = ChecklistItem::find($itemId);
                 if (!$checklistItem) {
@@ -100,7 +95,7 @@ class ChecklistPenyisiranController extends Controller
                 // Implementasi aturan validasi berdasarkan urutan item
                 // Anda perlu menyesuaikan logika ini dengan kebutuhan bisnis Anda
                 // Contoh: jika item 1-3 harus punya temuan, item 4 harus punya kondisi
-                
+
                 if (!$hasTemuan && !$hasKondisi) {
                     $validator->errors()->add(
                         "items.{$itemId}",
@@ -199,7 +194,6 @@ class ChecklistPenyisiranController extends Controller
             return redirect()
                 ->route('checklist.penyisiran.index')
                 ->with('success', 'Checklist penyisiran berhasil disimpan dengan ID: ' . $id);
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error saving penyisiran checklist: ' . $e->getMessage());
@@ -210,5 +204,56 @@ class ChecklistPenyisiranController extends Controller
                 ->with('error', 'Gagal menyimpan checklist: ' . $e->getMessage())
                 ->withInput();
         }
+    }
+
+    public function showReceivedChecklistPenyisiran($id)
+    {
+        // Eager load relasi yang dibutuhkan untuk efisiensi
+        $checklist = ChecklistPenyisiran::with([
+            'sender',
+            'receiver',
+            'approver',
+            'details.item'
+        ])
+        ->find($id);
+
+        // Cek apakah data ditemukan                                                                       
+        if (!$checklist) {
+            return redirect()->back()->with('error', 'Checklist Penyisiran tidak ditemukan.');
+        }
+
+        // Kelompokkan detail berdasarkan kategori itemnya
+        $groupedDetails = $checklist->details->groupBy(function ($detail) {
+            return $detail->item->category;
+        });
+
+        // Kirim data ke view
+        return view('officer.checklist.receivedChecklistPenyisiran', [
+            'checklist' => $checklist,
+            'groupedDetails' => $groupedDetails,
+        ]);
+    }
+
+    public function storeReceivedSignaturePenyisiran(Request $request, ChecklistPenyisiran $checklist)
+    {
+        $request->validate([
+            'receivedSignature' => 'required|string',
+        ]);
+
+        // Pastikan user yang login adalah user yang ditunjuk sebagai penerima
+        if (Auth::id() !== $checklist->received_id) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki otorisasi untuk menandatangani checklist ini.');
+        }
+
+        // Proses dan simpan tanda tangan
+        $signature = $request->input('receivedSignature');
+        if (preg_match('/^data:image\/(\w+);base64,/', $signature, $type)) {
+            $signature = substr($signature, strpos($signature, ',') + 1);
+        }
+
+        $checklist->receivedSignature = $signature;
+        $checklist->save();
+
+        return redirect()->route('officer.receivedChecklistPenyisiran.show', $checklist->id)->with('success', 'Tanda tangan berhasil disimpan.');
     }
 }
