@@ -18,51 +18,39 @@ class ChecklistKendaraanController extends Controller
 {
     public function indexChecklistKendaraan()
     {
-        // 1. Ambil semua item dari database (Pastikan nama model benar: ChecklistItem)
-        $items = ChecklistItem::orderBy('category')->orderBy('id')->get();
-
-        // 2. Kelompokkan item berdasarkan tipe kendaraan (mobil/motor)
+        // 1. Ambil semua item dari database dan kelompokkan langsung berdasarkan tipe
+        $items = ChecklistItem::orderBy('id')->get();
         $groupedItems = $items->groupBy('type');
 
-        // 3. Format data untuk checklist mobil sesuai struktur yang diharapkan view
+        // 2. Format data untuk checklist mobil - STRUKTUR FLAT (tanpa kategori)
         $mobilItems = $groupedItems->get('mobil', collect());
-        $mobilChecklist = $mobilItems->groupBy('category')
-            ->map(function ($items, $categoryName) {
-                return [
-                    'name' => strtoupper($categoryName),
-                    'items' => $items->map(fn($item) => ['id' => $item->id, 'name' => $item->name])->values()->all(),
-                ];
-            })
-            ->values()
-            ->map(function ($category, $index) {
-                $category['letter'] = chr(65 + $index); // Menghasilkan A, B, C, ...
-                return $category;
-            })
-            ->all();
+        $mobilChecklist = $mobilItems->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'name' => $item->name
+            ];
+        })->values()->all();
 
-        // 4. Format data untuk checklist motor
+        // 3. Format data untuk checklist motor - STRUKTUR FLAT (tanpa kategori)
         $motorItems = $groupedItems->get('motor', collect());
-        $motorChecklist = $motorItems->groupBy('category')
-            ->map(function ($items, $categoryName) {
-                return [
-                    'name' => strtoupper($categoryName),
-                    'items' => $items->map(fn($item) => ['id' => $item->id, 'name' => $item->name])->values()->all(),
-                ];
-            })
-            ->values()
-            ->all();
+        $motorChecklist = $motorItems->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'name' => $item->name
+            ];
+        })->values()->all();
 
-        // INI PERUBAHAN UTAMA: Buat instance baru, bukan mengambil data lama
+        // 4. Buat instance baru checklist
         $checklist = new ChecklistKendaraan();
 
-        // Ambil data user untuk dropdown
+        // 5. Ambil data user untuk dropdown
         $officers = User::whereHas('role', fn($q) => $q->where('name', Role::OFFICER))
-            ->where('id', '!=', Auth::id()) // Pastikan tidak mengambil user yang sedang login
+            ->where('id', '!=', Auth::id())
             ->get();
 
         $supervisors = User::whereHas('role', fn($q) => $q->where('name', Role::SUPERVISOR))->get();
 
-        // 5. Kirim data yang sudah diformat ke view
+        // 6. Kirim data yang sudah diformat ke view
         return view('checklist.checklistKendaraan', compact('mobilChecklist', 'motorChecklist', 'checklist', 'officers', 'supervisors'));
     }
 

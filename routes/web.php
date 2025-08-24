@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Checklist\ChecklistPenyisiranController;
 use App\Http\Controllers\DailyTest\HhmdController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExportPdfController;
@@ -199,5 +200,8 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/checklist-harian-kendaraan', [ChecklistKendaraanController::class, 'indexChecklistKendaraan'])->name('checklist.kendaraan.index');
     Route::post('/checklist-kendaraan/store', [ChecklistKendaraanController::class, 'store'])->name('checklist.kendaraan.store');
-
+    
+    Route::get('/checklist-harian-penyisiran-terminal-B', [ChecklistPenyisiranController::class, 'indexChecklistPenyisiran'])->name('checklist.penyisiran.index');
+    Route::post('/checklist-penyisiran-terminal-B/store', [ChecklistPenyisiranController::class, 'storeChecklistPenyisiran'])->name('checklist.penyisiran.store');
+    
 });

@@ -50,6 +50,23 @@ class ChecklistKendaraanSeeder extends Seeder
             ['name' => 'Kebersihan Kabin', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
             ['name' => 'Kebersihan Bak Belakang', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
             ['name' => 'Data Service Rutin', 'type' => 'mobil', 'created_at' => $now, 'updated_at' => $now],
+
+            //penyisiran
+            ['name' => 'Area kursi ruang tunggu', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Area sudut - sudut ruangan', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Langit - langit ruangan', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Area toilet', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Area mushola', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Area nursery room', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Area Kid Zone', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+
+            ['name' => 'Area sekitar X-ray dan WTMD', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Kotak Prohibited Item', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Pembatas antara WTMD dan X-ray', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+
+            ['name' => 'Kondisi boarding gate (terkunci)', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Kondisi dinding tembok/ kaca', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'Kondisi pintu-pintu yang lain', 'type' => 'penyisiran', 'created_at' => $now, 'updated_at' => $now],
         ];
 
         DB::table('checklist_items')->insert($items);

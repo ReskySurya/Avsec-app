@@ -209,12 +209,12 @@ $isChecklistOpen = request()->is('checklist*');
                     @if(auth()->user()->role->name === 'officer')
                     <li>
                         <a href="{{ route('checklist.kendaraan.index') }}"
-                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklist-motor-patroli') ? 'bg-gray-700' : '' }}">
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklist-kendaraan') ? 'bg-gray-700' : '' }}">
                             <span>Checklist Kendaraan Patroli</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#"
+                        <a href="{{ route('checklist.penyisiran.index') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklist-penyisiran') ? 'bg-gray-700' : '' }}">
                             <span>Checklist Penyisiran Terminal B</span>
                         </a>
