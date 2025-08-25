@@ -274,7 +274,7 @@ class ChecklistKendaraanController extends Controller
         // 6. Cek apakah view ada
         if (!view()->exists($viewName)) {
             Log::error('View not found after saving signature', ['viewName' => $viewName]);
-            return redirect()->route('dashboard.officer')->with('error', 'Template tidak ditemukan, namun data berhasil disimpan.');
+            return redirect()->route('supervisor.checklist-kendaraan.list')->with('error', 'Template tidak ditemukan, namun data berhasil disimpan.');
         }
 
         // 7. Ganti return view() untuk menyertakan KEDUA variabel

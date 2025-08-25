@@ -173,9 +173,9 @@
             <form action="{{ route('supervisor.checklist-kendaraan.signature', $checklist->id) }}" method="POST"
                 onsubmit="return validateApproverSignature(event)">
                 @csrf
-                <div class="w-full max-w-sm mx-auto my-2 border-2 border-gray-300 rounded-lg bg-gray-50 p-2">
+                <div class="w-48 mx-auto mb-2 h-28 flex flex-col items-center justify-center">
                     {{-- Canvas untuk TTD --}}
-                    <canvas id="signature-canvas-approver" class="w-full h-28 rounded"></canvas>
+                    <canvas id="signature-canvas-approver" class="w-full h-full"></canvas>
                 </div>
 
                 {{-- Hidden input untuk menyimpan data base64 ttd --}}
