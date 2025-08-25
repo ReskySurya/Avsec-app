@@ -64,7 +64,7 @@ class ChecklistKendaraanController extends Controller
         $supervisors = User::whereHas('role', fn($q) => $q->where('name', Role::SUPERVISOR))->get();
 
         // 5. Kirim data yang sudah diformat ke view
-        return view('checklist.checklistKendaraan', compact('mobilChecklist', 'motorChecklist', 'checklist', 'officers', 'supervisors'));
+        return view('checklist.kendaraan.checklistKendaraan', compact('mobilChecklist', 'motorChecklist', 'checklist', 'officers', 'supervisors'));
     }
 
     public function store(Request $request)
@@ -208,23 +208,20 @@ class ChecklistKendaraanController extends Controller
 
         // 3. Update signature dan status pada checklist
         $checklist->receivedSignature = $signature;
-        $checklist->status = 'approved';
+        $checklist->status = 'submitted';
         $checklist->save();
 
         // 4. (PENTING) Muat relasi yang dibutuhkan oleh view
         $checklist->load(['sender', 'receiver', 'approver', 'details.item']);
 
-        // --- TAMBAHKAN LOGIKA PENGELOMPOKAN DI SINI ---
         $groupedItems = null;
         $type = $checklist->type;
 
         if ($type === 'mobil') {
-            // Mengelompokkan relasi 'details' berdasarkan 'item.category'
             $groupedItems = $checklist->details->groupBy(function ($detail) {
                 return $detail->item->category;
             });
         }
-        // --- AKHIR DARI LOGIKA TAMBAHAN ---
 
         // 5. Bangun nama view
         $viewName = 'officer.checklist.receivedChecklistKendaraan' . ucfirst($type);
@@ -238,5 +235,73 @@ class ChecklistKendaraanController extends Controller
         // 7. Ganti return view() untuk menyertakan KEDUA variabel
         return view($viewName, compact('checklist', 'groupedItems'))
             ->with('success', 'Tanda tangan berhasil disimpan dan checklist telah disetujui.');
+    }
+
+    public function storeSignatureApproved(Request $request, ChecklistKendaraan $checklist)
+    {
+        // 1. Validasi input
+        $request->validate([
+            'approvedSignature' => 'required|string',
+        ]);
+
+        // 2. Ambil dan proses data base64
+        $signature = $request->input('approvedSignature');
+        if (str_starts_with($signature, 'data:image/')) {
+            $signature = substr($signature, strpos($signature, ',') + 1);
+        }
+
+        // 3. Update signature dan status pada checklist
+        $checklist->approvedSignature = $signature;
+        $checklist->status = 'approved';
+        $checklist->save();
+
+        // 4. (PENTING) Muat relasi yang dibutuhkan oleh view
+        $checklist->load(['sender', 'receiver', 'approver', 'details.item']);
+
+        $groupedItems = null;
+        $type = $checklist->type;
+
+        if ($type === 'mobil') {
+            $groupedItems = $checklist->details->groupBy(function ($detail) {
+                return $detail->item->category;
+            });
+        }
+
+        // 5. Bangun nama view
+        $viewName = 'officer.checklist.detailChecklistKendaraan' . ucfirst($type);
+
+        // 6. Cek apakah view ada
+        if (!view()->exists($viewName)) {
+            Log::error('View not found after saving signature', ['viewName' => $viewName]);
+            return redirect()->route('dashboard.officer')->with('error', 'Template tidak ditemukan, namun data berhasil disimpan.');
+        }
+
+        // 7. Ganti return view() untuk menyertakan KEDUA variabel
+        return view($viewName, compact('checklist', 'groupedItems'))
+            ->with('success', 'Tanda tangan berhasil disimpan dan checklist telah disetujui.');
+    }
+
+    public function show(ChecklistKendaraan $checklist)
+    {
+        // 1. Eager load relasi 'details' dan juga relasi 'item' di dalam details
+        // Ini penting untuk menghindari N+1 query problem dan membuat performa lebih cepat.
+        $checklist->load('details.item');
+
+        // 2. Ambil semua detail dan kelompokkan berdasarkan kategori dari relasi item.
+        // Hasilnya akan menjadi collection yang key-nya adalah nama kategori ('mesin', 'mekanik', 'lainlain')
+        // dan value-nya adalah item-item yang termasuk dalam kategori tersebut.
+        $groupedItems = $checklist->details->groupBy('item.category');
+
+        // 3. Kirim data '$checklist' dan '$groupedItems' ke view.
+        // Anda tidak perlu lagi melakukan query atau pengelompokan di dalam view.
+        if ($checklist->type === 'mobil') {
+            return view('supervisor.detailChecklistKendaraanMobil', compact('checklist', 'groupedItems'));
+        } else {
+            // Lakukan hal yang sama jika Anda punya view untuk motor
+            // return view('supervisor.detailChecklistKendaraanMotor', compact('checklist', 'groupedItems'));
+
+            // Sementara bisa diarahkan ke view yang sama jika strukturnya mirip
+            return view('supervisor.detailChecklistKendaraanMotor', compact('checklist'));
+        }
     }
 }

@@ -204,7 +204,7 @@ $isChecklistOpen = request()->is('checklist*');
                     @if(auth()->user()->role->name === 'officer')
                     <li>
                         <a href="{{ route('checklist.kendaraan.index') }}"
-                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklist-motor-patroli') ? 'bg-gray-700' : '' }}">
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklist-kendaraan-patroli') ? 'bg-gray-700' : '' }}">
                             <span>Checklist Kendaraan Patroli</span>
                         </a>
                     </li>
@@ -227,17 +227,12 @@ $isChecklistOpen = request()->is('checklist*');
                         </a>
                     </li>
                     @else
-                    <!-- <li>
-                        <a href="{{ route('sweepingPI.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('sweepingpi') ? 'bg-gray-700' : '' }}">
-                            <span>Logbook Sweeping PI</span>
+                    <li>
+                        <a href="{{route('supervisor.checklist-kendaraan.list')}}"
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklist-kendaraan/list') ? 'bg-gray-700' : '' }}">
+                            <span>Checklist Kendaraan Patroli</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="{{ route('supervisor.logbook-rotasi.list') }}"
-                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook-rotasi/list') ? 'bg-gray-700' : '' }}">
-                            <span>Logbook Rotasi</span>
-                        </a>
-                    </li> -->
                     @endif
                 </ul>
             </li>

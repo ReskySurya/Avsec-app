@@ -177,4 +177,21 @@ class DashboardController extends Controller
             return view('supervisor.listLogbookRotasi', compact('logbooksPSCP', 'logbooksHBSCP'));
         }
     }
+
+    public function showDataChecklistKendaraan()
+    {
+        $perPage = 10;
+
+        $checklistsMobil = ChecklistKendaraan::with('sender')
+            ->where('type', 'mobil')
+            ->latest('date')
+            ->paginate($perPage, ['*'], 'mobil_page');
+
+        $checklistsMotor = ChecklistKendaraan::with('sender')
+            ->where('type', 'motor')
+            ->latest('date')
+            ->paginate($perPage, ['*'], 'motor_page');
+
+        return view('supervisor.listChecklistKendaraan', compact('checklistsMobil', 'checklistsMotor'));
+    }
 }
