@@ -214,4 +214,6 @@ Route::middleware(['auth'])->group(function () {
     
     Route::get('/checklist-senpi', [ChecklistSenpiController::class, 'indexChecklistSenpi'])->name('checklist.senpi.index');
     Route::post('/checklist-senpi/store', [ChecklistSenpiController::class, 'storeChecklistSenpi'])->name('checklist.senpi.store');
+    Route::post('/checklist-senpi/update/{id}', [ChecklistSenpiController::class, 'updateChecklistSenpi'])->name('checklist.senpi.update');
+    Route::delete('/checklist-senpi/destroy/{id}', [ChecklistSenpiController::class, 'destroyChecklistSenpi'])->name('checklist.senpi.destroy');
 });

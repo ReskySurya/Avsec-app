@@ -506,7 +506,7 @@
                         d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
                         clip-rule="evenodd"></path>
                 </svg>
-                List Checklist Kendaraan yang Diterima
+                List Checklist Penyisiran yang Diterima
             </h3>
 
             <div class="hidden md:block overflow-x-auto">
@@ -535,7 +535,7 @@
                         @empty
                         <tr>
                             <td colspan="4" class="px-4 py-8 text-center text-gray-500">
-                                <p>Tidak ada Checklist Kendaraan yang perlu ditinjau.</p>
+                                <p>Tidak ada Checklist Penyisiran yang perlu ditinjau.</p>
                             </td>
                         </tr>
                         @endforelse
