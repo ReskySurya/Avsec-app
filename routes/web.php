@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Checklist\ManualBookController;
 use App\Http\Controllers\DailyTest\HhmdController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExportPdfController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\LogBook\LogbookRotasiController;
 use App\Http\Controllers\LogBook\LogbookRotasiHBSCPController;
 use App\Http\Controllers\LogBook\LogbookRotasiPSCPController;
 use App\Models\LogbookSweepingPI;
+use App\Models\ManualBook;
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
@@ -195,9 +197,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/officer/posjaga/detail/{logbookID}', [LogbookPosJagaController::class, 'officerReviewLogbook'])->name('officer.logbook.detail');
 });
 
+// Checklist Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/checklist-harian-kendaraan', [ChecklistKendaraanController::class, 'indexChecklistKendaraan'])->name('checklist.kendaraan.index');
     Route::post('/checklist-kendaraan/store', [ChecklistKendaraanController::class, 'store'])->name('checklist.kendaraan.store');
     Route::get('/officer/received-checklist-kendaraan/{type}/{id}', [ChecklistKendaraanController::class, 'showReceivedChecklist'])->name('officer.receivedChecklistKendaraan.show');
     Route::post('/checklist/received-signature/{checklist}', [ChecklistKendaraanController::class, 'storeSignatureReceived'])->name('checklist.receivedSignature');
+
+    // Manual Book Routes
+    Route::get('/checklist-manual-book', [ManualBookController::class, 'index'])->name('checklist.manualbook.index');
+    Route::post('/checklist-manual-book/store', [ManualBookController::class, 'store'])->name('checklist.manualbook.store');
+    Route::patch('/checklist-manual-book/add-details/{id}', [ManualBookController::class, 'addDetails'])->name('checklist.manualbook.addDetails');
+    Route::patch('/checklist-manual-book/finish/{id}', [ManualBookController::class, 'finish'])->name('checklist.manualbook.finish');
 });

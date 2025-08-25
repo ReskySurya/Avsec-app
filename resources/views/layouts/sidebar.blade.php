@@ -221,7 +221,7 @@ $isChecklistOpen = request()->is('checklist*');
                         </a>
                     </li>
                     <li>
-                        <a href="#"
+                        <a href="{{ route('checklist.manualbook.index') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('buku-pemeriksaan-manual') ? 'bg-gray-700' : '' }}">
                             <span>Buku Pemeriksaan Manual</span>
                         </a>

@@ -14,7 +14,8 @@ class ManualBookDetail extends Model
         'name',
         'pax',
         'flight',
-        'is_person',
+        'orang',
+        'barang',
         'temuan',
         'keterangan',
     ];

@@ -35,12 +35,13 @@ return new class extends Migration
 
         Schema::create('manualbook_details', function (Blueprint $table) {
             $table->id();
-            $table->string('manualbook_id', 10);
+            $table->string('manualbook_id', 20);
             $table->time('time')->nullable();
             $table->string('name')->nullable();
             $table->string('pax')->nullable();
             $table->string('flight')->nullable();
-            $table->boolean('is_person')->comment('true: Orang, false: Barang');
+            $table->integer('orang')->unsigned()->nullable();
+            $table->integer('barang')->unsigned()->nullable();
             $table->text('temuan')->nullable();
             $table->text('keterangan')->nullable();
             $table->timestamps();
@@ -48,7 +49,6 @@ return new class extends Migration
             $table->foreign('manualbook_id')->references('id')->on('manualbooks')->onDelete('cascade');
 
             $table->index('manualbook_id');
-
         });
     }
 
