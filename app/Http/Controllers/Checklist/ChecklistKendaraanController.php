@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Checklist;
 
 use App\Http\Controllers\Controller;
+use App\Models\ChecklistItem;
 use App\Models\ChecklistItemKendaraan;
 use App\Models\ChecklistKendaraan;
 use App\Models\ChecklistKendaraanDetail;
@@ -20,7 +21,7 @@ class ChecklistKendaraanController extends Controller
     public function indexChecklistKendaraan()
     {
         // 1. Ambil semua item dari database (Pastikan nama model benar: ChecklistItem)
-        $items = ChecklistItemKendaraan::orderBy('category')->orderBy('id')->get();
+        $items = ChecklistItem::orderBy('category')->orderBy('id')->get();
 
         // 2. Kelompokkan item berdasarkan tipe kendaraan (mobil/motor)
         $groupedItems = $items->groupBy('type');

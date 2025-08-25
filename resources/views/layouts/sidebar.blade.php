@@ -58,6 +58,11 @@ $isChecklistOpen = request()->is('checklist*');
                             <span>Tenant Management</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('checklist-items.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                            <span>Checklist Items</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
             @endif
@@ -164,6 +169,12 @@ $isChecklistOpen = request()->is('checklist*');
                             <span>Logbook Rotasi</span>
                         </a>
                     </li>
+                      <li>
+                        <a href="#"
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook-chief') ? 'bg-gray-700' : '' }}">
+                            <span>Logbook Chief</span>
+                        </a>
+                    </li>
                     @else
                     <li>
                         <a href="{{ route('sweepingPI.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('sweepingpi') ? 'bg-gray-700' : '' }}">
@@ -209,9 +220,15 @@ $isChecklistOpen = request()->is('checklist*');
                         </a>
                     </li>
                     <li>
-                        <a href="#"
+                        <a href="{{ route('checklist.penyisiran.index') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklist-penyisiran') ? 'bg-gray-700' : '' }}">
                             <span>Checklist Penyisiran Terminal B</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('checklist.senpi.index') }}"
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklis-senpi') ? 'bg-gray-700' : '' }}">
+                            <span>Checklist Senjata Api</span>
                         </a>
                     </li>
                     <li>

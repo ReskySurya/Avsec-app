@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Checklist\ManualBookController;
+use App\Http\Controllers\Checklist\ChecklistPenyisiranController;
+use App\Http\Controllers\Checklist\ChecklistSenpiController;
 use App\Http\Controllers\DailyTest\HhmdController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExportPdfController;
@@ -139,12 +141,19 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::post('/tenant-management/store', [MasterDataController::class, 'storeTenant'])->name('tenant.store');
     Route::post('/tenant-management/update/{tenantID}', [MasterDataController::class, 'updateTenant'])->name('tenant.update');
     Route::delete('/tenant-management/destroy/{id}', [MasterDataController::class, 'destroyTenant'])->name('tenant.destroy');
-
+    
     // Route untuk Tenant Items
     Route::get('/tenant-management/items/{tenantID}', [MasterDataController::class, 'indexProhibitedItem'])->name('tenant.items');
     Route::post('/tenant-management/items/store', [MasterDataController::class, 'storeProhibitedItem'])->name('prohibited-items.store');
     Route::post('/tenant-management/items/update/{id}', [MasterDataController::class, 'updateProhibitedItem'])->name('prohibited-items.update');
     Route::delete('/tenant-management/items/destroy/{id}', [MasterDataController::class, 'destroyProhibitedItem'])->name('prohibited-items.destroy');
+    
+    //Route untuk Checklist Items
+    //Kendaraan
+    Route::get('/checklist-items', [MasterDataController::class, 'indexChecklistItems'])->name('checklist-items.index');
+    Route::post('/checklist-items/store', [MasterDataController::class, 'storeChecklistItems'])->name('checklist-items.store');
+    Route::post('/checklist-items/update/{id}', [MasterDataController::class, 'updateChecklistItems'])->name('checklist-items.update');
+    Route::delete('/checklist-items/destroy/{id}', [MasterDataController::class, 'destroyChecklistItems'])->name('checklist-items.destroy');
 });
 
 // Logbook Routes
@@ -198,9 +207,14 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Checklist Routes
+// Checklist Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/checklist-harian-kendaraan', [ChecklistKendaraanController::class, 'indexChecklistKendaraan'])->name('checklist.kendaraan.index');
     Route::post('/checklist-kendaraan/store', [ChecklistKendaraanController::class, 'store'])->name('checklist.kendaraan.store');
+    
+    Route::get('/checklist-harian-penyisiran-terminal-B', [ChecklistPenyisiranController::class, 'indexChecklistPenyisiran'])->name('checklist.penyisiran.index');
+    Route::post('/checklist-penyisiran-terminal-B/store', [ChecklistPenyisiranController::class, 'storeChecklistPenyisiran'])->name('checklist.penyisiran.store');
+    
     Route::get('/officer/received-checklist-kendaraan/{type}/{id}', [ChecklistKendaraanController::class, 'showReceivedChecklist'])->name('officer.receivedChecklistKendaraan.show');
     Route::post('/checklist/received-signature/{checklist}', [ChecklistKendaraanController::class, 'storeSignatureReceived'])->name('checklist.receivedSignature');
 
@@ -209,4 +223,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/checklist-manual-book/store', [ManualBookController::class, 'store'])->name('checklist.manualbook.store');
     Route::patch('/checklist-manual-book/add-details/{id}', [ManualBookController::class, 'addDetails'])->name('checklist.manualbook.addDetails');
     Route::patch('/checklist-manual-book/finish/{id}', [ManualBookController::class, 'finish'])->name('checklist.manualbook.finish');
+    
+    Route::get('/officer/received-checklist-penyisiran/{id}', [ChecklistPenyisiranController::class, 'showReceivedChecklistPenyisiran'])->name('officer.receivedChecklistPenyisiran.show');
+    Route::post('/checklist/received-signature/{checklist}', [ChecklistPenyisiranController::class, 'storeReceivedSignaturePenyisiran'])->name('checklist.receivedSignature.penyisiran');
+    
+    Route::get('/checklist-senpi', [ChecklistSenpiController::class, 'indexChecklistSenpi'])->name('checklist.senpi.index');
+    Route::post('/checklist-senpi/store', [ChecklistSenpiController::class, 'storeChecklistSenpi'])->name('checklist.senpi.store');
+    Route::post('/checklist-senpi/update/{id}', [ChecklistSenpiController::class, 'updateChecklistSenpi'])->name('checklist.senpi.update');
+    Route::delete('/checklist-senpi/destroy/{id}', [ChecklistSenpiController::class, 'destroyChecklistSenpi'])->name('checklist.senpi.destroy');
 });

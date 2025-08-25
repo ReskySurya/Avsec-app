@@ -51,6 +51,6 @@ class ChecklistKendaraanDetail extends Model
      */
     public function item(): BelongsTo
     {
-        return $this->belongsTo(ChecklistItemKendaraan::class, 'checklist_item_id');
+        return $this->belongsTo(ChecklistItem::class, 'checklist_item_id');
     }
 }

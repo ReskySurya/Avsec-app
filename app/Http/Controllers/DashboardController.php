@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ChecklistKendaraan;
+use App\Models\ChecklistPenyisiran;
 use App\Models\Location;
 use App\Models\Report;
 use App\Models\Logbook;
@@ -144,12 +145,21 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $checklistPenyisiran = ChecklistPenyisiran::where('received_id', Auth::id())
+            ->whereNull('receivedSignature')
+            ->with(['sender']) // <-- UBAH INI: Muat relasi sender
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        
+
         return view('officer.dashboardOfficer', [
             'rejectedlogbooks' => $rejectedlogbooks,
             'locations' => $locations,
             'rejectedReports' => $rejectedReports,
             'logbookEntries' => $logbookEntries,
             'checklistKendaraan' => $checklistKendaraan,
+            'checklistPenyisiran' => $checklistPenyisiran,
         ]);
     }
 

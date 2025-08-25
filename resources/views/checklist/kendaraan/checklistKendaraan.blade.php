@@ -143,16 +143,14 @@
                     <table class="w-full border-collapse border border-gray-300">
                         <thead>
                             <tr class="bg-blue-600 text-white">
-                                <th class="border border-gray-300 px-4 py-3 text-left font-semibold">NO</th>
-                                <th class="border border-gray-300 px-4 py-3 text-left font-semibold">KETERANGAN</th>
+                                <th class="border border-gray-300 px-4 py-3 text-left font-semibold" rowspan="2">NO</th>
+                                <th class="border border-gray-300 px-4 py-3 text-left font-semibold" rowspan="2">KETERANGAN</th>
                                 <th class="border border-gray-300 px-4 py-3 text-center font-semibold" colspan="2"
                                     x-text="selectedShift === 'pagi' ? 'KONDISI SHIFT PAGI' : 'KONDISI SHIFT MALAM'">
                                 </th>
-                                <th class="border border-gray-300 px-4 py-3 text-left font-semibold">CATATAN</th>
+                                <th class="border border-gray-300 px-4 py-3 text-left font-semibold" rowspan="2">CATATAN</th>
                             </tr>
                             <tr class="bg-blue-500 text-white">
-                                <th class="border border-gray-300 px-4 py-2"></th>
-                                <th class="border border-gray-300 px-4 py-2"></th>
                                 <th class="border border-gray-300 px-4 py-2" colspan="2">
                                     <div class="grid grid-cols-2 gap-1">
                                         <div class="text-center font-semibold">BAIK</div>
@@ -320,7 +318,7 @@
                         index: `cat-${categoryIndex}`,
                         isCategory: true,
                         letter: category.letter || '',
-                        name: category.name || 'UNCATEGORIZED'
+                        name: category.name || ''
                     });
                     if (category.items && Array.isArray(category.items)) {
                         category.items.forEach((item, itemIndex) => {
