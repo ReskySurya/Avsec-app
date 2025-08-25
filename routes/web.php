@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Checklist\ChecklistPenyisiranController;
+use App\Http\Controllers\Checklist\ChecklistSenpiController;
 use App\Http\Controllers\DailyTest\HhmdController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExportPdfController;
@@ -197,6 +198,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/officer/posjaga/detail/{logbookID}', [LogbookPosJagaController::class, 'officerReviewLogbook'])->name('officer.logbook.detail');
 });
 
+// Checklist Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/checklist-harian-kendaraan', [ChecklistKendaraanController::class, 'indexChecklistKendaraan'])->name('checklist.kendaraan.index');
     Route::post('/checklist-kendaraan/store', [ChecklistKendaraanController::class, 'store'])->name('checklist.kendaraan.store');
@@ -209,4 +211,7 @@ Route::middleware(['auth'])->group(function () {
     
     Route::get('/officer/received-checklist-penyisiran/{id}', [ChecklistPenyisiranController::class, 'showReceivedChecklistPenyisiran'])->name('officer.receivedChecklistPenyisiran.show');
     Route::post('/checklist/received-signature/{checklist}', [ChecklistPenyisiranController::class, 'storeReceivedSignaturePenyisiran'])->name('checklist.receivedSignature.penyisiran');
+    
+    Route::get('/checklist-senpi', [ChecklistSenpiController::class, 'indexChecklistSenpi'])->name('checklist.senpi.index');
+    Route::post('/checklist-senpi/store', [ChecklistSenpiController::class, 'storeChecklistSenpi'])->name('checklist.senpi.store');
 });

@@ -647,12 +647,14 @@ class MasterDataController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:checklist_items,name',
+            'category' => 'required|string|max:50',
             'type' => 'required|string|max:50',
         ]);
 
         try {
             ChecklistItem::create([
                 'name' => $request->name,
+                'category' => $request->category,
                 'type' => $request->type,
             ]);
 
@@ -667,6 +669,7 @@ class MasterDataController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:checklist_items,name,' . $id,
+            'category' => 'required|string|max:50',
             'type' => 'required|string|max:50',
         ]);
 
@@ -675,6 +678,7 @@ class MasterDataController extends Controller
 
             $item->update([
                 'name' => $request->name,
+                'category' => $request->category,
                 'type' => $request->type,
             ]);
 

@@ -226,7 +226,7 @@ $isChecklistOpen = request()->is('checklist*');
                         </a>
                     </li>
                     <li>
-                        <a href="#"
+                        <a href="{{ route('checklist.senpi.index') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklis-senpi') ? 'bg-gray-700' : '' }}">
                             <span>Checklist Senjata Api</span>
                         </a>

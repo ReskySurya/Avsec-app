@@ -8,13 +8,14 @@
     openChecklist: false,
     openEditChecklist: false,
     openEditChecklist: false,
-    editChecklistData: { id: null, name: '', type: '' },
+    editChecklistData: { id: null, name: '', type: '', category: '' },
     
     // Functions for handling edit modals
     openEditChecklistModal(item) {
         this.editChecklistData = {
             id: item.id,
             name: item.name,
+            category: item.category,
             type: item.type
         };
         this.openEditChecklist = true;
@@ -126,6 +127,7 @@
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">No</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nama Item</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tipe</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kategori</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tanggal Dibuat</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Aksi</th>
                         </tr>
@@ -139,6 +141,9 @@
                             </td>
                             <td class="px-6 py-4">
                                 <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">{{ $item->type ?? 'Tidak ada Tipe' }}</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">{{ $item->category ?? 'Tidak ada Kategori' }}</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->created_at->format('d/m/Y') ?? '-' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -203,6 +208,15 @@
                     @enderror
                 </div>
                 <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori </label>
+                    <input type="text" name="category"
+                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-purple-500 focus:outline-none transition-colors duration-200"
+                        value="{{ old('category') }}">
+                    @error('category')
+                    <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="mb-6">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Tipe Item</label>
                     <select name="type" required
                         class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-purple-500 focus:outline-none transition-colors duration-200">
@@ -249,6 +263,13 @@
                         class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-purple-500 focus:outline-none transition-colors duration-200"
                         placeholder="Masukkan nama item kendaraan">
                 </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori</label>
+                    <input type="text" name="category" required x-model="editChecklistData.category"
+                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-purple-500 focus:outline-none transition-colors duration-200"
+                        placeholder="Masukkan nama kategori">
+                </div>
+
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Tipe Item</label>
                     <select name="type" required x-model="editChecklistData.type"
