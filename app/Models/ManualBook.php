@@ -19,6 +19,8 @@ class ManualBook extends Model
         'status',
         'created_by',
         'approved_by',
+        'senderSignature',
+        'approvedSignature',
         'approved_at',
         'notes',
     ];

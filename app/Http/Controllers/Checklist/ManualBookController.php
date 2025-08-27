@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Checklist;
 
 use App\Http\Controllers\Controller;
 use App\Models\ManualBook;
+use App\Models\ManualBookDetail;
+use App\Models\Role;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,10 +18,18 @@ class ManualBookController extends Controller
      */
     public function index()
     {
-        $manualBooks = ManualBook::with('creator','details')->latest()->paginate(10);
-        $loggedInUserName = Auth::user()->name;
+        $manualBooks = ManualBook::with('creator','details')
+            ->where('created_by', Auth::id())
+            ->orderBy('date', 'desc')
+            ->latest()->paginate(10);
 
-        return view('checklist.manualbook.manualBook', compact('manualBooks', 'loggedInUserName'));
+        $loggedInUserName = Auth::user()->name;
+        $supervisors = User::whereHas('role', fn($q) => $q->where('name', Role::SUPERVISOR))->get();
+
+        return view('checklist.manualbook.manualBook', compact(
+            'manualBooks',
+            'loggedInUserName',
+            'supervisors'));
     }
 
     /**
@@ -138,8 +149,15 @@ class ManualBookController extends Controller
     /**
      * Mengubah status laporan dari 'draft' menjadi 'submitted'.
      */
-    public function finish($id)
+    public function finish(Request $request, $id) // 1. Tambahkan Request $request
     {
+        // 2. Validasi input dari modal
+        $request->validate([
+            'signature'   => 'required|string',
+            // 'receivedID'  => 'required|exists:users,id',
+            'approvedID'  => 'required|exists:users,id',
+        ]);
+
         $manualBook = ManualBook::findOrFail($id);
 
         // Pastikan hanya pembuatnya yang bisa menyelesaikan
@@ -147,10 +165,44 @@ class ManualBookController extends Controller
             abort(403, 'AKSES DITOLAK');
         }
 
+        // 3. Simpan data baru dari form ke model
         $manualBook->status = 'submitted';
+        $manualBook->senderSignature = $request->signature; // Simpan tanda tangan
+        $manualBook->approved_by = $request->approvedID;    // Simpan ID supervisor
+
         $manualBook->save();
 
         return redirect()->route('checklist.manualbook.index')
-            ->with('success', 'Laporan ' . $manualBook->id . ' telah berhasil diselesaikan.');
+                         ->with('success', 'Laporan ' . $manualBook->id . ' telah berhasil diselesaikan.');
+    }
+
+    public function show(ManualBook $manualBook)
+    {
+        $manualBook->load('details');
+
+        return view('supervisor.detailManualBook', compact('manualBook'));
+
+    }
+
+    public function approveSignature(Request $request, ManualBook $manualBook)
+    {
+        // Validasi: pastikan data tanda tangan ada
+        $request->validate([
+            'approvedSignature' => 'required|string',
+        ]);
+
+        // Otorisasi: Pastikan user yang login adalah supervisor yang ditunjuk
+        // Anda bisa menambahkan logika yang lebih kompleks di sini jika perlu
+        if (Auth::id() !== $manualBook->approved_by) {
+            return redirect()->back()->withErrors(['general' => 'Anda tidak memiliki otorisasi untuk menyetujui laporan ini.']);
+        }
+
+        // Simpan tanda tangan dan ubah status jika perlu
+        $manualBook->approvedSignature = $request->approvedSignature;
+        $manualBook->status = 'approved';
+
+        $manualBook->save();
+
+        return redirect()->back()->with('success', 'Tanda tangan persetujuan berhasil disimpan.');
     }
 }

@@ -10,6 +10,7 @@ use App\Models\Logbook;
 use App\Models\LogbookRotasi;
 use App\Models\LogbookRotasiHBSCP;
 use App\Models\LogbookRotasiPSCP;
+use App\Models\ManualBook;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -151,7 +152,7 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        
+
 
         return view('officer.dashboardOfficer', [
             'rejectedlogbooks' => $rejectedlogbooks,
@@ -203,5 +204,24 @@ class DashboardController extends Controller
             ->paginate($perPage, ['*'], 'motor_page');
 
         return view('supervisor.listChecklistKendaraan', compact('checklistsMobil', 'checklistsMotor'));
+    }
+
+    public function showDataManualBook()
+    {
+        $perPage = 10;
+
+        $manualBooksHBSCP = ManualBook::with('creator', 'details')
+            ->where('approved_by', Auth::id())
+            ->where('type', 'hbscp')
+            ->latest('date')
+            ->paginate($perPage, ['*'], 'hbscp_page');
+
+        $manualBooksPSCP = ManualBook::with('creator', 'details')
+            ->where('approved_by', Auth::id())
+            ->where('type', 'pscp')
+            ->latest('date')
+            ->paginate($perPage, ['*'], 'pscp_page');
+
+        return view('supervisor.listManualBook', compact('manualBooksHBSCP', 'manualBooksPSCP'));
     }
 }

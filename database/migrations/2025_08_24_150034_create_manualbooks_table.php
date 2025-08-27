@@ -19,6 +19,8 @@ return new class extends Migration
             $table->enum('status', ['draft', 'submitted', 'approved'])->default('draft');
             $table->unsignedBigInteger('created_by');
             $table->unsignedBigInteger('approved_by')->nullable();
+            $table->text('senderSignature')->nullable();
+            $table->text('approvedSignature')->nullable();
             $table->timestamp('approved_at')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();

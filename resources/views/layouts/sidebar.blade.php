@@ -250,6 +250,12 @@ $isChecklistOpen = request()->is('checklist*');
                             <span>Checklist Kendaraan Patroli</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{route('supervisor.checklist-manualbook.list')}}"
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklist-kendaraan/list') ? 'bg-gray-700' : '' }}">
+                            <span>Buku Pemeriksaan Manual</span>
+                        </a>
+                    </li>
                     @endif
                 </ul>
             </li>
