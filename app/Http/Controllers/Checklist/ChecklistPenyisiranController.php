@@ -44,7 +44,7 @@ class ChecklistPenyisiranController extends Controller
             ->get();
 
         // 5. Kirim data yang sudah diformat ke view
-        return view('checklist.checklistPenyisiran', compact(
+        return view('checklist.penyisiran.checklistPenyisiran', compact(
             'penyisiranChecklist',
             'currentOfficer',
             'allOfficers',
@@ -215,7 +215,7 @@ class ChecklistPenyisiranController extends Controller
             'approver',
             'details.item'
         ])
-        ->find($id);
+            ->find($id);
 
         // Cek apakah data ditemukan                                                                       
         if (!$checklist) {
@@ -255,5 +255,66 @@ class ChecklistPenyisiranController extends Controller
         $checklist->save();
 
         return redirect()->route('officer.receivedChecklistPenyisiran.show', $checklist->id)->with('success', 'Tanda tangan berhasil disimpan.');
+    }
+
+
+    public function showDetailPenyisiran(ChecklistPenyisiran $checklist)
+    {
+        // 1. Eager load relasi 'details' dan juga relasi 'item' di dalam details
+        // Ini penting untuk menghindari N+1 query problem dan membuat performa lebih cepat.
+        $checklist->load('details.item');
+
+        // 2. Ambil semua detail dan kelompokkan berdasarkan kategori dari relasi item.
+        // Hasilnya akan menjadi collection yang key-nya adalah nama kategori ('mesin', 'mekanik', 'lainlain')
+        // dan value-nya adalah item-item yang termasuk dalam kategori tersebut.
+        $groupedItems = $checklist->details->groupBy('item.category');
+
+        // 3. Kirim data '$checklist' dan '$groupedItems' ke view.
+        // Anda tidak perlu lagi melakukan query atau pengelompokan di dalam view.
+        return view('supervisor.detailChecklistPenyisiran', compact('checklist', 'groupedItems'));
+    }
+
+    public function storeSignatureApproved(Request $request, ChecklistPenyisiran $checklist)
+    {
+        // 1. Validasi input
+        $request->validate([
+            'approvedSignature' => 'required|string',
+        ]);
+
+        // 2. Ambil dan proses data base64
+        $signature = $request->input('approvedSignature');
+        if (str_starts_with($signature, 'data:image/')) {
+            $signature = substr($signature, strpos($signature, ',') + 1);
+        }
+
+        // 3. Update signature dan status pada checklist
+        $checklist->approvedSignature = $signature;
+        $checklist->status = 'approved';
+        $checklist->save();
+
+        // 4. (PENTING) Muat relasi yang dibutuhkan oleh view
+        $checklist->load(['sender', 'receiver', 'approver', 'details.item']);
+
+        $groupedItems = null;
+        $type = $checklist->type;
+
+        if ($type === 'penyisiran') {
+            $groupedItems = $checklist->details->groupBy(function ($detail) {
+                return $detail->item->category;
+            });
+        }
+
+        // // // 5. Bangun nama view
+        $viewName = 'officer.checklist.detailChecklistPenyisiran' . ucfirst($type);
+
+        // 6. Cek apakah view ada
+        if (!view()->exists($viewName)) {
+            Log::error('View not found after saving signature', ['viewName' => $viewName]);
+            return redirect()->route('supervisor.checklist-penyisiran.list')->with('error', 'Template tidak ditemukan, namun data berhasil disimpan.');
+        }
+
+        // 7. Ganti return view() untuk menyertakan KEDUA variabel
+        return view('supervisor.list-checklist-penyisiran', compact('checklist', 'groupedItems'))
+            ->with('success', 'Tanda tangan berhasil disimpan dan checklist telah disetujui.');
     }
 }

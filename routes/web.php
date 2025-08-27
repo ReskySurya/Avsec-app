@@ -1,11 +1,12 @@
 <?php
 
+use App\Http\Controllers\Checklist\ChecklistSenpiController;
 use App\Http\Controllers\Checklist\ManualBookController;
 use App\Http\Controllers\Checklist\ChecklistPenyisiranController;
-use App\Http\Controllers\Checklist\ChecklistSenpiController;
 use App\Http\Controllers\DailyTest\HhmdController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExportPdfController;
+use App\Http\Controllers\Checklist\FormPencatatanPIController;
 use App\Http\Controllers\LogBook\LogbookSweppingPIController;
 use App\Http\Controllers\MasterDataController;
 use Illuminate\Support\Facades\Route;
@@ -61,6 +62,13 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
     Route::get('/checklist-kendaraan-patroli/list', [DashboardController::class, 'showDataChecklistKendaraan'])->name('supervisor.checklist-kendaraan.list');
     Route::get('/checklist-kendaraan-patroli/detail/{checklist}', [ChecklistKendaraanController::class, 'show'])->name('supervisor.checklist-kendaraan.detail');
     Route::post('/checklist-kendaraan-patroli/approve/{checklist}', [ChecklistKendaraanController::class, 'storeSignatureApproved'])->name('supervisor.checklist-kendaraan.signature');
+
+    // Review Checklist Penyisiran Terminal B
+    Route::get('/checklist-penyisiran-terminal-B/list', [DashboardController::class, 'showDataChecklistPenyisiran'])->name('supervisor.checklist-penyisiran.list');
+    Route::get('/checklist-penyisiran-terminal-B/detail/{checklist}', [ChecklistPenyisiranController::class, 'showDetailPenyisiran'])->name('supervisor.checklist-penyisiran.detail');
+    Route::post('/checklist-penyisiran-terminal-B/approve/{checklist}', [ChecklistPenyisiranController::class, 'storeSignatureApproved'])->name('supervisor.checklist-penyisiran.signature');
+
+
 
     // Review Manual Book
     Route::get('/checklist-manual-book/list', [DashboardController::class, 'showDataManualBook'])->name('supervisor.checklist-manualbook.list');
@@ -213,26 +221,39 @@ Route::middleware(['auth'])->group(function () {
 // Checklist Routes
 // Checklist Routes
 Route::middleware(['auth'])->group(function () {
+    // Checklist Kendaraan Patroli
     Route::get('/checklist-harian-kendaraan', [ChecklistKendaraanController::class, 'indexChecklistKendaraan'])->name('checklist.kendaraan.index');
     Route::post('/checklist-kendaraan/store', [ChecklistKendaraanController::class, 'store'])->name('checklist.kendaraan.store');
-
-    Route::get('/checklist-harian-penyisiran-terminal-B', [ChecklistPenyisiranController::class, 'indexChecklistPenyisiran'])->name('checklist.penyisiran.index');
-    Route::post('/checklist-penyisiran-terminal-B/store', [ChecklistPenyisiranController::class, 'storeChecklistPenyisiran'])->name('checklist.penyisiran.store');
-
     Route::get('/officer/received-checklist-kendaraan/{type}/{id}', [ChecklistKendaraanController::class, 'showReceivedChecklist'])->name('officer.receivedChecklistKendaraan.show');
     Route::post('/checklist/received-signature/kendaraan/{checklist}', [ChecklistKendaraanController::class, 'storeSignatureReceived'])->name('checklist.receivedSignature');
+    // Route::get('/officer/received-checklist-kendaraan/{type}/{id}', [ChecklistKendaraanController::class, 'showReceivedChecklist'])->name('officer.receivedChecklistKendaraan.show');
+    // Route::post('/checklist/received-signature/kendaraan/{checklist}', [ChecklistKendaraanController::class, 'storeSignatureReceived'])->name('checklist.receivedSignature');
+    
+    // Checklist Penyisiran Terminal B
+    Route::get('/checklist-harian-penyisiran-terminal-B', [ChecklistPenyisiranController::class, 'indexChecklistPenyisiran'])->name('checklist.penyisiran.index');
+    Route::post('/checklist-penyisiran-terminal-B/store', [ChecklistPenyisiranController::class, 'storeChecklistPenyisiran'])->name('checklist.penyisiran.store');
+    Route::get('/officer/received-checklist-penyisiran/{id}', [ChecklistPenyisiranController::class, 'showReceivedChecklistPenyisiran'])->name('officer.receivedChecklistPenyisiran.show');
+    Route::post('/checklist/received-signature/penyisiran/{checklist}', [ChecklistPenyisiranController::class, 'storeReceivedSignaturePenyisiran'])->name('checklist.receivedSignature.penyisiran');
+    // Route::get('/officer/received-checklist-penyisiran/{id}', [ChecklistPenyisiranController::class, 'showReceivedChecklistPenyisiran'])->name('officer.receivedChecklistPenyisiran.show');
+    // Route::post('/checklist/received-signature/penyisiran/{checklist}', [ChecklistPenyisiranController::class, 'storeReceivedSignaturePenyisiran'])->name('checklist.receivedSignature.penyisiran');
+
 
     // Manual Book Routes
     Route::get('/checklist-manual-book', [ManualBookController::class, 'index'])->name('checklist.manualbook.index');
     Route::post('/checklist-manual-book/store', [ManualBookController::class, 'store'])->name('checklist.manualbook.store');
     Route::patch('/checklist-manual-book/add-details/{id}', [ManualBookController::class, 'addDetails'])->name('checklist.manualbook.addDetails');
     Route::patch('/checklist-manual-book/finish/{id}', [ManualBookController::class, 'finish'])->name('checklist.manualbook.finish');
-
-    Route::get('/officer/received-checklist-penyisiran/{id}', [ChecklistPenyisiranController::class, 'showReceivedChecklistPenyisiran'])->name('officer.receivedChecklistPenyisiran.show');
-    Route::post('/checklist/received-signature/penyisiran/{checklist}', [ChecklistPenyisiranController::class, 'storeReceivedSignaturePenyisiran'])->name('checklist.receivedSignature.penyisiran');
-
+    
+    
+    // Checklist Senpi Routes
     Route::get('/checklist-senpi', [ChecklistSenpiController::class, 'indexChecklistSenpi'])->name('checklist.senpi.index');
     Route::post('/checklist-senpi/store', [ChecklistSenpiController::class, 'storeChecklistSenpi'])->name('checklist.senpi.store');
     Route::post('/checklist-senpi/update/{id}', [ChecklistSenpiController::class, 'updateChecklistSenpi'])->name('checklist.senpi.update');
     Route::delete('/checklist-senpi/destroy/{id}', [ChecklistSenpiController::class, 'destroyChecklistSenpi'])->name('checklist.senpi.destroy');
+
+    // Checklist Pencatatan PI Routes
+    Route::get('/form-pencatatan-pi', [FormPencatatanPIController::class, 'indexChecklistPencatatanPI'])->name('checklist.pencatatanpi.index');
+    Route::post('/form-pencatatan-pi/store', [FormPencatatanPIController::class, 'storeChecklistPencatatanPI'])->name('checklist.pencatatanpi.store');
+    Route::delete('/form-pencatatan-pi/{id}', [FormPencatatanPIController::class, 'destroyChecklistPencatatanPI'])->name('checklist.pencatatanpi.destroy');
+    
 });

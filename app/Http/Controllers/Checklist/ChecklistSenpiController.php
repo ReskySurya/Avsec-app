@@ -16,7 +16,7 @@ class ChecklistSenpiController extends Controller
         $currentuser = Auth::user();
         $senpi = ChecklistSenpi::orderBy('date', 'desc')->get();
 
-        return view('checklist.checklistSenpi', compact('senpi', 'currentuser'));
+        return view('checklist.senpi.checklistSenpi', compact('senpi', 'currentuser'));
     }
 
     public function storeChecklistSenpi(Request $request)
@@ -42,6 +42,7 @@ class ChecklistSenpiController extends Controller
 
         // Generate unique ID
         $validated['id'] = (string) Str::uuid();
+        
 
         ChecklistSenpi::create($validated);
 

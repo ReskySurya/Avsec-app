@@ -206,6 +206,17 @@ class DashboardController extends Controller
         return view('supervisor.listChecklistKendaraan', compact('checklistsMobil', 'checklistsMotor'));
     }
 
+    public function showDataChecklistPenyisiran()
+    {
+        $perPage = 10;
+
+        $checklistsPenyisiran = ChecklistPenyisiran::with('sender')
+            ->latest('date')
+            ->paginate($perPage, ['*']);
+
+        return view('supervisor.listChecklistPenyisiran', compact('checklistsPenyisiran'));
+    }
+
     public function showDataManualBook()
     {
         $perPage = 10;

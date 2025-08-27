@@ -68,6 +68,7 @@ $isChecklistOpen = request()->is('checklist*');
             @endif
 
             <!-- Daily Test -->
+            @if(auth()->user()->role->name === 'officer')
             <li x-data="{ open: {{ $isDailyTestOpen ? 'true' : 'false' }} }">
                 <button @click="open = !open"
                     class="flex items-center justify-between w-full py-2 px-2 rounded hover:bg-gray-700 no-mobile-close">
@@ -126,6 +127,20 @@ $isChecklistOpen = request()->is('checklist*');
                     </li>
                 </ul>
             </li>
+            @else
+            <li>
+                <div class="flex items-center rounded hover:bg-gray-700 no-mobile-close">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 ms-2" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                    <a href="{{ route('supervisor.dailytest-form') }}" class="flex items-center py-2 rounded hover:bg-gray-700 w-full">
+                        <span>Daily Test</span>
+                    </a>
+                </div>
+            </li>
+            @endif
 
             <li x-data="{ open: {{ $isLogbookOpen ? 'true' : 'false' }} }">
                 <button @click="open = !open"
@@ -147,16 +162,14 @@ $isChecklistOpen = request()->is('checklist*');
                 </button>
 
                 <ul x-show="open" class="pl-8 mt-2 space-y-2">
-                    <!-- Submenu Pos Jaga -->
+                    <!-- Menu Lainnya -->
+                    @if(auth()->user()->role->name === 'officer')
                     <li x-data="{ openPosJaga: {{ $isLogbookPosJagaOpen ? 'true' : 'false' }} }">
                         <a href="{{ route('logbook.index') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook/posjaga') ? 'bg-gray-700' : '' }}">
                             <span>Logbook Pos Jaga</span>
                         </a>
                     </li>
-
-                    <!-- Menu Lainnya -->
-                    @if(auth()->user()->role->name === 'officer')
                     <li>
                         <a href="{{ route('logbookSweppingPI.index') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook-sweppingpi') ? 'bg-gray-700' : '' }}">
@@ -169,13 +182,12 @@ $isChecklistOpen = request()->is('checklist*');
                             <span>Logbook Rotasi</span>
                         </a>
                     </li>
-                      <li>
-                        <a href="#"
-                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook-chief') ? 'bg-gray-700' : '' }}">
-                            <span>Logbook Chief</span>
+                    @else
+                    <li>
+                        <a href="{{ route('supervisor.logbook-form') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('posjaga') ? 'bg-gray-700' : '' }}">
+                            <span>Logbook Pos Jaga</span>
                         </a>
                     </li>
-                    @else
                     <li>
                         <a href="{{ route('sweepingPI.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('sweepingpi') ? 'bg-gray-700' : '' }}">
                             <span>Logbook Sweeping PI</span>
@@ -185,6 +197,12 @@ $isChecklistOpen = request()->is('checklist*');
                         <a href="{{ route('supervisor.logbook-rotasi.list') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook-rotasi/list') ? 'bg-gray-700' : '' }}">
                             <span>Logbook Rotasi</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#"
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook-chief') ? 'bg-gray-700' : '' }}">
+                            <span>Logbook Chief</span>
                         </a>
                     </li>
                     @endif
@@ -232,7 +250,7 @@ $isChecklistOpen = request()->is('checklist*');
                         </a>
                     </li>
                     <li>
-                        <a href="#"
+                        <a href="{{ route('checklist.pencatatanpi.index') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('form-catatan-pi') ? 'bg-gray-700' : '' }}">
                             <span>Form Catatan PI</span>
                         </a>
@@ -248,6 +266,18 @@ $isChecklistOpen = request()->is('checklist*');
                         <a href="{{route('supervisor.checklist-kendaraan.list')}}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklist-kendaraan/list') ? 'bg-gray-700' : '' }}">
                             <span>Checklist Kendaraan Patroli</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('supervisor.checklist-penyisiran.list') }}"
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklist-penyisiran/list') ? 'bg-gray-700' : '' }}">
+                            <span>Checklist Penyisiran Terminal B</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('checklist.senpi.index') }}"
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklis-senpi') ? 'bg-gray-700' : '' }}">
+                            <span>Checklist Senjata Api</span>
                         </a>
                     </li>
                     <li>
