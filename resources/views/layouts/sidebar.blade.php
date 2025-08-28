@@ -245,14 +245,14 @@ $isChecklistOpen = request()->is('checklist*');
                     </li>
                     <li>
                         <a href="{{ route('checklist.senpi.index') }}"
-                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklis-senpi') ? 'bg-gray-700' : '' }}">
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklist-senpi') ? 'bg-gray-700' : '' }}">
                             <span>Checklist Senjata Api</span>
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('checklist.pencatatanpi.index') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('form-catatan-pi') ? 'bg-gray-700' : '' }}">
-                            <span>Form Catatan PI</span>
+                            <span>Form Pencatatan PI</span>
                         </a>
                     </li>
                     <li>
@@ -281,8 +281,14 @@ $isChecklistOpen = request()->is('checklist*');
                         </a>
                     </li>
                     <li>
+                        <a href="{{route('supervisor.form-pencatatan-pi.list')}}"
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklist-pencatatanpi/list') ? 'bg-gray-700' : '' }}">
+                            <span>Form Pencatatan PI</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="{{route('supervisor.checklist-manualbook.list')}}"
-                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklist-kendaraan/list') ? 'bg-gray-700' : '' }}">
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklist-manualbook/list') ? 'bg-gray-700' : '' }}">
                             <span>Buku Pemeriksaan Manual</span>
                         </a>
                     </li>

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('checklist_senpi', function (Blueprint $table) {
-            $table->string('id')->primary();
+            $table->string('id')->primary(); 
             $table->date('date');
             $table->string('name')->nullable();
             $table->string('agency')->nullable();

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ChecklistKendaraan;
 use App\Models\ChecklistPenyisiran;
+use App\Models\FormPencatatanPI;
 use App\Models\Location;
 use App\Models\Report;
 use App\Models\Logbook;
@@ -235,4 +236,16 @@ class DashboardController extends Controller
 
         return view('supervisor.listManualBook', compact('manualBooksHBSCP', 'manualBooksPSCP'));
     }
+
+    public function showDataFormPencatatanPI()
+{
+    $perPage = 10;
+    
+    // Perbaikan: Hapus get() dan gunakan where() langsung pada query builder
+    $formPencatatanPI = FormPencatatanPI::where('approved_id', Auth::id())
+        ->latest('date')
+        ->paginate($perPage, ['*']);
+        
+    return view('supervisor.listFormPencatatanPI', compact('formPencatatanPI'));
+}
 }

@@ -50,6 +50,7 @@
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider" rowspan="2">Jenis PI</th>
                         <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider" colspan="2">Jumlah</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider" rowspan="2">Ket</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider" rowspan="2">Status</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider" rowspan="2">Aksi</th>
                     </tr>
                     <tr>
@@ -63,21 +64,42 @@
                     @forelse($pencatatanPI ?? [] as $index => $item)
                     <tr class="hover:bg-gray-50 transition-colors duration-200">
                         <td class="px-4 py-3 whitespace-nowrap">{{ $index + 1 }}</td>
-                        <td class="px-4 py-3 whitespace-nowrap">{{ \Carbon\Carbon::parse($item->date)->format('d M Y') }}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-center">{{ $item->in_time }}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-center">{{ $item->out_time }}</td>
-                        <td class="px-4 py-3 whitespace-nowrap">{{ $item->name_person }}</td>
-                        <td class="px-4 py-3 whitespace-nowrap">{{ $item->agency }}</td>
-                        <td class="px-4 py-3 whitespace-nowrap">{{ $item->jenis_PI }}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-center">{{ $item->in_quantity }}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-center">{{ $item->out_quantity }}</td>
-                        <td class="px-4 py-3">{{ $item->summary }}</td>
-                        <td class="px-4 py-3 whitespace-nowrap">
-                            <form action="{{ route('checklist.pencatatanpi.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
+                        <td class="px-4 py-3 whitespace-nowrap">{{ \Carbon\Carbon::parse($item->date)->format('d M Y') ?? '-'}}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-center">{{ $item->in_time ?? '-' }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-center">{{ $item->out_time ?? '-' }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap">{{ $item->name_person ?? '-' }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap">{{ $item->agency ?? '-' }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap">{{ $item->jenis_PI ?? '-' }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-center">{{ $item->in_quantity ?? '-' }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-center">{{ $item->out_quantity ?? '-' }}</td>
+                        <td class="px-4 py-3">{{ $item->summary ?? '-' }}</td>
+                        <td class="px-4 py-3">{{ $item->status ?? '-' }}</td>
+                       
+                        <td class="px-5 py-4 flex justify-center space-x-2" @click.stop>
+                            <a href="{{ route('checklist.pencatatanpi.edit', $item->id) }}"
+                                class="p-2 bg-yellow-100 text-yellow-700 rounded-full hover:bg-yellow-200 transition-colors duration-200"
+                                title="Edit Pencatatan PI">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                    </path>
+                                </svg>
+                            </a>
+
+                            <!-- Delete button with better confirmation -->
+                            <form action="{{ route('checklist.pencatatanpi.destroy', $item->id) }}" method="POST"
+                                class="inline-block"
+                                onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="bg-red-100 text-red-600 hover:bg-red-200 px-4 py-2 rounded-lg font-medium transition-colors duration-200">
-                                    Hapus
+                                <button type="submit"
+                                    class="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors duration-200"
+                                    title="Hapus Pencatatan PI">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                        </path>
+                                    </svg>
                                 </button>
                             </form>
                         </td>
@@ -118,15 +140,15 @@
                     </div>
                     <div>
                         <label for="name_person" class="block text-sm font-semibold text-gray-700 mb-2">Nama Petugas</label>
-                        <input type="text" id="name_person" name="name_person" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" placeholder="nama penanggung jawab">
+                        <input required type="text" id="name_person" name="name_person" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" placeholder="nama penanggung jawab">
                     </div>
                     <div>
                         <label for="agency" class="block text-sm font-semibold text-gray-700 mb-2">Instansi</label>
-                        <input type="text" id="agency" name="agency" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" placeholder="nama instansi">
+                        <input required type="text" id="agency" name="agency" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" placeholder="nama instansi">
                     </div>
                     <div>
                         <label for="in_time" class="block text-sm font-semibold text-gray-700 mb-2">Jam Masuk</label>
-                        <input type="time" id="in_time" name="in_time" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
+                        <input required type="time" id="in_time" name="in_time" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
                     </div>
                     <div>
                         <label for="out_time" class="block text-sm font-semibold text-gray-700 mb-2">Jam Keluar</label>
@@ -134,11 +156,11 @@
                     </div>
                     <div>
                         <label for="jenis_PI" class="block text-sm font-semibold text-gray-700 mb-2">Jenis PI</label>
-                        <input type="text" id="jenis_PI" name="jenis_PI" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
+                        <input required type="text" id="jenis_PI" name="jenis_PI" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
                     </div>
                     <div>
                         <label for="in_quantity" class="block text-sm font-semibold text-gray-700 mb-2">Jumlah Masuk</label>
-                        <input type="text" id="in_quantity" name="in_quantity" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 " placeholder="0">
+                        <input required type="text" id="in_quantity" name="in_quantity" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 " placeholder="0">
                     </div>
                     <div>
                         <label for="out_quantity" class="block text-sm font-semibold text-gray-700 mb-2">Jumlah Keluar</label>

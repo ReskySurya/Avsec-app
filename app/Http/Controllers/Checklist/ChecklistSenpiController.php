@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Checklist;
 
 use App\Http\Controllers\Controller;
 use App\Models\ChecklistSenpi;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -40,11 +41,30 @@ class ChecklistSenpiController extends Controller
 
         $validated = $validator->validated();
 
-        // Generate unique ID
-        $validated['id'] = (string) Str::uuid();
-        
+        // Generate custom ID with format: SNP-YYMMDD-AGENCY-XXXX
+        $dateString = Carbon::parse($validated['date'])->format('ymd');
+        $agencyString = !empty($validated['agency']) ? strtoupper(substr($validated['agency'], 0, 3)) : 'GEN'; // Ambil 3 karakter pertama dari agency atau 'GEN' jika kosong
 
-        ChecklistSenpi::create($validated);
+        do {
+            $randomPart = strtoupper(Str::random(4));
+            $id = "SNP-{$dateString}-{$agencyString}";
+        } while (ChecklistSenpi::find($id));
+
+        $validated['id'] = $id;
+
+        ChecklistSenpi::create([
+            'id' => $id,
+            'date' => $validated['date'],
+            'name' => $validated['name'],
+            'agency' => $validated['agency'],
+            'flightNumber' => $validated['flightNumber'],
+            'destination' => $validated['destination'],
+            'typeSenpi' => $validated['typeSenpi'],
+            'quantitySenpi' => $validated['quantitySenpi'],
+            'quantityMagazine' => $validated['quantityMagazine'],
+            'quantityBullet' => $validated['quantityBullet'],
+            'licenseNumber' => $validated['licenseNumber'],
+        ]);
 
         return redirect()
             ->route('checklist.senpi.index')

@@ -33,6 +33,7 @@ class ChecklistSenpi extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
+        'id',
         'date',
         'name',
         'agency',

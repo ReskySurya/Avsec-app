@@ -23,6 +23,11 @@ return new class extends Migration
             $table->string('in_quantity')->nullable();
             $table->string('out_quantity')->nullable();
             $table->string('summary')->nullable();
+            $table->enum('status', ['draft', 'submitted', 'approved'])->default('draft');
+            $table->unsignedBigInteger('sender_id')->nullable();
+            $table->unsignedBigInteger('approved_id')->nullable();
+            $table->text('senderSignature')->nullable();
+            $table->text('approvedSignature')->nullable();
             $table->timestamps();
         });
     }
