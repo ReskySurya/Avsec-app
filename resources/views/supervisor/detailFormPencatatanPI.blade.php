@@ -50,7 +50,7 @@
                         <p class="mt-1 text-sm font-semibold text-gray-900">{{ $pencatatanPI->grup }}</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-500">Nama Petugas</label>
+                        <label class="block text-sm font-medium text-gray-500">Nama Pemilik</label>
                         <p class="mt-1 text-sm font-semibold text-gray-900">{{ $pencatatanPI->name_person }}</p>
                     </div>
                     <div>

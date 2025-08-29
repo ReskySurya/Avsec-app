@@ -223,7 +223,7 @@
                         <option value="">Pilih Tipe Item</option>
                         <option value="motor" {{ old('type') == 'motor' ? 'selected' : '' }}>Motor</option>
                         <option value="mobil" {{ old('type') == 'mobil' ? 'selected' : '' }}>Mobil</option>
-                        <option value="penyisiran" {{ old('type') == 'penyisiran' ? 'selected' : '' }}>Penyisiran Terminal B</option>
+                        <option value="penyisiran" {{ old('type') == 'penyisiran' ? 'selected' : '' }}>Penyisiran Ruang Tunggu</option>
                     </select>
                     @error('type')
                     <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
@@ -277,7 +277,7 @@
                         <option value="">Pilih Tipe Item</option>
                         <option value="motor">Motor</option>
                         <option value="mobil">Mobil</option>
-                        <option value="penyisiran">Penyisiran Terminal B</option>
+                        <option value="penyisiran">Penyisiran Ruang Tunggu</option>
                     </select>
                 </div>
                 <div class="flex justify-end space-x-3">

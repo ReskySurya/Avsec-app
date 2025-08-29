@@ -14,11 +14,11 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label for="date" class="block text-sm font-semibold text-gray-700 mb-2">Tanggal</label>
-                    <input type="date" id="date" name="date" value="{{ old('date', $pencatatanPI->date ? $pencatatanPI->date->format('Y-m-d') : '') }}" required class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
+                    <input type="date" id="date" name="date" value="{{ old('date', $pencatatanPI->date ? $pencatatanPI->date->format('Y-m-d') : '') }}" required class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" readonly>
                 </div>
                 <div>
                     <label for="grup" class="block text-sm font-semibold text-gray-700 mb-2">Grup</label>
-                    <select id="grup" name="grup" required class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
+                    <select id="grup" name="grup" required class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" disabled>
                         <option value="">Pilih Grup</option>
                         <option value="A" {{ old('grup', $pencatatanPI->grup) == 'A' ? 'selected' : '' }}>A</option>
                         <option value="B" {{ old('grup', $pencatatanPI->grup) == 'B' ? 'selected' : '' }}>B</option>
@@ -26,16 +26,16 @@
                     </select>
                 </div>
                 <div>
-                    <label for="name_person" class="block text-sm font-semibold text-gray-700 mb-2">Nama Petugas</label>
-                    <input required type="text" id="name_person" name="name_person" value="{{ old('name_person', $pencatatanPI->name_person) }}" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" placeholder="nama penanggung jawab">
+                    <label for="name_person" class="block text-sm font-semibold text-gray-700 mb-2">Nama Pemilik</label>
+                    <input required type="text" id="name_person" name="name_person" value="{{ old('name_person', $pencatatanPI->name_person) }}" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" placeholder="nama penanggung jawab" readonly>
                 </div>
                 <div>
                     <label for="agency" class="block text-sm font-semibold text-gray-700 mb-2">Instansi</label>
-                    <input type="text" id="agency" name="agency" value="{{ old('agency', $pencatatanPI->agency) }}" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" placeholder="nama instansi">
+                    <input type="text" id="agency" name="agency" value="{{ old('agency', $pencatatanPI->agency) }}" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" placeholder="nama instansi" readonly>
                 </div>
                 <div>
                     <label for="in_time" class="block text-sm font-semibold text-gray-700 mb-2">Jam Masuk</label>
-                    <input required type="time" id="in_time" name="in_time" value="{{ old('in_time', $pencatatanPI->in_time) }}" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
+                    <input required type="time" id="in_time" name="in_time" value="{{ old('in_time', $pencatatanPI->in_time) }}" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" readonly>
                 </div>
                 <div>
                     <label for="out_time" class="block text-sm font-semibold text-gray-700 mb-2">Jam Keluar</label>
@@ -43,22 +43,26 @@
                 </div>
                 <div>
                     <label for="jenis_PI" class="block text-sm font-semibold text-gray-700 mb-2">Jenis PI</label>
-                    <input required type="text" id="jenis_PI" name="jenis_PI" value="{{ old('jenis_PI', $pencatatanPI->jenis_PI) }}" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
+                    <input required type="text" id="jenis_PI" name="jenis_PI" value="{{ old('jenis_PI', $pencatatanPI->jenis_PI) }}" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" readonly>
                 </div>
                 <div>
                     <label for="in_quantity" class="block text-sm font-semibold text-gray-700 mb-2">Jumlah Masuk</label>
-                    <input required type="text" id="in_quantity" name="in_quantity" value="{{ old('in_quantity', $pencatatanPI->in_quantity) }}" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 " placeholder="0">
+                    <input required type="text" id="in_quantity" name="in_quantity" value="{{ old('in_quantity', $pencatatanPI->in_quantity) }}" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 " placeholder="0" readonly>
                 </div>
                 <div>
                     <label for="out_quantity" class="block text-sm font-semibold text-gray-700 mb-2">Jumlah Keluar</label>
-                    <input type="text" id="out_quantity" name="out_quantity" value="{{ old('out_quantity', $pencatatanPI->out_quantity) }}" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" placeholder="0">
+                    <input type="text" id="out_quantity" name="out_quantity"
+                        value="{{ old('out_quantity', $pencatatanPI->in_quantity) }}"
+                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200"
+                        placeholder="0">
                 </div>
+
                 <div class="md:col-span-2">
                     <label for="summary" class="block text-sm font-semibold text-gray-700 mb-2">Keterangan</label>
                     <textarea id="summary" name="summary" rows="3" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" placeholder="Masukkan Keterangan">{{ old('summary', $pencatatanPI->summary) }}</textarea>
                 </div>
             </div>
-            
+
             <!-- Hidden inputs -->
             <input type="hidden" name="senderSignature" id="senderSignature">
             <input type="hidden" name="approved_id" id="approved_id">
@@ -112,6 +116,15 @@
 
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
 <script>
+       document.addEventListener("DOMContentLoaded", function () {
+        const inQty = document.getElementById("in_quantity");
+        const outQty = document.getElementById("out_quantity");
+
+        outQty.value = inQty.value; // awalnya sama
+        inQty.addEventListener("input", function () {
+            outQty.value = inQty.value;
+        });
+    });
     function checklistForm() {
         return {
             openFinishDialog: false,

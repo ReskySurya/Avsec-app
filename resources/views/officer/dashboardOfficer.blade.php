@@ -572,7 +572,7 @@
                                 <div>
                                     {{-- Sesuaikan dengan data yang ada di $checklist --}}
                                     <p class="text-sm font-medium text-gray-900 uppercase">{{ $checklist->type }}
-                                        Terminal B</p>
+                                        Ruang Tunggu</p>
                                     <p class="text-xs text-gray-500">Grup: {{ $checklist->grup }}</p>
                                 </div>
                             </div>

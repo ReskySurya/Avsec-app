@@ -10,7 +10,7 @@
             <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-5">
                 <div class="flex justify-between items-center">
                     <div>
-                        <h2 class="text-xl font-bold text-white mb-1">Checklist Penyisiran Terminal B</h2>
+                        <h2 class="text-xl font-bold text-white mb-1">Checklist Penyisiran Ruang Tunggu</h2>
                     </div>
                     <div class="bg-blue-500 text-white px-4 py-2 rounded-full font-semibold text-sm">
                         {{ $checklistsPenyisiran->count() }} Data

@@ -240,7 +240,7 @@ $isChecklistOpen = request()->is('checklist*');
                     <li>
                         <a href="{{ route('checklist.penyisiran.index') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklist-penyisiran') ? 'bg-gray-700' : '' }}">
-                            <span>Checklist Penyisiran Terminal B</span>
+                            <span>Checklist Penyisiran Ruang Tunggu</span>
                         </a>
                     </li>
                     <li>
@@ -271,7 +271,7 @@ $isChecklistOpen = request()->is('checklist*');
                     <li>
                         <a href="{{ route('supervisor.checklist-penyisiran.list') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklist-penyisiran/list') ? 'bg-gray-700' : '' }}">
-                            <span>Checklist Penyisiran Terminal B</span>
+                            <span>Checklist Penyisiran Ruang Tunggu</span>
                         </a>
                     </li>
                     <li>

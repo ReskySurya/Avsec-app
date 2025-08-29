@@ -9,7 +9,9 @@
     @if(session('success'))
     <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition class="bg-gradient-to-r from-blue-400 to-blue-500 text-white px-6 py-4 rounded-xl mb-6 shadow-lg border-l-4 border-blue-600">
         <div class="flex items-center">
-            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
             {{ session('success') }}
         </div>
     </div>
@@ -18,7 +20,9 @@
     @if(session('error'))
     <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition class="bg-gradient-to-r from-red-400 to-red-500 text-white px-6 py-4 rounded-xl mb-6 shadow-lg border-l-4 border-red-600">
         <div class="flex items-center">
-            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
             {{ session('error') }}
         </div>
     </div>
@@ -32,7 +36,9 @@
                     <p class="text-blue-100">Catatan aktivitas Prohibited Items harian</p>
                 </div>
                 <button @click="openPencatatanPI = true" class="bg-white text-blue-600 hover:bg-blue-50 px-6 py-3 mt-3 sm:mt-0 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl w-full sm:w-auto ">
-                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
                     Tambah Data
                 </button>
             </div>
@@ -40,24 +46,29 @@
 
         <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
             <table class="min-w-full">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider" rowspan="2">No</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider" rowspan="2">Tanggal</th>
-                        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider" colspan="2">Jam</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider" rowspan="2">Nama Petugas</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider" rowspan="2">Instansi</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider" rowspan="2">Jenis PI</th>
-                        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider" colspan="2">Jumlah</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider" rowspan="2">Ket</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider" rowspan="2">Status</th>
+                <thead class="bg-gray-50 border-2">
+                    <tr class="border-2">
+                        <th class="border-2 px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider" rowspan="2">No</th>
+                        <th class="border-2 px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider" rowspan="2">Tanggal</th>
+                        <th class="border-2 px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider" colspan="2">Jam</th>
+                        <th class="border-2 px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider" rowspan="2">Nama Pemilik</th>
+                        <th class="border-2 px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider" rowspan="2">Instansi</th>
+                        <th class="border-2 px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider" rowspan="2">Jenis PI</th>
+                        <th class="border-2 px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider" colspan="2">Jumlah</th>
+                        <th class="border-2 px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider" rowspan="2">Ket</th>
+                        <th class="border-2 px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider" rowspan="2">Status</th>
+                        @forelse($pencatatanPI ?? [] as $index => $item)
+                        @if ($item->status == 'draft')
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider" rowspan="2">Aksi</th>
+                        @endif
+                        @empty
+                        @endforelse
                     </tr>
-                    <tr>
-                        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Masuk</th>
-                        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Keluar</th>
-                        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Masuk</th>
-                        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Keluar</th>
+                    <tr class="border-2">
+                        <th class="border-2 px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Masuk</th>
+                        <th class="border-2 px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Keluar</th>
+                        <th class="border-2 px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Masuk</th>
+                        <th class="border-2 px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Keluar</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -74,7 +85,8 @@
                         <td class="px-4 py-3 whitespace-nowrap text-center">{{ $item->out_quantity ?? '-' }}</td>
                         <td class="px-4 py-3">{{ $item->summary ?? '-' }}</td>
                         <td class="px-4 py-3">{{ $item->status ?? '-' }}</td>
-                       
+
+                        @if ($item->status == 'draft')
                         <td class="px-5 py-4 flex justify-center space-x-2" @click.stop>
                             <a href="{{ route('checklist.pencatatanpi.edit', $item->id) }}"
                                 class="p-2 bg-yellow-100 text-yellow-700 rounded-full hover:bg-yellow-200 transition-colors duration-200"
@@ -103,6 +115,7 @@
                                 </button>
                             </form>
                         </td>
+                        @endif
                     </tr>
                     @empty
                     <tr>
@@ -139,8 +152,8 @@
                         </select>
                     </div>
                     <div>
-                        <label for="name_person" class="block text-sm font-semibold text-gray-700 mb-2">Nama Petugas</label>
-                        <input required type="text" id="name_person" name="name_person" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" placeholder="nama penanggung jawab">
+                        <label for="name_person" class="block text-sm font-semibold text-gray-700 mb-2">Nama Pemilik</label>
+                        <input required type="text" id="name_person" name="name_person" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" placeholder="nama pemilik">
                     </div>
                     <div>
                         <label for="agency" class="block text-sm font-semibold text-gray-700 mb-2">Instansi</label>
