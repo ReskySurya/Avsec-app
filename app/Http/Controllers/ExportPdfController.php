@@ -87,9 +87,12 @@ class ExportPdfController extends Controller
                     // Buat objek baru untuk menghindari modifikasi data asli
                     $form = new \stdClass();
 
-                    // Ambil semua atribut dari reportDetails jika ada
-                    if ($report->reportDetails) {
-                        foreach ($report->reportDetails->getAttributes() as $key => $value) {
+                    // Ambil detail pertama dari collection
+                    $detail = $report->reportDetails->first();
+
+                    // Jika detail ada, ambil semua atributnya
+                    if ($detail) {
+                        foreach ($detail->getAttributes() as $key => $value) {
                             $form->$key = $value;
                         }
                     }
