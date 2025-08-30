@@ -40,8 +40,15 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
 
     Route::get('/export', [ExportPdfController::class, 'index'])->name('export.index');
     Route::get('/export/dailytest', [ExportPdfController::class, 'exportPdfDailyTest'])->name('export.dailytest');
+
+
     Route::get('/export/logbook', [ExportPdfController::class, 'exportPdfLogbook'])->name('export.logbook');
     Route::post('/export/logbook/filter', [ExportPdfController::class, 'filterLogbook'])->name('export.logbook.filter');
+    // Di dalam group route yang sesuai
+    Route::get('/preview-pdf-data', [ExportPdfController::class, 'previewPdfData'])->name('preview.pdf.data');
+    Route::post('/export-selected-pdf', [ExportPdfController::class, 'exportSelectedPdf'])->name('export.selected.pdf');
+    Route::post('/export-all-pdf', [ExportPdfController::class, 'exportAllPdf'])->name('export.all.pdf');
+    Route::post('/filter-logbook', [ExportPdfController::class, 'filterLogbook'])->name('filter.logbook');
 });
 
 // Supervisor Routes
@@ -67,7 +74,7 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
     Route::get('/checklist-penyisiran-ruang-tunggu/list', [DashboardController::class, 'showDataChecklistPenyisiran'])->name('supervisor.checklist-penyisiran.list');
     Route::get('/checklist-penyisiran-ruang-tunggu/detail/{checklist}', [ChecklistPenyisiranController::class, 'showDetailPenyisiran'])->name('supervisor.checklist-penyisiran.detail');
     Route::post('/checklist-penyisiran-ruang-tunggu/approve/{checklist}', [ChecklistPenyisiranController::class, 'storeSignatureApproved'])->name('supervisor.checklist-penyisiran.signature');
-    
+
     // Review Form Pencatatan PI
     Route::get('/form-pencatatan-pi/list', [DashboardController::class, 'showDataFormPencatatanPI'])->name('supervisor.form-pencatatan-pi.list');
     Route::get('/form-pencatatan-pi/detail/{checklist}', [FormPencatatanPIController::class, 'showDetailPencatatanPI'])->name('supervisor.form-pencatatan-pi.detail');
@@ -231,7 +238,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/checklist/received-signature/kendaraan/{checklist}', [ChecklistKendaraanController::class, 'storeSignatureReceived'])->name('checklist.receivedSignature');
     // Route::get('/officer/received-checklist-kendaraan/{type}/{id}', [ChecklistKendaraanController::class, 'showReceivedChecklist'])->name('officer.receivedChecklistKendaraan.show');
     // Route::post('/checklist/received-signature/kendaraan/{checklist}', [ChecklistKendaraanController::class, 'storeSignatureReceived'])->name('checklist.receivedSignature');
-    
+
     // Checklist Penyisiran Ruang Tunggu
     Route::get('/checklist-harian-penyisiran-ruang-tunggu', [ChecklistPenyisiranController::class, 'indexChecklistPenyisiran'])->name('checklist.penyisiran.index');
     Route::post('/checklist-penyisiran-ruang-tunggu/store', [ChecklistPenyisiranController::class, 'storeChecklistPenyisiran'])->name('checklist.penyisiran.store');
@@ -246,8 +253,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/checklist-manual-book/store', [ManualBookController::class, 'store'])->name('checklist.manualbook.store');
     Route::patch('/checklist-manual-book/add-details/{id}', [ManualBookController::class, 'addDetails'])->name('checklist.manualbook.addDetails');
     Route::patch('/checklist-manual-book/finish/{id}', [ManualBookController::class, 'finish'])->name('checklist.manualbook.finish');
-    
-    
+
+
     // Checklist Senpi Routes
     Route::get('/checklist-senpi', [ChecklistSenpiController::class, 'indexChecklistSenpi'])->name('checklist.senpi.index');
     Route::post('/checklist-senpi/store', [ChecklistSenpiController::class, 'storeChecklistSenpi'])->name('checklist.senpi.store');
@@ -260,5 +267,4 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/form-pencatatan-pi/{id}/edit', [FormPencatatanPIController::class, 'editChecklistPencatatanPI'])->name('checklist.pencatatanpi.edit');
     Route::put('/form-pencatatan-pi/{id}', [FormPencatatanPIController::class, 'updateChecklistPencatatanPI'])->name('checklist.pencatatanpi.update');
     Route::delete('/form-pencatatan-pi/{id}', [FormPencatatanPIController::class, 'destroyChecklistPencatatanPI'])->name('checklist.pencatatanpi.destroy');
-    
 });

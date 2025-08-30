@@ -38,7 +38,7 @@
                             <select name="location" id="location"
                                 class="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                                 @foreach($locations as $loc)
-                                <option value="{{ $loc->name }}" {{ $loc->name == 'HBSCP' ? 'selected' : '' }}>
+                                <option value="{{ $loc->name }}" {{ $loc->name == 'Semua Lokasi' ? 'selected' : '' }}>
                                     {{ $loc->name }}
                                 </option>
                                 @endforeach
@@ -103,7 +103,7 @@
                                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                             approved
                                         </span>
-                                        @elseif($logbook->status == 'pending')
+                                        @elseif($logbook->status == 'submitted')
                                         <span
                                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                             pending
@@ -268,7 +268,7 @@
                 if (logbook.status === 'approved') {
                     statusSpan.classList.add('bg-green-100', 'text-green-800');
                     statusSpan.textContent = 'approved';
-                } else if (logbook.status === 'pending') {
+                } else if (logbook.status === 'submitted') {
                     statusSpan.classList.add('bg-yellow-100', 'text-yellow-800');
                     statusSpan.textContent = 'pending';
                 } else {

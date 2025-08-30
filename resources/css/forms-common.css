@@ -1,0 +1,819 @@
+/* Common CSS for HHMD, WTMD, and X-RAY Forms - Enhanced Version */
+
+/* Reset and base styles */
+/* * {
+    box-sizing: border-box;
+} */
+
+/* body {
+    margin: 0;
+    padding: 2mm;
+    font-family: 'Arial', sans-serif;
+    font-size: 12px;
+    line-height: 1.2;
+    background-color: #f8f9fa;
+} */
+
+/* Page layout */
+/* @page {
+    size: A4;
+    margin: 15mm;
+}
+
+.form-page {
+    width: 100%;
+    border: 2px solid #2c3e50;
+    margin: 12mm;
+    page-break-after: always;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 2px;
+}
+
+.page-break-after {
+    page-break-after: always;
+} */
+
+/* Header styles */
+.header-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-bottom: 2px solid #2c3e50;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.header-table td {
+    padding: 12px;
+    vertical-align: middle;
+}
+
+.logo-cell {
+    width: 80px;
+    text-align: center;
+}
+
+.logo-cell img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.logo-cell img:hover {
+    transform: scale(1.05);
+}
+
+.title-cell {
+    text-align: center;
+    font-weight: bold;
+    font-size: 11px;
+    line-height: 1.3;
+    color: #2c3e50;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+}
+
+.logo-right {
+    width: 80px;
+    text-align: center;
+}
+
+.logo-right img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.logo-right img:hover {
+    transform: scale(1.05);
+}
+
+/* Info table styles */
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.info-table tr {
+    border-bottom: 1px solid #dee2e6;
+    transition: background-color 0.2s ease;
+}
+
+.info-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.info-table tr:hover {
+    background-color: #e3f2fd;
+}
+
+.info-table td, .info-table th {
+    padding: 10px 12px;
+    font-size: 11px;
+    vertical-align: top;
+    text-align: left;
+}
+
+.info-table .label-col {
+    width: 35%;
+    font-weight: 600;
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    color: #1565c0;
+}
+
+.info-table .value-col {
+    width: 65%;
+    background: white;
+    color: #333;
+}
+
+/* Checkbox styles */
+.checkbox-section {
+    padding: 15px 12px;
+    border-bottom: 1px solid #dee2e6;
+    background: linear-gradient(135deg, #f1f8e9 0%, #dcedc8 100%);
+}
+
+.checkbox-row {
+    margin: 6px 0;
+}
+
+.custom-checkbox {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #333;
+    margin-right: 8px;
+    position: relative;
+    vertical-align: middle;
+    border-radius: 2px;
+    background: white;
+    transition: all 0.2s ease;
+}
+
+.custom-checkbox:hover {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+.custom-checkbox.checked::before {
+    content: '✓';
+    position: absolute;
+    left: 1px;
+    top: -2px;
+    font-size: 10px;
+    font-weight: bold;
+    color: #28a745;
+}
+
+.custom-checkbox-alt {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #6c757d;
+    border-radius: 3px;
+    cursor: not-allowed;
+    background: white;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.custom-checkbox-alt:hover {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+.custom-checkbox-alt:checked {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border-color: #28a745;
+    position: relative;
+}
+
+.custom-checkbox-alt:checked::before {
+    content: '✓';
+    position: absolute;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Radio button styles */
+.custom-radio {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #6c757d;
+    border-radius: 50%;
+    cursor: not-allowed;
+    background: white;
+    transition: all 0.2s ease;
+}
+
+.custom-radio:hover {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+.custom-radio:checked {
+    background: white;
+    border-color: #007bff;
+    position: relative;
+}
+
+.custom-radio:checked::before {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border-radius: 50%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Test sections */
+.test-section {
+    text-align: center;
+    padding: 30px 12px;
+    border-bottom: 1px solid #dee2e6;
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+}
+
+.test-title {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 20px;
+    color: #856404;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.test-box {
+    width: 80px;
+    height: 80px;
+    border: 2px solid #333;
+    margin: 0 auto;
+    position: relative;
+    display: inline-block;
+    border-radius: 6px;
+    background: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+.test-box:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.test-checkbox {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid #333;
+    border-radius: 3px;
+    background: white;
+}
+
+.test-checkbox.checked::before {
+    content: '✓';
+    position: absolute;
+    left: 3px;
+    top: -1px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #28a745;
+}
+
+/* Conditions section */
+.conditions-section {
+    padding: 15px 12px;
+    border-bottom: 1px solid #dee2e6;
+    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+}
+
+.condition-row {
+    margin: 8px 0;
+    display: block;
+    padding: 6px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.condition-row:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.condition-text {
+    font-size: 10px;
+    line-height: 1.3;
+    margin-left: 20px;
+    display: inline-block;
+    width: calc(100% - 20px);
+    color: #2d5016;
+}
+
+/* Results section */
+.results-section {
+    padding: 15px 12px;
+    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+}
+
+.results-row {
+    margin: 15px 0;
+}
+
+.results-label {
+    font-weight: bold;
+    display: inline-block;
+    width: 60px;
+    vertical-align: top;
+    color: #4a148c;
+}
+
+.radio-group {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.radio-option {
+    display: block;
+    margin: 5px 0;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.radio-option:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Notes section */
+.notes-section {
+    margin-top: 20px;
+    padding: 12px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.notes-label {
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: block;
+    color: #495057;
+}
+
+.notes-content {
+    min-height: 30px;
+    font-size: 11px;
+    line-height: 1.4;
+    color: #6c757d;
+}
+
+/* Signature section */
+.signature-section {
+    border-top: 2px solid #333;
+    padding: 15px 12px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.signature-title {
+    font-weight: bold;
+    margin-bottom: 15px;
+    font-size: 12px;
+    color: #2c3e50;
+    text-align: center;
+}
+
+.signature-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.signature-table td {
+    width: 50%;
+    padding: 10px;
+    vertical-align: bottom;
+}
+
+.signature-name {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.name-text {
+    font-weight: bold;
+    margin-bottom: 3px;
+    color: #2c3e50;
+}
+
+.title-text {
+    font-size: 10px;
+    color: #6c757d;
+}
+
+.signature-space {
+    height: 50px;
+    border-bottom: 2px solid #6c757d;
+    margin: 10px 0;
+    text-align: center;
+    line-height: 50px;
+    font-size: 9px;
+    color: #adb5bd;
+    background: white;
+    border-radius: 4px 4px 0 0;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.signature-space img {
+    max-height: 50px;
+    width: auto;
+    vertical-align: middle;
+}
+
+/* WTMD specific styles */
+.wtmd-container {
+    width: 210mm;
+    background: white;
+    padding: 16px;
+}
+
+.wtmd-header {
+    border-top: 2px solid black;
+    border-left: 2px solid black;
+    border-right: 2px solid black;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    padding: 8px 16px;
+}
+
+.wtmd-content {
+    border: 2px solid black;
+    background: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.wtmd-diagram {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    border-left: 2px solid black;
+    border-right: 2px solid black;
+    border-top: 2px solid black;
+    text-align: center;
+    align-items: center;
+}
+
+/* X-RAY specific styles */
+.xray-container {
+    width: 210mm;
+    background: white;
+}
+
+.xray-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 2px solid black;
+    border-left: 2px solid black;
+    border-right: 2px solid black;
+    padding: 8px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.xray-content {
+    border: 2px solid black;
+    border-collapse: collapse;
+}
+
+.generator-section {
+    border: 2px solid black;
+    margin: 0 8px;
+    padding: 4px;
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+}
+
+.test-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    margin-left: 8px;
+}
+
+.test-container {
+    padding: 8px;
+    text-align: center;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.test-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 0;
+    margin-left: 80px;
+}
+
+/* Specific test elements for X-RAY */
+.awg-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.awg-grid {
+    display: grid;
+    grid-template-rows: repeat(4, 1fr);
+    gap: 6px;
+    margin-top: 24px;
+}
+
+.awg-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.test1b-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border: 1px solid black;
+    margin-right: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.test1b-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #d4edda;
+    padding: 2px;
+}
+
+.test1b-column:not(:last-child) {
+    border-right: 1px solid black;
+}
+
+.test3-container {
+    position: relative;
+}
+
+.test3-table {
+    display: table;
+    border: 2px solid black;
+    margin-bottom: 8px;
+    width: 160%;
+    height: 60px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.test3-row {
+    display: table-row;
+}
+
+.test3-cell {
+    display: table-cell;
+    border-right: 1px solid black;
+    position: relative;
+    width: 10%;
+}
+
+.test3-cell:last-child {
+    border-right: none;
+}
+
+.test3-line {
+    position: absolute;
+    width: 100%;
+    height: 4px;
+    border: 1px solid black;
+    background: black;
+    top: 50%;
+    left: 0;
+}
+
+.test4-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 228px;
+}
+
+.test4-area {
+    background-color: #87ceeb;
+    width: 224px;
+    height: 144px;
+    position: relative;
+    padding: 0 32px;
+    border-radius: 4px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.test4-element {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.test4-gaps {
+    display: flex;
+    gap: 2px;
+}
+
+.test4-gap-line {
+    height: 2px;
+    background: white;
+    border: 1px solid black;
+}
+
+.test5-container {
+    width: 96px;
+    font-family: Arial, sans-serif;
+}
+
+.test5-box {
+    position: relative;
+    display: inline-block;
+    margin-right: 0;
+    display: flex;
+    align-items: center;
+}
+
+.test5-square {
+    width: 48px;
+    height: 48px;
+    border: 2px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.test5-label {
+    font-size: 0.7rem;
+    transform: rotate(-90deg);
+}
+
+/* Enhanced utility classes for better styling */
+.inline-flex {
+    display: inline-flex;
+    align-items: center;
+}
+
+.ml-2 {
+    margin-left: 8px;
+}
+
+.text-sm {
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.mb-0 {
+    margin-bottom: 0;
+}
+
+/* Print styles */
+@media print {
+    @page {
+        size: A4;
+        margin: 5mm;
+    }
+    
+    body { 
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        margin: 0;
+        padding: 2mm;
+        background: white;
+    }
+    
+    .form-page {
+        page-break-after: always;
+        margin: 2mm;
+        box-shadow: none;
+        border-radius: 0;
+    }
+    
+    .page-break-after {
+        page-break-after: always;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Ensure all gradients and colors print correctly */
+    .header-table,
+    .checkbox-section,
+    .test-section,
+    .conditions-section,
+    .results-section,
+    .signature-section,
+    .wtmd-header,
+    .xray-header,
+    .generator-section {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Remove hover effects in print */
+    *:hover {
+        background-color: inherit !important;
+        transform: none !important;
+        box-shadow: inherit !important;
+    }
+}
+
+/* Utility classes */
+.text-xs { font-size: 0.75rem; }
+.text-sm { font-size: 0.875rem; }
+.text-base { font-size: 1rem; }
+.text-lg { font-size: 1.125rem; }
+.text-xl { font-size: 1.25rem; }
+
+.font-bold { font-weight: bold; }
+.font-normal { font-weight: normal; }
+.font-semibold { font-weight: 600; }
+
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.flex { display: flex; }
+.grid { display: grid; }
+.inline-block { display: inline-block; }
+.block { display: block; }
+
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.items-end { align-items: flex-end; }
+
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+
+.m-0 { margin: 0; }
+.m-1 { margin: 0.25rem; }
+.m-2 { margin: 0.5rem; }
+.mt-1 { margin-top: 0.25rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.ml-1 { margin-left: 0.25rem; }
+.mr-1 { margin-right: 0.25rem; }
+
+.p-1 { padding: 0.25rem; }
+.p-2 { padding: 0.5rem; }
+.p-4 { padding: 1rem; }
+
+.border { border: 1px solid black; }
+.border-2 { border: 2px solid black; }
+.border-t { border-top: 1px solid black; }
+.border-t-2 { border-top: 2px solid black; }
+.border-b { border-bottom: 1px solid black; }
+.border-r { border-right: 1px solid black; }
+
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+
+.relative { position: relative; }
+.absolute { position: absolute; }
+
+.transform { transform: translateX(0); }
+.rotate-90 { transform: rotate(90deg); }
+.-rotate-90 { transform: rotate(-90deg); }
+
+/* Color utilities - Enhanced with gradients */
+.bg-white { background-color: white; }
+.bg-green-200 { background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%); }
+.bg-green-300 { background: linear-gradient(135deg, #9ae6b4 0%, #68d391 100%); }
+.bg-green-400 { background: linear-gradient(135deg, #68d391 0%, #48bb78 100%); }
+.bg-green-500 { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); }
+.bg-blue-100 { background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%); }
+.bg-blue-200 { background: linear-gradient(135deg, #bee3f8 0%, #90cdf4 100%); }
+.bg-blue-300 { background: linear-gradient(135deg, #90cdf4 0%, #63b3ed 100%); }
+.bg-blue-400 { background: linear-gradient(135deg, #63b3ed 0%, #4299e1 100%); }
+.bg-blue-500 { background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); }
+.bg-blue-600 { background: linear-gradient(135deg, #3182ce 0%, #2b77cb 100%); }
+.bg-blue-700 { background: linear-gradient(135deg, #2b77cb 0%, #2c5aa0 100%); }
+.bg-blue-800 { background: linear-gradient(135deg, #2c5aa0 0%, #2a4365 100%); }
+.bg-blue-900 { background: linear-gradient(135deg, #2a4365 0%, #1a365d 100%); }
+.bg-orange-500 { background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); }
+.bg-sky-300 { background: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 100%); }

@@ -62,9 +62,9 @@ class ExportPdfController extends Controller
                 $type = strtolower($formType);
                 $viewMapping = [
                     'hhmd'       => 'superadmin.export.pdf.hhmdTemplate',
-                    'wtmd'       => 'pdf.templates.wtmd',
-                    'xraycabin'  => 'pdf.templates.xraycabin',
-                    'xraybagasi' => 'pdf.templates.xraybagasi',
+                    'wtmd'       => 'superadmin.export.pdf.wtmdTemplate',
+                    'xraycabin'  => 'superadmin.export.pdf.xraycabinTemplate',
+                    'xraybagasi' => 'superadmin.export.pdf.templates.xraybagasiTemplate',
                 ];
 
                 if (!isset($viewMapping[$type])) {
