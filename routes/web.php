@@ -40,15 +40,15 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
 
     Route::get('/export', [ExportPdfController::class, 'index'])->name('export.index');
     Route::get('/export/dailytest', [ExportPdfController::class, 'exportPdfDailyTest'])->name('export.dailytest');
-
+    Route::get('/export/daily-test/review/{report}', [ExportPdfController::class,'reviewDailyTest'])->name('export.dailytest.review');
 
     Route::get('/export/logbook', [ExportPdfController::class, 'exportPdfLogbook'])->name('export.logbook');
     Route::post('/export/logbook/filter', [ExportPdfController::class, 'filterLogbook'])->name('export.logbook.filter');
-    // Di dalam group route yang sesuai
-    Route::get('/preview-pdf-data', [ExportPdfController::class, 'previewPdfData'])->name('preview.pdf.data');
-    Route::post('/export-selected-pdf', [ExportPdfController::class, 'exportSelectedPdf'])->name('export.selected.pdf');
-    Route::post('/export-all-pdf', [ExportPdfController::class, 'exportAllPdf'])->name('export.all.pdf');
-    Route::post('/filter-logbook', [ExportPdfController::class, 'filterLogbook'])->name('filter.logbook');
+    
+    
+    Route::get('/export/checklist', [ExportPdfController::class, 'exportPdfChecklist'])->name('export.checklist');
+    Route::post('/export/checklist/filter', [ExportPdfController::class, 'filterChecklist'])->name('export.checklist.filter');
+
 });
 
 // Supervisor Routes
@@ -57,8 +57,8 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
         return view('supervisor.dashboardSupervisor');
     })->name('dashboard.supervisor');
 
-    Route::get('/supervisor/dailytest-form',  [DashboardController::class, 'showDataDailyTest'])->name('supervisor.dailytest-form');
-    Route::get('/supervisor/logbook-form',  [DashboardController::class, 'showDataLogbook'])->name('supervisor.logbook-form');
+    // Route::get('/supervisor/dailytest-form',  [DashboardController::class, 'showDataDailyTest'])->name('supervisor.dailytest-form');
+    // Route::get('/supervisor/logbook-form',  [DashboardController::class, 'showDataLogbook'])->name('supervisor.logbook-form');
     Route::post('/logbook/signature/approve/{logbookID}', [LogbookPosJagaController::class, 'signatureApprove'])->name('supervisor.logbook.signature');
 
     // Review Logbook Rotasi
@@ -103,6 +103,9 @@ Route::middleware(['auth', 'role:officer'])->group(function () {
 
 // Daily Test Routes
 Route::middleware(['auth'])->group(function () {
+    Route::get('/supervisor/dailytest-form',  [DashboardController::class, 'showDataDailyTest'])->name('supervisor.dailytest-form');
+    Route::get('/supervisor/logbook-form',  [DashboardController::class, 'showDataLogbook'])->name('supervisor.logbook-form');
+
     // Daily Test HHMD Routes
     Route::get('/daily-test/hhmd', [HhmdController::class, 'hhmdLayout'])->name('daily-test.hhmd');
     Route::post('/daily-test/hhmd/check-submission', [HhmdController::class, 'checkSubmission'])->name('daily-test.hhmd.check-submission');

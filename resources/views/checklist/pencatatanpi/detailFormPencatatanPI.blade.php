@@ -18,12 +18,13 @@
                 </div>
                 <div>
                     <label for="grup" class="block text-sm font-semibold text-gray-700 mb-2">Grup</label>
-                    <select id="grup" name="grup" required class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" disabled>
+                    <select id="grup" name="grup_disabled" required class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 bg-gray-100" disabled>
                         <option value="">Pilih Grup</option>
                         <option value="A" {{ old('grup', $pencatatanPI->grup) == 'A' ? 'selected' : '' }}>A</option>
                         <option value="B" {{ old('grup', $pencatatanPI->grup) == 'B' ? 'selected' : '' }}>B</option>
                         <option value="C" {{ old('grup', $pencatatanPI->grup) == 'C' ? 'selected' : '' }}>C</option>
                     </select>
+                    <input type="hidden" name="grup" value="{{ $pencatatanPI->grup }}">
                 </div>
                 <div>
                     <label for="name_person" class="block text-sm font-semibold text-gray-700 mb-2">Nama Pemilik</label>

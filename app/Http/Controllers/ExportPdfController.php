@@ -4,13 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Equipment;
 use App\Models\EquipmentLocation;
+use App\Models\LogbookRotasi;
 use App\Models\Report;
 use App\Models\ReportDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Location;
 use App\Models\Logbook;
+use App\Models\LogbookSweepingPI;
 use App\Services\PdfService;
+use Illuminate\Support\Facades\Log;
 
 class ExportPdfController extends Controller
 {
@@ -22,7 +25,7 @@ class ExportPdfController extends Controller
         'PSCP',
         'CCTV',
         'Patroli',
-        'Walking Patrol'
+        'Walking Patrol',
     ];
 
     public function index(Request $request)
@@ -30,110 +33,146 @@ class ExportPdfController extends Controller
         return view('superadmin.export.exportPdf');
     }
 
-    /**
-     * Menampilkan halaman filter ekspor PDF dan menangani logika ekspor.
-     *
-     * @param Request $request
-     * @param PdfService $pdfService
-     * @return \Illuminate\Contracts\View\View|\Illuminate\Http\Response
-     */
+    //daily test
+    private function prepareFormData(Report $report)
+    {
+        $form = new \stdClass();
+
+        $detail = $report->reportDetails->first();
+
+        if ($detail instanceof \Illuminate\Support\Collection) {
+            $detail = $detail->first();
+        }
+
+        if ($detail instanceof \Illuminate\Database\Eloquent\Model) {
+            foreach ($detail->toArray() as $key => $value) {
+                $form->$key = $value;
+            }
+        }
+
+        $form->operatorName      = $report->submittedBy->name ?? 'N/A';
+        $form->testDateTime      = $report->testDate;
+        $form->location          = $report->equipmentLocation->location->name ?? 'N/A';
+        $form->deviceInfo        = $report->equipmentLocation->merk_type ?? 'N/A';
+        $form->certificateInfo   = $report->equipmentLocation->certificateInfo ?? 'N/A';
+        $form->officerName       = $report->submittedBy->name ?? 'N/A';
+        $form->supervisor        = $report->approvedBy;
+        $form->officer_signature = $report->submitterSignature;
+        $form->supervisor_signature = $report->approverSignature;
+        $form->result            = strtolower($report->result ?? '');
+        $form->notes             = $report->note;
+        $form->terpenuhi = ($form->result === 'pass');
+        $form->tidakTerpenuhi = ($form->result === 'fail');
+
+        if (!isset($form->testCondition1)) {
+            $form->testCondition1 = true;
+        }
+        if (!isset($form->testCondition2)) {
+            $form->testCondition2 = true;
+        }
+        if (!isset($form->test1)) {
+            $form->test1 = ($form->result === 'pass');
+        }
+
+        return $form;
+    }
+
+    public function reviewDailyTest(Report $report)
+    {
+        $formType = $report->equipmentLocation->equipment->name;
+        $type = strtolower($formType);
+        $viewMapping = [
+            'hhmd'       => 'superadmin.export.pdf.hhmdTemplate',
+            'wtmd'       => 'superadmin.export.pdf.wtmdTemplate',
+            'xraycabin'  => 'superadmin.export.pdf.xraycabinTemplate',
+            'xraybagasi' => 'superadmin.export.pdf.xraybagasiTemplate',
+        ];
+
+        if (!isset($viewMapping[$type])) {
+            return response('Template not found for this form type.', 404);
+        }
+        $viewName = $viewMapping[$type];
+
+        $report->load(['reportDetails', 'submittedBy', 'approvedBy', 'equipmentLocation.location']);
+
+        $form = $this->prepareFormData($report);
+        $forms = collect([$form]);
+
+        return view($viewName, [
+            'forms' => $forms,
+        ]);
+    }
+
     public function exportPdfDailyTest(Request $request, PdfService $pdfService)
     {
-        // ====================================================================
-        // BAGIAN 1: LOGIKA UNTUK MENANGANI PERMINTAAN EKSPOR PDF
-        // ====================================================================
         if ($request->has('export_type')) {
+            $formType = $request->input('form_type');
+            if (empty($formType)) {
+                return redirect()->back()->with('error', 'Silakan pilih "Jenis Form" pada filter untuk bisa mengekspor.');
+            }
+
+            $type = strtolower($formType);
+            $viewMapping = [
+                'hhmd'       => 'superadmin.export.pdf.hhmdTemplate',
+                'wtmd'       => 'superadmin.export.pdf.wtmdTemplate',
+                'xraycabin'  => 'superadmin.export.pdf.xraycabinTemplate',
+                'xraybagasi' => 'superadmin.export.pdf.xraybagasiTemplate',
+            ];
+
+            if (!isset($viewMapping[$type])) {
+                return redirect()->back()->with('error', 'Jenis Form tidak valid atau tidak memiliki template.');
+            }
+            $viewName = $viewMapping[$type];
+
+            $exportQuery = Report::query()->where('statusID', 2); // Can only export approved reports.
 
             if ($request->input('export_type') === 'selected') {
-
-                // 1. Ambil Jenis Form dari filter
-                $formType = $request->input('form_type');
-                if (empty($formType)) {
-                    return redirect()->back()->with('error', 'Silakan pilih "Jenis Form" pada filter untuk bisa mengekspor.');
-                }
-
-                // 2. Ambil ID laporan yang dicentang
                 $selectedIds = $request->input('selected_reports', []);
                 if (empty($selectedIds)) {
                     return redirect()->back()->with('error', 'Pilih minimal satu laporan untuk diekspor!');
                 }
+                $exportQuery->whereIn('reportID', $selectedIds);
+            } elseif ($request->input('export_type') === 'all') {
+                // Apply filters for 'all' export
+                $filters = $request->only(['form_type', 'location', 'start_date', 'end_date']);
+                $exportQuery
+                    ->join('equipment_locations', 'reports.equipmentLocationID', '=', 'equipment_locations.id')
+                    ->join('equipment', 'equipment_locations.equipment_id', '=', 'equipment.id')
+                    ->join('locations', 'equipment_locations.location_id', '=', 'locations.id');
 
-                // 3. Petakan Tipe Form ke View yang sesuai
-                $type = strtolower($formType);
-                $viewMapping = [
-                    'hhmd'       => 'superadmin.export.pdf.hhmdTemplate',
-                    'wtmd'       => 'superadmin.export.pdf.wtmdTemplate',
-                    'xraycabin'  => 'superadmin.export.pdf.xraycabinTemplate',
-                    'xraybagasi' => 'superadmin.export.pdf.templates.xraybagasiTemplate',
-                ];
-
-                if (!isset($viewMapping[$type])) {
-                    return redirect()->back()->with('error', 'Jenis Form tidak valid atau tidak memiliki template.');
-                }
-                $viewName = $viewMapping[$type];
-
-                // 4. Ambil data dari model Report dan relasi ReportDetail
-                $reportsToExport = Report::whereIn('reportID', $selectedIds)
-                    ->with([
-                        'reportDetails', // <-- KUNCI UTAMA: Ambil data dari tabel report_details
-                        'submittedBy',
-                        'approvedBy',
-                        'equipmentLocation.location',
-                    ])
-                    ->get();
-
-                // 5. Gabungkan data dari Report dan ReportDetail menjadi satu objek untuk view
-                $formsForView = $reportsToExport->map(function ($report) {
-                    // Buat objek baru untuk menghindari modifikasi data asli
-                    $form = new \stdClass();
-
-                    // Ambil detail pertama dari collection
-                    $detail = $report->reportDetails->first();
-
-                    // Jika detail ada, ambil semua atributnya
-                    if ($detail) {
-                        foreach ($detail->getAttributes() as $key => $value) {
-                            $form->$key = $value;
-                        }
-                    }
-
-                    // Tambahkan/Timpa dengan data dari report utama dan relasinya
-                    $form->operatorName      = $report->submittedBy->name ?? 'N/A';
-                    $form->testDateTime      = $report->testDate;
-                    $form->location          = $report->equipmentLocation->location->name ?? 'N/A';
-                    $form->deviceInfo        = $report->equipmentLocation->merk_type ?? 'N/A';
-                    $form->certificateInfo   = $report->equipmentLocation->certificateInfo ?? 'N/A';
-                    $form->officerName       = $report->submittedBy->name ?? 'N/A';
-                    $form->supervisor        = $report->approvedBy;
-                    $form->officer_signature = $report->submitterSignature; // Nama kolom dari model Report
-                    $form->supervisor_signature = $report->approverSignature; // Nama kolom dari model Report
-                    $form->result            = $report->result; // Ambil dari tabel reports
-                    $form->notes             = $report->note; // Ambil dari tabel reports
-
-                    return $form;
-                });
-
-                if ($formsForView->isEmpty()) {
-                    return redirect()->back()->with('error', 'Data laporan yang dipilih tidak ditemukan.');
-                }
-
-                // 6. Panggil service dengan view dan data yang sudah benar
-                return $pdfService->generatePdfFromTemplate($viewName, $formsForView, $formType);
+                if (!empty($filters['form_type'])) $exportQuery->where('equipment.name', strtolower($filters['form_type']));
+                if (!empty($filters['location'])) $exportQuery->where('locations.name', $filters['location']);
+                if (!empty($filters['start_date'])) $exportQuery->whereDate('reports.testDate', '>=', $filters['start_date']);
+                if (!empty($filters['end_date'])) $exportQuery->whereDate('reports.testDate', '<=', $filters['end_date']);
             }
+
+            $reportsToExport = $exportQuery->with([
+                'reportDetails',
+                'submittedBy',
+                'approvedBy',
+                'equipmentLocation.location',
+                'equipmentLocation.equipment',
+            ])->get();
+
+            if ($reportsToExport->isEmpty()) {
+                $errorMessage = $request->input('export_type') === 'selected'
+                    ? 'Laporan yang dipilih tidak ada yang berstatus "approved" atau tidak ditemukan.'
+                    : 'Tidak ada laporan berstatus "approved" yang ditemukan untuk filter yang dipilih.';
+                return redirect()->back()->with('error', $errorMessage);
+            }
+
+            $formsForView = $reportsToExport->map(fn($report) => $this->prepareFormData($report));
+            return $pdfService->generatePdfFromTemplate($viewName, $formsForView, $formType);
         }
 
-        // ====================================================================
-        // BAGIAN 2: LOGIKA UNTUK MENAMPILKAN HALAMAN FILTER
-        // ====================================================================
         $equipmentTypes = ['hhmd', 'wtmd', 'xraycabin', 'xraybagasi'];
-
         $availableEquipments = Equipment::whereIn('name', $equipmentTypes)
             ->orderBy('name')->get(['id', 'name'])
             ->map(fn($eq) => ['value' => strtoupper($eq->name), 'label' => 'Form ' . strtoupper($eq->name), 'name'  => $eq->name]);
 
         $allLocations = EquipmentLocation::whereHas('equipment', fn($q) => $q->whereIn('name', $equipmentTypes))
             ->with(['location', 'equipment'])->get()
-            ->map(fn($el) => ['location_name' => $el->location->name ?? 'N/A', 'equipment_name'=> $el->equipment->name ?? '']);
+            ->map(fn($el) => ['location_name' => $el->location->name ?? 'N/A', 'equipment_name' => $el->equipment->name ?? '']);
 
         $locationsByEquipment = $allLocations->groupBy('equipment_name');
         $filters = $request->only(['form_type', 'location', 'start_date', 'end_date', 'status']);
@@ -171,51 +210,285 @@ class ExportPdfController extends Controller
         ]);
     }
 
+
+    //logbook
     public function exportPdfLogbook(Request $request)
     {
-        // Ambil data lokasi dari model Location
+        // Jika request memiliki export_type, proses export
+        if ($request->has('export_type')) {
+            return $this->processLogbookExport($request);
+        }
+
         $locations = Location::whereIn('name', $this->allowedLocationLogbook)
             ->orderBy('name')
             ->get();
 
-        // Ambil data logbook untuk tabel (contoh dengan filter sederhana)
-        $logbooks = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy'])
-            ->orderBy('date', 'desc')
-            ->take(10) // Batasi untuk contoh
-            ->get();
+        // Load initial data berdasarkan form type default (pos_jaga)
+        $initialFormType = $request->input('form_type', 'pos_jaga');
+        $initialData = $this->getLogbookData($initialFormType, $request->only(['location', 'start_date', 'end_date']));
 
         return view('superadmin.export.exportPdfLogbook', [
             'locations' => $locations,
-            'logbooks' => $logbooks
+            'logbooks' => $initialData,
+            'formType' => $initialFormType
         ]);
     }
 
     public function filterLogbook(Request $request)
     {
-        $query = Logbook::with(['locationArea'])
-            ->orderBy('date', 'desc');
+        $formType = $request->input('form_type', 'pos_jaga');
+        $filters = $request->only(['location', 'start_date', 'end_date']);
 
-        if ($request->form_type) {
-            // Tambahkan filter berdasarkan form_type jika diperlukan
-        }
-
-        if ($request->location) {
-            $query->whereHas('locationArea', function ($q) use ($request) {
-                $q->where('name', $request->location);
-            });
-        }
-
-        if ($request->start_date && $request->end_date) {
-            $query->whereBetween('date', [
-                $request->start_date,
-                $request->end_date
-            ]);
-        }
-
-        $logbooks = $query->get();
+        $data = $this->getLogbookData($formType, $filters);
 
         return response()->json([
-            'logbooks' => $logbooks
+            'logbooks' => $data,
+            'form_type' => $formType
+        ]);
+    }
+
+    private function getLogbookData($formType, $filters = [])
+    {
+        $startDate = $filters['start_date'] ?? null;
+        $endDate = $filters['end_date'] ?? null;
+        $locationName = $filters['location'] ?? null;
+
+        switch ($formType) {
+            case 'pos_jaga':
+                try {
+                    $query = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy'])
+                        ->orderBy('date', 'desc');
+
+                    if ($locationName && $locationName !== 'Semua Lokasi') {
+                        $query->whereHas('locationArea', fn($q) => $q->where('name', $locationName));
+                    }
+                    if ($startDate && $endDate) {
+                        $query->whereBetween('date', [$startDate, $endDate]);
+                    }
+
+                    $logbooks = $query->get();
+
+                    return $logbooks->map(function ($logbook) {
+                        return [
+                            'logbookID' => $logbook->logbookID,
+                            'date' => $logbook->date,
+                            'location_area' => $logbook->locationArea,
+                            'sender_by' => $logbook->senderBy,
+                            'receiver_by' => $logbook->receiverBy,
+                            'approver_by' => $logbook->approverBy,
+                            'status' => $logbook->status ?? 'submitted',
+                        ];
+                    });
+                } catch (\Exception $e) {
+                    Log::error("Error getting pos_jaga data: " . $e->getMessage());
+                    return collect();
+                }
+
+            case 'sweeping_pi':
+                try {
+                    $query = LogbookSweepingPI::with(['tenant'])
+                        ->orderBy('created_at', 'desc');
+
+                    if ($startDate && $endDate) {
+                        $startMonth = date('n', strtotime($startDate));
+                        $startYear = date('Y', strtotime($startDate));
+                        $endMonth = date('n', strtotime($endDate));
+                        $endYear = date('Y', strtotime($endDate));
+
+                        $query->where(function ($q) use ($startYear, $startMonth, $endYear, $endMonth) {
+                            $q->where(function ($subQ) use ($startYear, $startMonth) {
+                                $subQ->where('tahun', $startYear)->where('bulan', '>=', $startMonth);
+                            })->orWhere(function ($subQ) use ($endYear, $endMonth) {
+                                $subQ->where('tahun', $endYear)->where('bulan', '<=', $endMonth);
+                            })->orWhere(function ($subQ) use ($startYear, $endYear) {
+                                $subQ->where('tahun', '>', $startYear)->where('tahun', '<', $endYear);
+                            });
+                        });
+                    }
+
+                    $sweepings = $query->get();
+
+                    return $sweepings->map(function ($sweeping) {
+                        return [
+                            'sweepingpiID' => $sweeping->sweepingpiID, // Sesuai primary key
+                            'created_at' => $sweeping->created_at,
+                            'tenant' => $sweeping->tenant,
+                            'bulan' => $sweeping->bulan,
+                            'tahun' => $sweeping->tahun
+                        ];
+                    });
+                } catch (\Exception $e) {
+                    Log::error("Error getting sweeping_pi data: " . $e->getMessage());
+                    return collect();
+                }
+
+            case 'rotasi':
+                try {
+                    $query = LogbookRotasi::with(['creator', 'approver'])
+                        ->orderBy('date', 'desc');
+
+                    if ($startDate && $endDate) {
+                        $query->whereBetween('date', [$startDate, $endDate]);
+                    }
+
+                    $rotasis = $query->get();
+
+                    return $rotasis->map(function ($rotasi) {
+                        return [
+                            'rotasiID' => $rotasi->id,
+                            'date' => $rotasi->date,
+                            'type' => $rotasi->type,
+                            'location' => (object)['name' => 'Area ' . $rotasi->type], // Model tidak punya relasi location
+                            'shift' => $rotasi->type, // Menggunakan type sebagai shift
+                            'petugas_masuk' => $rotasi->creator->name ?? 'N/A',
+                            'petugas_keluar' => 'N/A', // Model tidak punya field ini
+                            'status' => $rotasi->status ?? 'submitted',
+                        ];
+                    });
+                } catch (\Exception $e) {
+                    Log::error("Error getting rotasi data: " . $e->getMessage());
+                    return collect();
+                }
+
+            case 'chief':
+                // Model chief belum ada, return dummy data
+                return collect([
+                    [
+                        'chiefID' => 1,
+                        'date' => now(),
+                        'aktivitas' => 'Inspeksi Rutin',
+                        'lokasi' => 'Semua Area',
+                        'chief' => 'Chief Security',
+                        'status' => 'submitted',
+                    ]
+                ]);
+
+            default:
+                return collect();
+        }
+    }
+    private function processLogbookExport(Request $request)
+    {
+        $formType = $request->input('form_type');
+        if (empty($formType)) {
+            return redirect()->back()->with('error', 'Silakan pilih "Jenis Logbook" untuk bisa mengekspor.');
+        }
+
+        // Logic untuk export PDF berdasarkan jenis logbook
+        if ($request->input('export_type') === 'selected') {
+            $selectedIds = $request->input('selected_reports', []);
+            if (empty($selectedIds)) {
+                return redirect()->back()->with('error', 'Pilih minimal satu data untuk diekspor!');
+            }
+
+            // Export selected data
+            return $this->exportSelectedLogbook($formType, $selectedIds);
+        } elseif ($request->input('export_type') === 'all') {
+            $filters = $request->only(['location', 'start_date', 'end_date']);
+
+            // Export all data with filters
+            return $this->exportAllLogbook($formType, $filters);
+        }
+
+        return redirect()->back()->with('error', 'Tipe export tidak valid.');
+    }
+    private function exportSelectedLogbook($formType, $selectedIds)
+    {
+        // Implementasi export selected logbook
+        // Sesuaikan dengan PDF service yang ada
+
+        switch ($formType) {
+            case 'pos_jaga':
+                $data = Logbook::whereIn('logbookID', $selectedIds)
+                    ->with(['locationArea', 'senderBy', 'receiverBy', 'approverBy'])
+                    ->get();
+                break;
+
+            case 'sweeping_pi':
+                $data = LogbookSweepingPI::whereIn('sweepingID', $selectedIds)
+                    ->with(['tenant', 'createdBy'])
+                    ->get();
+                break;
+
+            case 'rotasi':
+                $data = LogbookRotasi::whereIn('id', $selectedIds)
+                    ->with(['location', 'petugasMasuk', 'petugasKeluar'])
+                    ->get();
+                break;
+
+            default:
+                return redirect()->back()->with('error', 'Jenis logbook tidak valid.');
+        }
+
+        if ($data->isEmpty()) {
+            return redirect()->back()->with('error', 'Data yang dipilih tidak ditemukan.');
+        }
+
+        // Generate PDF menggunakan service yang ada
+        return $this->generateLogbookPdf($formType, $data);
+    }
+    private function exportAllLogbook($formType, $filters)
+    {
+        // Implementasi export all logbook dengan filter
+        $data = $this->getLogbookData($formType, $filters);
+
+        if ($data->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada data yang ditemukan untuk filter yang dipilih.');
+        }
+
+        // Generate PDF menggunakan service yang ada
+        return $this->generateLogbookPdf($formType, $data);
+    }
+    private function generateLogbookPdf($formType, $data)
+    {
+        // Implementasi generate PDF untuk logbook
+        // Sesuaikan dengan template dan service yang ada
+
+        $viewMapping = [
+            'pos_jaga' => 'superadmin.export.pdf.logbookPosJagaTemplate',
+            'sweeping_pi' => 'superadmin.export.pdf.logbookSweepingTemplate',
+            'rotasi' => 'superadmin.export.pdf.logbookRotasiTemplate',
+            'chief' => 'superadmin.export.pdf.logbookChiefTemplate',
+        ];
+
+        $viewName = $viewMapping[$formType] ?? null;
+
+        if (!$viewName) {
+            return redirect()->back()->with('error', 'Template tidak ditemukan untuk jenis logbook ini.');
+        }
+
+        // Menggunakan PDF service yang sudah ada
+        // return $this->pdfService->generatePdfFromTemplate($viewName, $data, $formType);
+
+        // Untuk sementara, return view untuk testing
+        return view($viewName, [
+            'data' => $data,
+            'formType' => $formType
+        ]);
+    }
+
+
+
+    //checklist
+    public function exportPdfChecklist(Request $request)
+    {
+        // // Jika request memiliki export_type, proses export
+        // if ($request->has('export_type')) {
+        //     return $this->processLogbookExport($request);
+        // }
+
+        // $locations = Location::whereIn('name', $this->allowedLocationLogbook)
+        //     ->orderBy('name')
+        //     ->get();
+
+        // // Load initial data berdasarkan form type default (pos_jaga)
+        // $initialFormType = $request->input('form_type', 'pos_jaga');
+        // $initialData = $this->getLogbookData($initialFormType, $request->only(['location', 'start_date', 'end_date']));
+
+        return view('superadmin.export.exportPdfChecklist', [
+            // 'locations' => $locations,
+            // 'logbooks' => $initialData,
+            // 'formType' => $initialFormType
         ]);
     }
 }
