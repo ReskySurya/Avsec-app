@@ -6,6 +6,7 @@ use App\Http\Controllers\Checklist\ChecklistPenyisiranController;
 use App\Http\Controllers\DailyTest\HhmdController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExportPdfController;
+use App\Http\Controllers\Logbook\LogbookChiefController;
 use App\Http\Controllers\Checklist\FormPencatatanPIController;
 use App\Http\Controllers\LogBook\LogbookSweppingPIController;
 use App\Http\Controllers\MasterDataController;
@@ -57,6 +58,10 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
     // Review Logbook Rotasi
     Route::get('/logbook-rotasi/list', [DashboardController::class, 'showDataLogbookRotasi'])->name('supervisor.logbook-rotasi.list');
     Route::get('/logbook-rotasi/detail/{logbook}', [LogbookRotasiController::class, 'show'])->name('supervisor.logbook-rotasi.detail');
+    Route::post('/logbook-rotasi/approved/{id}', [LogbookRotasiController::class, 'approvedForm'])->name('supervisor.logbook-rotasi.approved');
+
+    // Review Logbook Chief
+    Route::get('/logbook/chief', [LogbookChiefController::class, 'index'])->name('logbook.chief.index');
 
     // Review Checklist Kendaraan Motor Patroli
     Route::get('/checklist-kendaraan-patroli/list', [DashboardController::class, 'showDataChecklistKendaraan'])->name('supervisor.checklist-kendaraan.list');
@@ -185,6 +190,7 @@ Route::middleware(['auth'])->group(function () {
     // Logbook Rotasi
     Route::get('/logbook-rotasi', [LogbookRotasiController::class, 'index'])->name('logbookRotasi.index');
     Route::post('/logbook-rotasi/store', [LogbookRotasiController::class, 'store'])->name('logbookRotasi.store');
+    Route::put('/logbook-rotasi/{id}/submit', [LogbookRotasiController::class, 'submitForm'])->name('logbookRotasi.submit');
 
     // Logbook Sweeping PI
     Route::get('/logbook-sweppingpi', [LogbookSweppingPIController::class, 'index'])->name('logbookSweppingPI.index');
@@ -221,7 +227,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/officer/posjaga/detail/{logbookID}', [LogbookPosJagaController::class, 'officerReviewLogbook'])->name('officer.logbook.detail');
 });
 
-// Checklist Routes
+
 // Checklist Routes
 Route::middleware(['auth'])->group(function () {
     // Checklist Kendaraan Patroli

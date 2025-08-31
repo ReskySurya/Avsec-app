@@ -5,6 +5,7 @@
 <div x-data="{
         openLogbook: false,
         openEditLogbook: false,
+        openFinishDialog: false,
         editLogbookData: {
             logbookID: null,
             date: '',
@@ -13,10 +14,9 @@
         },
     }" class="mx-auto p-0 sm:p-6 min-h-screen pt-5 lg:pt-20">
 
-    <!-- Alert Messages with Enhanced Design -->
     @if(session('success'))
-    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 2000)" x-show="show" x-transition
-        class="bg-gradient-to-r from-blue-400 to-blue-500 text-white px-6 py-4 rounded-xl mb-6 shadow-lg border-l-4 border-blue-600 animate-pulse">
+    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition
+        class="bg-gradient-to-r from-blue-400 to-blue-500 text-white px-6 py-4 rounded-xl mb-6 shadow-lg border-l-4 border-blue-600">
         <div class="flex items-center">
             <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -25,9 +25,8 @@
         </div>
     </div>
     @endif
-
     @if(session('error'))
-    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 2000)" x-show="show" x-transition
+    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition
         class="bg-gradient-to-r from-red-400 to-red-500 text-white px-6 py-4 rounded-xl mb-6 shadow-lg border-l-4 border-red-600">
         <div class="flex items-center">
             <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -39,16 +38,15 @@
     </div>
     @endif
 
-    <!-- Logbook Section -->
     <div class="bg-white shadow-xl rounded-2xl overflow-hidden mb-8 border border-gray-100">
         <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-6 py-6 text-white">
             <div class="flex flex-col sm:flex-row justify-between items-start">
                 <div>
-                    <h3 class="text-2xl font-bold mb-1">{{ 'Logbook Rotasi ' }}</h3>
-                    <p class="text-blue-100">Catatan aktivitas harian rotasi PSCP dan HBSCP</p>
+                    <h3 class="text-2xl font-bold mb-1">Logbook Rotasi</h3>
+                    <p class="text-blue-100">Catatan aktivitas harian rotasi PSCP dan HBSCP.</p>
                 </div>
                 <button @click="openLogbook = true"
-                    class="bg-white text-blue-600 hover:bg-blue-50 px-6 py-3 mt-3 sm:mt-0 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl w-full sm:w-auto ">
+                    class="bg-white text-blue-600 hover:bg-blue-50 px-6 py-3 mt-3 sm:mt-0 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl w-full sm:w-auto">
                     <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
@@ -57,173 +55,27 @@
             </div>
         </div>
 
-        <!-- Mobile Card View -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6 md:hidden">
-            @forelse($logbooks ?? [] as $logbook)
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200"
-                @click="window.location.href='{{ route('logbook.detail', ['id' => $logbook->logbookID]) }}'">
-                <div class="p-5">
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">{{
-                            \Carbon\Carbon::parse($logbook->date)->format('d M Y') }}</span>
-                        <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-teal-100 rounded-full">{{
-                            $logbook->shift ?? 'N/A' }}</span>
-                    </div>
-                    <div class="mt-4 space-y-2 text-sm text-gray-600">
-                        <p><strong class="font-medium text-gray-800">Area:</strong> {{ $logbook->locationArea->name ??
-                            'N/A' }}</p>
-                        <p><strong class="font-medium text-gray-800">Group:</strong> {{ $logbook->grup ?? 'N/A' }}</p>
-                        <p><strong class="font-medium text-gray-800">Dinas/Shift:</strong> {{ $logbook->shift ?? 'N/A'
-                            }}</p>
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-5 py-3 flex justify-end space-x-2">
-                    <button type="button"
-                        class="p-2 bg-yellow-100 text-yellow-700 rounded-full hover:bg-yellow-200 transition-colors duration-200"
-                        @click.stop="
-                            openEditLogbook = true;
-                            editLogbookData.logbookID = '{{ $logbook->logbookID }}';
-                            editLogbookData.date = '{{ $logbook->date->format('Y-m-d') }}';
-                            editLogbookData.grup = '{{ addslashes($logbook->grup ?? '') }}';
-                            editLogbookData.shift = '{{ addslashes($logbook->shift ?? '') }}';
-                        ">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                            </path>
-                        </svg>
-                    </button>
-                    <form action="{{ route('logbook.destroy', $logbook->logbookID) }}" method="POST"
-                        onsubmit="return confirm('Yakin ingin menghapus entry ini?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit"
-                            class="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors duration-200"
-                            @click.stop>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                </path>
-                            </svg>
-                        </button>
-                    </form>
+        {{-- === KONTEN UTAMA YANG DIRUBAH (TAB & TABEL DINAMIS) === --}}
+        <div class="p-6">
+            <div class="mb-4 border-b border-gray-200">
+                <div class="flex space-x-2">
+                    <a href="{{ route('logbookRotasi.index', ['type' => 'pscp']) }}"
+                        class="px-4 py-2 text-sm font-medium rounded-t-lg transition-colors duration-200
+                              {{ $typeForm === 'pscp' ? 'bg-blue-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100' }}">
+                        Rotasi PSCP
+                    </a>
+                    <a href="{{ route('logbookRotasi.index', ['type' => 'hbscp']) }}"
+                        class="px-4 py-2 text-sm font-medium rounded-t-lg transition-colors duration-200
+                              {{ $typeForm === 'hbscp' ? 'bg-teal-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100' }}">
+                        Rotasi HBSCP
+                    </a>
                 </div>
             </div>
-            @empty
-            <div class="col-span-1 sm:col-span-2 text-center py-12">
-                <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                    </path>
-                </svg>
-                <p class="text-gray-500 text-lg">Belum ada entry logbook</p>
-                <p class="text-gray-400">Tambahkan entry pertama Anda</p>
-            </div>
-            @endforelse
-        </div>
 
-        <!-- Desktop Table View -->
-        <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hidden md:block">
-            <table class="min-w-full">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            No</th>
-                        <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Tanggal</th>
-                        <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Area</th>
-                        <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Grup</th>
-                        <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Dinas/Shift</th>
-                        <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    @forelse($logbooks ?? [] as $index => $logbook)
-                    <tr @click="window.location.href='{{ route('logbook.detail', ['id' => $logbook->logbookID]) }}'"
-                        class="hover:bg-gray-50 transition-colors duration-200 cursor-pointer">
-
-                        <td class="px-5 py-4 text-blue-600 font-bold">{{ $index + 1 }}</td>
-                        <td class="px-5 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M8 7V3a1 1 0 012 0v4m0 0V3a1 1 0 012 0v4m0 0a1 1 0 011 1v3H7V8a1 1 0 011-1zM3 19a2 2 0 002 2h6a2 2 0 002-2v-5H3v5zM15 7a2 2 0 012-2h2a2 2 0 012 2v12a2 2 0 01-2 2h-2a2 2 0 01-2-2V7z">
-                                        </path>
-                                    </svg>
-                                </div>
-                                <span class="font-medium text-gray-900">{{
-                                    \Carbon\Carbon::parse($logbook->date)->format('d M Y') }}</span>
-                            </div>
-                        </td>
-                        <td class="px-5 py-4 text-gray-600">{{ $logbook->locationArea->name ?? 'N/A' }}</td>
-                        <td class="px-5 py-4 text-gray-600">{{ $logbook->grup ?? 'N/A' }}</td>
-                        <td class="px-5 py-4 whitespace-nowrap">
-                            <span class="px-3 py-1 text-xs font-semibold text-teal-800 bg-teal-100 rounded-full">
-                                {{ $logbook->shift ?? 'N/A' }}
-                            </span>
-                        </td>
-                        <td class="px-4 py-4 whitespace-nowrap flex space-x-2">
-                            <button type="button"
-                                class="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 px-4 py-2 rounded-lg font-medium transition-colors duration-200"
-                                @click.stop="
-                                    openEditLogbook = true;
-                                    editLogbookData.logbookID = '{{ $logbook->logbookID }}';
-                                    editLogbookData.date = '{{ $logbook->date->format('Y-m-d') }}';
-                                    editLogbookData.location_area_id = '{{ $logbook->location_area_id }}';
-                                    editLogbookData.grup = '{{ addslashes($logbook->grup ?? '') }}';
-                                    editLogbookData.shift = '{{ addslashes($logbook->shift ?? '') }}';
-                                ">
-                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                    </path>
-                                </svg>
-                                Edit
-                            </button>
-                            <form action="{{ route('logbook.destroy', $logbook->logbookID) }}" method="POST"
-                                onsubmit="event.stopPropagation(); return confirm('Yakin ingin menghapus entry ini?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                    class="bg-red-100 text-red-600 hover:bg-red-200 px-4 py-2 rounded-lg font-medium transition-colors duration-200"
-                                    @click.stop>
-                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                        </path>
-                                    </svg>
-                                    Hapus
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="6" class="text-center py-12">
-                            <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                </path>
-                            </svg>
-                            <p class="text-gray-500 text-lg">Belum ada entry logbook</p>
-                            <p class="text-gray-400">Tambahkan entry pertama Anda</p>
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-            @if(isset($logbooks) && method_exists($logbooks, 'links'))
-            <div class="px-4 py-3 bg-white border-t border-gray-200">
-                {{ $logbooks->links() }}
-            </div>
+            @if ($typeForm === 'pscp')
+            @include('logbook.rotasi.partials.tabel_pscp', ['logbook' => $logbook])
+            @else
+            @include('logbook.rotasi.partials.tabel_hbscp', ['logbook' => $logbook])
             @endif
         </div>
     </div>
@@ -231,31 +83,26 @@
     {{-- Modal Tambah Logbook --}}
     <div x-show="openLogbook" x-transition
         class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
-
-        {{-- State management dengan Alpine.js --}}
         <div @click.away="openLogbook = false" x-data="{ selectedRotasi: '', selectedTempatJaga: '' }"
             class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
-
             <div class="bg-gradient-to-r from-blue-500 to-teal-600 text-white p-6 rounded-t-2xl">
                 <h2 class="text-2xl font-bold">Tambah Entry Logbook Rotasi</h2>
-                <p class="text-blue-100">Tambahkan catatan Rotasi</p>
+                <p class="text-blue-100">Tambahkan catatan rotasi harian Anda.</p>
             </div>
 
-            <form action="{{ route('logbookRotasi.store') }}" method="POST" class="p-6">
+            <form action="{{ route('logbookRotasi.store') }}" method="POST" class="p-6 space-y-4">
                 @csrf
-                {{-- 1. Input Tanggal (Tetap) --}}
-                <div class="mb-4">
+                {{-- Input Tanggal --}}
+                <div>
                     <label for="date" class="block text-sm font-semibold text-gray-700 mb-2">Tanggal</label>
                     <input type="date" id="date" name="date" required
                         class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200"
                         readonly>
-                    @error('date')
-                    <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
-                    @enderror
+                    @error('date') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                 </div>
 
-                {{-- 2. Dropdown Rotasi (Trigger) --}}
-                <div class="mb-4">
+                {{-- Dropdown Area Rotasi --}}
+                <div>
                     <label for="type" class="block text-sm font-semibold text-gray-700 mb-2">Area Rotasi</label>
                     <select id="type" name="type" required x-model="selectedRotasi" @change="selectedTempatJaga = ''"
                         class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
@@ -263,102 +110,91 @@
                         <option value="PSCP">PSCP</option>
                         <option value="HBSCP">HBSCP</option>
                     </select>
-                    @error('type')
-                    <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
-                    @enderror
+                    @error('type') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                 </div>
 
-                {{-- 3. Dropdown Tempat Jaga (Kondisional) --}}
-                <div class="mb-4" x-show="selectedRotasi !== ''" x-transition>
+                {{-- Dropdown Tempat Jaga (Kondisional) --}}
+                <div x-show="selectedRotasi" x-transition>
                     <label for="tempat_jaga" class="block text-sm font-semibold text-gray-700 mb-2">Tempat Jaga</label>
 
                     {{-- Opsi untuk PSCP --}}
-                    <select id="tempat_jaga_pscp" name="tempat_jaga" x-show="selectedRotasi === 'PSCP'"
-                        x-model="selectedTempatJaga" :disabled="selectedRotasi !== 'PSCP'"
-                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
-                        <option value="">Pilih Tempat Jaga</option>
+                    <select name="tempat_jaga" x-show="selectedRotasi === 'PSCP'" x-model="selectedTempatJaga"
+                        :disabled="selectedRotasi !== 'PSCP'" {{-- <<< TAMBAHKAN INI --}}
+                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none">
+                        <option value="">Pilih Tempat Jaga PSCP</option>
                         @foreach($pscpOptions as $value => $label)
                         <option value="{{ $value }}">{{ $label }}</option>
                         @endforeach
                     </select>
 
                     {{-- Opsi untuk HBSCP --}}
-                    <select id="tempat_jaga_hbscp" name="tempat_jaga" x-show="selectedRotasi === 'HBSCP'"
-                        x-model="selectedTempatJaga" :disabled="selectedRotasi !== 'HBSCP'"
-                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
-                        <option value="">Pilih Tempat Jaga</option>
+                    <select name="tempat_jaga" x-show="selectedRotasi === 'HBSCP'" x-model="selectedTempatJaga"
+                        :disabled="selectedRotasi !== 'HBSCP'" {{-- <<< TAMBAHKAN INI --}}
+                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none">
+                        <option value="">Pilih Tempat Jaga HBSCP</option>
                         @foreach($hbscpOptions as $value => $label)
                         <option value="{{ $value }}">{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>
 
-                {{-- 4. Input Jam dan Input Tambahan --}}
-                <div class="space-y-4" x-show="selectedTempatJaga !== ''" x-transition>
-
-                    {{-- Input Jam (Sekarang Selalu Tampil jika tempat jaga dipilih) --}}
+                {{-- Input Jam & Input Tambahan --}}
+                <div class="space-y-4" x-show="selectedTempatJaga" x-transition>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label for="start_time" class="block text-sm font-semibold text-gray-700 mb-2">Jam
                                 Mulai</label>
-                            <input type="time" name="start_time" id="start_time" required
+                            <input type="time" name="start_time" required
                                 class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none">
                         </div>
                         <div>
                             <label for="end_time" class="block text-sm font-semibold text-gray-700 mb-2">Jam
                                 Selesai</label>
-                            <input type="time" name="end_time" id="end_time" required
+                            <input type="time" name="end_time" required
                                 class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none">
                         </div>
                     </div>
 
-                    {{-- Input Counter Tambahan (Tetap Kondisional) --}}
-                    {{-- Kondisi 1: PSCP & Pemeriksaan Orang Manual / HHMD --}}
-                    <div x-show="selectedRotasi === 'PSCP' && selectedTempatJaga === 'hhmd_petugas'">
-                        <div class="grid grid-cols-2 gap-4 pt-2 border-t">
-                            <div>
-                                <label for="hhmd_random" class="block text-sm font-semibold text-gray-700 mb-2">HHMD
-                                    Random</label>
-                                <input type="number" name="hhmd_random" id="hhmd_random" value="0"
-                                    class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none">
-                            </div>
-                            <div>
-                                <label for="hhmd_unpredictable"
-                                    class="block text-sm font-semibold text-gray-700 mb-2">HHMD Unpredictable</label>
-                                <input type="number" name="hhmd_unpredictable" id="hhmd_unpredictable" value="0"
-                                    class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none">
-                            </div>
+                    {{-- Counter untuk HHMD --}}
+                    <div x-show="selectedRotasi === 'PSCP' && selectedTempatJaga === 'hhmd_petugas'"
+                        class="grid grid-cols-2 gap-4 pt-2 border-t">
+                        <div>
+                            <label for="hhmd_random" class="block text-sm font-semibold text-gray-700 mb-2">HHMD
+                                Random</label>
+                            <input type="number" name="hhmd_random" value="0"
+                                class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label for="hhmd_unpredictable" class="block text-sm font-semibold text-gray-700 mb-2">HHMD
+                                Unpredictable</label>
+                            <input type="number" name="hhmd_unpredictable" value="0"
+                                class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none">
                         </div>
                     </div>
 
-                    {{-- Kondisi 2: PSCP & Pemeriksa Manual Kabin --}}
-                    <div x-show="selectedRotasi === 'PSCP' && selectedTempatJaga === 'manual_kabin_petugas'">
-                        <div class="grid grid-cols-2 gap-4 pt-2 border-t">
-                            <div>
-                                <label for="cek_random_barang"
-                                    class="block text-sm font-semibold text-gray-700 mb-2">Cek Random Barang</label>
-                                <input type="number" name="cek_random_barang" id="cek_random_barang" value="0"
-                                    class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none">
-                            </div>
-                            <div>
-                                <label for="barang_unpredictable"
-                                    class="block text-sm font-semibold text-gray-700 mb-2">Barang Unpredictable</label>
-                                <input type="number" name="barang_unpredictable" id="barang_unpredictable" value="0"
-                                    class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none">
-                            </div>
+                    {{-- Counter untuk Manual Kabin --}}
+                    <div x-show="selectedRotasi === 'PSCP' && selectedTempatJaga === 'manual_kabin_petugas'"
+                        class="grid grid-cols-2 gap-4 pt-2 border-t">
+                        <div>
+                            <label for="cek_random_barang" class="block text-sm font-semibold text-gray-700 mb-2">Cek
+                                Random Barang</label>
+                            <input type="number" name="cek_random_barang" value="0"
+                                class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label for="barang_unpredictable"
+                                class="block text-sm font-semibold text-gray-700 mb-2">Barang Unpredictable</label>
+                            <input type="number" name="barang_unpredictable" value="0"
+                                class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none">
                         </div>
                     </div>
                 </div>
 
-                <div class="flex justify-end space-x-3 mt-2">
+                <div class="flex justify-end space-x-3 pt-4">
                     <button type="button" @click="openLogbook = false"
-                        class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium">
-                        Batal
-                    </button>
+                        class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium">Batal</button>
                     <button type="submit"
-                        class="px-6 py-3 bg-gradient-to-r from-blue-500 to-teal-600 text-white rounded-xl hover:from-blue-600 hover:to-teal-700 transition-all duration-200 font-medium shadow-lg">
-                        Simpan
-                    </button>
+                        class="px-6 py-3 bg-gradient-to-r from-blue-500 to-teal-600 text-white rounded-xl hover:from-blue-600 hover:to-teal-700 transition-all duration-200 font-medium shadow-lg">Simpan</button>
                 </div>
             </form>
         </div>
@@ -445,6 +281,61 @@
             </form>
         </div>
     </div>
+    @if(isset($logbook))
+    <div x-show="openFinishDialog" x-transition
+        x-on:transitionend="if(openFinishDialog){ initializeSignaturePad(); }"
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
+        <div @click.away="openFinishDialog = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
+            <div class="bg-gradient-to-r from-blue-500 to-teal-600 text-white p-6 rounded-t-2xl">
+                <h2 class="text-2xl font-bold">Konfirmasi Penyelesaian Shift</h2>
+                <p class="text-blue-100">Lengkapi data untuk menyelesaikan logbook.</p>
+            </div>
+
+            <form action="{{ route('logbookRotasi.submit', $logbook->id) }}" method="POST" class="p-6"
+                onsubmit="return handleSignatureSubmit(event)">
+                @csrf
+                @method('PUT')
+                <div class="space-y-4">
+                    {{-- Tanda Tangan --}}
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Tanda Tangan Digital Anda</label>
+                        <div class="relative w-full h-40 border-2 border-gray-200 rounded-lg bg-white">
+                            <canvas id="signature-canvas" class="w-full h-full"></canvas>
+                        </div>
+                        <input type="hidden" name="signature" id="signature-data" value="">
+                        <div class="flex justify-between items-center mt-1">
+                            <span id="signature-status" class="text-xs text-gray-500">Belum ada tanda tangan</span>
+                            <button type="button" class="text-sm text-blue-600 hover:text-blue-800"
+                                onclick="clearSignature()">Hapus</button>
+                        </div>
+                    </div>
+
+                    {{-- Pilih Supervisor --}}
+                    <div>
+                        <label for="approvedID" class="block text-sm font-semibold text-gray-700 mb-2">Diketahui Oleh
+                            (Supervisor)</label>
+                        <select name="approvedID" id="approvedID"
+                            class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none"
+                            required>
+                            <option value="">Pilih Supervisor</option>
+                            @foreach($supervisors as $supervisor)
+                            <option value="{{ $supervisor->id }}">{{ $supervisor->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-6 mt-4 border-t">
+                    <button type="button" @click="openFinishDialog = false"
+                        class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 font-medium">Batal</button>
+                    <button type="submit"
+                        class="px-6 py-3 bg-gradient-to-r from-blue-500 to-teal-600 text-white rounded-xl hover:from-blue-600 hover:to-teal-700 font-medium shadow-lg">Konfirmasi
+                        & Kirim</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    @endif
 </div>
 
 {{-- Custom Scrollbar Styles --}}
@@ -477,8 +368,9 @@
 </style>
 
 <script>
+    // Bagian 1: Logika yang berjalan setelah halaman siap (DOM)
     document.addEventListener('DOMContentLoaded', function() {
-        // Set current date for tanggal input
+        // Setel tanggal saat ini untuk input tanggal di modal "Tambah Data"
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -489,7 +381,7 @@
             dateInput.value = formattedDate;
         }
 
-        // Form validation
+        // Validasi form "Tambah Data"
         const routeLogbookStore = "{{ route('logbook.store') }}";
         const form = document.querySelector(`form[action="${routeLogbookStore}"]`);
         if (form) {
@@ -505,18 +397,108 @@
             });
         }
 
-        // Reset form when modal is closed
+        // Reset form "Tambah Data" saat modal ditutup
         const resetForm = () => {
             if (form) {
                 form.reset();
-                dateInput.value = formattedDate;
+                if (dateInput) {
+                    dateInput.value = formattedDate;
+                }
             }
         };
 
-        // Add event listener for modal close button
+        // Tambahkan event listener untuk tombol tutup modal "Tambah Data"
         const closeButtons = document.querySelectorAll('[x-on\\:click="openLogbook = false"]');
         closeButtons.forEach(button => {
             button.addEventListener('click', resetForm);
+        });
+    });
+
+    // Bagian 2: Logika untuk Signature Pad & Modal Konfirmasi
+    let signaturePadInstance;
+
+    function initializeSignaturePad() {
+        const canvas = document.getElementById('signature-canvas');
+        if (!canvas) {
+            console.error("Elemen canvas tidak ditemukan!");
+            return;
+        }
+
+        // --- PERUBAHAN UTAMA ---
+        // Cek jika canvas sudah siap (memiliki dimensi). Jika tidak, tunggu dan coba lagi.
+        if (canvas.offsetWidth === 0) {
+            setTimeout(initializeSignaturePad, 100); // Coba lagi setelah 100ms
+            return;
+        }
+
+        // Hindari membuat instance baru jika sudah ada. Cukup bersihkan.
+        if (signaturePadInstance) {
+            signaturePadInstance.clear();
+            return;
+        }
+
+        // Inisialisasi hanya jika belum ada instance
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext("2d").scale(ratio, ratio);
+
+        signaturePadInstance = new SignaturePad(canvas, {
+            backgroundColor: 'rgb(255, 255, 255)' // Latar belakang putih
+        });
+
+        const statusEl = document.getElementById('signature-status');
+        signaturePadInstance.addEventListener("endStroke", () => {
+            if (statusEl) {
+                statusEl.textContent = 'Tanda tangan dibuat';
+                statusEl.className = 'text-xs text-green-600';
+            }
+        });
+    }
+
+    function clearSignature() {
+        // Cukup panggil inisialisasi. Fungsi ini sudah cerdas untuk menangani
+        // apakah perlu membuat instance baru atau hanya membersihkan yang sudah ada.
+        initializeSignaturePad();
+
+        // Atur ulang status teks setelah dibersihkan
+        if(signaturePadInstance){
+            const statusEl = document.getElementById('signature-status');
+            if (statusEl) {
+                statusEl.textContent = 'Belum ada tanda tangan';
+                statusEl.className = 'text-xs text-gray-500';
+            }
+            document.getElementById('signature-data').value = '';
+        }
+    }
+
+    function handleSignatureSubmit(event) {
+        const approvedID = document.getElementById('approvedID').value;
+
+        if (!approvedID) {
+            alert('Mohon lengkapi pilihan Supervisor.');
+            event.preventDefault();
+            return false;
+        }
+
+        // Pastikan signature pad sudah diinisialisasi sebelum cek isEmpty
+        if (!signaturePadInstance || signaturePadInstance.isEmpty()) {
+            alert('Mohon berikan tanda tangan Anda.');
+            event.preventDefault();
+            return false;
+        }
+
+        document.getElementById('signature-data').value = signaturePadInstance.toDataURL('image/png');
+        return confirm('Apakah Anda yakin ingin menyelesaikan logbook ini?');
+    }
+
+    // Listener Alpine.js (tidak berubah, tetapi sekarang memanggil fungsi yang lebih andal)
+    document.addEventListener('alpine:init', () => {
+        Alpine.watch('openFinishDialog', (value) => {
+            if (value) {
+                // tunggu animasi modal selesai, lalu inisialisasi
+                setTimeout(initializeSignaturePad, 50);
+            }
         });
     });
 </script>

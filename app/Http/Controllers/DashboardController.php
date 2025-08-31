@@ -166,28 +166,29 @@ class DashboardController extends Controller
     }
 
     public function showDataLogbookRotasi()
-    { {
-            // 1. Tentukan jumlah item per halaman untuk pagination
-            $perPage = 10;
+    {
+        // 1. Tentukan jumlah item per halaman untuk pagination
+        $perPage = 10;
 
-            // 2. Ambil data untuk PSCP dengan pagination
-            // Kita menggunakan eager loading 'creator' untuk efisiensi query
-            $logbooksPSCP = LogbookRotasi::with('creator')
-                ->where('type', 'pscp')
-                ->latest('date') // Urutkan berdasarkan tanggal terbaru
-                ->paginate($perPage, ['*'], 'pscp_page');
+        // 2. Ambil data untuk PSCP dengan pagination
+        // Kita menggunakan eager loading 'creator' untuk efisiensi query
+        $logbooksPSCP = LogbookRotasi::with('creator', 'approver')
+            ->where('approved_by', Auth::id())
+            ->where('type', 'pscp')
+            ->latest('date') // Urutkan berdasarkan tanggal terbaru
+            ->paginate($perPage, ['*'], 'pscp_page');
 
-            // 3. Ambil data untuk HBSCP dengan pagination
-            $logbooksHBSCP = LogbookRotasi::with('creator')
-                ->where('type', 'hbscp')
-                ->latest('date')
-                ->paginate($perPage, ['*'], 'hbscp_page');
+        // 3. Ambil data untuk HBSCP dengan pagination
+        $logbooksHBSCP = LogbookRotasi::with('creator', 'approver')
+            ->where('approved_by', Auth::id())
+            ->where('type', 'hbscp')
+            ->latest('date')
+            ->paginate($perPage, ['*'], 'hbscp_page');
 
-            // 4. Kirim kedua koleksi data ke view
-            // Nama variabel ($logbooksPSCP, $logbooksHBSCP) sengaja disamakan
-            // dengan view lama agar Anda tidak perlu mengubah kode di file Blade.
-            return view('supervisor.listLogbookRotasi', compact('logbooksPSCP', 'logbooksHBSCP'));
-        }
+        // 4. Kirim kedua koleksi data ke view
+        // Nama variabel ($logbooksPSCP, $logbooksHBSCP) sengaja disamakan
+        // dengan view lama agar Anda tidak perlu mengubah kode di file Blade.
+        return view('supervisor.listLogbookRotasi', compact('logbooksPSCP', 'logbooksHBSCP'));
     }
 
     public function showDataChecklistKendaraan()

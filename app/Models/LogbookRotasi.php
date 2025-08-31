@@ -21,7 +21,9 @@ class LogbookRotasi extends Model
         'status',
         'created_by',
         'approved_by',
-        'approved_at',
+        'submitted_by',
+        'submittedSignature',
+        'approvedSignature',
         'notes',
     ];
 

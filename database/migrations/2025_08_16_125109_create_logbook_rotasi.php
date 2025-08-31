@@ -38,13 +38,16 @@ return new class extends Migration
             $table->date('date');
             $table->enum('status', ['draft', 'submitted', 'approved'])->default('draft');
             $table->unsignedBigInteger('created_by');
+            $table->unsignedBigInteger('submitted_by')->nullable();
             $table->unsignedBigInteger('approved_by')->nullable();
-            $table->timestamp('approved_at')->nullable();
+            $table->text('submittedSignature')->nullable();
+            $table->text('approvedSignature')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
 
             // Foreign keys
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('submitted_by')->references('id')->on('users')->onDelete('set null');
             $table->foreign('approved_by')->references('id')->on('users')->onDelete('set null');
 
             // Indexes
