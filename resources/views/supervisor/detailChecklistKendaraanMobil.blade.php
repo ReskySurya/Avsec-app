@@ -3,15 +3,20 @@
 @section('title', 'Checklist Pengecekan Harian Mobil Patroli')
 
 @section('content')
-<div class="container mx-auto p-2 sm:p-4 max-w-6xl">
-    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+<div class="mx-auto p-4 sm:p-6 min-h-screen pt-5 sm:pt-20">
+    <div class="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
 
         {{-- Header --}}
-        <div class="border-2 border-black">
-            <div class="text-center py-2 sm:py-4 bg-gray-50">
-                <h1 class="text-sm sm:text-lg font-bold uppercase mb-1 sm:mb-2 px-2">CHECK LIST PENGECEKAN HARIAN MOBIL
-                    PATROLI</h1>
-                <h2 class="text-xs sm:text-base font-bold uppercase px-2">AIRPORT SECURITY BANDAR UDARA ADISUTJIPTO</h2>
+        <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-6 py-6 text-white">
+            <div class="flex items-center justify-between">
+                <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo"
+                    class="w-20 h-20 mb-2 sm:mb-0">
+                <div class="text-center">
+                    <h1 class="text-2xl font-bold">CHECK LIST PENGECEKAN HARIAN</h1>
+                    <h2 class="text-xl font-semibold">KENDARAAN MOBIL PATROLI</h2>
+                    <p class="text-blue-100">AIRPORT SECURITY BANDAR UDARA ADISUTJIPTO</p>
+                </div>
+                <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo" class="w-24 h-24 mt-2 sm:mt-0">
             </div>
         </div>
 
@@ -27,7 +32,7 @@
                             class="border border-black px-1 sm:px-2 py-2 text-xs sm:text-sm font-bold min-w-24 sm:w-40">
                             KETERANGAN</th>
                         <th class="border border-black px-1 sm:px-2 py-2 text-xs sm:text-sm font-bold text-center"
-                            colspan="2">KONDISI SHIFT {{ ucfirst($checklist->shift) }}</th>
+                            colspan="2">KONDISI SHIFT {{ strtoupper($checklist->shift) }}</th>
                     </tr>
                     <tr class="bg-gray-100">
                         <th class="border border-black px-1 sm:px-2 py-1 text-xs font-bold w-12 sm:w-16">BAIK</th>
@@ -35,6 +40,7 @@
                     </tr>
                 </thead>
                 <tbody>
+                    
                     {{-- Mendefinisikan urutan dan nama kategori --}}
                     @php
                     $categories = [
@@ -115,18 +121,47 @@
                     </div>
                 </div>
 
+                {{-- CATATAN Section - Final Version --}}
                 <div class="mb-6">
                     <h3 class="font-bold text-sm mb-2">CATATAN :</h3>
                     <div class="space-y-1">
-                        @for($i = 1; $i <= 2; $i++) <div class="flex">
-                            <span class="w-4 text-sm">{{ $i }}</span>
-                            <div class="border-b border-dotted border-black flex-1 min-h-[20px]">
-                                @if(isset($checklist) && $checklist->notes && $i == 1)
-                                <span class="text-sm">{{ $checklist->notes }}</span>
-                                @endif
+                        @php
+                            // Kumpulkan semua notes dari checklist kendaraan details yang tidak kosong
+                            $allNotes = [];
+                            
+                            // Loop melalui semua detail checklist untuk mengambil notes
+                            if(isset($checklist) && $checklist->details) {
+                                foreach ($checklist->details as $detail) {
+                                    if (!empty($detail->notes) && !is_null($detail->notes)) {
+                                        $allNotes[] = [
+                                            'item_name' => $detail->item->name ?? 'Item tidak ditemukan',
+                                            'notes' => $detail->notes,
+                                            'category' => $detail->item->category ?? 'lainlain'
+                                        ];
+                                    }
+                                }
+                            }
+                        @endphp
+
+                        @forelse($allNotes as $index => $noteData)
+                            <div class="flex">
+                                <span class="w-4 text-sm">{{ $index + 1 }}</span>
+                                <div class="border-b border-dotted border-black flex-1 min-h-[20px] flex items-end pb-1">
+                                    <span class="text-sm">
+                                        <strong>{{ $noteData['item_name'] }}:</strong> {{ $noteData['notes'] }}
+                                    </span>
+                                </div>
                             </div>
+                        @empty
+                            {{-- Jika tidak ada notes, tampilkan satu baris kosong --}}
+                            <div class="flex">
+                                <span class="w-4 text-sm">1</span>
+                                <div class="border-b border-dotted border-black flex-1 min-h-[20px]">
+                                    {{-- Baris kosong --}}
+                                </div>
+                            </div>
+                        @endforelse
                     </div>
-                    @endfor
                 </div>
             </div>
         </div>

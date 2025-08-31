@@ -25,11 +25,11 @@
                             </label>
                             <select name="form_type" id="form_type"
                                 class="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                                <option value="kendaraan">Checklist Kendaraan Patroli</option>
-                                <option value="penyisiran">Checklist Penyisiran Ruang Tunggu</option>
-                                <option value="senpi">Checklist Senjata Api</option>
-                                <option value="pencatatan_pi">Form Pencatatan PI</option>
-                                <option value="manual_book">Buku Pemeriksaan Manual</option>
+                                <option value="kendaraan" {{ ($formType ?? 'kendaraan') == 'kendaraan' ? 'selected' : '' }}>Checklist Kendaraan Patroli</option>
+                                <option value="penyisiran" {{ ($formType ?? '') == 'penyisiran' ? 'selected' : '' }}>Checklist Penyisiran Ruang Tunggu</option>
+                                <option value="senpi" {{ ($formType ?? '') == 'senpi' ? 'selected' : '' }}>Checklist Senjata Api</option>
+                                <option value="pencatatan_pi" {{ ($formType ?? '') == 'pencatatan_pi' ? 'selected' : '' }}>Form Pencatatan PI</option>
+                                <option value="manual_book" {{ ($formType ?? '') == 'manual_book' ? 'selected' : '' }}>Buku Pemeriksaan Manual</option>
                             </select>
                         </div>
 
@@ -41,10 +41,9 @@
                             <select name="location" id="location"
                                 class="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                                 <option value="">Semua Lokasi</option>
-                                {{-- @foreach($locations as $loc)
+                                @foreach($locations as $loc)
                                 <option value="{{ $loc->name }}">{{ $loc->name }}</option>
-                                @endforeach --}}
-                                <!-- Note: Locations should be populated dynamically or passed from controller -->
+                                @endforeach
                             </select>
                         </div>
 
@@ -289,7 +288,7 @@
         }
 
         // Initial data load
-        updateTable([], formTypeSelect.value); // To set initial headers
+        updateTable(@json($checklists), @json($formType));
         fetchFilteredData();
         setupEventListeners();
     });

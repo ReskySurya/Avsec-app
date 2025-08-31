@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChecklistKendaraan;
+use App\Models\ChecklistPenyisiran;
+use App\Models\ChecklistSenpi;
 use App\Models\Equipment;
 use App\Models\EquipmentLocation;
+use App\Models\FormPencatatanPI;
 use App\Models\LogbookRotasi;
 use App\Models\Report;
 use App\Models\ReportDetail;
@@ -472,23 +476,219 @@ class ExportPdfController extends Controller
     //checklist
     public function exportPdfChecklist(Request $request)
     {
-        // // Jika request memiliki export_type, proses export
-        // if ($request->has('export_type')) {
-        //     return $this->processLogbookExport($request);
-        // }
+        if ($request->has('export_type')) {
+            return $this->processChecklistExport($request);
+        }
 
-        // $locations = Location::whereIn('name', $this->allowedLocationLogbook)
-        //     ->orderBy('name')
-        //     ->get();
+        $locations = Location::whereIn('name', $this->allowedLocationLogbook)
+            ->orderBy('name')
+            ->get();
 
-        // // Load initial data berdasarkan form type default (pos_jaga)
-        // $initialFormType = $request->input('form_type', 'pos_jaga');
-        // $initialData = $this->getLogbookData($initialFormType, $request->only(['location', 'start_date', 'end_date']));
+        $initialFormType = $request->input('form_type', 'kendaraan');
+        $initialData = $this->getChecklistData($initialFormType, $request->only(['location', 'start_date', 'end_date']));
 
         return view('superadmin.export.exportPdfChecklist', [
-            // 'locations' => $locations,
-            // 'logbooks' => $initialData,
-            // 'formType' => $initialFormType
+            'locations' => $locations,
+            'checklists' => $initialData,
+            'formType' => $initialFormType
+        ]);
+    }
+
+    public function filterChecklist(Request $request)
+    {
+        $formType = $request->input('form_type', 'kendaraan');
+        $filters = $request->only(['location', 'start_date', 'end_date']);
+
+        $data = $this->getChecklistData($formType, $filters);
+
+        return response()->json([
+            'checklists' => $data,
+            'form_type' => $formType
+        ]);
+    }
+
+    private function getChecklistData($formType, $filters = [])
+    {
+        $startDate = $filters['start_date'] ?? null;
+        $endDate = $filters['end_date'] ?? null;
+        $locationName = $filters['location'] ?? null;
+
+        switch ($formType) {
+            case 'kendaraan':
+                $query = ChecklistKendaraan::with(['sender', 'receiver', 'approver'])
+                    ->orderBy('date', 'desc');
+                if ($startDate && $endDate) {
+                    $query->whereBetween('date', [$startDate, $endDate]);
+                }
+                return $query->get()->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'date' => $item->date,
+                        'nomor_polisi' => $item->type,
+                        'petugas' => $item->sender,
+                        'status' => $item->status,
+                    ];
+                });
+
+            case 'penyisiran':
+                $query = ChecklistPenyisiran::with(['sender', 'receiver', 'approver'])
+                    ->orderBy('date', 'desc');
+                if ($startDate && $endDate) {
+                    $query->whereBetween('date', [$startDate, $endDate]);
+                }
+                return $query->get()->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'date' => $item->date,
+                        'lokasi' => (object)['name' => $item->type],
+                        'petugas' => $item->sender,
+                        'status' => $item->status,
+                    ];
+                });
+
+            case 'senpi':
+                $query = ChecklistSenpi::orderBy('date', 'desc');
+                if ($startDate && $endDate) {
+                    $query->whereBetween('date', [$startDate, $endDate]);
+                }
+                return $query->get()->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'date' => $item->date,
+                        'nomor_senpi' => $item->licenseNumber,
+                        'petugas' => (object)['name' => $item->name],
+                        'status' => 'approved',
+                    ];
+                });
+
+            case 'pencatatan_pi':
+                $query = FormPencatatanPI::with(['sender', 'approver'])
+                    ->orderBy('date', 'desc');
+                if ($startDate && $endDate) {
+                    $query->whereBetween('date', [$startDate, $endDate]);
+                }
+                return $query->get()->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'date' => $item->date,
+                        'petugas' => $item->sender,
+                        'jenis_pi' => $item->jenis_PI,
+                        'lokasi' => (object)['name' => 'Area ' . $item->grup],
+                        'status' => $item->status,
+                    ];
+                });
+
+            default:
+                return collect();
+        }
+    }
+
+    private function processChecklistExport(Request $request)
+    {
+        $formType = $request->input('form_type');
+        if (empty($formType)) {
+            return redirect()->back()->with('error', 'Silakan pilih "Jenis Checklist" untuk bisa mengekspor.');
+        }
+
+        // Logic untuk export PDF berdasarkan jenis checklist
+        if ($request->input('export_type') === 'selected') {
+            $selectedIds = $request->input('selected_reports', []);
+            if (empty($selectedIds)) {
+                return redirect()->back()->with('error', 'Pilih minimal satu data untuk diekspor!');
+            }
+
+            // Export selected data
+            return $this->exportSelectedChecklist($formType, $selectedIds);
+        } elseif ($request->input('export_type') === 'all') {
+            $filters = $request->only(['location', 'start_date', 'end_date']);
+
+            // Export all data with filters
+            return $this->exportAllChecklist($formType, $filters);
+        }
+
+        return redirect()->back()->with('error', 'Tipe export tidak valid.');
+    }
+
+    private function exportSelectedChecklist($formType, $selectedIds)
+    {
+        // Implementasi export selected checklist
+        // Sesuaikan dengan PDF service yang ada
+
+        switch ($formType) {
+            case 'kendaraan':
+                $data = ChecklistKendaraan::whereIn('id', $selectedIds)
+                    ->with(['sender', 'receiver', 'approver'])
+                    ->get();
+                break;
+
+            case 'penyisiran':
+                $data = ChecklistPenyisiran::whereIn('id', $selectedIds)
+                    ->with(['sender', 'receiver', 'approver'])
+                    ->get();
+                break;
+
+            case 'senpi':
+                $data = ChecklistSenpi::whereIn('id', $selectedIds)
+                    ->with(['creator'])
+                    ->get();
+                break;
+
+            case 'pencatatan_pi':
+                $data = FormPencatatanPI::whereIn('id', $selectedIds)
+                    ->with(['sender', 'approver'])
+                    ->get();
+                break;
+
+            default:
+                return redirect()->back()->with('error', 'Jenis checklist tidak valid.');
+        }
+
+        if ($data->isEmpty()) {
+            return redirect()->back()->with('error', 'Data yang dipilih tidak ditemukan.');
+        }
+
+        // Generate PDF menggunakan service yang ada
+        return $this->generateChecklistPdf($formType, $data);
+    }
+
+    private function exportAllChecklist($formType, $filters)
+    {
+        // Implementasi export all checklist dengan filter
+        $data = $this->getChecklistData($formType, $filters);
+
+        if ($data->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada data yang ditemukan untuk filter yang dipilih.');
+        }
+
+        // Generate PDF menggunakan service yang ada
+        return $this->generateChecklistPdf($formType, $data);
+    }
+
+    private function generateChecklistPdf($formType, $data)
+    {
+        // Implementasi generate PDF untuk checklist
+        // Sesuaikan dengan template dan service yang ada
+
+        $viewMapping = [
+            'kendaraan' => 'superadmin.export.pdf.checklistKendaraanTemplate',
+            'penyisiran' => 'superadmin.export.pdf.checklistPenyisiranTemplate',
+            'senpi' => 'superadmin.export.pdf.checklistSenpiTemplate',
+            'pencatatan_pi' => 'superadmin.export.pdf.checklistPencatatanPITemplate',
+        ];
+
+        $viewName = $viewMapping[$formType] ?? null;
+
+        if (!$viewName) {
+            return redirect()->back()->with('error', 'Template tidak ditemukan untuk jenis checklist ini.');
+        }
+
+        // Menggunakan PDF service yang sudah ada
+        // return $this->pdfService->generatePdfFromTemplate($viewName, $data, $formType);
+
+        // Untuk sementara, return view untuk testing
+        return view($viewName, [
+            'data' => $data,
+            'formType' => $formType
         ]);
     }
 }

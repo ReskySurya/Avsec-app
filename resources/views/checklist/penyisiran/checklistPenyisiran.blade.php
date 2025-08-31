@@ -39,7 +39,7 @@
                     class="w-20 h-20 mb-2 sm:mb-0">
                 <div class="text-center">
                     <h1 class="text-2xl font-bold">CHECK LIST PENGECEKAN HARIAN</h1>
-                    <h2 class="text-xl font-semibold">CHECK LIST PENYISIRAN DAERAH STERIL RUANG TUNGGU</h2>
+                    <h2 class="text-xl font-semibold">PENYISIRAN DAERAH STERIL RUANG TUNGGU</h2>
                     <p class="text-blue-100">AIRPORT SECURITY BANDAR UDARA ADISUTJIPTO</p>
                 </div>
                 <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo" class="w-24 h-24 mt-2 sm:mt-0">

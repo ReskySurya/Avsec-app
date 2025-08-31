@@ -40,15 +40,14 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
 
     Route::get('/export', [ExportPdfController::class, 'index'])->name('export.index');
     Route::get('/export/dailytest', [ExportPdfController::class, 'exportPdfDailyTest'])->name('export.dailytest');
-    Route::get('/export/daily-test/review/{report}', [ExportPdfController::class,'reviewDailyTest'])->name('export.dailytest.review');
+    Route::get('/export/daily-test/review/{report}', [ExportPdfController::class, 'reviewDailyTest'])->name('export.dailytest.review');
 
     Route::get('/export/logbook', [ExportPdfController::class, 'exportPdfLogbook'])->name('export.logbook');
     Route::post('/export/logbook/filter', [ExportPdfController::class, 'filterLogbook'])->name('export.logbook.filter');
-    
-    
+
+
     Route::get('/export/checklist', [ExportPdfController::class, 'exportPdfChecklist'])->name('export.checklist');
     Route::post('/export/checklist/filter', [ExportPdfController::class, 'filterChecklist'])->name('export.checklist.filter');
-
 });
 
 // Supervisor Routes
@@ -62,22 +61,22 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
     Route::post('/logbook/signature/approve/{logbookID}', [LogbookPosJagaController::class, 'signatureApprove'])->name('supervisor.logbook.signature');
 
     // Review Logbook Rotasi
-    Route::get('/logbook-rotasi/list', [DashboardController::class, 'showDataLogbookRotasi'])->name('supervisor.logbook-rotasi.list');
-    Route::get('/logbook-rotasi/detail/{logbook}', [LogbookRotasiController::class, 'show'])->name('supervisor.logbook-rotasi.detail');
+    // Route::get('/logbook-rotasi/list', [DashboardController::class, 'showDataLogbookRotasi'])->name('supervisor.logbook-rotasi.list');
+    // Route::get('/logbook-rotasi/detail/{logbook}', [LogbookRotasiController::class, 'show'])->name('supervisor.logbook-rotasi.detail');
 
     // Review Checklist Kendaraan Motor Patroli
-    Route::get('/checklist-kendaraan-patroli/list', [DashboardController::class, 'showDataChecklistKendaraan'])->name('supervisor.checklist-kendaraan.list');
-    Route::get('/checklist-kendaraan-patroli/detail/{checklist}', [ChecklistKendaraanController::class, 'show'])->name('supervisor.checklist-kendaraan.detail');
+    // Route::get('/checklist-kendaraan-patroli/list', [DashboardController::class, 'showDataChecklistKendaraan'])->name('supervisor.checklist-kendaraan.list');
+    // Route::get('/checklist-kendaraan-patroli/detail/{checklist}', [ChecklistKendaraanController::class, 'show'])->name('supervisor.checklist-kendaraan.detail');
     Route::post('/checklist-kendaraan-patroli/approve/{checklist}', [ChecklistKendaraanController::class, 'storeSignatureApproved'])->name('supervisor.checklist-kendaraan.signature');
 
     // Review Checklist Penyisiran Ruang Tunggu
-    Route::get('/checklist-penyisiran-ruang-tunggu/list', [DashboardController::class, 'showDataChecklistPenyisiran'])->name('supervisor.checklist-penyisiran.list');
-    Route::get('/checklist-penyisiran-ruang-tunggu/detail/{checklist}', [ChecklistPenyisiranController::class, 'showDetailPenyisiran'])->name('supervisor.checklist-penyisiran.detail');
+    // Route::get('/checklist-penyisiran-ruang-tunggu/list', [DashboardController::class, 'showDataChecklistPenyisiran'])->name('supervisor.checklist-penyisiran.list');
+    // Route::get('/checklist-penyisiran-ruang-tunggu/detail/{checklist}', [ChecklistPenyisiranController::class, 'showDetailPenyisiran'])->name('supervisor.checklist-penyisiran.detail');
     Route::post('/checklist-penyisiran-ruang-tunggu/approve/{checklist}', [ChecklistPenyisiranController::class, 'storeSignatureApproved'])->name('supervisor.checklist-penyisiran.signature');
 
     // Review Form Pencatatan PI
-    Route::get('/form-pencatatan-pi/list', [DashboardController::class, 'showDataFormPencatatanPI'])->name('supervisor.form-pencatatan-pi.list');
-    Route::get('/form-pencatatan-pi/detail/{checklist}', [FormPencatatanPIController::class, 'showDetailPencatatanPI'])->name('supervisor.form-pencatatan-pi.detail');
+    // Route::get('/form-pencatatan-pi/list', [DashboardController::class, 'showDataFormPencatatanPI'])->name('supervisor.form-pencatatan-pi.list');
+    // Route::get('/form-pencatatan-pi/detail/{checklist}', [FormPencatatanPIController::class, 'showDetailPencatatanPI'])->name('supervisor.form-pencatatan-pi.detail');
     Route::post('/form-pencatatan-pi/approve/{checklist}', [FormPencatatanPIController::class, 'storeSignatureApproved'])->name('supervisor.form-pencatatan-pi.signature');
 
     // Review Manual Book
@@ -103,6 +102,7 @@ Route::middleware(['auth', 'role:officer'])->group(function () {
 
 // Daily Test Routes
 Route::middleware(['auth'])->group(function () {
+    //Tampilan Superadmin dan Supervisor
     Route::get('/supervisor/dailytest-form',  [DashboardController::class, 'showDataDailyTest'])->name('supervisor.dailytest-form');
     Route::get('/supervisor/logbook-form',  [DashboardController::class, 'showDataLogbook'])->name('supervisor.logbook-form');
 
@@ -183,6 +183,9 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
 
 // Logbook Routes
 Route::middleware(['auth'])->group(function () {
+    Route::get('/logbook-rotasi/list', [DashboardController::class, 'showDataLogbookRotasi'])->name('supervisor.logbook-rotasi.list');
+    Route::get('/logbook-rotasi/detail/{logbook}', [LogbookRotasiController::class, 'show'])->name('supervisor.logbook-rotasi.detail');
+
     // Logbook Sweeping PI Supervisor & Superadmin
     Route::get('/sweepingpi', [LogbookSweppingPIController::class, 'indexSweepingPI'])->name('sweepingPI.index');
 
@@ -215,7 +218,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/logbook/detail/update/{id}', [LogbookPosJagaController::class, 'updateDetail'])->name('logbook.detail.update');
     Route::delete('/logbook/detail/delete/{id}', [LogbookPosJagaController::class, 'deleteDetail'])->name('logbook.detail.delete');
 
-
     Route::post('/logbook/staff/store', [LogbookPosJagaController::class, 'storeStaff'])->name('logbook.staff.store');
     Route::post('/logbook/staff/update/{id}', [LogbookPosJagaController::class, 'updateStaff'])->name('logbook.staff.update');
     Route::delete('/logbook/staff/delete/{id}', [LogbookPosJagaController::class, 'deleteStaff'])->name('logbook.staff.delete');
@@ -231,9 +233,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/officer/posjaga/detail/{logbookID}', [LogbookPosJagaController::class, 'officerReviewLogbook'])->name('officer.logbook.detail');
 });
 
-// Checklist Routes
+
 // Checklist Routes
 Route::middleware(['auth'])->group(function () {
+    //Tampilan Superadmin dan Supervisor
+    Route::get('/checklist-kendaraan-patroli/list', [DashboardController::class, 'showDataChecklistKendaraan'])->name('supervisor.checklist-kendaraan.list');
+    Route::get('/checklist-kendaraan-patroli/detail/{checklist}', [ChecklistKendaraanController::class, 'show'])->name('supervisor.checklist-kendaraan.detail');
+    Route::get('/checklist-penyisiran-ruang-tunggu/list', [DashboardController::class, 'showDataChecklistPenyisiran'])->name('supervisor.checklist-penyisiran.list');
+    Route::get('/checklist-penyisiran-ruang-tunggu/detail/{checklist}', [ChecklistPenyisiranController::class, 'showDetailPenyisiran'])->name('supervisor.checklist-penyisiran.detail');
+    Route::get('/form-pencatatan-pi/list', [DashboardController::class, 'showDataFormPencatatanPI'])->name('supervisor.form-pencatatan-pi.list');
+    Route::get('/form-pencatatan-pi/detail/{checklist}', [FormPencatatanPIController::class, 'showDetailPencatatanPI'])->name('supervisor.form-pencatatan-pi.detail');
+
     // Checklist Kendaraan Patroli
     Route::get('/checklist-harian-kendaraan', [ChecklistKendaraanController::class, 'indexChecklistKendaraan'])->name('checklist.kendaraan.index');
     Route::post('/checklist-kendaraan/store', [ChecklistKendaraanController::class, 'store'])->name('checklist.kendaraan.store');

@@ -37,8 +37,8 @@
         <div class="bg-white rounded-2xl shadow-2xl p-8 space-y-6">
             <!-- Header -->
             <div class="text-center space-y-2">
-                <div class="mx-auto w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mb-4">
-                    <i class="fas fa-user-shield text-white text-2xl"></i>
+                <div class="mx-auto w-24 h-24  flex items-center justify-center mb-4">
+                    <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo" class=" mb-2 sm:mb-0">
                 </div>
                 <h1 class="text-3xl font-bold text-gray-800">Selamat Datang</h1>
                 <p class="text-gray-500">Masuk ke akun Anda untuk melanjutkan</p>
