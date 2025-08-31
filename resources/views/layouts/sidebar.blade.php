@@ -169,12 +169,6 @@ $isChecklistOpen = request()->is('checklist*');
                             <span>Logbook Rotasi</span>
                         </a>
                     </li>
-                      <li>
-                        <a href="#"
-                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook-chief') ? 'bg-gray-700' : '' }}">
-                            <span>Logbook Chief</span>
-                        </a>
-                    </li>
                     @else
                     <li>
                         <a href="{{ route('sweepingPI.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('sweepingpi') ? 'bg-gray-700' : '' }}">
@@ -185,6 +179,12 @@ $isChecklistOpen = request()->is('checklist*');
                         <a href="{{ route('supervisor.logbook-rotasi.list') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook-rotasi/list') ? 'bg-gray-700' : '' }}">
                             <span>Logbook Rotasi</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('logbook.chief.index')}}"
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook-chief') ? 'bg-gray-700' : '' }}">
+                            <span>Logbook Chief</span>
                         </a>
                     </li>
                     @endif

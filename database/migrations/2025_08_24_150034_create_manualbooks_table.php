@@ -42,8 +42,8 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->string('pax')->nullable();
             $table->string('flight')->nullable();
-            $table->integer('orang')->unsigned()->nullable();
-            $table->integer('barang')->unsigned()->nullable();
+            $table->string('orang')->nullable();
+            $table->string('barang')->nullable();
             $table->text('temuan')->nullable();
             $table->text('keterangan')->nullable();
             $table->timestamps();

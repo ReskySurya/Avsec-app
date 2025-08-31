@@ -19,7 +19,7 @@ class ManualBookController extends Controller
     public function index()
     {
         $manualBooks = ManualBook::with('creator','details')
-            ->where('created_by', Auth::id())
+            // ->where('created_by', Auth::id())
             ->orderBy('date', 'desc')
             ->latest()->paginate(10);
 
@@ -117,9 +117,9 @@ class ManualBookController extends Controller
         $header = ManualBook::findOrFail($id);
 
         // Pastikan hanya pembuatnya yang bisa menambah detail
-        if ($header->created_by !== Auth::id()) {
-            abort(403, 'AKSES DITOLAK');
-        }
+        // if ($header->created_by !== Auth::id()) {
+        //     abort(403, 'AKSES DITOLAK');
+        // }
 
         // Pastikan laporan masih berstatus draft
         if ($header->status !== 'draft') {
@@ -161,9 +161,9 @@ class ManualBookController extends Controller
         $manualBook = ManualBook::findOrFail($id);
 
         // Pastikan hanya pembuatnya yang bisa menyelesaikan
-        if ($manualBook->created_by !== Auth::id()) {
-            abort(403, 'AKSES DITOLAK');
-        }
+        // if ($manualBook->created_by !== Auth::id()) {
+        //     abort(403, 'AKSES DITOLAK');
+        // }
 
         // 3. Simpan data baru dari form ke model
         $manualBook->status = 'submitted';

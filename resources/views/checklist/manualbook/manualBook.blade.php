@@ -169,14 +169,15 @@
 
                 <div class="bg-gradient-to-r from-blue-500 to-teal-600 text-white p-6 rounded-t-2xl">
                     <h2 class="text-2xl font-bold"
-                        x-text="isContinueMode ? 'Lanjutkan Input Laporan' : 'Buat Laporan Baru'"></h2>
+                        x-text="isContinueMode ? 'Lanjutkan Input Laporan' : 'Buat Laporan Baru'">
+                    </h2>
                 </div>
 
                 <form :action="formAction" method="POST" class="p-6 overflow-y-auto">
                     @csrf
                     <template x-if="isContinueMode"> @method('PATCH') </template>
 
-                    {{-- Input Header (Tidak ada perubahan) --}}
+                    {{-- Input Header --}}
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         <div>
                             <label for="date" class="block text-sm font-semibold text-gray-700 mb-2">Tanggal</label>
@@ -199,6 +200,7 @@
                         <div>
                             <label for="type" class="block text-sm font-semibold text-gray-700 mb-2">Pos Jaga</label>
                             <select name="type" x-model="form.type" required
+                                @change="if (form.type === 'hbscp') { form.rows.forEach(row => row.orang = '') }"
                                 class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500"
                                 :disabled="isContinueMode">
                                 <option value="">Pilih Pos</option>
@@ -221,7 +223,7 @@
                                         <th class="p-2 text-left">Nama Petugas</th>
                                         <th class="p-2 text-left">Pax</th>
                                         <th class="p-2 text-left">Flight</th>
-                                        <th class="p-2 text-left">Orang</th>
+                                        <th x-show="form.type === 'pscp'" class="p-2 text-left">Orang</th>
                                         <th class="p-2 text-left">Barang</th>
                                         <th class="p-2 text-left">Temuan</th>
                                         <th class="p-2 text-center">keterangan</th>
@@ -236,7 +238,7 @@
                                             <td class="p-2" x-text="detail.name"></td>
                                             <td class="p-2" x-text="detail.pax"></td>
                                             <td class="p-2" x-text="detail.flight"></td>
-                                            <td class="p-2" x-text="detail.orang"></td>
+                                            <td x-show="form.type === 'pscp'" class="p-2" x-text="detail.orang"></td>
                                             <td class="p-2" x-text="detail.barang"></td>
                                             <td class="p-2" x-text="detail.temuan"></td>
                                             <td class="p-2" x-text="detail.keterangan"></td>
@@ -246,11 +248,9 @@
                             </table>
                         </div>
                     </div>
-                    {{-- ===== AKHIR BAGIAN BARU ===== --}}
 
                     <h3 class="text-lg font-semibold text-gray-700 mt-4">Tambah Baris Baru</h3>
                     <div class="overflow-x-auto border rounded-lg mt-2">
-                        {{-- Tabel Input Dinamis (Tidak ada perubahan di dalamnya) --}}
                         <table class="min-w-full text-sm">
                             <thead class="bg-gray-100">
                                 <tr>
@@ -258,7 +258,7 @@
                                     <th class="p-3 text-left">Nama Petugas</th>
                                     <th class="p-3 text-left">Pax</th>
                                     <th class="p-3 text-left">Flight</th>
-                                    <th class="p-3 text-left">Orang</th>
+                                    <th x-show="form.type === 'pscp'" class="p-3 text-left">Orang</th>
                                     <th class="p-3 text-left">Barang</th>
                                     <th class="p-3 text-left">Temuan</th>
                                     <th class="p-3 text-left">Ket</th>
@@ -277,9 +277,10 @@
                                                 class="w-24 p-2 border-0 rounded"></td>
                                         <td><input type="text" :name="`rows[${index}][flight]`" x-model="row.flight"
                                                 class="w-24 p-2 border-0 rounded"></td>
-                                        <td><input type="number" :name="`rows[${index}][orang]`" x-model="row.orang"
+                                        <td x-show="form.type === 'pscp'"><input type="text"
+                                                :name="`rows[${index}][orang]`" x-model="row.orang"
                                                 class="w-20 p-2 border-0 rounded" min="0"></td>
-                                        <td><input type="number" :name="`rows[${index}][barang]`" x-model="row.barang"
+                                        <td><input type="text" :name="`rows[${index}][barang]`" x-model="row.barang"
                                                 class="w-20 p-2 border-0 rounded" min="0"></td>
                                         <td><textarea :name="`rows[${index}][temuan]`" x-model="row.temuan"
                                                 class="w-full p-2 border-0 rounded" rows="1"></textarea></td>
@@ -311,6 +312,7 @@
                 </form>
             </div>
         </div>
+
         <div x-show="openFinishModal" x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 transform scale-95"
             x-transition:enter-end="opacity-100 transform scale-100"
@@ -323,7 +325,7 @@
             <div @click.away="openFinishModal = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
                 <div class="bg-gradient-to-r from-blue-500 to-teal-600 text-white p-6 rounded-t-2xl">
                     <h2 class="text-2xl font-bold">Konfirmasi Selesai</h2>
-                    <p class="text-blue-100">Konfirmasi penyelesaian Catatan Manual Book  ini</p>
+                    <p class="text-blue-100">Konfirmasi penyelesaian Catatan Manual Book ini</p>
                 </div>
 
                 {{-- Form untuk Konfirmasi --}}
@@ -373,7 +375,7 @@
 </div>
 
 <script>
-document.addEventListener('alpine:init', () => {
+    document.addEventListener('alpine:init', () => {
     Alpine.data('manualBook', () => ({
         openManualBook: false,
         isContinueMode: false,

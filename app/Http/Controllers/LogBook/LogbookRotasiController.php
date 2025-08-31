@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\LogbookRotasi;
 use App\Models\LogbookRotasiDetail;
 use App\Models\OfficerRotasiAssignments;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -14,14 +16,13 @@ use Illuminate\Support\Facades\Validator;
 
 class LogbookRotasiController extends Controller
 {
-    /**
-     * Tampilkan semua logbook
-     */
+
     public function index(Request $request)
     {
-        $currentUser = Auth::id();
+        // 1. Ambil tipe dari query URL, default-nya 'pscp'
+        $typeForm = $request->query('type', 'pscp');
 
-        // Opsi untuk dropdown PSCP
+        // 2. Siapkan opsi untuk dropdown (tidak berubah)
         $pscpOptions = [
             'pemeriksaan_dokumen' => 'Pemeriksaan Dokumen',
             'pengatur_flow' => 'Pengatur Flow',
@@ -29,8 +30,6 @@ class LogbookRotasiController extends Controller
             'hhmd_petugas' => 'Pemeriksaan Orang Manual / HHMD',
             'manual_kabin_petugas' => 'Pemeriksa Manual Kabin',
         ];
-
-        // Opsi untuk dropdown HBSCP
         $hbscpOptions = [
             'pengatur_flow' => 'Pengatur Flow',
             'operator_xray' => 'Operator X-Ray',
@@ -38,105 +37,183 @@ class LogbookRotasiController extends Controller
             'reunited' => 'Reunited',
         ];
 
-        $typeForm = $request->query('type', 'PSCP');
-        $logbook = LogbookRotasi::where('type', $typeForm)->latest()->get();
+        // 3. Peta relasi (tidak berubah)
+        $roleRelationMap = [
+            'pemeriksaan_dokumen'   => 'pemeriksaanDokumen',
+            'pengatur_flow'         => 'pengaturFlow',
+            'operator_xray'         => 'operatorXray',
+            'hhmd_petugas'          => 'hhmdPetugas',
+            'manual_kabin_petugas'  => 'manualKabinPetugas',
+            'manual_bagasi_petugas' => 'manualBagasiPetugas',
+            'reunited'              => 'reunitedPetugas',
+        ];
 
+        // 4. Ambil SATU logbook DRAFT TERAKHIR berdasarkan tipe
+        $logbook = LogbookRotasi::where('type', $typeForm)
+            ->where('status', 'draft')
+            ->latest('id') // Mengambil yang paling baru
+            ->first(); // Mengambil hanya 1 hasil
+
+        // 5. Inisialisasi variabel
+        $details = [];
+        $officerLog = [];
+
+        // 6. Jika logbook dengan status draft ditemukan, ambil detailnya
+        if ($logbook) {
+            $details = LogbookRotasiDetail::with(array_values($roleRelationMap))
+                ->where('logbook_id', $logbook->id) // Ambil detail HANYA untuk logbook ini
+                ->latest('id')
+                ->get();
+        }
+
+        // 7. Proses data dan kelompokkan berdasarkan officer (Loop ini hanya berjalan jika $details tidak kosong)
+        foreach ($details as $detail) {
+            $startTime = $detail->officerAssignment?->start_time ? Carbon::parse($detail->officerAssignment->start_time)->format('H:i') : '-';
+            $endTime = $detail->officerAssignment?->end_time ? Carbon::parse($detail->officerAssignment->end_time)->format('H:i') : '-';
+            $keterangan = $detail->keterangan ?? '';
+
+            foreach ($roleRelationMap as $roleKey => $relationName) {
+                if ($officer = $detail->{$relationName}) {
+                    $officerId = $officer->id;
+
+                    if (!isset($officerLog[$officerId])) {
+                        $officerLog[$officerId] = [
+                            'officer_name' => $officer->display_name,
+                            'roles' => [],
+                            'keterangan' => []
+                        ];
+                    }
+
+                    $slotData = [
+                        'start' => $startTime,
+                        'end'   => $endTime,
+                    ];
+
+                    if ($roleKey === 'hhmd_petugas') {
+                        $slotData['hhmd_random'] = $detail->hhmd_random;
+                        $slotData['hhmd_unpredictable'] = $detail->hhmd_unpredictable;
+                    }
+                    if ($roleKey === 'manual_kabin_petugas') {
+                        $slotData['cek_random_barang'] = $detail->cek_random_barang;
+                        $slotData['barang_unpredictable'] = $detail->barang_unpredictable;
+                    }
+
+                    $officerLog[$officerId]['roles'][$roleKey][] = $slotData;
+                    if (!empty($keterangan)) {
+                        $officerLog[$officerId]['keterangan'][] = $keterangan;
+                    }
+                }
+            }
+        }
+
+        $supervisors = User::whereHas('role', function ($query) {
+            $query->where('name', Role::SUPERVISOR);
+        })->get();
+
+        // 8. Kirim semua data yang dibutuhkan ke view, termasuk variabel $logbook
         return view('logbook.rotasi.logbookRotasi', compact(
-            'logbook',
+            'officerLog',
             'typeForm',
+            'logbook', // <-- MENGIRIM VARIABEL YANG BENAR
             'pscpOptions',
-            'hbscpOptions'
+            'hbscpOptions',
+            'supervisors'
         ));
     }
 
     public function store(Request $request)
     {
-
-        // 2. Validasi Input
+        // 1. Validasi Input
         $validator = Validator::make($request->all(), [
             'date' => 'required|date',
             'type' => 'required|in:PSCP,HBSCP',
             'tempat_jaga' => 'required|string',
-            
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
-
-            // Validasi kondisional untuk input number PSCP (Sudah Benar)
-            'hhmd_random' => 'required_if:tempat_jaga,hhmd_petugas|nullable|integer|min:0',
-            'hhmd_unpredictable' => 'required_if:tempat_jaga,hhmd_petugas|nullable|integer|min:0',
-            'cek_random_barang' => 'required_if:tempat_jaga,manual_kabin_petugas|nullable|integer|min:0',
-            'barang_unpredictable' => 'required_if:tempat_jaga,manual_kabin_petugas|nullable|integer|min:0',
+            'hhmd_random' => 'nullable|integer|min:0',
+            'hhmd_unpredictable' => 'nullable|integer|min:0',
+            'cek_random_barang' => 'nullable|integer|min:0',
+            'barang_unpredictable' => 'nullable|integer|min:0',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        // 3. Gunakan Transaksi Database
         try {
             DB::beginTransaction();
 
             $userId = Auth::id();
             $logbookType = strtolower($request->input('type'));
             $logbookDate = $request->input('date');
+            $tempatJaga = $request->input('tempat_jaga');
 
-            // === LANGKAH A: Membuat record di tabel `logbook_rotasi` ===
-            $logbook = LogbookRotasi::firstOrCreate(
-                [
-                    // Kunci pencarian: Cari logbook berdasarkan tanggal DAN tipe
-                    'date' => $logbookDate,
-                    'type' => $logbookType,
-                ],
-                [
-                    // Data ini hanya akan digunakan JIKA logbook baru dibuat
-                    'id' => $this->generateLogbookId($logbookType),
-                    'status' => 'draft',
+            // 1. Cari logbook terakhir untuk hari dan tipe ini
+            $latestLogbook = LogbookRotasi::where('date', $logbookDate)
+                ->where('type', $logbookType)
+                ->orderBy('id', 'desc') // Urutkan dari ID terbesar/terbaru
+                ->first();
+
+            $logbook = null;
+
+            // 2. Cek kondisinya
+            if ($latestLogbook && $latestLogbook->status === 'draft') {
+                // Jika logbook terakhir ada DAN statusnya 'draft', kita pakai logbook ini.
+                $logbook = $latestLogbook;
+            } else {
+                // Jika tidak ada logbook ATAU logbook terakhir statusnya bukan 'draft',
+                // maka kita buat logbook yang benar-benar baru.
+                $logbook = LogbookRotasi::create([
+                    'id'         => $this->generateLogbookId($logbookType), // Fungsi ini akan membuat nomor urut baru
+                    'date'       => $logbookDate,
+                    'type'       => $logbookType,
+                    'status'     => 'draft',
                     'created_by' => $userId,
-                ]
-            );
+                ]);
+            }
 
-            // === LANGKAH B: Membuat record di tabel `officer_rotasi_assignments` ===
+            // LANGKAH B: Membuat Jadwal Petugas
             $assignment = OfficerRotasiAssignments::create([
                 'officer_id' => $userId,
                 'date' => $logbookDate,
-                'start_time' => $request->input('start_time'), // Akan null jika tidak ada
-                'end_time' => $request->input('end_time'),     // Akan null jika tidak ada
+                'start_time' => $request->input('start_time'),
+                'end_time' => $request->input('end_time'),
                 'location_type' => $logbookType,
             ]);
 
-            // === LANGKAH C: Membuat record di tabel `logbook_rotasi_details` ===
+            // LANGKAH C: Menyiapkan dan Menyimpan Detail Logbook
             $detailData = [
                 'logbook_id' => $logbook->id,
                 'officer_assignment_id' => $assignment->id,
             ];
 
-            // Trik Dinamis: Gunakan 'tempat_jaga' sebagai nama kolom, dan isi dengan ID user
-            $detailData[$request->input('tempat_jaga')] = $userId;
+            // Tetapkan ID officer ke kolom peran yang dipilih
+            $detailData[$tempatJaga] = $userId;
 
-            // Tambahkan data counter jika ada
-            if ($request->filled('hhmd_random')) {
-                $detailData['hhmd_random'] = $request->input('hhmd_random');
-                $detailData['hhmd_unpredictable'] = $request->input('hhmd_unpredictable');
+            // Jika tipenya PSCP, periksa dan tambahkan data counter
+            if ($logbookType === 'pscp') {
+                if ($tempatJaga === 'hhmd_petugas') {
+                    $detailData['hhmd_random'] = $request->input('hhmd_random', 0);
+                    $detailData['hhmd_unpredictable'] = $request->input('hhmd_unpredictable', 0);
+                }
+
+                if ($tempatJaga === 'manual_kabin_petugas') {
+                    $detailData['cek_random_barang'] = $request->input('cek_random_barang', 0);
+                    $detailData['barang_unpredictable'] = $request->input('barang_unpredictable', 0);
+                }
             }
 
-            if ($request->filled('cek_random_barang')) {
-                $detailData['cek_random_barang'] = $request->input(key: 'cek_random_barang');
-                $detailData['barang_unpredictable'] = $request->input('barang_unpredictable');
-            }
-
+            // Simpan data detail yang sudah lengkap
             LogbookRotasiDetail::create($detailData);
 
-            // Jika semua berhasil, commit transaksi
             DB::commit();
-        } catch (\Exception $e) {
-            // Jika terjadi error, batalkan semua query
-            DB::rollBack();
-            // Redirect kembali dengan pesan error
-            return redirect()->back()->with('error', 'Gagal menyimpan data logbook: ' . $e->getMessage())->withInput();
-        }
 
-        // 4. Redirect dengan pesan sukses
-        return redirect()->route('logbookRotasi.index')->with('success', 'Entry logbook berhasil ditambahkan.');
+            return redirect()->route('logbookRotasi.index', ['type' => $logbookType])
+                ->with('success', 'Entri logbook berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal menyimpan data: ' . $e->getMessage())->withInput();
+        }
     }
 
     /**
@@ -249,5 +326,66 @@ class LogbookRotasiController extends Controller
         } else {
             return view('supervisor.detailLogbookRotasiPSCP', compact('logbook', 'officerLog'));
         }
+    }
+
+    public function submitForm(Request $request, $id)
+    {
+        // 1. Validasi input dari modal
+        $validator = Validator::make($request->all(), [
+            'signature'    => 'required|string',
+            'approvedID'   => 'required|exists:users,id',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->with('error', 'Semua field pada modal konfirmasi wajib diisi.');
+        }
+
+        $logbook = LogbookRotasi::findOrFail($id);
+
+        if ($logbook->status !== 'draft') {
+            return redirect()->route('logbookRotasi.index')->with('error', 'Gagal, logbook ini sudah tidak dalam status draft.');
+        }
+
+        // 2. Simpan data baru dari modal
+        $logbook->status = 'submitted';
+        $logbook->submittedSignature = $request->input('signature');
+        $logbook->submitted_by = Auth::id();
+        $logbook->approved_by = $request->input('approvedID');
+
+        $logbook->save();
+
+        return redirect()->route('logbookRotasi.index')->with('success', 'Logbook berhasil diselesaikan dan dikirim.');
+    }
+
+    public function approvedForm(Request $request, $id)
+    {
+        // 1. Validasi input dari modal
+        $validator = Validator::make($request->all(), [
+            'signature' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tanda tangan wajib diisi.'
+            ], 422);
+        }
+
+        $logbook = LogbookRotasi::findOrFail($id);
+
+        // Periksa status - seharusnya submitted, bukan draft
+        if ($logbook->status !== 'submitted') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Logbook ini tidak dapat disetujui karena statusnya bukan submitted.'
+            ], 400);
+        }
+
+        // 2. Update logbook
+        $logbook->status = 'approved';
+        $logbook->approvedSignature = $request->input('signature');
+        $logbook->save();
+
+        return redirect()->back()->with('success', 'Logbook berhasil disetujui.');
     }
 }
