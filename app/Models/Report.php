@@ -183,9 +183,9 @@ class Report extends Model
     /**
      * Relationship: Report has many Report Details
      */
-    public function reportDetails(): HasOne
+    public function reportDetails(): HasMany
     {
-        return $this->hasOne(ReportDetail::class, 'reportID', 'reportID');
+        return $this->hasMany(ReportDetail::class, 'reportID', 'reportID');
     }
 
     /**

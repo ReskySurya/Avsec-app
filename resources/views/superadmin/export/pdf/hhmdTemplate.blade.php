@@ -10,21 +10,35 @@
     </style>
 </head>
 <body class="m-0 p-0">
+@php
+    $logoAirportBase64 = base64_encode(file_get_contents(public_path('images/airport-security-logo.png')));
+    $logoInjourneyBase64 = base64_encode(file_get_contents(public_path('images/injourney-API.png')));
+@endphp
     @foreach($forms as $form)
     <div class="page-break-after">
-        <div class="bg-white p-4" style="width: 210mm;">
+        <div class="bg-white p-4" style="width: 200mm;">
             <div id="format" class="mx-auto">
-                <div class="border-t-2 border-x-2 border-black bg-white shadow-md px-4 py-2">
-                    <div class="flex items-center justify-between">
-                        <img src="data:image/png;base64,{{ $logoAirportBase64 }}" alt="Logo" class="w-16 h-16">
-                        <h1 class="text-sm font-bold text-center flex-grow px-2">
-                            CHECK LIST PENGUJIAN HARIAN<br>
-                            PENDETEKSI LOGAM GENGGAM<br>
-                            (HAND HELD METAL DETECTOR/HHMD)<br>
-                            PADA KONDISI NORMAL (HIJAU)
-                        </h1>
-                        <img src="data:image/png;base64,{{ $logoInjourneyBase64 }}" alt="Injourney Logo" class="w-20 h-16">
-                    </div>
+                <div class="border-t-2 border-x-2 border-black bg-white shadow-md py-2">
+                    <table style="width: 100%;">
+                        <tbody>
+                            <tr>
+                                <td style="width: 20%; text-align: center; vertical-align: middle;">
+                                    <img src="data:image/png;base64,{{ $logoAirportBase64 }}" alt="Logo" style="width: 64px; height: 64px; display: inline-block;">
+                                </td>
+                                <td style="width: 60%; text-align: center; vertical-align: middle;">
+                                    <h3 style="font-size: 12px; font-weight: bold; line-height: 1.3;">
+                                        CHECK LIST PENGUJIAN HARIAN<br>
+                                        PENDETEKSI LOGAM GENGGAM<br>
+                                        (HAND HELD METAL DETECTOR/HHMD)<br>
+                                        PADA KONDISI NORMAL (HIJAU)
+                                    </h3>
+                                </td>
+                                <td style="width: 20%; text-align: center; vertical-align: middle;">
+                                    <img src="data:image/png;base64,{{ $logoInjourneyBase64 }}" alt="Injourney Logo" style="width: 80px; height: 64px; display: inline-block;">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 <div class="border-2 border-black bg-white shadow">
@@ -68,7 +82,7 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="border-x-2 border-t-2 border-black text-center items-center pt-10">
+                        <div class="border-x-2 border-t-2 border-black text-center items-center">
                             <div>
                                 <h2 class="font-bold mb-1">TEST 1</h2>
                                 <div class="w-20 h-20 mx-auto border-2 border-black flex items-center justify-center">
@@ -77,7 +91,7 @@
                             </div>
                         </div>
 
-                        <div class="border-x-2 border-black pt-10 pb-10">
+                        <div class="border-x-2 border-black">
                             <div class="flex items-center mb-0 pl-4">
                                 <input type="checkbox" class="custom-checkbox-alt" {{ $form->testCondition1 ? 'checked' : '' }} disabled>
                                 <label class="ml-2 text-sm">Letak alat uji OTP dan HHMD pada saat pengujian harus > 1m dari benda logam lain disekelilingnya.</label>
@@ -90,16 +104,16 @@
                     </div>
 
                     <div class="border-t-2 border-black p-4">
-                        <div class="flex items-start mb-4">
+                        <div class="flex items-start">
                             <label class="text-gray-700 font-bold mr-4">Hasil:</label>
                             <div class="flex flex-col">
-                                <div class="flex items-center mb-0">
-                                    <input type="radio" class="custom-radio" {{ $form->result == 'pass' ? 'checked' : '' }} disabled>
-                                    <label class="text-sm ml-2">PASS</label>
+                                <div class="flex items-center ">
+                                    <input type="radio" class="" {{ $form->result == 'pass' ? 'checked' : '' }} disabled>
+                                    <label class="text-sm">PASS</label>
                                 </div>
-                                <div class="flex items-center">
-                                    <input type="radio" class="custom-radio" {{ $form->result == 'fail' ? 'checked' : '' }} disabled>
-                                    <label class="text-sm ml-2">FAIL</label>
+                                <div class="flex items-center ">
+                                    <input type="radio" class="" {{ $form->result == 'fail' ? 'checked' : '' }} disabled>
+                                    <label class="text-sm">FAIL</label>
                                 </div>
                             </div>
                         </div>

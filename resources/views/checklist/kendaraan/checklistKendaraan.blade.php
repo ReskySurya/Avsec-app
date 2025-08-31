@@ -32,21 +32,16 @@
     <div class="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
         <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-6 py-6 text-white">
             <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo"
-                        class="w-20 h-20 mb-2 sm:mb-0">
-                    <div>
-                        <h1 class="text-2xl font-bold">CHECK LIST PENGECEKAN HARIAN</h1>
-                        <h2 class="text-xl font-semibold"
-                            x-text="selectedVehicle === 'mobil' ? 'KENDARAAN MOBIL PATROLI' : 'KENDARAAN MOTOR PATROLI'">
-                        </h2>
-                        <p class="text-blue-100">AIRPORT SECURITY BANDAR UDARA ADISUTJIPTO</p>
-                    </div>
+                <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo"
+                    class="w-20 h-20 mb-2 sm:mb-0">
+                <div class="text-center">
+                    <h1 class="text-2xl font-bold">CHECK LIST PENGECEKAN HARIAN</h1>
+                    <h2 class="text-xl font-semibold"
+                        x-text="selectedVehicle === 'mobil' ? 'KENDARAAN MOBIL PATROLI' : 'KENDARAAN MOTOR PATROLI'">
+                    </h2>
+                    <p class="text-blue-100">AIRPORT SECURITY BANDAR UDARA ADISUTJIPTO</p>
                 </div>
-                <div class="text-right">
-                    <div class="text-sm font-medium">Adisutjipto</div>
-                    <div class="text-sm font-medium">Airport</div>
-                </div>
+                <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo" class="w-24 h-24 mt-2 sm:mt-0">
             </div>
         </div>
 
@@ -54,7 +49,7 @@
             @submit.prevent="submitForm" class="p-6 space-y-6">
             @csrf
             @if($checklist->exists)
-                @method('PUT')
+            @method('PUT')
             @endif
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

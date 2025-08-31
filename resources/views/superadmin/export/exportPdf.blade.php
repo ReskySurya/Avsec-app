@@ -53,7 +53,7 @@
 
         {{-- Vehicle Checklist Card --}}
         <div class="document-card group border-2 border-gray-200 rounded-xl p-4 md:p-5 cursor-pointer transition-all duration-300 hover:border-blue-500 hover:-translate-y-1 hover:shadow-lg bg-white active:scale-95"
-             onclick="alert('Fitur sedang dalam pengembangan')">
+             onclick="window.location.href='{{ route('export.checklist') }}'">
             <div class="flex flex-col items-center justify-center text-center h-full">
                 <div class="w-12 h-12 md:w-16 md:h-16 mb-3 bg-blue-100 rounded-full flex items-center justify-center">
                     <svg class="w-6 h-6 md:w-8 md:h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -61,10 +61,10 @@
                     </svg>
                 </div>
                 <h3 class="font-semibold text-gray-800 mb-1 md:mb-2 text-sm md:text-base group-hover:text-blue-600 transition-colors text-center">
-                    Checklist Kendaraan
+                    Checklist
                 </h3>
                 <p class="text-xs md:text-sm text-gray-600 group-hover:text-gray-700 text-center">
-                    Pemeriksaan kondisi kendaraan
+                    Pemeriksaan
                 </p>
                 {{-- Badge untuk fitur yang belum tersedia --}}
                 <span class="inline-block mt-1 px-2 py-1 text-xs bg-yellow-100 text-yellow-600 rounded-full">

@@ -132,8 +132,13 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-center">
-                                        <input type="checkbox" name="selected_reports[]" value="{{ $report['id'] }}"
-                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                        @if($report['status'] == 'approved')
+                                            <input type="checkbox" name="selected_reports[]" value="{{ $report['id'] }}"
+                                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                        @else
+                                            <input type="checkbox" disabled
+                                                class="h-4 w-4 text-gray-400 bg-gray-200 focus:ring-gray-500 border-gray-300 rounded cursor-not-allowed">
+                                        @endif
                                     </td>
                                 </tr>
                                 @endforeach
@@ -166,6 +171,26 @@
         </div>
     </div>
 </div>
+
+<!-- Modal container -->
+<div id="previewModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-10 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-auto shadow-lg rounded-md bg-white" style="max-width: 850px;">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center pb-3">
+            <p class="text-2xl font-bold">Preview Laporan</p>
+            <div class="cursor-pointer z-50" onclick="closeModal()">
+                <svg class="fill-current text-black" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 18 18">
+                    <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+                </svg>
+            </div>
+        </div>
+        <!-- Modal Content -->
+        <div id="modalContent" class="max-h-[85vh] overflow-y-auto">
+            <!-- Preview content will be loaded here -->
+        </div>
+    </div>
+</div>
+
 
 <script>
     // Auto-submit saat filter berubah
@@ -238,6 +263,81 @@
         document.getElementById('exportForm').submit();
     }
 
+    const modal = document.getElementById('previewModal');
+    const modalContent = document.getElementById('modalContent');
+
+    function openModal() {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    function closeModal() {
+        modal.classList.add('hidden');
+        modalContent.innerHTML = ''; // Clear content
+        document.body.style.overflow = 'auto'; // Restore background scrolling
+    }
+
+    // Close modal on escape key press
+    window.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' || event.key === 'Esc') {
+            if (!modal.classList.contains('hidden')) {
+                closeModal();
+            }
+        }
+    });
+    
+    // Close modal on outside click
+    modal.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+
+    async function previewData() {
+        const formData = new FormData(document.getElementById('exportForm'));
+        const selectedReports = formData.getAll('selected_reports[]');
+
+        if (selectedReports.length === 0) {
+            alert('Silakan pilih satu data untuk di-review.');
+            return;
+        }
+
+        if (selectedReports.length > 1) {
+            alert('Hanya satu data yang bisa di-review dalam satu waktu. Silakan pilih satu saja.');
+            return;
+        }
+
+        const reportId = selectedReports[0];
+        const url = `/export/daily-test/review/${reportId}`;
+
+        try {
+            // Show a loading indicator
+            modalContent.innerHTML = '<p class="text-center py-20">Loading preview...</p>';
+            openModal();
+
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const html = await response.text();
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const formContent = doc.querySelector('.page-break-after');
+
+            if (formContent) {
+                // Inject the content and scale it to fit better in the modal
+                modalContent.innerHTML = `<div style="transform: scale(0.9); transform-origin: center center; width: 100%;">${formContent.innerHTML}</div>`;
+            } else {
+                modalContent.innerHTML = html; // Fallback
+            }
+
+        } catch (error) {
+            console.error('Error fetching preview:', error);
+            modalContent.innerHTML = '<p class="text-center py-20 text-red-500">Gagal memuat preview. Silakan coba lagi.</p>';
+        }
+    }
+
     function exportSelected() {
         const formData = new FormData(document.getElementById('exportForm'));
         const selectedReports = formData.getAll('selected_reports[]');
@@ -271,3 +371,4 @@
     }
 </script>
 @endsection
+
