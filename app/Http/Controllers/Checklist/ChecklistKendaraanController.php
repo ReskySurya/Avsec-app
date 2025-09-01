@@ -286,7 +286,7 @@ class ChecklistKendaraanController extends Controller
     {
         // 1. Eager load relasi 'details' dan juga relasi 'item' di dalam details
         // Ini penting untuk menghindari N+1 query problem dan membuat performa lebih cepat.
-        $checklist->load('details.item', 'details.notes');
+        $checklist->load('details.item');
 
         // 2. Ambil semua detail dan kelompokkan berdasarkan kategori dari relasi item.
         // Hasilnya akan menjadi collection yang key-nya adalah nama kategori ('mesin', 'mekanik', 'lainlain')
