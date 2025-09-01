@@ -5,8 +5,15 @@
 @section('content')
 <div class="bg-gray-50 lg:my-20 py-6 px-4 sm:px-6 lg:px-8">
     <div class="max-w-7xl mx-auto">
+        <a href="javascript:history.back()"
+            class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-semibold rounded-lg shadow transition">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Kembali
+        </a>
         <!-- Export PDF Form Card -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 mt-4">
             <!-- Header -->
             <div class="px-6 py-4 border-b border-gray-200">
                 <h2 class="text-xl font-bold text-gray-900">Export PDF Logbook</h2>
@@ -237,17 +244,37 @@
     </div>
 </div>
 
+
+<!-- Modal container -->
+<div id="previewModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-10 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-auto shadow-lg rounded-md bg-white" style="max-width: 850px;">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center pb-3">
+            <p class="text-2xl font-bold">Preview Laporan</p>
+            <div class="cursor-pointer z-50" onclick="closeModal()">
+                <svg class="fill-current text-black" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 18 18">
+                    <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+                </svg>
+            </div>
+        </div>
+        <!-- Modal Content -->
+        <div id="modalContent" class="max-h-[85vh] overflow-y-auto">
+            <!-- Preview content will be loaded here -->
+        </div>
+    </div>
+</div>
+
 <script>
     function showTable(formType) {
         console.log('Showing table for form type:', formType);
-        
+
         // Hide semua tabel
         const tables = document.querySelectorAll('.table-container');
         tables.forEach(table => table.classList.add('hidden'));
-        
+
         // Show tabel yang sesuai dengan mapping yang benar
         let targetTableId = '';
-        switch(formType) {
+        switch (formType) {
             case 'pos_jaga':
                 targetTableId = 'table-pos-jaga';
                 break;
@@ -261,7 +288,7 @@
                 targetTableId = 'table-chief';
                 break;
         }
-        
+
         const targetTable = document.getElementById(targetTableId);
         if (targetTable) {
             targetTable.classList.remove('hidden');
@@ -269,7 +296,7 @@
         } else {
             console.error('Table not found:', targetTableId);
         }
-        
+
         // Update filter lokasi visibility
         const locationFilter = document.getElementById('location-filter');
         if (formType === 'sweeping_pi' || formType === 'chief') {
@@ -294,7 +321,7 @@
     function createStatusBadge(status) {
         let badgeClass = '';
         let statusText = '';
-        
+
         switch (status) {
             case 'approved':
                 badgeClass = 'bg-green-100 text-green-800';
@@ -312,7 +339,7 @@
                 badgeClass = 'bg-red-100 text-red-800';
                 statusText = 'Ditolak';
         }
-        
+
         return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badgeClass}">${statusText}</span>`;
     }
 
@@ -322,10 +349,10 @@
 
     function updateTable(formType, logbooks) {
         console.log('Updating table for form type:', formType, 'with data:', logbooks);
-        
+
         // Mapping yang benar untuk tbody ID
         let tbodyId = '';
-        switch(formType) {
+        switch (formType) {
             case 'pos_jaga':
                 tbodyId = 'pos-jaga-tbody';
                 break;
@@ -339,27 +366,27 @@
                 tbodyId = 'chief-tbody';
                 break;
         }
-        
+
         const tbody = document.getElementById(tbodyId);
-        
+
         if (!tbody) {
             console.error('tbody not found for ID:', tbodyId);
             return;
         }
-        
+
         tbody.innerHTML = '';
-        
+
         if (!logbooks || logbooks.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">Tidak ada data ditemukan</td></tr>';
             return;
         }
-        
+
         logbooks.forEach((item, index) => {
             console.log(`Processing item ${index}:`, item);
-            
+
             const row = document.createElement('tr');
             row.className = 'hover:bg-gray-50';
-            
+
             switch (formType) {
                 case 'pos_jaga':
                     row.innerHTML = `
@@ -383,7 +410,7 @@
                         </td>
                     `;
                     break;
-                    
+
                 case 'sweeping_pi':
                     row.innerHTML = `
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -403,7 +430,7 @@
                         </td>
                     `;
                     break;
-                    
+
                 case 'rotasi':
                     row.innerHTML = `
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -426,7 +453,7 @@
                         </td>
                     `;
                     break;
-                    
+
                 case 'chief':
                     row.innerHTML = `
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -450,14 +477,44 @@
                     `;
                     break;
             }
-            
+
             tbody.appendChild(row);
         });
-        
+
         console.log('Table updated successfully with', logbooks.length, 'rows');
     }
 
-    function previewData() {
+    const modal = document.getElementById('previewModal');
+    const modalContent = document.getElementById('modalContent');
+
+    function openModal() {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    function closeModal() {
+        modal.classList.add('hidden');
+        modalContent.innerHTML = ''; // Clear content
+        document.body.style.overflow = 'auto'; // Restore background scrolling
+    }
+
+    // Close modal on escape key press
+    window.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' || event.key === 'Esc') {
+            if (!modal.classList.contains('hidden')) {
+                closeModal();
+            }
+        }
+    });
+
+    // Close modal on outside click
+    modal.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+
+    async function previewData() {
         const formData = new FormData(document.getElementById('exportForm'));
         const formType = formData.get('form_type');
         const selectedReports = formData.getAll('selected_reports[]');
@@ -467,12 +524,48 @@
             return;
         }
 
-        alert(`Preview data ${formType.replace('_', ' ')} untuk ${selectedReports.length} item yang dipilih`);
+        // if (selectedReports.length > 1) {
+        //     alert('Hanya satu data yang bisa di-review dalam satu waktu. Silakan pilih satu saja.');
+        //     return;
+        // }
+
+        const reportId = selectedReports[0];
+        // Include form_type as query parameter
+        const url = `/export/logbook/review/${reportId}?form_type=${formType}`;
+
+        try {
+            // Show a loading indicator
+            modalContent.innerHTML = '<p class="text-center py-20">Loading preview...</p>';
+            openModal();
+
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const html = await response.text();
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const formContent = doc.querySelector('.page-break-after');
+
+            if (formContent) {
+                // Inject the content and scale it to fit better in the modal
+                modalContent.innerHTML = `<div style="transform: scale(0.9); transform-origin: center center; width: 100%;">${formContent.innerHTML}</div>`;
+            } else {
+                modalContent.innerHTML = html; // Fallback
+            }
+
+        } catch (error) {
+            console.error('Error fetching preview:', error);
+            console.log(url);
+            modalContent.innerHTML = '<p class="text-center py-20 text-red-500">Gagal memuat preview. Silakan coba lagi.</p>';
+        }
     }
 
     function exportSelected() {
         const formData = new FormData(document.getElementById('exportForm'));
         const selectedReports = formData.getAll('selected_reports[]');
+
 
         if (selectedReports.length === 0) {
             alert('Silakan pilih minimal satu data untuk export');
@@ -560,7 +653,7 @@
 
         // Show initial table
         showTable(formType.value);
-        
+
         // Load initial data
         fetchFilteredData();
 
@@ -571,7 +664,7 @@
                 fetchFilteredData();
             });
         });
-        
+
         // Special handler untuk form type change
         formType.addEventListener('change', function() {
             console.log('Form type changed to:', this.value);

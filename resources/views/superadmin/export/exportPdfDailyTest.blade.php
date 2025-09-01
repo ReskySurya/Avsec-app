@@ -5,8 +5,15 @@
 @section('content')
 <div class="bg-gray-50 lg:my-20 py-6 px-4 sm:px-6 lg:px-8">
     <div class="max-w-7xl mx-auto">
+         <a href="javascript:history.back()"
+            class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-semibold rounded-lg shadow transition">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Kembali
+        </a>
         <!-- Export PDF Form Card -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 mt-4">
             <!-- Header -->
             <div class="px-6 py-4 border-b border-gray-200">
                 <h2 class="text-xl font-bold text-gray-900">Export PDF Form Daily Test</h2>
@@ -327,6 +334,7 @@
 
             if (formContent) {
                 // Inject the content and scale it to fit better in the modal
+                console.log(url)
                 modalContent.innerHTML = `<div style="transform: scale(0.9); transform-origin: center center; width: 100%;">${formContent.innerHTML}</div>`;
             } else {
                 modalContent.innerHTML = html; // Fallback

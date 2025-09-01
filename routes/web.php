@@ -38,9 +38,10 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::get('/export', [ExportPdfController::class, 'index'])->name('export.index');
     Route::get('/export/dailytest', [ExportPdfController::class, 'exportPdfDailyTest'])->name('export.dailytest');
     Route::get('/export/daily-test/review/{report}', [ExportPdfController::class, 'reviewDailyTest'])->name('export.dailytest.review');
-
+    
     Route::get('/export/logbook', [ExportPdfController::class, 'exportPdfLogbook'])->name('export.logbook');
     Route::post('/export/logbook/filter', [ExportPdfController::class, 'filterLogbook'])->name('export.logbook.filter');
+    Route::get('/export/logbook/review/{report}', [ExportPdfController::class, 'reviewLogbook'])->name('export.logbook.review');
 
 
     Route::get('/export/checklist', [ExportPdfController::class, 'exportPdfChecklist'])->name('export.checklist');

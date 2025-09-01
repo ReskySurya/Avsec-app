@@ -17,20 +17,28 @@
 <div class="max-w-4xl mx-auto bg-white p-6 mt-6 shadow-md border text-sm">
 
     {{-- Logo dan Header --}}
-    <div class="flex justify-between items-start mb-4">
-        <div>
-            <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo" class="h-10 mb-2">
-            <p class="text-xs text-gray-500">LOKASI: <span class="font-semibold">{{ $logbook->locationArea->name
-                    }}</span></p>
-            <p class="text-xs text-gray-500">HARI / TANGGAL: <span class="font-semibold">{{
-                    \Carbon\Carbon::parse($logbook->created_at)->translatedFormat('l, d F Y') }}</span></p>
-            <p class="text-xs text-gray-500">DINAS / SHIFT: <span class="font-semibold">{{ $logbook->shift }}</span></p>
-        </div>
-        <div class="text-right">
-            <img src="{{ asset('images/Injourney-API.png') }}" alt="Logo Yogyakarta Airport" class="h-12">
+    <div class="flex flex-col sm:flex-row items-center justify-between">
+        <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo" class="w-20 h-20 mb-2 sm:mb-0">
+        <h1 class="text-sm sm:text-xl font-bold text-center flex-grow px-2">
+            LOGBOOK HARIAN <br>
+            CATATAN AKTIVITAS HARIAN <br>
+            POS JAGA
+        </h1>
+        <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo" class="w-20 h-20 mt-2 sm:mt-0">
+    </div>
+    <!-- Informasi detail -->
+    <div class="border-t border-gray-300 pt-3 mt-4 mb-6">
+        <div class="grid grid-cols-2 gap-y-2 text-sm text-gray-700">
+            <p>HARI / TANGGAL
+                <span class="font-semibold">
+                    : {{ \Carbon\Carbon::parse($logbook->created_at)->translatedFormat('l, d F Y') }}
+                </span>
+            </p>
+            <p>LOKASI <span class="font-semibold">: {{ $logbook->locationArea->name }}</span></p>
+            <p>DINAS / SHIFT <span class="font-semibold">: {{ strtoupper($logbook->shift) }}</span></p>
+            <p>GRUP <span class="font-semibold">: {{ strtoupper($logbook->grup) }}</span></p>
         </div>
     </div>
-
     {{-- Tabel Petugas Jaga --}}
     <div class="flex justify-center mb-2">
         <p class="font-semibold self-center">PETUGAS JAGA</p>

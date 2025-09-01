@@ -86,10 +86,10 @@ class ExportPdfController extends Controller
         $formType = $report->equipmentLocation->equipment->name;
         $type = strtolower($formType);
         $viewMapping = [
-            'hhmd'       => 'superadmin.export.pdf.hhmdTemplate',
-            'wtmd'       => 'superadmin.export.pdf.wtmdTemplate',
-            'xraycabin'  => 'superadmin.export.pdf.xraycabinTemplate',
-            'xraybagasi' => 'superadmin.export.pdf.xraybagasiTemplate',
+            'hhmd'       => 'superadmin.export.pdf.dailytest.hhmdTemplate',
+            'wtmd'       => 'superadmin.export.pdf.dailytest.wtmdTemplate',
+            'xraycabin'  => 'superadmin.export.pdf.dailytest.xraycabinTemplate',
+            'xraybagasi' => 'superadmin.export.pdf.dailytest.xraybagasiTemplate',
         ];
 
         if (!isset($viewMapping[$type])) {
@@ -117,10 +117,10 @@ class ExportPdfController extends Controller
 
             $type = strtolower($formType);
             $viewMapping = [
-                'hhmd'       => 'superadmin.export.pdf.hhmdTemplate',
-                'wtmd'       => 'superadmin.export.pdf.wtmdTemplate',
-                'xraycabin'  => 'superadmin.export.pdf.xraycabinTemplate',
-                'xraybagasi' => 'superadmin.export.pdf.xraybagasiTemplate',
+                'hhmd'       => 'superadmin.export.pdf.dailytest.hhmdTemplate',
+                'wtmd'       => 'superadmin.export.pdf.dailytest.wtmdTemplate',
+                'xraycabin'  => 'superadmin.export.pdf.dailytest.xraycabinTemplate',
+                'xraybagasi' => 'superadmin.export.pdf.dailytest.xraybagasiTemplate',
             ];
 
             if (!isset($viewMapping[$type])) {
@@ -216,6 +216,209 @@ class ExportPdfController extends Controller
 
 
     //logbook
+    public function reviewLogbook(Request $request, $logbookID)
+    {
+        // Get form type from request or determine from logbook ID pattern
+        $formType = $request->input('form_type');
+
+        if (!$formType) {
+            // Auto-detect form type based on ID pattern
+            $formType = $this->detectLogbookType($logbookID);
+        }
+
+        try {
+            switch ($formType) {
+                case 'pos_jaga':
+                    return $this->reviewPosJagaLogbook($logbookID);
+
+                case 'sweeping_pi':
+                    return $this->reviewSweepingPILogbook($logbookID);
+
+                case 'rotasi':
+                    return $this->reviewRotasiLogbook($logbookID);
+
+                case 'chief':
+                    return $this->reviewChiefLogbook($logbookID);
+
+                default:
+                    abort(404, 'Jenis logbook tidak ditemukan');
+            }
+        } catch (\Exception $e) {
+            Log::error("Error reviewing logbook: " . $e->getMessage());
+            abort(404, 'Data logbook tidak ditemukan');
+        }
+    }
+
+    private function detectLogbookType($logbookID)
+    {
+        // Detect based on ID pattern
+        if (str_starts_with($logbookID, 'SPI-')) {
+            return 'sweeping_pi';
+        } elseif (str_starts_with($logbookID, 'LRH-') || str_starts_with($logbookID, 'LRS-')) {
+            return 'rotasi';
+        } elseif (str_starts_with($logbookID, 'CHF-')) {
+            return 'chief';
+        } else {
+            return 'pos_jaga'; // default untuk logbook pos jaga
+        }
+    }
+
+    private function reviewPosJagaLogbook($logbookID)
+    {
+        $logbook = Logbook::where('logbookID', $logbookID)->firstOrFail();
+        $logbook->load(['details', 'senderBy', 'receiverBy', 'approverBy', 'locationArea']);
+
+        $form = $this->prepareLogbookFormData($logbook);
+        $forms = collect([$form]);
+
+        return view('superadmin.export.pdf.logbook.logbookPosJagaTemplate', [
+            'forms' => $forms,
+            'logbook' => $logbook,
+            'formType' => 'pos_jaga'
+        ]);
+    }
+
+    private function reviewSweepingPILogbook($sweepingpiID)
+    {
+        $sweeping = LogbookSweepingPI::where('sweepingpiID', $sweepingpiID)->firstOrFail();
+        $sweeping->load(['tenant', 'sweepingPIDetails', 'notesSweepingPI']);
+
+        $form = $this->prepareSweepingPIFormData($sweeping);
+        $forms = collect([$form]);
+
+        return view('superadmin.export.pdf.logbook.logbookSweepingTemplate', [
+            'forms' => $forms,
+            'sweeping' => $sweeping,
+            'formType' => 'sweeping_pi'
+        ]);
+    }
+
+    private function reviewRotasiLogbook($rotasiID)
+    {
+        // $rotasi = LogbookRotasi::where('id', $rotasiID)->firstOrFail();
+        // $rotasi->load(['creator', 'approver', 'details']);
+
+        // $form = $this->prepareRotasiFormData($rotasi);
+        // $forms = collect([$form]);
+
+        return view('superadmin.export.pdf.logbook.logbookRotasiTemplate', [
+            // 'forms' => $forms,
+            // 'rotasi' => $rotasi,
+            'formType' => 'rotasi'
+        ]);
+    }
+
+    private function reviewChiefLogbook($chiefID)
+    {
+        // Untuk sementara return dummy data karena model chief belum ada
+        $form = new \stdClass();
+        $form->chiefID = $chiefID;
+        $form->date = now();
+        $form->aktivitas = 'Inspeksi Rutin';
+        $form->lokasi = 'Semua Area';
+        $form->chief = 'Chief Security';
+        $form->status = 'submitted';
+
+        $forms = collect([$form]);
+
+        return view('superadmin.export.pdf.logbook.logbookChiefTemplate', [
+            'forms' => $forms,
+            'formType' => 'chief'
+        ]);
+    }
+
+    private function prepareSweepingPIFormData(LogbookSweepingPI $sweeping)
+    {
+        $form = new \stdClass();
+
+        // Map sweeping main attributes
+        $form->sweepingpiID = $sweeping->sweepingpiID;
+        $form->created_at = $sweeping->created_at;
+        $form->bulan = $sweeping->bulan;
+        $form->tahun = $sweeping->tahun;
+        $form->notes = $sweeping->notes;
+
+        // Map tenant relationship
+        $form->tenantName = $sweeping->tenant->name ?? 'N/A';
+        $form->tenant = $sweeping->tenant;
+
+        // Map details
+        $form->sweepingDetails = $sweeping->sweepingPIDetails;
+        $form->notesSweeping = $sweeping->notesSweepingPI;
+
+        // Calculate completion stats
+        $form->completionStats = $sweeping->getCompletionStats();
+
+        return $form;
+    }
+
+    private function prepareRotasiFormData(LogbookRotasi $rotasi)
+    {
+        $form = new \stdClass();
+
+        // Map rotasi main attributes
+        $form->rotasiID = $rotasi->id;
+        $form->date = $rotasi->date;
+        $form->type = $rotasi->type;
+        $form->status = $rotasi->status;
+        $form->notes = $rotasi->notes;
+
+        // Map user relationships
+        $form->creatorName = $rotasi->creator->name ?? 'N/A';
+        $form->approverName = $rotasi->approver->name ?? 'N/A';
+        $form->creator = $rotasi->creator;
+        $form->approver = $rotasi->approver;
+
+        // Map signatures
+        $form->submittedSignature = $rotasi->submittedSignature;
+        $form->approvedSignature = $rotasi->approvedSignature;
+
+        // Map details
+        $form->rotasiDetails = $rotasi->details;
+
+        // Additional fields for compatibility
+        $form->location = (object)['name' => 'Area ' . $rotasi->type];
+        $form->shift = $rotasi->type;
+        $form->petugas_masuk = $rotasi->creator->name ?? 'N/A';
+        $form->petugas_keluar = 'N/A'; // Model tidak punya field ini
+
+        return $form;
+    }
+
+    // Keep existing prepareLogbookFormData function for pos_jaga
+    private function prepareLogbookFormData(Logbook $logbook)
+    {
+        $form = new \stdClass();
+
+        // Map logbook main attributes
+        $form->logbookID = $logbook->logbookID;
+        $form->date = $logbook->date;
+        $form->location = $logbook->locationArea->name ?? 'N/A';
+        $form->grup = $logbook->grup;
+        $form->shift = $logbook->shift;
+        $form->status = $logbook->status;
+
+        // Map user relationships
+        $form->senderName = $logbook->senderBy->name ?? 'N/A';
+        $form->receiverName = $logbook->receiverBy->name ?? 'N/A';
+        $form->approverName = $logbook->approverBy->name ?? 'N/A';
+
+        // Map signatures
+        $form->senderSignature = $logbook->senderSignature;
+        $form->receivedSignature = $logbook->receivedSignature;
+        $form->approvedSignature = $logbook->approvedSignature;
+
+        // Map rejection reason if exists
+        $form->rejectedReason = $logbook->rejected_reason;
+
+        // Map logbook details for uraian tugas
+        $form->logbookDetails = $logbook->details;
+        $form->facility = $logbook->facility;
+        $form->personil = $logbook->personil;
+
+        return $form;
+    }
+
     public function exportPdfLogbook(Request $request)
     {
         // Jika request memiliki export_type, proses export
@@ -449,10 +652,10 @@ class ExportPdfController extends Controller
         // Sesuaikan dengan template dan service yang ada
 
         $viewMapping = [
-            'pos_jaga' => 'superadmin.export.pdf.logbookPosJagaTemplate',
-            'sweeping_pi' => 'superadmin.export.pdf.logbookSweepingTemplate',
-            'rotasi' => 'superadmin.export.pdf.logbookRotasiTemplate',
-            'chief' => 'superadmin.export.pdf.logbookChiefTemplate',
+            'pos_jaga' => 'superadmin.export.pdf.logbook.logbookPosJagaTemplate',
+            'sweeping_pi' => 'superadmin.export.pdf.logbook.logbookSweepingTemplate',
+            'rotasi' => 'superadmin.export.pdf.logbook.logbookRotasiTemplate',
+            'chief' => 'superadmin.export.pdf.logbook.logbookChiefTemplate',
         ];
 
         $viewName = $viewMapping[$formType] ?? null;
