@@ -9,6 +9,7 @@ use App\Models\Equipment;
 use App\Models\EquipmentLocation;
 use App\Models\FormPencatatanPI;
 use App\Models\LogbookRotasi;
+use App\Models\ManualBook;
 use App\Models\Report;
 use App\Models\ReportDetail;
 use Illuminate\Http\Request;
@@ -847,6 +848,27 @@ class ExportPdfController extends Controller
                     ];
                 });
 
+            case 'manual_book':
+                $query = ManualBook::with(['creator', 'approver', 'details'])
+                    ->orderBy('date', 'desc');
+                if ($startDate && $endDate) {
+                    $query->whereBetween('date', [$startDate, $endDate]);
+                }
+                if ($locationName) {
+                    $query->where('type', 'like', '%' . $locationName . '%');
+                }
+                return $query->get()->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'date' => $item->date,
+                        'petugas' => $item->creator,
+                        'shift' => $item->shift,
+                        'lokasi' => (object)['name' => $item->type],
+                        'status' => $item->status,
+                        'total_records' => $item->details->count(),
+                    ];
+                });
+
             default:
                 return collect();
         }
@@ -908,6 +930,12 @@ class ExportPdfController extends Controller
                     ->get();
                 break;
 
+            case 'manual_book':
+                $data = ManualBook::whereIn('id', $selectedIds)
+                    ->with(['creator', 'approver', 'details'])
+                    ->get();
+                break;
+
             default:
                 return redirect()->back()->with('error', 'Jenis checklist tidak valid.');
         }
@@ -923,7 +951,7 @@ class ExportPdfController extends Controller
     private function exportAllChecklist($formType, $filters)
     {
         // Implementasi export all checklist dengan filter
-        $data = $this->getChecklistData($formType, $filters);
+        $data = $this->getChecklistDataForExport($formType, $filters);
 
         if ($data->isEmpty()) {
             return redirect()->back()->with('error', 'Tidak ada data yang ditemukan untuk filter yang dipilih.');
@@ -931,6 +959,61 @@ class ExportPdfController extends Controller
 
         // Generate PDF menggunakan service yang ada
         return $this->generateChecklistPdf($formType, $data);
+    }
+
+    private function getChecklistDataForExport($formType, $filters = [])
+    {
+        $startDate = $filters['start_date'] ?? null;
+        $endDate = $filters['end_date'] ?? null;
+        $locationName = $filters['location'] ?? null;
+
+        switch ($formType) {
+            case 'kendaraan':
+                $query = ChecklistKendaraan::with(['sender', 'receiver', 'approver'])
+                    ->orderBy('date', 'desc');
+                if ($startDate && $endDate) {
+                    $query->whereBetween('date', [$startDate, $endDate]);
+                }
+                return $query->get();
+
+            case 'penyisiran':
+                $query = ChecklistPenyisiran::with(['sender', 'receiver', 'approver'])
+                    ->orderBy('date', 'desc');
+                if ($startDate && $endDate) {
+                    $query->whereBetween('date', [$startDate, $endDate]);
+                }
+                return $query->get();
+
+            case 'senpi':
+                $query = ChecklistSenpi::with(['creator'])
+                    ->orderBy('date', 'desc');
+                if ($startDate && $endDate) {
+                    $query->whereBetween('date', [$startDate, $endDate]);
+                }
+                return $query->get();
+
+            case 'pencatatan_pi':
+                $query = FormPencatatanPI::with(['sender', 'approver'])
+                    ->orderBy('date', 'desc');
+                if ($startDate && $endDate) {
+                    $query->whereBetween('date', [$startDate, $endDate]);
+                }
+                return $query->get();
+
+            case 'manual_book':
+                $query = ManualBook::with(['creator', 'approver', 'details'])
+                    ->orderBy('date', 'desc');
+                if ($startDate && $endDate) {
+                    $query->whereBetween('date', [$startDate, $endDate]);
+                }
+                if ($locationName) {
+                    $query->where('type', 'like', '%' . $locationName . '%');
+                }
+                return $query->get();
+
+            default:
+                return collect();
+        }
     }
 
     private function generateChecklistPdf($formType, $data)
@@ -943,6 +1026,7 @@ class ExportPdfController extends Controller
             'penyisiran' => 'superadmin.export.pdf.checklistPenyisiranTemplate',
             'senpi' => 'superadmin.export.pdf.checklistSenpiTemplate',
             'pencatatan_pi' => 'superadmin.export.pdf.checklistPencatatanPITemplate',
+            'manual_book' => 'superadmin.export.pdf.checklistManualBookTemplate',
         ];
 
         $viewName = $viewMapping[$formType] ?? null;

@@ -74,21 +74,125 @@
                         </div>
                     </div>
 
-                    <!-- Data Table -->
-                    <div class="overflow-hidden border border-gray-200 rounded-lg mb-6">
-                        <table id="checklist-table" class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <!-- Headers will be dynamically inserted by JS -->
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <!-- Data will be loaded via JavaScript -->
-                            </tbody>
-                        </table>
+                    <!-- Tabel Checklist Kendaraan -->
+                    <div id="table-kendaraan" class="table-container overflow-hidden border border-gray-200 rounded-lg mb-6 {{ ($formType ?? 'kendaraan') != 'kendaraan' ? 'hidden' : '' }}">
+                        <div class="bg-blue-50 px-4 py-2 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-blue-800">Data Checklist Kendaraan Patroli</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No. Polisi</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Petugas</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="kendaraan-tbody" class="bg-white divide-y divide-gray-200">
+                                    <!-- Data akan dimuat via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tabel Checklist Penyisiran -->
+                    <div id="table-penyisiran" class="table-container overflow-hidden border border-gray-200 rounded-lg mb-6 {{ ($formType ?? 'kendaraan') != 'penyisiran' ? 'hidden' : '' }}">
+                        <div class="bg-green-50 px-4 py-2 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-green-800">Data Checklist Penyisiran Ruang Tunggu</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lokasi</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Petugas</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="penyisiran-tbody" class="bg-white divide-y divide-gray-200">
+                                    <!-- Data akan dimuat via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tabel Checklist Senpi -->
+                    <div id="table-senpi" class="table-container overflow-hidden border border-gray-200 rounded-lg mb-6 {{ ($formType ?? 'kendaraan') != 'senpi' ? 'hidden' : '' }}">
+                        <div class="bg-purple-50 px-4 py-2 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-purple-800">Data Checklist Senjata Api</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No. Senpi</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Petugas</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="senpi-tbody" class="bg-white divide-y divide-gray-200">
+                                    <!-- Data akan dimuat via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tabel Form Pencatatan PI -->
+                    <div id="table-pencatatan_pi" class="table-container overflow-hidden border border-gray-200 rounded-lg mb-6 {{ ($formType ?? 'kendaraan') != 'pencatatan_pi' ? 'hidden' : '' }}">
+                        <div class="bg-orange-50 px-4 py-2 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-orange-800">Data Form Pencatatan PI</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Petugas</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jenis PI</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lokasi</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pencatatan_pi-tbody" class="bg-white divide-y divide-gray-200">
+                                    <!-- Data akan dimuat via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tabel Buku Pemeriksaan Manual -->
+                    <div id="table-manual_book" class="table-container overflow-hidden border border-gray-200 rounded-lg mb-6 {{ ($formType ?? 'kendaraan') != 'manual_book' ? 'hidden' : '' }}">
+                        <div class="bg-red-50 px-4 py-2 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-red-800">Data Buku Pemeriksaan Manual</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Petugas</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lokasi</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="manual_book-tbody" class="bg-white divide-y divide-gray-200">
+                                    <!-- Data akan dimuat via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <!-- Action Buttons -->
                     <div class="flex flex-col sm:flex-row gap-3 sm:justify-end">
-                        <button type="button" onclick="fetchFilteredData()"
+                        <button type="button" onclick="previewData()"
                             class="inline-flex justify-center items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             Preview Data
                         </button>
@@ -107,22 +211,40 @@
     </div>
 </div>
 
-<script>
-    function getStatusBadge(status) {
-        const statusText = status ? status.toLowerCase() : 'pending';
-        const statusClasses = {
-            'approved': 'bg-green-100 text-green-800',
-            'submitted': 'bg-yellow-100 text-yellow-800',
-            'pending': 'bg-yellow-100 text-yellow-800',
-            'draft': 'bg-gray-100 text-gray-800',
-            'rejected': 'bg-red-100 text-red-800'
-        };
-        const className = statusClasses[statusText] || 'bg-gray-100 text-gray-800';
-        return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${className}">${statusText}</span>`;
-    }
+<!-- Modal Preview -->
+<div id="previewModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-10 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-auto shadow-lg rounded-md bg-white" style="max-width: 850px;">
+        <div class="flex justify-between items-center pb-3">
+            <p class="text-2xl font-bold">Preview Checklist</p>
+            <div class="cursor-pointer z-50" onclick="closeModal()">
+                <svg class="fill-current text-black" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 18 18">
+                    <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+                </svg>
+            </div>
+        </div>
+        <div id="modalContent" class="max-h-[85vh] overflow-y-auto">
+            <!-- Preview content will be loaded here -->
+        </div>
+    </div>
+</div>
 
-    function getCheckbox(id) {
-        return `<input type="checkbox" name="selected_ids[]" value="${id}" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">`;
+<script>
+    // Fungsi untuk show/hide tabel berdasarkan form type
+    function showTable(formType) {
+        console.log('Showing table for form type:', formType);
+        
+        // Hide semua tabel
+        const tables = document.querySelectorAll('.table-container');
+        tables.forEach(table => table.classList.add('hidden'));
+        
+        // Show tabel yang sesuai
+        const targetTable = document.getElementById(`table-${formType}`);
+        if (targetTable) {
+            targetTable.classList.remove('hidden');
+            console.log('Table shown:', `table-${formType}`);
+        } else {
+            console.error('Table not found:', `table-${formType}`);
+        }
     }
 
     function formatDate(dateString) {
@@ -137,37 +259,40 @@
         }
     }
 
-    function updateTable(checklists, formType) {
-        const table = document.getElementById('checklist-table');
-        const thead = table.querySelector('thead');
-        const tbody = table.querySelector('tbody');
+    function getStatusBadge(status) {
+        const statusText = status ? status.toLowerCase() : 'pending';
+        const statusClasses = {
+            'approved': 'bg-green-100 text-green-800',
+            'submitted': 'bg-yellow-100 text-yellow-800',
+            'pending': 'bg-yellow-100 text-yellow-800',
+            'draft': 'bg-gray-100 text-gray-800',
+            'rejected': 'bg-red-100 text-red-800'
+        };
+        const className = statusClasses[statusText] || 'bg-gray-100 text-gray-800';
+        const displayText = status === 'approved' ? 'Disetujui' : 
+                           status === 'submitted' ? 'Pending' :
+                           status === 'draft' ? 'Draft' :
+                           status === 'rejected' ? 'Ditolak' : 'Pending';
+        return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${className}">${displayText}</span>`;
+    }
+
+    function getCheckbox(id) {
+        return `<input type="checkbox" name="selected_ids[]" value="${id}" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">`;
+    }
+
+    function updateTable(formType, checklists) {
+        console.log('Updating table for form type:', formType, 'with data:', checklists);
         
-        thead.innerHTML = '';
+        const tbody = document.getElementById(`${formType}-tbody`);
+        if (!tbody) {
+            console.error('tbody not found for ID:', `${formType}-tbody`);
+            return;
+        }
+
         tbody.innerHTML = '';
 
-        let headers = [];
-        const headerConfig = {
-            kendaraan: ['Tanggal', 'No. Polisi', 'Petugas', 'Status', 'Aksi'],
-            penyisiran: ['Tanggal', 'Lokasi', 'Petugas', 'Status', 'Aksi'],
-            senpi: ['Tanggal', 'No. Senpi', 'Petugas', 'Status', 'Aksi'],
-            pencatatan_pi: ['Tanggal', 'Petugas', 'Jenis PI', 'Lokasi', 'Status', 'Aksi'],
-            manual_book: ['Tanggal', 'Petugas', 'Lokasi', 'Status', 'Aksi']
-        };
-
-        headers = headerConfig[formType] || [];
-
-        const headerRow = document.createElement('tr');
-        headers.forEach(headerText => {
-            const th = document.createElement('th');
-            th.className = 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider';
-            if (headerText === 'Aksi') th.classList.add('text-center');
-            th.textContent = headerText;
-            headerRow.appendChild(th);
-        });
-        thead.appendChild(headerRow);
-
         if (!checklists || checklists.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="${headers.length}" class="text-center p-8 text-gray-500">Tidak ada data yang ditemukan.</td></tr>`;
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">Tidak ada data ditemukan</td></tr>';
             return;
         }
 
@@ -175,7 +300,7 @@
             const row = document.createElement('tr');
             row.className = 'hover:bg-gray-50';
             let cells = '';
-            const id = item.id; // Assuming a generic 'id' field
+            const id = item.id;
 
             switch (formType) {
                 case 'kendaraan':
@@ -184,6 +309,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.nomor_polisi || 'N/A'}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.petugas?.name || 'N/A'}</td>
                         <td class="px-6 py-4 whitespace-nowrap">${getStatusBadge(item.status)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">${getCheckbox(id)}</td>
                     `;
                     break;
                 case 'penyisiran':
@@ -192,6 +318,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.lokasi?.name || 'N/A'}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.petugas?.name || 'N/A'}</td>
                         <td class="px-6 py-4 whitespace-nowrap">${getStatusBadge(item.status)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">${getCheckbox(id)}</td>
                     `;
                     break;
                 case 'senpi':
@@ -200,6 +327,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.nomor_senpi || 'N/A'}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.petugas?.name || 'N/A'}</td>
                         <td class="px-6 py-4 whitespace-nowrap">${getStatusBadge(item.status)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">${getCheckbox(id)}</td>
                     `;
                     break;
                 case 'pencatatan_pi':
@@ -209,6 +337,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.jenis_pi || 'N/A'}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.lokasi?.name || 'N/A'}</td>
                         <td class="px-6 py-4 whitespace-nowrap">${getStatusBadge(item.status)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">${getCheckbox(id)}</td>
                     `;
                     break;
                 case 'manual_book':
@@ -217,24 +346,96 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.petugas?.name || 'N/A'}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.lokasi?.name || 'N/A'}</td>
                         <td class="px-6 py-4 whitespace-nowrap">${getStatusBadge(item.status)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">${getCheckbox(id)}</td>
                     `;
                     break;
             }
             
-            cells += `<td class="px-6 py-4 whitespace-nowrap text-center">${getCheckbox(id)}</td>`;
             row.innerHTML = cells;
             tbody.appendChild(row);
         });
+
+        console.log('Table updated successfully with', checklists.length, 'rows');
+    }
+
+    // Modal functions
+    const modal = document.getElementById('previewModal');
+    const modalContent = document.getElementById('modalContent');
+
+    function openModal() {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        modal.classList.add('hidden');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = 'auto';
+    }
+
+    window.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' || event.key === 'Esc') {
+            if (!modal.classList.contains('hidden')) {
+                closeModal();
+            }
+        }
+    });
+
+    modal.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+
+    async function previewData() {
+        const formData = new FormData(document.getElementById('exportForm'));
+        const formType = formData.get('form_type');
+        const selectedIds = formData.getAll('selected_ids[]');
+
+        if (selectedIds.length === 0) {
+            alert('Silakan pilih minimal satu data untuk preview');
+            return;
+        }
+
+        const checklistId = selectedIds[0];
+        const url = `/export/checklist/review/${checklistId}?form_type=${formType}`;
+
+        try {
+            modalContent.innerHTML = '<p class="text-center py-20">Loading preview...</p>';
+            openModal();
+
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const html = await response.text();
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const formContent = doc.querySelector('.page-break-after');
+
+            if (formContent) {
+                modalContent.innerHTML = `<div style="transform: scale(0.9); transform-origin: center center; width: 100%;">${formContent.innerHTML}</div>`;
+            } else {
+                modalContent.innerHTML = html;
+            }
+
+        } catch (error) {
+            console.error('Error fetching preview:', error);
+            modalContent.innerHTML = '<p class="text-center py-20 text-red-500">Gagal memuat preview. Silakan coba lagi.</p>';
+        }
     }
 
     function fetchFilteredData() {
         const formData = new FormData(document.getElementById('exportForm'));
-        const tbody = document.querySelector('#checklist-table tbody');
-        const headers = document.querySelector('#checklist-table thead tr');
-        const colspan = headers ? headers.children.length : 5;
-
-        tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center p-8 text-gray-500">Loading...</td></tr>`;
         
+        console.log('Fetching filtered data with params:', {
+            form_type: formData.get('form_type'),
+            location: formData.get('location'),
+            start_date: formData.get('start_date'),
+            end_date: formData.get('end_date')
+        });
+
         fetch('{{ route("export.checklist.filter") }}', {
             method: 'POST',
             headers: {
@@ -242,18 +443,29 @@
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(Object.fromEntries(formData.entries()))
+            body: JSON.stringify({
+                form_type: formData.get('form_type'),
+                location: formData.get('location'),
+                start_date: formData.get('start_date'),
+                end_date: formData.get('end_date')
+            })
         })
         .then(response => {
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             return response.json();
         })
         .then(data => {
-            updateTable(data.checklists, data.form_type);
+            console.log('Response data:', data);
+            if (data.checklists) {
+                updateTable(data.form_type, data.checklists);
+            } else {
+                console.error('No checklists data in response');
+                alert('Tidak ada data yang ditemukan');
+            }
         })
         .catch(error => {
             console.error('Error:', error);
-            tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center p-8 text-red-500">Error loading data. Please try again.</td></tr>`;
+            alert('Terjadi kesalahan saat memuat data: ' + error.message);
         });
     }
 
@@ -287,17 +499,28 @@
         const startDate = document.getElementById('start_date');
         const endDate = document.getElementById('end_date');
 
-        function setupEventListeners() {
-            formTypeSelect.addEventListener('change', fetchFilteredData);
-            locationSelect.addEventListener('change', fetchFilteredData);
-            startDate.addEventListener('change', fetchFilteredData);
-            endDate.addEventListener('change', fetchFilteredData);
-        }
+        console.log('DOM loaded, initializing...');
 
-        // Initial data load
-        updateTable(@json($checklists), @json($formType));
+        // Show initial table
+        showTable(formTypeSelect.value);
+
+        // Load initial data
         fetchFilteredData();
-        setupEventListeners();
+
+        // Event listeners untuk filter
+        [locationSelect, startDate, endDate].forEach(element => {
+            element.addEventListener('change', function() {
+                console.log('Filter changed:', element.id, element.value);
+                fetchFilteredData();
+            });
+        });
+
+        // Special handler untuk form type change
+        formTypeSelect.addEventListener('change', function() {
+            console.log('Form type changed to:', this.value);
+            showTable(this.value);
+            fetchFilteredData();
+        });
     });
 </script>
 @endsection
