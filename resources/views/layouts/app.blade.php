@@ -12,6 +12,9 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    {{-- DITAMBAHKAN: Tempat untuk menampung stylesheet dari halaman lain --}}
+    @stack('styles')
+
 </head>
 <body class="bg-gray-100">
     @auth
@@ -20,7 +23,7 @@
         <!-- Mobile Sidebar Overlay -->
         <div id="mobile-sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden lg:hidden"></div>
 
-        <div class="flex h-full"></div>
+        <div class="flex h-full">
             @include('layouts.sidebar')
             <main class="flex-1 min-h-screen pt-16 px-4 lg:pt-0 lg:ml-64 lg:px-8">
                 <div class="mx-auto">
@@ -98,5 +101,8 @@
             }
         });
     </script>
+
+    {{-- DITAMBAHKAN: Tempat untuk menampung script dari halaman lain --}}
+    @stack('scripts')
 </body>
 </html>

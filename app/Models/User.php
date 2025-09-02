@@ -80,7 +80,17 @@ class User extends Authenticatable
     }
 
     public function getDisplayNameAttribute()
-{
-    return substr($this->nip, -4) . ' - ' . $this->name;
-}
+    {
+        return substr($this->nip, -4) . ' - ' . $this->name;
+    }
+
+    public function folders()
+    {
+        return $this->hasMany(PMIKFolder::class, 'created_by');
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(PMIKDocument::class, 'uploaded_by');
+    }
 }

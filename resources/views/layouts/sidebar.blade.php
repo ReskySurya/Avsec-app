@@ -44,22 +44,26 @@ $isChecklistOpen = request()->is('checklist*');
                 </button>
                 <ul x-show="open" class="pl-8 mt-2 space-y-2">
                     <li>
-                        <a href="{{ route('users-management.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                        <a href="{{ route('users-management.index') }}"
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
                             <span>User Management</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('equipment-locations.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                        <a href="{{ route('equipment-locations.index') }}"
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
                             <span>Equipment location</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('tenant-management.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                        <a href="{{ route('tenant-management.index') }}"
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
                             <span>Tenant Management</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('checklist-items.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                        <a href="{{ route('checklist-items.index') }}"
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
                             <span>Checklist Items</span>
                         </a>
                     </li>
@@ -89,12 +93,14 @@ $isChecklistOpen = request()->is('checklist*');
                 </button>
                 <ul x-show="open" class="pl-8 mt-2 space-y-2">
                     <li>
-                        <a href="{{ route('daily-test.hhmd') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                        <a href="{{ route('daily-test.hhmd') }}"
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
                             <span>HHMD</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('daily-test.wtmd') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                        <a href="{{ route('daily-test.wtmd') }}"
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
                             <span>WTMD</span>
                         </a>
                     </li>
@@ -113,12 +119,14 @@ $isChecklistOpen = request()->is('checklist*');
                         </button>
                         <ul x-show="openXray" class="pl-4 mt-2 space-y-2">
                             <li>
-                                <a href="{{ route('daily-test.xraycabin') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                                <a href="{{ route('daily-test.xraycabin') }}"
+                                    class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
                                     <span>XRAY CABIN</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('daily-test.xraybagasi') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
+                                <a href="{{ route('daily-test.xraybagasi') }}"
+                                    class="flex items-center py-2 px-4 rounded hover:bg-gray-700">
                                     <span>XRAY BAGASI</span>
                                 </a>
                             </li>
@@ -171,7 +179,8 @@ $isChecklistOpen = request()->is('checklist*');
                     </li>
                     @else
                     <li>
-                        <a href="{{ route('sweepingPI.index') }}" class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('sweepingpi') ? 'bg-gray-700' : '' }}">
+                        <a href="{{ route('sweepingPI.index') }}"
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('sweepingpi') ? 'bg-gray-700' : '' }}">
                             <span>Logbook Sweeping PI</span>
                         </a>
                     </li>
@@ -260,25 +269,27 @@ $isChecklistOpen = request()->is('checklist*');
                 </ul>
             </li>
 
-
-
-
             @if(auth()->user()->role->name === 'superadmin')
+            <li>
+                <a href="{{ route('pmik.index') }}" class="flex items-center p-2 rounded hover:bg-gray-700">
+                    <svg class="h-5 w-5 mr-3" ...></svg>
+                    <span>PM dan IK</span>
+                </a>
+            </li>
             <li>
                 <a href="{{ route('export.index') }}" class="flex items-center p-2 rounded hover:bg-gray-700">
                     <svg class="h-5 w-5 mr-3" ...></svg>
                     <span>Export PDF</span>
                 </a>
             </li>
-            @endif
-            <!-- Other static menu items -->
+            @else
             <li>
                 <a href="#" class="flex items-center p-2 rounded hover:bg-gray-700">
                     <svg class="h-5 w-5 mr-3" ...></svg>
                     <span>PM dan IK</span>
                 </a>
             </li>
-
+            @endif
 
             <li class="hidden lg:block">
                 <form method="GET" action="{{ route('logout') }}">
