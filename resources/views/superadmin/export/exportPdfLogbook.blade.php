@@ -164,13 +164,13 @@
                                             Tanggal
                                         </th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Lokasi
+                                            Tipe/Area
                                         </th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Shift
+                                            Dibuat Oleh
                                         </th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Petugas Masuk
+                                            Disetujui Oleh
                                         </th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Status
@@ -431,27 +431,28 @@
                     `;
                     break;
 
+
                 case 'rotasi':
                     row.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            ${formatDate(item.date)}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            ${item.location?.name || item.type || 'N/A'}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            ${item.shift || 'N/A'}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            ${item.creator?.name || 'N/A'}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            ${createStatusBadge(item.status)}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            ${createCheckbox(item.id)}
-                        </td>
-                    `;
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${formatDate(item.date)}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${item.type ? 'Area ' + item.type : 'N/A'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${item.creator?.name || 'N/A'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${item.approver?.name || 'Belum disetujui'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        ${createStatusBadge(item.status)}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                        ${createCheckbox(item.id)}
+                    </td>
+                `;
                     break;
 
                 case 'chief':

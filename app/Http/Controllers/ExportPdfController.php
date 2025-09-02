@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Location;
 use App\Models\Logbook;
 use App\Models\LogbookSweepingPI;
+use App\Models\User;
 use App\Services\PdfService;
 use Illuminate\Support\Facades\Log;
 
@@ -293,18 +294,29 @@ class ExportPdfController extends Controller
         ]);
     }
 
-    private function reviewRotasiLogbook($rotasiID)
+    private function reviewRotasiLogbook($id)
     {
-        // $rotasi = LogbookRotasi::where('id', $rotasiID)->firstOrFail();
-        // $rotasi->load(['creator', 'approver', 'details']);
+        $rotasi = LogbookRotasi::where('id', $id)->firstOrFail();
 
-        // $form = $this->prepareRotasiFormData($rotasi);
-        // $forms = collect([$form]);
+        // Load relationships yang dibutuhkan
+        $rotasi->load([
+            'creator',
+            'submitter',
+            'approver',
+            'details.officerAssignment'
+        ]);
+
+        // Prepare form data
+        $form = $this->prepareRotasiFormData($rotasi);
+
+        // Prepare officer log data (struktur seperti di detail view)
+        $officerLog = $this->prepareOfficerLogData($rotasi);
+
+        $forms = collect([$form]);
 
         return view('superadmin.export.pdf.logbook.logbookRotasiTemplate', [
-            // 'forms' => $forms,
-            // 'rotasi' => $rotasi,
-            'formType' => 'rotasi'
+            'forms' => $forms,
+            'officerLog' => $officerLog, // Pass officerLog data ke template
         ]);
     }
 
@@ -342,14 +354,47 @@ class ExportPdfController extends Controller
         $form->tenantName = $sweeping->tenant->name ?? 'N/A';
         $form->tenant = $sweeping->tenant;
 
-        // Map details
+        // Map details with calendar format
         $form->sweepingDetails = $sweeping->sweepingPIDetails;
         $form->notesSweeping = $sweeping->notesSweepingPI;
 
         // Calculate completion stats
         $form->completionStats = $sweeping->getCompletionStats();
 
+        // // Calculate calendar data for each prohibited item
+        $form->calendarData = $this->prepareCalendarData($sweeping);
+
         return $form;
+    }
+
+    private function prepareCalendarData(LogbookSweepingPI $sweeping)
+    {
+        $daysInMonth = \Carbon\Carbon::createFromDate($sweeping->tahun, $sweeping->bulan, 1)->daysInMonth;
+        $calendarData = [];
+
+        foreach ($sweeping->sweepingPIDetails as $detail) {
+            $itemData = [
+                'item_name' => $detail->item_name ?? 'Prohibited Item',
+                'item_count' => $detail->item_count ?? 0,
+                'days' => []
+            ];
+
+            for ($day = 1; $day <= $daysInMonth; $day++) {
+                $fieldName = 'tanggal_' . $day;
+                $noteField = 'note_' . $day;
+
+                $itemData['days'][$day] = [
+                    'checked' => isset($detail->$fieldName) && $detail->$fieldName,
+                    'has_note' => isset($detail->$noteField) && !empty($detail->$noteField),
+                    'note' => $detail->$noteField ?? null,
+                    'is_overdue' => $day < now()->day && $sweeping->bulan == now()->month && $sweeping->tahun == now()->year && (!isset($detail->$fieldName) || !$detail->$fieldName)
+                ];
+            }
+
+            $calendarData[] = $itemData;
+        }
+
+        return $calendarData;
     }
 
     private function prepareRotasiFormData(LogbookRotasi $rotasi)
@@ -373,16 +418,84 @@ class ExportPdfController extends Controller
         $form->submittedSignature = $rotasi->submittedSignature;
         $form->approvedSignature = $rotasi->approvedSignature;
 
-        // Map details
-        $form->rotasiDetails = $rotasi->details;
+        // Create location object
+        $form->location = (object)[
+            'name' => 'Area ' . ucfirst($rotasi->type)
+        ];
 
         // Additional fields for compatibility
-        $form->location = (object)['name' => 'Area ' . $rotasi->type];
-        $form->shift = $rotasi->type;
+        $form->shift = ucfirst($rotasi->type);
         $form->petugas_masuk = $rotasi->creator->name ?? 'N/A';
-        $form->petugas_keluar = 'N/A'; // Model tidak punya field ini
+        $form->petugas_keluar = $rotasi->approver->name ?? 'N/A';
+
+        // Transform details menjadi struktur seperti di detail view
+        $form->rotasiDetails = $rotasi->details;
 
         return $form;
+    }
+
+    // Method tambahan untuk membuat struktur officerLog seperti di detail view
+    private function prepareOfficerLogData(LogbookRotasi $rotasi)
+    {
+        $officerLog = [];
+
+        foreach ($rotasi->details as $detail) {
+            // Array semua role dan officer IDs
+            $roles = [
+                'pengatur_flow' => $detail->pengatur_flow,
+                'operator_xray' => $detail->operator_xray,
+                'manual_bagasi_petugas' => $detail->manual_bagasi_petugas,
+                'reunited' => $detail->reunited,
+                'pemeriksaan_dokumen' => $detail->pemeriksaan_dokumen,
+                'hhmd_petugas' => $detail->hhmd_petugas,
+                'manual_kabin_petugas' => $detail->manual_kabin_petugas,
+            ];
+
+            foreach ($roles as $roleName => $officerId) {
+                if (!$officerId) continue;
+
+                // Initialize officer entry if not exists
+                if (!isset($officerLog[$officerId])) {
+                    $user = User::find($officerId);
+                    $officerLog[$officerId] = [
+                        'officer_name' => $user->name ?? 'Officer ' . $officerId,
+                        'roles' => [],
+                        'keterangan' => []
+                    ];
+                }
+
+                // Add role data
+                if (!isset($officerLog[$officerId]['roles'][$roleName])) {
+                    $officerLog[$officerId]['roles'][$roleName] = [];
+                }
+
+                $roleData = [
+                    'start' => $detail->officerAssignment->start_time ?? '00:00',
+                    'end' => $detail->officerAssignment->end_time ?? '23:59',
+                ];
+
+                // Add special fields for HHMD
+                if ($roleName === 'hhmd_petugas') {
+                    $roleData['hhmd_random'] = $detail->hhmd_random ?? '-';
+                    $roleData['hhmd_unpredictable'] = $detail->hhmd_unpredictable ?? '-';
+                }
+
+                // Add special fields for Manual Kabin
+                if ($roleName === 'manual_kabin_petugas') {
+                    $roleData['cek_random_barang'] = $detail->cek_random_barang ?? '-';
+                    $roleData['barang_unpredictable'] = $detail->barang_unpredictable ?? '-';
+                }
+
+                $officerLog[$officerId]['roles'][$roleName][] = $roleData;
+
+                // Add keterangan
+                if ($detail->keterangan) {
+                    $officerLog[$officerId]['keterangan'][] = $detail->keterangan;
+                }
+            }
+        }
+
+        return $officerLog;
     }
 
     // Keep existing prepareLogbookFormData function for pos_jaga
@@ -446,127 +559,80 @@ class ExportPdfController extends Controller
         $formType = $request->input('form_type', 'pos_jaga');
         $filters = $request->only(['location', 'start_date', 'end_date']);
 
-        $data = $this->getLogbookData($formType, $filters);
+        $logbooks = $this->getLogbookData($formType, $filters);
 
         return response()->json([
-            'logbooks' => $data,
-            'form_type' => $formType
+            'success' => true,
+            'form_type' => $formType,
+            'logbooks' => $logbooks,
+            'count' => $logbooks->count()
         ]);
     }
 
+    // Add this method to your controller or update existing getLogbookData method
     private function getLogbookData($formType, $filters = [])
     {
-        $startDate = $filters['start_date'] ?? null;
-        $endDate = $filters['end_date'] ?? null;
-        $locationName = $filters['location'] ?? null;
-
         switch ($formType) {
             case 'pos_jaga':
-                try {
-                    $query = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy'])
-                        ->orderBy('date', 'desc');
+                $query = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy']);
 
-                    if ($locationName && $locationName !== 'Semua Lokasi') {
-                        $query->whereHas('locationArea', fn($q) => $q->where('name', $locationName));
-                    }
-                    if ($startDate && $endDate) {
-                        $query->whereBetween('date', [$startDate, $endDate]);
-                    }
-
-                    $logbooks = $query->get();
-
-                    return $logbooks->map(function ($logbook) {
-                        return [
-                            'logbookID' => $logbook->logbookID,
-                            'date' => $logbook->date,
-                            'location_area' => $logbook->locationArea,
-                            'sender_by' => $logbook->senderBy,
-                            'receiver_by' => $logbook->receiverBy,
-                            'approver_by' => $logbook->approverBy,
-                            'status' => $logbook->status ?? 'submitted',
-                        ];
+                if (!empty($filters['location'])) {
+                    $query->whereHas('locationArea', function ($q) use ($filters) {
+                        $q->where('name', $filters['location']);
                     });
-                } catch (\Exception $e) {
-                    Log::error("Error getting pos_jaga data: " . $e->getMessage());
-                    return collect();
                 }
+
+                if (!empty($filters['start_date'])) {
+                    $query->whereDate('date', '>=', $filters['start_date']);
+                }
+
+                if (!empty($filters['end_date'])) {
+                    $query->whereDate('date', '<=', $filters['end_date']);
+                }
+
+                return $query->orderBy('date', 'desc')->get();
 
             case 'sweeping_pi':
-                try {
-                    $query = LogbookSweepingPI::with(['tenant'])
-                        ->orderBy('created_at', 'desc');
+                $query = LogbookSweepingPI::with(['tenant']);
 
-                    if ($startDate && $endDate) {
-                        $startMonth = date('n', strtotime($startDate));
-                        $startYear = date('Y', strtotime($startDate));
-                        $endMonth = date('n', strtotime($endDate));
-                        $endYear = date('Y', strtotime($endDate));
-
-                        $query->where(function ($q) use ($startYear, $startMonth, $endYear, $endMonth) {
-                            $q->where(function ($subQ) use ($startYear, $startMonth) {
-                                $subQ->where('tahun', $startYear)->where('bulan', '>=', $startMonth);
-                            })->orWhere(function ($subQ) use ($endYear, $endMonth) {
-                                $subQ->where('tahun', $endYear)->where('bulan', '<=', $endMonth);
-                            })->orWhere(function ($subQ) use ($startYear, $endYear) {
-                                $subQ->where('tahun', '>', $startYear)->where('tahun', '<', $endYear);
-                            });
-                        });
-                    }
-
-                    $sweepings = $query->get();
-
-                    return $sweepings->map(function ($sweeping) {
-                        return [
-                            'sweepingpiID' => $sweeping->sweepingpiID, // Sesuai primary key
-                            'created_at' => $sweeping->created_at,
-                            'tenant' => $sweeping->tenant,
-                            'bulan' => $sweeping->bulan,
-                            'tahun' => $sweeping->tahun
-                        ];
-                    });
-                } catch (\Exception $e) {
-                    Log::error("Error getting sweeping_pi data: " . $e->getMessage());
-                    return collect();
+                if (!empty($filters['start_date'])) {
+                    $query->whereDate('created_at', '>=', $filters['start_date']);
                 }
+
+                if (!empty($filters['end_date'])) {
+                    $query->whereDate('created_at', '<=', $filters['end_date']);
+                }
+
+                return $query->orderBy('created_at', 'desc')->get();
 
             case 'rotasi':
-                try {
-                    $query = LogbookRotasi::with(['creator', 'approver'])
-                        ->orderBy('date', 'desc');
+                $query = LogbookRotasi::with(['creator', 'approver', 'submitter', 'details']);
 
-                    if ($startDate && $endDate) {
-                        $query->whereBetween('date', [$startDate, $endDate]);
-                    }
-
-                    $rotasis = $query->get();
-
-                    return $rotasis->map(function ($rotasi) {
-                        return [
-                            'rotasiID' => $rotasi->id,
-                            'date' => $rotasi->date,
-                            'type' => $rotasi->type,
-                            'location' => (object)['name' => 'Area ' . $rotasi->type], // Model tidak punya relasi location
-                            'shift' => $rotasi->type, // Menggunakan type sebagai shift
-                            'petugas_masuk' => $rotasi->creator->name ?? 'N/A',
-                            'petugas_keluar' => 'N/A', // Model tidak punya field ini
-                            'status' => $rotasi->status ?? 'submitted',
-                        ];
-                    });
-                } catch (\Exception $e) {
-                    Log::error("Error getting rotasi data: " . $e->getMessage());
-                    return collect();
+                // For rotasi, you might filter by type instead of location
+                if (!empty($filters['location'])) {
+                    $query->where('type', $filters['location']);
                 }
 
+                if (!empty($filters['start_date'])) {
+                    $query->whereDate('date', '>=', $filters['start_date']);
+                }
+
+                if (!empty($filters['end_date'])) {
+                    $query->whereDate('date', '<=', $filters['end_date']);
+                }
+
+                return $query->orderBy('date', 'desc')->get();
+
             case 'chief':
-                // Model chief belum ada, return dummy data
+                // Return dummy data for chief since model doesn't exist yet
                 return collect([
-                    [
-                        'chiefID' => 1,
+                    (object) [
+                        'chiefID' => 'CHF-001',
                         'date' => now(),
                         'aktivitas' => 'Inspeksi Rutin',
                         'lokasi' => 'Semua Area',
                         'chief' => 'Chief Security',
-                        'status' => 'submitted',
+                        'status' => 'submitted'
                     ]
                 ]);
 

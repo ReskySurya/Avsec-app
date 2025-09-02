@@ -64,29 +64,7 @@
                     Checklist
                 </h3>
                 <p class="text-xs md:text-sm text-gray-600 group-hover:text-gray-700 text-center">
-                    Pemeriksaan
-                </p>
-                {{-- Badge untuk fitur yang belum tersedia --}}
-                <span class="inline-block mt-1 px-2 py-1 text-xs bg-yellow-100 text-yellow-600 rounded-full">
-                    Coming Soon
-                </span>
-            </div>
-        </div>
-
-        {{-- Attendance Card --}}
-        <div class="document-card group border-2 border-gray-200 rounded-xl p-4 md:p-5 cursor-pointer transition-all duration-300 hover:border-blue-500 hover:-translate-y-1 hover:shadow-lg bg-white active:scale-95"
-             onclick="alert('Fitur sedang dalam pengembangan')">
-            <div class="flex flex-col items-center justify-center text-center h-full">
-                <div class="w-12 h-12 md:w-16 md:h-16 mb-3 bg-purple-100 rounded-full flex items-center justify-center">
-                    <svg class="w-6 h-6 md:w-8 md:h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <h3 class="font-semibold text-gray-800 mb-1 md:mb-2 text-sm md:text-base group-hover:text-blue-600 transition-colors text-center">
-                    Dokumen Absensi
-                </h3>
-                <p class="text-xs md:text-sm text-gray-600 group-hover:text-gray-700 text-center">
-                    Data kehadiran dan ketidakhadiran
+                    Pemeriksaan Checklist
                 </p>
                 {{-- Badge untuk fitur yang belum tersedia --}}
                 <span class="inline-block mt-1 px-2 py-1 text-xs bg-yellow-100 text-yellow-600 rounded-full">
@@ -96,7 +74,7 @@
         </div>
     </div>
 
-    {{-- Info Section untuk mobile --}}
+    <!-- {{-- Info Section untuk mobile --}}
     <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg md:hidden">
         <div class="flex items-start">
             <div class="flex-shrink-0">
@@ -109,7 +87,7 @@
                 <p class="text-xs text-blue-700 mt-1">Tap pada kartu dokumen untuk memulai proses export. Pastikan koneksi internet stabil.</p>
             </div>
         </div>
-    </div>
+    </div> -->
 </div>
 
 {{-- Touch Feedback Styles --}}
