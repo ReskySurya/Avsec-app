@@ -44,7 +44,6 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::get('/export/logbook', [ExportPdfController::class, 'exportPdfLogbook'])->name('export.logbook');
     Route::post('/export/logbook/filter', [ExportPdfController::class, 'filterLogbook'])->name('export.logbook.filter');
 
-    Route::get('/pmik', [PMIKController::class, 'index'])->name('pmik.index');
     // Rute untuk Folder
     Route::get('/folders/create', [PMIKController::class, 'create'])->name('folders.create');
     Route::post('/folders', [PMIKController::class, 'store'])->name('folders.store');
@@ -135,6 +134,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/daily-test/xray/update-status/{id}', [XrayController::class, 'updateStatus'])->name('xray.updateStatus');
     Route::post('/daily-test/xray/save-supervisor-signature/{id}', [XrayController::class, 'saveSupervisorSignature'])->name('xray.saveSupervisorSignature');
 
+    Route::get('/pmik', [PMIKController::class, 'index'])->name('pmik.index');
     Route::get('/folders/{folder}', [PMIKController::class, 'show'])->name('folders.show');
     Route::get('/documents/{document}/view', [PMIKController::class, 'view'])->name('documents.view');
     Route::get('/documents/{document}/viewer', [PMIKController::class, 'showViewer'])->name('documents.viewer');

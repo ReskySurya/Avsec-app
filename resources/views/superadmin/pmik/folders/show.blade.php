@@ -265,10 +265,10 @@
                             </div>
                         </div>
 
-                        {{-- Action Buttons --}}
-                        <div class="flex items-center gap-2 sm:gap-3">
-                            <a href="{{ route('documents.viewer', $document) }}" {{-- <-- Arahkan ke route baru --}}
-                                class="flex items-center justify-center w-10 h-10 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-xl transition-colors"
+                        {{-- Action Buttons - Responsive untuk semua ukuran layar --}}
+                        <div class="flex items-center justify-center sm:justify-start gap-2 sm:gap-3 w-full sm:w-auto">
+                            <a href="{{ route('documents.viewer', $document) }}"
+                                class="flex items-center justify-center w-10 h-10 sm:w-10 sm:h-10 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-xl transition-colors group"
                                 title="Lihat Dokumen">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -276,21 +276,25 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                 </svg>
+                                <span
+                                    class="sr-only sm:not-sr-only sm:ml-2 text-sm font-medium hidden group-hover:inline">Lihat</span>
                             </a>
 
+                            @if(auth()->user()->isSuperAdmin())
                             <a href="{{ route('documents.download', $document) }}"
-                                class="flex items-center justify-center w-10 h-10 bg-green-50 hover:bg-green-100 text-green-600 rounded-xl transition-colors"
+                                class="flex items-center justify-center w-10 h-10 sm:w-10 sm:h-10 bg-green-50 hover:bg-green-100 text-green-600 rounded-xl transition-colors group"
                                 title="Unduh Dokumen">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                 </svg>
+                                <span
+                                    class="sr-only sm:not-sr-only sm:ml-2 text-sm font-medium hidden group-hover:inline">Unduh</span>
                             </a>
 
-                            @if(auth()->user()->isSuperAdmin())
                             <div class="relative">
                                 <button onclick="toggleDocumentMenu('doc-{{ $document->id }}')"
-                                    class="flex items-center justify-center w-10 h-10 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-xl transition-colors"
+                                    class="flex items-center justify-center w-10 h-10 sm:w-10 sm:h-10 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-xl transition-colors"
                                     title="More Options">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -316,30 +320,6 @@
                                 </div>
                             </div>
                             @endif
-                        </div>
-                    </div>
-
-                    {{-- Mobile-only expanded view --}}
-                    <div class="mt-4 pt-4 border-t border-gray-100 sm:hidden">
-                        <div class="grid grid-cols-2 gap-4 text-center">
-                            <a href="{{ route('documents.viewer', $document) }}" 
-                                class="flex flex-col items-center gap-2 p-3 bg-blue-50 rounded-xl text-blue-600">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                                <span class="text-sm font-medium">Lihat</span>
-                            </a>
-                            <a href="{{ route('documents.download', $document) }}"
-                                class="flex flex-col items-center gap-2 p-3 bg-green-50 rounded-xl text-green-600">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                </svg>
-                                <span class="text-sm font-medium">Unduh</span>
-                            </a>
                         </div>
                     </div>
                 </div>

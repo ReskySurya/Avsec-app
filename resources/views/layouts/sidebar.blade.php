@@ -284,7 +284,7 @@ $isChecklistOpen = request()->is('checklist*');
             </li>
             @else
             <li>
-                <a href="#" class="flex items-center p-2 rounded hover:bg-gray-700">
+                <a href="{{ route('pmik.index') }}" class="flex items-center p-2 rounded hover:bg-gray-700">
                     <svg class="h-5 w-5 mr-3" ...></svg>
                     <span>PM dan IK</span>
                 </a>
