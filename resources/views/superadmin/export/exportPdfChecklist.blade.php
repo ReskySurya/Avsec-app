@@ -396,9 +396,13 @@
             alert('Silakan pilih minimal satu data untuk preview');
             return;
         }
+         if (selectedIds.length > 1) {
+            alert('Hanya satu data yang bisa di-review dalam satu waktu. Silakan pilih satu saja.');
+            return;
+        }
 
-        const checklistId = selectedIds[0];
-        const url = `/export/checklist/review/${checklistId}?form_type=${formType}`;
+        const reportId = selectedIds[0];
+        const url = `/export/checklist/review/${reportId}?form_type=${formType}`;
 
         try {
             modalContent.innerHTML = '<p class="text-center py-20">Loading preview...</p>';
@@ -422,6 +426,7 @@
 
         } catch (error) {
             console.error('Error fetching preview:', error);
+            console.log(url);
             modalContent.innerHTML = '<p class="text-center py-20 text-red-500">Gagal memuat preview. Silakan coba lagi.</p>';
         }
     }

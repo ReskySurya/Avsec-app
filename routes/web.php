@@ -42,10 +42,11 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::get('/export/logbook', [ExportPdfController::class, 'exportPdfLogbook'])->name('export.logbook');
     Route::post('/export/logbook/filter', [ExportPdfController::class, 'filterLogbook'])->name('export.logbook.filter');
     Route::get('/export/logbook/review/{report}', [ExportPdfController::class, 'reviewLogbook'])->name('export.logbook.review');
-
-
+    
+    
     Route::get('/export/checklist', [ExportPdfController::class, 'exportPdfChecklist'])->name('export.checklist');
     Route::post('/export/checklist/filter', [ExportPdfController::class, 'filterChecklist'])->name('export.checklist.filter');
+    Route::get('/export/checklist/review/{report}', [ExportPdfController::class, 'reviewChecklist'])->name('export.checklist.review');
 });
 
 // Supervisor Routes

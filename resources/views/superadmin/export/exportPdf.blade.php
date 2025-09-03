@@ -66,10 +66,6 @@
                 <p class="text-xs md:text-sm text-gray-600 group-hover:text-gray-700 text-center">
                     Pemeriksaan Checklist
                 </p>
-                {{-- Badge untuk fitur yang belum tersedia --}}
-                <span class="inline-block mt-1 px-2 py-1 text-xs bg-yellow-100 text-yellow-600 rounded-full">
-                    Coming Soon
-                </span>
             </div>
         </div>
     </div>

@@ -525,10 +525,10 @@
             return;
         }
 
-        // if (selectedReports.length > 1) {
-        //     alert('Hanya satu data yang bisa di-review dalam satu waktu. Silakan pilih satu saja.');
-        //     return;
-        // }
+        if (selectedReports.length > 1) {
+            alert('Hanya satu data yang bisa di-review dalam satu waktu. Silakan pilih satu saja.');
+            return;
+        }
 
         const reportId = selectedReports[0];
         // Include form_type as query parameter

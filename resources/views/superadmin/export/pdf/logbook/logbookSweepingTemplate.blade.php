@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>HHMD Forms - Sweeping PI</title>
+    <title>Forms - Sweeping PI</title>
     <style>
         {
             ! ! file_get_contents(public_path('css/pdf.css')) ! !

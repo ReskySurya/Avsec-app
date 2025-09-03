@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChecklistItem;
 use App\Models\ChecklistKendaraan;
+use App\Models\ChecklistKendaraanDetail;
 use App\Models\ChecklistPenyisiran;
 use App\Models\ChecklistSenpi;
 use App\Models\Equipment;
@@ -744,6 +746,136 @@ class ExportPdfController extends Controller
 
 
     //checklist
+
+    public function reviewChecklist(Request $request, $id)
+    {
+        $formType = $request->input('form_type');
+
+        if (!$formType) {
+            abort(400, 'Jenis checklist tidak disediakan.');
+        }
+
+        try {
+            switch ($formType) {
+                case 'kendaraan':
+                    return $this->reviewChecklistKendaraan($id);
+                case 'penyisiran':
+                    return $this->reviewChecklistPenyisiran($id);
+                case 'senpi':
+                    return $this->reviewChecklistSenpi($id);
+                case 'pencatatan_pi':
+                    return $this->reviewFormPencatatanPI($id);
+                case 'manual_book':
+                    return $this->reviewManualBook($id);
+                default:
+                    abort(404, 'Jenis checklist tidak valid.');
+            }
+        } catch (\Exception $e) {
+            Log::error("Error reviewing checklist: " . $e->getMessage());
+            abort(404, 'Data checklist tidak ditemukan.');
+        }
+    }
+
+    private function reviewChecklistKendaraan($id)
+    {
+        $checklist = ChecklistKendaraan::with([
+            'details.item',
+            'sender',
+            'receiver',
+            'approver'
+        ])->findOrFail($id);
+
+        // Ambil kategori unik dari ChecklistItem yang ada di detail checklist ini
+        $categoryList = $checklist->details
+            ->pluck('item.category')
+            ->filter() // Remove null values
+            ->unique()
+            ->sort()
+            ->values();
+
+        // Buat array categories dengan format yang sesuai untuk template
+        $categories = [];
+        $categoryCounter = 'A';
+
+        foreach ($categoryList as $category) {
+            if (!empty($category)) {
+                $categories[$category] = [
+                    $categoryCounter,
+                    strtoupper($category)
+                ];
+                $categoryCounter++;
+            }
+        }
+
+        // Handle items dengan category null/kosong
+        $hasEmptyCategory = $checklist->details->contains(function ($detail) {
+            return empty($detail->item->category) || is_null($detail->item->category);
+        });
+
+        if ($hasEmptyCategory) {
+            $categories['uncategorized'] = [$categoryCounter, 'Motor'];
+        }
+
+        // Group items by category for display
+        $groupedItems = [];
+        foreach ($checklist->details as $detail) {
+            $category = $detail->item->category;
+
+            // Jika category null atau kosong, masukkan ke uncategorized
+            if (empty($category) || is_null($category)) {
+                $category = 'uncategorized';
+            }
+
+            if (!isset($groupedItems[$category])) {
+                $groupedItems[$category] = [];
+            }
+            $groupedItems[$category][] = $detail;
+        }
+
+        return view('superadmin.export.pdf.checklist.checklistKendaraanTemplate', [
+            'checklist' => $checklist,
+            'groupedItems' => $groupedItems,
+            'categories' => $categories,
+            'formType' => 'kendaraan'
+        ]);
+    }
+
+    private function reviewChecklistPenyisiran($id)
+    {
+        $checklist = ChecklistPenyisiran::with(['details', 'sender', 'receiver', 'approver'])->findOrFail($id);
+        return view('superadmin.export.pdf.checklist.checklistPenyisiranTemplate', [
+            'data' => collect([$checklist]),
+            'formType' => 'penyisiran'
+        ]);
+    }
+
+    private function reviewChecklistSenpi($id)
+    {
+        $checklist = ChecklistSenpi::findOrFail($id);
+        return view('superadmin.export.pdf.checklist.checklistSenpiTemplate', [
+            'data' => collect([$checklist]),
+            'formType' => 'senpi'
+        ]);
+    }
+
+    private function reviewFormPencatatanPI($id)
+    {
+        $checklist = FormPencatatanPI::with(['sender', 'approver'])->findOrFail($id);
+        return view('superadmin.export.pdf.checklist.checklistPencatatanPITemplate', [
+            'data' => collect([$checklist]),
+            'formType' => 'pencatatan_pi'
+        ]);
+    }
+
+    private function reviewManualBook($id)
+    {
+        $checklist = ManualBook::with(['details', 'creator', 'approver'])->findOrFail($id);
+        return view('superadmin.export.pdf.checklist.checklistManualBookTemplate', [
+            'data' => collect([$checklist]),
+            'formType' => 'manual_book'
+        ]);
+    }
+
     public function exportPdfChecklist(Request $request)
     {
         if ($request->has('export_type')) {
@@ -1022,11 +1154,11 @@ class ExportPdfController extends Controller
         // Sesuaikan dengan template dan service yang ada
 
         $viewMapping = [
-            'kendaraan' => 'superadmin.export.pdf.checklistKendaraanTemplate',
-            'penyisiran' => 'superadmin.export.pdf.checklistPenyisiranTemplate',
-            'senpi' => 'superadmin.export.pdf.checklistSenpiTemplate',
-            'pencatatan_pi' => 'superadmin.export.pdf.checklistPencatatanPITemplate',
-            'manual_book' => 'superadmin.export.pdf.checklistManualBookTemplate',
+            'kendaraan' => 'superadmin.export.pdf.checklist.checklistKendaraanTemplate',
+            'penyisiran' => 'superadmin.export.pdf.checklist.checklistPenyisiranTemplate',
+            'senpi' => 'superadmin.export.pdf.checklist.checklistSenpiTemplate',
+            'pencatatan_pi' => 'superadmin.export.pdf.checklist.checklistPencatatanPITemplate',
+            'manual_book' => 'superadmin.export.pdf.checklist.checklistManualBookTemplate',
         ];
 
         $viewName = $viewMapping[$formType] ?? null;
@@ -1034,6 +1166,15 @@ class ExportPdfController extends Controller
         if (!$viewName) {
             return redirect()->back()->with('error', 'Template tidak ditemukan untuk jenis checklist ini.');
         }
+
+        // Special case for 'kendaraan' if the template is not modified to accept a collection
+        if ($formType === 'kendaraan') {
+            // If you modify checklistKendaraanTemplate to loop through `$data`, you can remove this `if` block.
+            // For now, we assume it might receive a single object or a collection.
+            $viewData = $data instanceof \Illuminate\Support\Collection ? ['data' => $data] : ['checklist' => $data->first()];
+            return view($viewName, $viewData);
+        }
+
 
         // Menggunakan PDF service yang sudah ada
         // return $this->pdfService->generatePdfFromTemplate($viewName, $data, $formType);
