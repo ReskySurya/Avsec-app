@@ -12,6 +12,7 @@
 </head>
 
 <body class="m-0 p-0">
+    @foreach($forms as $checklist)
     <div class="page-break-after border-t-2 border-x-2 border-black bg-white shadow-md p-6 m-6">
         @php
         $logoAirportBase64 = base64_encode(file_get_contents(public_path('images/airport-security-logo.png')));
@@ -20,13 +21,13 @@
 
         {{-- Header --}}
         <div class="flex flex-col sm:flex-row items-center justify-between mb-6">
-            <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo" class="w-20 h-20 mb-2 sm:mb-0">
+            <img src="data:image/png;base64,{{ $logoAirportBase64 }}" alt="Logo" class="w-20 h-20 mb-2 sm:mb-0">
             <div class="text-center flex-grow px-2">
                 <h1 class="text-sm sm:text-xl font-bold">CHECK LIST PENGECEKAN HARIAN</h1>
                 <h2 class="text-sm sm:text-lg font-bold">KENDARAAN {{ strtoupper($checklist->type ?? 'PATROLI') }} PATROLI</h2>
                 <p class="text-xs sm:text-sm">AIRPORT SECURITY BANDAR UDARA ADISUTJIPTO</p>
             </div>
-            <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo" class="w-20 h-20 mt-2 sm:mt-0">
+            <img src="data:image/png;base64,{{ $logoInjourneyBase64 }}" alt="Injourney Logo" class="w-20 h-20 mt-2 sm:mt-0">
         </div>
 
         {{-- Informasi Detail --}}
@@ -63,13 +64,46 @@
             </thead>
             <tbody>
                 @php
-                $overallNumber = 1; // Counter untuk nomor urut keseluruhan
+                $overallNumber = 1;
+
+                // This logic is moved from the controller to be reusable for single previews and bulk exports.
+                // It prepares the categories and groups the checklist items by category.
+
+                $categoryList = $checklist->details
+                    ->pluck('item.category')
+                    ->filter() // Removes null/false/empty strings to avoid them being treated as categories
+                    ->unique()
+                    ->sort()
+                    ->values();
+
+                $categories = [];
+                $categoryCounter = 'A';
+
+                foreach ($categoryList as $category) {
+                    // We already filtered for non-empty strings
+                    $categories[$category] = [$categoryCounter, strtoupper($category)];
+                    $categoryCounter++;
+                }
+
+                // Check if there are any items with a null or empty category string
+                $hasEmptyCategory = $checklist->details->contains(function ($detail) {
+                    return empty($detail->item->category);
+                });
+
+                // If so, add a special 'uncategorized' category
+                if ($hasEmptyCategory) {
+                    // Note: 'Motor' seems to be a default name for the uncategorized section
+                    $categories['uncategorized'] = [$categoryCounter, 'Motor'];
+                }
+
+                // Group the items, ensuring that null or empty strings are keyed as 'uncategorized'
+                $groupedItems = $checklist->details->groupBy(function ($detail) {
+                    return !empty($detail->item->category) ? $detail->item->category : 'uncategorized';
+                });
                 @endphp
                 
                 @foreach ($categories as $categoryKey => $categoryData)
-                    {{-- Cek apakah ada data untuk kategori ini --}}
                     @if (isset($groupedItems[$categoryKey]) && count($groupedItems[$categoryKey]) > 0)
-                        {{-- Baris Judul Kategori --}}
                         <tr>
                             <td class="border border-black px-2 py-2 text-center font-bold bg-gray-100">
                                 {{ $categoryData[0] }}
@@ -81,7 +115,6 @@
                             <td class="border border-black bg-gray-100"></td>
                         </tr>
 
-                        {{-- Looping untuk setiap item dalam kategori ini --}}
                         @foreach ($groupedItems[$categoryKey] as $detail)
                             <tr>
                                 <td class="border border-black px-2 py-2 text-center">
@@ -106,8 +139,7 @@
                     @endif
                 @endforeach
 
-                {{-- Jika tidak ada data sama sekali --}}
-                @if(empty($groupedItems))
+                @if($groupedItems->isEmpty())
                     <tr>
                         <td colspan="4" class="border border-black px-2 py-4 text-center text-gray-500">
                             Tidak ada data checklist
@@ -147,39 +179,23 @@
             <h3 class="font-bold text-sm mb-2">CATATAN :</h3>
             <div class="space-y-1">
                 @php
-                // Kumpulkan semua notes dari checklist kendaraan details yang tidak kosong
-                $allNotes = [];
-
-                // Loop melalui semua detail checklist untuk mengambil notes
-                if(isset($checklist) && $checklist->details) {
-                    foreach ($checklist->details as $detail) {
-                        if (!empty($detail->notes) && !is_null($detail->notes)) {
-                            $allNotes[] = [
-                                'item_name' => $detail->item->name ?? 'Item tidak ditemukan',
-                                'notes' => $detail->notes,
-                                'category' => $detail->item->category ?? 'motor'
-                            ];
-                        }
-                    }
-                }
+                $allNotes = $checklist->details->filter(fn($detail) => !empty($detail->notes));
                 @endphp
 
-                @forelse($allNotes as $index => $noteData)
+                @forelse($allNotes as $index => $detail)
                     <div class="flex">
                         <span class="w-4 text-sm">{{ $index + 1 }}</span>
                         <div class="border-b border-dotted border-black flex-1 min-h-[20px] flex items-end pb-1">
                             <span class="text-sm">
-                                <strong>{{ $noteData['item_name'] }}:</strong> {{ $noteData['notes'] }}
+                                <strong>{{ $detail->item->name ?? 'Item tidak ditemukan' }}:</strong> {{ $detail->notes }}
                             </span>
                         </div>
                     </div>
                 @empty
-                    {{-- Jika tidak ada notes, tampilkan beberapa baris kosong --}}
                     @for($i = 1; $i <= 3; $i++)
                         <div class="flex">
                             <span class="w-4 text-sm">{{ $i }}</span>
                             <div class="border-b border-dotted border-black flex-1 min-h-[20px]">
-                                {{-- Baris kosong --}}
                             </div>
                         </div>
                     @endfor
@@ -195,10 +211,9 @@
                 5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
                 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
             ];
-
-            $checklistDate = $checklist->date ? \Carbon\Carbon::parse($checklist->date) : $checklist->created_at;
+            $date = \Carbon\Carbon::parse($checklist->date);
             @endphp
-            <p class="mb-6">Yogyakarta, {{ $checklistDate->format('d') }} {{ $bulan[(int)$checklistDate->format('n')] }} {{ $checklistDate->format('Y') }}</p>
+            <p class="mb-6">Yogyakarta, {{ $date->format('d') }} {{ $bulan[(int)$date->format('n')] }} {{ $date->format('Y') }}</p>
 
             <div class="grid grid-cols-2 gap-4">
                 {{-- Kiri: Yang Menyerahkan --}}
@@ -252,6 +267,7 @@
             </div>
         </div>
     </div>
+    @endforeach
 </body>
 
 </html>

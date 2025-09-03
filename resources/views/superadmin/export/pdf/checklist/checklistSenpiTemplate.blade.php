@@ -7,7 +7,7 @@
     <style>{!! file_get_contents(public_path('css/pdf.css')) !!}</style>
 </head>
 <body class="m-0 p-0">
-    @foreach($data as $checklist)
+    @foreach($forms as $checklist)
     <div class="page-break-after border-t-2 border-x-2 border-black bg-white shadow-md p-6 m-6">
         @php
             $logoAirportBase64 = base64_encode(file_get_contents(public_path('images/airport-security-logo.png')));

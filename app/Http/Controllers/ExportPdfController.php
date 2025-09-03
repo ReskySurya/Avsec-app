@@ -717,8 +717,7 @@ class ExportPdfController extends Controller
     }
     private function generateLogbookPdf($formType, $data)
     {
-        // Implementasi generate PDF untuk logbook
-        // Sesuaikan dengan template dan service yang ada
+        $pdfService = app(PdfService::class);
 
         $viewMapping = [
             'pos_jaga' => 'superadmin.export.pdf.logbook.logbookPosJagaTemplate',
@@ -733,14 +732,7 @@ class ExportPdfController extends Controller
             return redirect()->back()->with('error', 'Template tidak ditemukan untuk jenis logbook ini.');
         }
 
-        // Menggunakan PDF service yang sudah ada
-        // return $this->pdfService->generatePdfFromTemplate($viewName, $data, $formType);
-
-        // Untuk sementara, return view untuk testing
-        return view($viewName, [
-            'data' => $data,
-            'formType' => $formType
-        ]);
+        return $pdfService->generatePdfFromTemplate($viewName, $data, $formType);
     }
 
 
@@ -785,66 +777,17 @@ class ExportPdfController extends Controller
             'approver'
         ])->findOrFail($id);
 
-        // Ambil kategori unik dari ChecklistItem yang ada di detail checklist ini
-        $categoryList = $checklist->details
-            ->pluck('item.category')
-            ->filter() // Remove null values
-            ->unique()
-            ->sort()
-            ->values();
-
-        // Buat array categories dengan format yang sesuai untuk template
-        $categories = [];
-        $categoryCounter = 'A';
-
-        foreach ($categoryList as $category) {
-            if (!empty($category)) {
-                $categories[$category] = [
-                    $categoryCounter,
-                    strtoupper($category)
-                ];
-                $categoryCounter++;
-            }
-        }
-
-        // Handle items dengan category null/kosong
-        $hasEmptyCategory = $checklist->details->contains(function ($detail) {
-            return empty($detail->item->category) || is_null($detail->item->category);
-        });
-
-        if ($hasEmptyCategory) {
-            $categories['uncategorized'] = [$categoryCounter, 'Motor'];
-        }
-
-        // Group items by category for display
-        $groupedItems = [];
-        foreach ($checklist->details as $detail) {
-            $category = $detail->item->category;
-
-            // Jika category null atau kosong, masukkan ke uncategorized
-            if (empty($category) || is_null($category)) {
-                $category = 'uncategorized';
-            }
-
-            if (!isset($groupedItems[$category])) {
-                $groupedItems[$category] = [];
-            }
-            $groupedItems[$category][] = $detail;
-        }
-
         return view('superadmin.export.pdf.checklist.checklistKendaraanTemplate', [
-            'checklist' => $checklist,
-            'groupedItems' => $groupedItems,
-            'categories' => $categories,
+            'forms' => collect([$checklist]),
             'formType' => 'kendaraan'
         ]);
     }
 
     private function reviewChecklistPenyisiran($id)
     {
-        $checklist = ChecklistPenyisiran::with(['details', 'sender', 'receiver', 'approver'])->findOrFail($id);
+        $checklist = ChecklistPenyisiran::with(['details.item', 'sender', 'receiver', 'approver'])->findOrFail($id);
         return view('superadmin.export.pdf.checklist.checklistPenyisiranTemplate', [
-            'data' => collect([$checklist]),
+            'forms' => collect([$checklist]),
             'formType' => 'penyisiran'
         ]);
     }
@@ -853,7 +796,7 @@ class ExportPdfController extends Controller
     {
         $checklist = ChecklistSenpi::findOrFail($id);
         return view('superadmin.export.pdf.checklist.checklistSenpiTemplate', [
-            'data' => collect([$checklist]),
+            'forms' => collect([$checklist]),
             'formType' => 'senpi'
         ]);
     }
@@ -862,7 +805,7 @@ class ExportPdfController extends Controller
     {
         $checklist = FormPencatatanPI::with(['sender', 'approver'])->findOrFail($id);
         return view('superadmin.export.pdf.checklist.checklistPencatatanPITemplate', [
-            'data' => collect([$checklist]),
+            'forms' => collect([$checklist]),
             'formType' => 'pencatatan_pi'
         ]);
     }
@@ -871,7 +814,7 @@ class ExportPdfController extends Controller
     {
         $checklist = ManualBook::with(['details', 'creator', 'approver'])->findOrFail($id);
         return view('superadmin.export.pdf.checklist.checklistManualBookTemplate', [
-            'data' => collect([$checklist]),
+            'forms' => collect([$checklist]),
             'formType' => 'manual_book'
         ]);
     }
@@ -1117,8 +1060,7 @@ class ExportPdfController extends Controller
                 return $query->get();
 
             case 'senpi':
-                $query = ChecklistSenpi::with(['creator'])
-                    ->orderBy('date', 'desc');
+                $query = ChecklistSenpi::orderBy('date', 'desc');
                 if ($startDate && $endDate) {
                     $query->whereBetween('date', [$startDate, $endDate]);
                 }
@@ -1150,8 +1092,7 @@ class ExportPdfController extends Controller
 
     private function generateChecklistPdf($formType, $data)
     {
-        // Implementasi generate PDF untuk checklist
-        // Sesuaikan dengan template dan service yang ada
+        $pdfService = app(PdfService::class);
 
         $viewMapping = [
             'kendaraan' => 'superadmin.export.pdf.checklist.checklistKendaraanTemplate',
@@ -1166,23 +1107,7 @@ class ExportPdfController extends Controller
         if (!$viewName) {
             return redirect()->back()->with('error', 'Template tidak ditemukan untuk jenis checklist ini.');
         }
-
-        // Special case for 'kendaraan' if the template is not modified to accept a collection
-        if ($formType === 'kendaraan') {
-            // If you modify checklistKendaraanTemplate to loop through `$data`, you can remove this `if` block.
-            // For now, we assume it might receive a single object or a collection.
-            $viewData = $data instanceof \Illuminate\Support\Collection ? ['data' => $data] : ['checklist' => $data->first()];
-            return view($viewName, $viewData);
-        }
-
-
-        // Menggunakan PDF service yang sudah ada
-        // return $this->pdfService->generatePdfFromTemplate($viewName, $data, $formType);
-
-        // Untuk sementara, return view untuk testing
-        return view($viewName, [
-            'data' => $data,
-            'formType' => $formType
-        ]);
+        
+        return $pdfService->generatePdfFromTemplate($viewName, $data, $formType);
     }
 }

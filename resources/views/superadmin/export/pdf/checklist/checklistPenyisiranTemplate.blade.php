@@ -7,7 +7,7 @@
     <style>{!! file_get_contents(public_path('css/pdf.css')) !!}</style>
 </head>
 <body class="m-0 p-0">
-    @foreach($data as $checklist)
+    @foreach($forms as $checklist)
     <div class="page-break-after border-t-2 border-x-2 border-black bg-white shadow-md p-6 m-6">
         @php
             $logoAirportBase64 = base64_encode(file_get_contents(public_path('images/airport-security-logo.png')));
@@ -41,28 +41,26 @@
         <table class="w-full border border-black mb-6 text-sm">
             <thead class="bg-gray-200">
                 <tr>
-                    <th class="border border-black px-2 py-2 font-bold w-10">NO</th>
-                    <th class="border border-black px-2 py-2 font-bold">LOKASI</th>
-                    <th class="border border-black px-2 py-2 font-bold">URAIAN</th>
+                    <th class="border border-black px-2 py-2 font-bold w-10" rowspan="2">NO</th>
+                    <th class="border border-black px-2 py-2 font-bold" rowspan="2">LOKASI</th>
+                    <th class="border border-black px-2 py-2 font-bold" rowspan="2">URAIAN</th>
                     <th class="border border-black px-2 py-2 font-bold" colspan="2">KONDISI</th>
-                    <th class="border border-black px-2 py-2 font-bold">KETERANGAN</th>
+                    <th class="border border-black px-2 py-2 font-bold" rowspan="2">KETERANGAN</th>
                 </tr>
                 <tr class="bg-gray-200">
-                    <th colspan="3"></th>
                     <th class="border border-black px-2 py-1 font-bold w-16">AMAN</th>
                     <th class="border border-black px-2 py-1 font-bold w-16">TIDAK AMAN</th>
-                    <th></th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($checklist->details as $index => $detail)
                 <tr>
                     <td class="border border-black px-2 py-2 text-center">{{ $index + 1 }}</td>
-                    <td class="border border-black px-2 py-2">{{ $detail->location }}</td>
-                    <td class="border border-black px-2 py-2">{{ $detail->uraian }}</td>
-                    <td class="border border-black px-2 py-2 text-center">@if($detail->is_ok) ✓ @endif</td>
-                    <td class="border border-black px-2 py-2 text-center">@if(!$detail->is_ok) ✓ @endif</td>
-                    <td class="border border-black px-2 py-2">{{ $detail->keterangan }}</td>
+                    <td class="border border-black px-2 py-2">{{ $detail->item->category ?? 'N/A' }}</td>
+                    <td class="border border-black px-2 py-2">{{ $detail->item->name ?? 'N/A' }}</td>
+                    <td class="border border-black px-2 py-2 text-center">@if($detail->iscondition) ✓ @endif</td>
+                    <td class="border border-black px-2 py-2 text-center">@if(!$detail->iscondition) ✓ @endif</td>
+                    <td class="border border-black px-2 py-2">{{ $detail->notes }}</td>
                 </tr>
                 @empty
                 <tr>
