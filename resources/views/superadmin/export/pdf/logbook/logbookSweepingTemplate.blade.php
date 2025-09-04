@@ -7,10 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Forms - Sweeping PI</title>
     <style>
-        {
-            ! ! file_get_contents(public_path('css/pdf.css')) ! !
-        }
-
+        {!! file_get_contents(public_path('css/pdf.css')) !!}
         /* Custom CSS untuk landscape */
         @page {
             size: A4 landscape;
@@ -49,6 +46,7 @@
 </head>
 
 <body class="m-0 p-0">
+    @foreach($forms as $form)
     <div class="landscape-container border-t-2 border-x-2 border-black bg-white shadow-md p-4 m-4 page-break-after">
         @php
         $logoAirportBase64 = base64_encode(file_get_contents(public_path('images/airport-security-logo.png')));
@@ -57,7 +55,7 @@
 
         <!-- Header Section -->
         <div class="flex items-center justify-between mb-4">
-            <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo" class="w-16 h-16">
+            <img src="data:image/png;base64,{{ $logoAirportBase64 }}" alt="Logo" class="w-16 h-16">
             <div class="text-center flex-grow px-4">
                 <h1 class="text-sm font-bold">
                     LOGBOOK HARIAN <br>
@@ -65,10 +63,9 @@
                     SWEEPING PROHIBITED ITEMS
                 </h1>
             </div>
-            <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo" class="w-16 h-16">
+            <img src="data:image/png;base64,{{ $logoInjourneyBase64 }}" alt="Injourney Logo" class="w-16 h-16">
         </div>
 
-        @foreach($forms as $form)
         <!-- Informasi detail -->
         <div class="border-t border-gray-300 pt-2 mb-4">
             <div class="grid grid-cols-2 gap-x-8 text-xs text-gray-700">
@@ -77,7 +74,7 @@
                         : {{ \Carbon\Carbon::createFromDate($form->tahun, $form->bulan, 1)->translatedFormat('F Y') }}
                     </span>
                 </p>
-                <p>TENANT <span class="font-semibold">: {{ $form->tenant->tenant_name }}</span></p>
+                <p>TENANT <span class="font-semibold">: {{ $form->tenant->tenant_name ?? 'N/A' }}</span></p>
             </div>
         </div>
 
@@ -111,21 +108,16 @@
         {{-- Kalender Checklist Prohibited Items --}}
         @php
         $daysInMonth = \Carbon\Carbon::createFromDate($form->tahun, $form->bulan, 1)->daysInMonth;
-        $monthName = \Carbon\Carbon::createFromDate($form->tahun, $form->bulan, 1)->translatedFormat('F Y');
         @endphp
 
-        {{-- Tabel Prohibited Items dengan Kalender --}}
         <div class="flex justify-center mb-2">
             <p class="font-semibold text-xs">PROHIBITED ITEMS</p>
         </div>
 
         @if(isset($form->sweepingDetails) && $form->sweepingDetails->count() > 0)
         @foreach($form->sweepingDetails as $detailIndex => $detail)
-
-        <!-- Single table untuk semua tanggal (landscape bisa muat) -->
         <table class="w-full border border-black mb-3 calendar-table">
             <thead>
-                <!-- Header dengan nama item -->
                 <tr class="bg-gray-100">
                     <td class="border border-black px-1 py-1 font-semibold item-name-cell" rowspan="2">
                         <div class="text-xs">
@@ -137,15 +129,13 @@
                     </td>
                     @for($day = 1; $day <= $daysInMonth; $day++)
                         <th class="border border-black px-1 py-1 day-cell text-center text-2xs">{{ $day }}</th>
+                    @endfor
+                    @if($daysInMonth < 31)
+                        @for($day=$daysInMonth + 1; $day <=31; $day++)
+                        <th class="border border-black px-1 py-1 day-cell text-center bg-gray-200 text-2xs">-</th>
                         @endfor
-                        @if($daysInMonth < 31)
-                            @for($day=$daysInMonth + 1; $day <=31; $day++)
-                            <th class="border border-black px-1 py-1 day-cell text-center bg-gray-200 text-2xs">-</th>
-                            @endfor
-                            @endif
+                    @endif
                 </tr>
-
-                <!-- Baris untuk checkboxes -->
                 <tr class="bg-gray-100">
                     @for($day = 1; $day <= $daysInMonth; $day++)
                         @php
@@ -167,16 +157,15 @@
                                 @endif
                             </div>
                         </td>
+                    @endfor
+                    @if($daysInMonth < 31)
+                        @for($day=$daysInMonth + 1; $day <=31; $day++)
+                        <td class="border border-black px-1 py-1 text-center day-cell bg-gray-200">-</td>
                         @endfor
-                        @if($daysInMonth < 31)
-                            @for($day=$daysInMonth + 1; $day <=31; $day++)
-                            <td class="border border-black px-1 py-1 text-center day-cell bg-gray-200">-</td>
-                            @endfor
-                            @endif
+                    @endif
                 </tr>
             </thead>
         </table>
-
         @endforeach
         @else
         <div class="border border-black p-4 text-center text-gray-400 italic text-xs">
@@ -184,7 +173,6 @@
         </div>
         @endif
 
-        {{-- Keterangan --}}
         <div class="mb-4">
             <p class="font-semibold mb-2 text-xs">Keterangan:</p>
             <div class="grid grid-cols-4 gap-2 text-xs">
@@ -204,18 +192,7 @@
                 </div>
             </div>
         </div>
-        <!-- 
-        {{-- Catatan --}}
-        @if(isset($form->notes) && $form->notes)
-        <div class="flex justify-center mb-2">
-            <p class="font-semibold text-xs">CATATAN</p>
-        </div>
-        <div class="border border-black p-2 mb-4 text-xs min-h-12">
-            <p>{{ $form->notes }}</p>
-        </div>
-        @endif -->
 
-        {{-- Notes Sweeping PI --}}
         @if(isset($form->notesSweeping) && $form->notesSweeping->count() > 0)
         <div class="flex justify-center mb-2">
             <p class="font-semibold text-xs">CATATAN</p>
@@ -242,24 +219,23 @@
         </table>
         @endif
 
-        {{-- Tanda Tangan --}}
         <div class="mt-6 text-center text-xs">
             <div class="flex justify-end">
                 <div>
                     <p>Pemilik Tenant</p>
                     <div class="h-12 flex items-center justify-center">
-                        @if(isset($sweeping) && $sweeping->tenant->supervisorSignature)
-                        <img src="data:image/png;base64,{!! $sweeping->tenant->supervisorSignature !!}" class="h-12 mt-3" alt="Tanda Tangan">
+                        @if(isset($form->tenant) && $form->tenant->supervisorSignature)
+                        <img src="data:image/png;base64,{{ $form->tenant->supervisorSignature }}" class="h-12 mt-3" alt="Tanda Tangan">
                         @else
                         <span class="italic text-gray-400">Belum tanda tangan</span>
                         @endif
                     </div>
-                    <p class="font-semibold mt-1">{{ $sweeping->tenant->supervisorName ?? '-' }}</p>
+                    <p class="font-semibold mt-1">{{ $form->tenant->supervisorName ?? '-' }}</p>
                 </div>
             </div>
         </div>
-        @endforeach
     </div>
+    @endforeach
 </body>
 
 </html>

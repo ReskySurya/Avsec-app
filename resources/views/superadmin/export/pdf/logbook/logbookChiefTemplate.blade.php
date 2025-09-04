@@ -12,6 +12,7 @@
 </head>
 
 <body class="m-0 p-0">
+    @foreach($forms as $chief)
     <div class="border-t-2 border-x-2 border-black bg-white shadow-md p-6 m-6 page-break-after">
         @php
         $logoAirportBase64 = base64_encode(file_get_contents(public_path('images/airport-security-logo.png')));
@@ -19,27 +20,26 @@
         @endphp
         
         <div class="flex flex-col sm:flex-row items-center justify-between">
-            <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo" class="w-20 h-20 mb-2 sm:mb-0">
+            <img src="data:image/png;base64,{{ $logoAirportBase64 }}" alt="Logo" class="w-20 h-20 mb-2 sm:mb-0">
             <h1 class="text-sm sm:text-xl font-bold text-center flex-grow px-2">
                 LOGBOOK HARIAN <br>
                 CATATAN AKTIVITAS HARIAN <br>
                 CHIEF SECURITY
             </h1>
-            <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo" class="w-20 h-20 mt-2 sm:mt-0">
+            <img src="data:image/png;base64,{{ $logoInjourneyBase64 }}" alt="Injourney Logo" class="w-20 h-20 mt-2 sm:mt-0">
         </div>
 
-        @foreach($forms as $form)
         <!-- Informasi detail -->
         <div class="border-t border-gray-300 pt-3 mt-4 mb-6">
             <div class="grid grid-cols-2 gap-y-2 text-sm text-gray-700">
                 <p>HARI / TANGGAL
                     <span class="font-semibold">
-                        : {{ \Carbon\Carbon::parse($form->date)->translatedFormat('l, d F Y') }}
+                        : {{ \Carbon\Carbon::parse($chief->date)->translatedFormat('l, d F Y') }}
                     </span>
                 </p>
-                <p>LOKASI <span class="font-semibold">: {{ $form->lokasi }}</span></p>
-                <p>CHIEF <span class="font-semibold">: {{ $form->chief }}</span></p>
-                <p>STATUS <span class="font-semibold">: {{ strtoupper($form->status) }}</span></p>
+                <p>LOKASI <span class="font-semibold">: {{ $chief->lokasi }}</span></p>
+                <p>CHIEF <span class="font-semibold">: {{ $chief->chief }}</span></p>
+                <p>STATUS <span class="font-semibold">: {{ strtoupper($chief->status) }}</span></p>
             </div>
         </div>
 
@@ -63,8 +63,8 @@
                 <tr>
                     <td class="border border-black px-2 py-1 text-center">1</td>
                     <td class="border border-black px-2 py-1 text-center">08:00 - 09:00</td>
-                    <td class="border border-black px-2 py-1">{{ $form->aktivitas }}</td>
-                    <td class="border border-black px-2 py-1 text-center">{{ $form->lokasi }}</td>
+                    <td class="border border-black px-2 py-1">{{ $chief->aktivitas }}</td>
+                    <td class="border border-black px-2 py-1 text-center">{{ $chief->lokasi }}</td>
                     <td class="border border-black px-2 py-1 text-center">-</td>
                     <td class="border border-black px-2 py-1 text-center">-</td>
                 </tr>
@@ -124,7 +124,7 @@
             <p class="font-semibold self-center">CATATAN CHIEF</p>
         </div>
         <div class="border border-black p-4 mb-6 text-sm min-h-20">
-            <p>{{ $form->notes ?? 'Tidak ada catatan khusus. Semua aktivitas berjalan normal sesuai prosedur.' }}</p>
+            <p>{{ $chief->notes ?? 'Tidak ada catatan khusus. Semua aktivitas berjalan normal sesuai prosedur.' }}</p>
         </div>
 
         {{-- Tanda Tangan --}}
@@ -135,18 +135,18 @@
                     <p>Chief Security</p>
                     <div class="h-16 flex items-center justify-center">
                         @if(isset($chief) && $chief->chiefSignature)
-                        <img src="data:image/png;base64,{!! $chief->chiefSignature !!}" class="h-16 mt-5" alt="Tanda Tangan">
+                        <img src="data:image/png;base64,{{ $chief->chiefSignature }}" class="h-16 mt-5" alt="Tanda Tangan">
                         @else
                         <span class="italic text-gray-400">Belum tanda tangan</span>
                         @endif
                     </div>
-                    <p class="font-semibold mt-1">{{ $form->chief }}</p>
-                    <p class="text-xs text-gray-600">{{ \Carbon\Carbon::parse($form->date)->format('d/m/Y') }}</p>
+                    <p class="font-semibold mt-1">{{ $chief->chief }}</p>
+                    <p class="text-xs text-gray-600">{{ \Carbon\Carbon::parse($chief->date)->format('d/m/Y') }}</p>
                 </div>
             </div>
         </div>
-        @endforeach
     </div>
+    @endforeach
 </body>
 
 </html>
