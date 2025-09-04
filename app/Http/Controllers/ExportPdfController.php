@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChecklistItem;
 use App\Models\ChecklistKendaraan;
+use App\Models\ChecklistKendaraanDetail;
 use App\Models\ChecklistPenyisiran;
 use App\Models\ChecklistSenpi;
 use App\Models\Equipment;
 use App\Models\EquipmentLocation;
 use App\Models\FormPencatatanPI;
 use App\Models\LogbookRotasi;
+use App\Models\ManualBook;
 use App\Models\Report;
 use App\Models\ReportDetail;
 use Illuminate\Http\Request;
@@ -16,6 +19,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Location;
 use App\Models\Logbook;
 use App\Models\LogbookSweepingPI;
+use App\Models\User;
 use App\Services\PdfService;
 use Illuminate\Support\Facades\Log;
 
@@ -86,10 +90,10 @@ class ExportPdfController extends Controller
         $formType = $report->equipmentLocation->equipment->name;
         $type = strtolower($formType);
         $viewMapping = [
-            'hhmd'       => 'superadmin.export.pdf.hhmdTemplate',
-            'wtmd'       => 'superadmin.export.pdf.wtmdTemplate',
-            'xraycabin'  => 'superadmin.export.pdf.xraycabinTemplate',
-            'xraybagasi' => 'superadmin.export.pdf.xraybagasiTemplate',
+            'hhmd'       => 'superadmin.export.pdf.dailytest.hhmdTemplate',
+            'wtmd'       => 'superadmin.export.pdf.dailytest.wtmdTemplate',
+            'xraycabin'  => 'superadmin.export.pdf.dailytest.xraycabinTemplate',
+            'xraybagasi' => 'superadmin.export.pdf.dailytest.xraybagasiTemplate',
         ];
 
         if (!isset($viewMapping[$type])) {
@@ -117,10 +121,10 @@ class ExportPdfController extends Controller
 
             $type = strtolower($formType);
             $viewMapping = [
-                'hhmd'       => 'superadmin.export.pdf.hhmdTemplate',
-                'wtmd'       => 'superadmin.export.pdf.wtmdTemplate',
-                'xraycabin'  => 'superadmin.export.pdf.xraycabinTemplate',
-                'xraybagasi' => 'superadmin.export.pdf.xraybagasiTemplate',
+                'hhmd'       => 'superadmin.export.pdf.dailytest.hhmdTemplate',
+                'wtmd'       => 'superadmin.export.pdf.dailytest.wtmdTemplate',
+                'xraycabin'  => 'superadmin.export.pdf.dailytest.xraycabinTemplate',
+                'xraybagasi' => 'superadmin.export.pdf.dailytest.xraybagasiTemplate',
             ];
 
             if (!isset($viewMapping[$type])) {
@@ -216,9 +220,190 @@ class ExportPdfController extends Controller
 
 
     //logbook
+    public function reviewLogbook(Request $request, $logbookID)
+    {
+        $formType = $request->input('form_type');
+        if (!$formType) {
+            $formType = $this->detectLogbookType($logbookID);
+        }
+
+        try {
+            switch ($formType) {
+                case 'pos_jaga':
+                    return $this->reviewPosJagaLogbook($logbookID);
+                case 'sweeping_pi':
+                    return $this->reviewSweepingPILogbook($logbookID);
+                case 'rotasi':
+                    return $this->reviewRotasiLogbook($logbookID);
+                case 'chief':
+                    return $this->reviewChiefLogbook($logbookID);
+                default:
+                    abort(404, 'Jenis logbook tidak ditemukan');
+            }
+        } catch (\Exception $e) {
+            Log::error("Error reviewing logbook: " . $e->getMessage());
+            abort(404, 'Data logbook tidak ditemukan');
+        }
+    }
+
+    private function detectLogbookType($logbookID)
+    {
+        if (str_starts_with($logbookID, 'SPI-')) return 'sweeping_pi';
+        if (str_starts_with($logbookID, 'LRH-') || str_starts_with($logbookID, 'LRS-')) return 'rotasi';
+        if (str_starts_with($logbookID, 'CHF-')) return 'chief';
+        return 'pos_jaga';
+    }
+
+    private function reviewPosJagaLogbook($logbookID)
+    {
+        $logbook = Logbook::with(['details', 'senderBy', 'receiverBy', 'approverBy', 'locationArea', 'facility', 'personil.user'])->findOrFail($logbookID);
+        $form = $this->prepareLogbookFormData($logbook);
+        return view('superadmin.export.pdf.logbook.logbookPosJagaTemplate', [
+            'forms' => collect([$form]),
+        ]);
+    }
+
+    private function reviewSweepingPILogbook($sweepingpiID)
+    {
+        $sweeping = LogbookSweepingPI::with(['tenant', 'sweepingPIDetails', 'notesSweepingPI'])->findOrFail($sweepingpiID);
+        $form = $this->prepareSweepingPIFormData($sweeping);
+        return view('superadmin.export.pdf.logbook.logbookSweepingTemplate', [
+            'forms' => collect([$form]),
+        ]);
+    }
+
+    private function reviewRotasiLogbook($id)
+    {
+        $rotasi = LogbookRotasi::with(['creator', 'submitter', 'approver', 'details.officerAssignment.user'])->findOrFail($id);
+        $form = $this->prepareRotasiFormData($rotasi);
+        $form->officerLog = $this->prepareOfficerLogData($rotasi);
+        return view('superadmin.export.pdf.logbook.logbookRotasiTemplate', [
+            'forms' => collect([$form]),
+        ]);
+    }
+
+    private function reviewChiefLogbook($chiefID)
+    {
+        $form = new \stdClass();
+        $form->chiefID = $chiefID;
+        $form->date = now();
+        $form->aktivitas = 'Inspeksi Rutin';
+        $form->lokasi = 'Semua Area';
+        $form->chief = 'Chief Security';
+        $form->status = 'submitted';
+        $form->notes = 'Tidak ada catatan khusus.';
+        $form->chiefSignature = null;
+        return view('superadmin.export.pdf.logbook.logbookChiefTemplate', [
+            'forms' => collect([$form]),
+        ]);
+    }
+
+    private function prepareSweepingPIFormData(LogbookSweepingPI $sweeping)
+    {
+        $form = new \stdClass();
+        $form->sweepingpiID = $sweeping->sweepingpiID;
+        $form->created_at = $sweeping->created_at;
+        $form->bulan = $sweeping->bulan;
+        $form->tahun = $sweeping->tahun;
+        $form->notes = $sweeping->notes;
+        $form->tenant = $sweeping->tenant;
+        $form->sweepingDetails = $sweeping->sweepingPIDetails;
+        $form->notesSweeping = $sweeping->notesSweepingPI;
+        $form->completionStats = $sweeping->getCompletionStats();
+        return $form;
+    }
+
+    private function prepareRotasiFormData(LogbookRotasi $rotasi)
+    {
+        $form = new \stdClass();
+        $form->rotasiID = $rotasi->id;
+        $form->date = $rotasi->date;
+        $form->type = $rotasi->type;
+        $form->status = $rotasi->status;
+        $form->notes = $rotasi->notes;
+        $form->creatorName = $rotasi->creator->name ?? 'N/A';
+        $form->approverName = $rotasi->approver->name ?? 'N/A';
+        $form->submittedSignature = $rotasi->submittedSignature;
+        $form->approvedSignature = $rotasi->approvedSignature;
+        return $form;
+    }
+
+    private function prepareOfficerLogData(LogbookRotasi $rotasi)
+    {
+        $officerLog = [];
+        $officerIds = $rotasi->details->pluck('pemeriksaan_dokumen')
+            ->merge($rotasi->details->pluck('pengatur_flow'))
+            ->merge($rotasi->details->pluck('operator_xray'))
+            ->merge($rotasi->details->pluck('hhmd_petugas'))
+            ->merge($rotasi->details->pluck('manual_kabin_petugas'))
+            ->filter()->unique();
+
+        $officers = User::whereIn('id', $officerIds)->get()->keyBy('id');
+
+        foreach ($rotasi->details as $detail) {
+            $roles = [
+                'pemeriksaan_dokumen' => $detail->pemeriksaan_dokumen,
+                'pengatur_flow' => $detail->pengatur_flow,
+                'operator_xray' => $detail->operator_xray,
+                'hhmd_petugas' => $detail->hhmd_petugas,
+                'manual_kabin_petugas' => $detail->manual_kabin_petugas,
+            ];
+
+            foreach ($roles as $roleName => $officerId) {
+                if (!$officerId) continue;
+
+                if (!isset($officerLog[$officerId])) {
+                    $officer = $officers->get($officerId);
+                    $officerLog[$officerId] = [
+                        'officer_name' => $officer->name ?? 'Officer ' . $officerId,
+                        'roles' => [],
+                        'keterangan' => []
+                    ];
+                }
+
+                $roleData = [
+                    'start' => $detail->officerAssignment->start_time ?? '00:00',
+                    'end' => $detail->officerAssignment->end_time ?? '23:59',
+                    'hhmd_random' => $detail->hhmd_random ?? '-',
+                    'hhmd_unpredictable' => $detail->hhmd_unpredictable ?? '-',
+                    'cek_random_barang' => $detail->cek_random_barang ?? '-',
+                    'barang_unpredictable' => $detail->barang_unpredictable ?? '-',
+                ];
+
+                $officerLog[$officerId]['roles'][$roleName][] = $roleData;
+
+                if ($detail->keterangan) {
+                    $officerLog[$officerId]['keterangan'][] = $detail->keterangan;
+                }
+            }
+        }
+        return $officerLog;
+    }
+
+    private function prepareLogbookFormData(Logbook $logbook)
+    {
+        $form = new \stdClass();
+        $form->logbookID = $logbook->logbookID;
+        $form->date = $logbook->date;
+        $form->location = $logbook->locationArea->name ?? 'N/A';
+        $form->grup = $logbook->grup;
+        $form->shift = $logbook->shift;
+        $form->status = $logbook->status;
+        $form->senderName = $logbook->senderBy->name ?? 'N/A';
+        $form->receiverName = $logbook->receiverBy->name ?? 'N/A';
+        $form->approverName = $logbook->approverBy->name ?? 'N/A';
+        $form->senderSignature = $logbook->senderSignature;
+        $form->receivedSignature = $logbook->receivedSignature;
+        $form->approvedSignature = $logbook->approvedSignature;
+        $form->rejectedReason = $logbook->rejected_reason;
+        $form->logbookDetails = $logbook->details;
+        $form->facility = $logbook->facility;
+        $form->personil = $logbook->personil;
+        return $form;
+    }
+
     public function exportPdfLogbook(Request $request)
     {
-        // Jika request memiliki export_type, proses export
         if ($request->has('export_type')) {
             return $this->processLogbookExport($request);
         }
@@ -227,7 +412,6 @@ class ExportPdfController extends Controller
             ->orderBy('name')
             ->get();
 
-        // Load initial data berdasarkan form type default (pos_jaga)
         $initialFormType = $request->input('form_type', 'pos_jaga');
         $initialData = $this->getLogbookData($initialFormType, $request->only(['location', 'start_date', 'end_date']));
 
@@ -242,128 +426,56 @@ class ExportPdfController extends Controller
     {
         $formType = $request->input('form_type', 'pos_jaga');
         $filters = $request->only(['location', 'start_date', 'end_date']);
-
-        $data = $this->getLogbookData($formType, $filters);
-
+        $logbooks = $this->getLogbookData($formType, $filters);
         return response()->json([
-            'logbooks' => $data,
-            'form_type' => $formType
+            'success' => true,
+            'form_type' => $formType,
+            'logbooks' => $logbooks,
+            'count' => $logbooks->count()
         ]);
     }
 
     private function getLogbookData($formType, $filters = [])
     {
+        $query = null;
         $startDate = $filters['start_date'] ?? null;
         $endDate = $filters['end_date'] ?? null;
-        $locationName = $filters['location'] ?? null;
 
         switch ($formType) {
             case 'pos_jaga':
-                try {
-                    $query = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy'])
-                        ->orderBy('date', 'desc');
-
-                    if ($locationName && $locationName !== 'Semua Lokasi') {
-                        $query->whereHas('locationArea', fn($q) => $q->where('name', $locationName));
-                    }
-                    if ($startDate && $endDate) {
-                        $query->whereBetween('date', [$startDate, $endDate]);
-                    }
-
-                    $logbooks = $query->get();
-
-                    return $logbooks->map(function ($logbook) {
-                        return [
-                            'logbookID' => $logbook->logbookID,
-                            'date' => $logbook->date,
-                            'location_area' => $logbook->locationArea,
-                            'sender_by' => $logbook->senderBy,
-                            'receiver_by' => $logbook->receiverBy,
-                            'approver_by' => $logbook->approverBy,
-                            'status' => $logbook->status ?? 'submitted',
-                        ];
-                    });
-                } catch (\Exception $e) {
-                    Log::error("Error getting pos_jaga data: " . $e->getMessage());
-                    return collect();
+                $query = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy', 'details', 'facility', 'personil.user']);
+                if (!empty($filters['location'])) {
+                    $query->whereHas('locationArea', fn($q) => $q->where('name', $filters['location']));
                 }
+                if ($startDate) $query->whereDate('date', '>=', $startDate);
+                if ($endDate) $query->whereDate('date', '<=', $endDate);
+                return $query->orderBy('date', 'desc')->get();
 
             case 'sweeping_pi':
-                try {
-                    $query = LogbookSweepingPI::with(['tenant'])
-                        ->orderBy('created_at', 'desc');
-
-                    if ($startDate && $endDate) {
-                        $startMonth = date('n', strtotime($startDate));
-                        $startYear = date('Y', strtotime($startDate));
-                        $endMonth = date('n', strtotime($endDate));
-                        $endYear = date('Y', strtotime($endDate));
-
-                        $query->where(function ($q) use ($startYear, $startMonth, $endYear, $endMonth) {
-                            $q->where(function ($subQ) use ($startYear, $startMonth) {
-                                $subQ->where('tahun', $startYear)->where('bulan', '>=', $startMonth);
-                            })->orWhere(function ($subQ) use ($endYear, $endMonth) {
-                                $subQ->where('tahun', $endYear)->where('bulan', '<=', $endMonth);
-                            })->orWhere(function ($subQ) use ($startYear, $endYear) {
-                                $subQ->where('tahun', '>', $startYear)->where('tahun', '<', $endYear);
-                            });
-                        });
-                    }
-
-                    $sweepings = $query->get();
-
-                    return $sweepings->map(function ($sweeping) {
-                        return [
-                            'sweepingpiID' => $sweeping->sweepingpiID, // Sesuai primary key
-                            'created_at' => $sweeping->created_at,
-                            'tenant' => $sweeping->tenant,
-                            'bulan' => $sweeping->bulan,
-                            'tahun' => $sweeping->tahun
-                        ];
-                    });
-                } catch (\Exception $e) {
-                    Log::error("Error getting sweeping_pi data: " . $e->getMessage());
-                    return collect();
-                }
+                $query = LogbookSweepingPI::with(['tenant', 'sweepingPIDetails', 'notesSweepingPI']);
+                if ($startDate) $query->whereDate('created_at', '>=', $startDate);
+                if ($endDate) $query->whereDate('created_at', '<=', $endDate);
+                return $query->orderBy('created_at', 'desc')->get();
 
             case 'rotasi':
-                try {
-                    $query = LogbookRotasi::with(['creator', 'approver'])
-                        ->orderBy('date', 'desc');
-
-                    if ($startDate && $endDate) {
-                        $query->whereBetween('date', [$startDate, $endDate]);
-                    }
-
-                    $rotasis = $query->get();
-
-                    return $rotasis->map(function ($rotasi) {
-                        return [
-                            'rotasiID' => $rotasi->id,
-                            'date' => $rotasi->date,
-                            'type' => $rotasi->type,
-                            'location' => (object)['name' => 'Area ' . $rotasi->type], // Model tidak punya relasi location
-                            'shift' => $rotasi->type, // Menggunakan type sebagai shift
-                            'petugas_masuk' => $rotasi->creator->name ?? 'N/A',
-                            'petugas_keluar' => 'N/A', // Model tidak punya field ini
-                            'status' => $rotasi->status ?? 'submitted',
-                        ];
-                    });
-                } catch (\Exception $e) {
-                    Log::error("Error getting rotasi data: " . $e->getMessage());
-                    return collect();
+                $query = LogbookRotasi::with(['creator', 'approver', 'submitter', 'details.officerAssignment.user']);
+                if (!empty($filters['location'])) {
+                    $query->where('type', $filters['location']);
                 }
+                if ($startDate) $query->whereDate('date', '>=', $startDate);
+                if ($endDate) $query->whereDate('date', '<=', $endDate);
+                return $query->orderBy('date', 'desc')->get();
 
             case 'chief':
-                // Model chief belum ada, return dummy data
+                // Return dummy data for chief since model doesn't exist yet
                 return collect([
-                    [
-                        'chiefID' => 1,
+                    (object) [
+                        'chiefID' => 'CHF-001',
                         'date' => now(),
                         'aktivitas' => 'Inspeksi Rutin',
                         'lokasi' => 'Semua Area',
                         'chief' => 'Chief Security',
-                        'status' => 'submitted',
+                        'status' => 'submitted'
                     ]
                 ]);
 
@@ -371,6 +483,7 @@ class ExportPdfController extends Controller
                 return collect();
         }
     }
+
     private function processLogbookExport(Request $request)
     {
         $formType = $request->input('form_type');
@@ -378,102 +491,169 @@ class ExportPdfController extends Controller
             return redirect()->back()->with('error', 'Silakan pilih "Jenis Logbook" untuk bisa mengekspor.');
         }
 
-        // Logic untuk export PDF berdasarkan jenis logbook
         if ($request->input('export_type') === 'selected') {
             $selectedIds = $request->input('selected_reports', []);
             if (empty($selectedIds)) {
                 return redirect()->back()->with('error', 'Pilih minimal satu data untuk diekspor!');
             }
-
-            // Export selected data
             return $this->exportSelectedLogbook($formType, $selectedIds);
         } elseif ($request->input('export_type') === 'all') {
             $filters = $request->only(['location', 'start_date', 'end_date']);
-
-            // Export all data with filters
             return $this->exportAllLogbook($formType, $filters);
         }
 
         return redirect()->back()->with('error', 'Tipe export tidak valid.');
     }
+
     private function exportSelectedLogbook($formType, $selectedIds)
     {
-        // Implementasi export selected logbook
-        // Sesuaikan dengan PDF service yang ada
-
-        switch ($formType) {
-            case 'pos_jaga':
-                $data = Logbook::whereIn('logbookID', $selectedIds)
-                    ->with(['locationArea', 'senderBy', 'receiverBy', 'approverBy'])
-                    ->get();
-                break;
-
-            case 'sweeping_pi':
-                $data = LogbookSweepingPI::whereIn('sweepingID', $selectedIds)
-                    ->with(['tenant', 'createdBy'])
-                    ->get();
-                break;
-
-            case 'rotasi':
-                $data = LogbookRotasi::whereIn('id', $selectedIds)
-                    ->with(['location', 'petugasMasuk', 'petugasKeluar'])
-                    ->get();
-                break;
-
-            default:
-                return redirect()->back()->with('error', 'Jenis logbook tidak valid.');
+        $model = $this->getLogbookModel($formType);
+        if (!$model) {
+            return redirect()->back()->with('error', 'Jenis logbook tidak valid.');
         }
+        $data = $model::whereIn($model->getKeyName(), $selectedIds)->get();
 
         if ($data->isEmpty()) {
             return redirect()->back()->with('error', 'Data yang dipilih tidak ditemukan.');
         }
-
-        // Generate PDF menggunakan service yang ada
         return $this->generateLogbookPdf($formType, $data);
     }
+
     private function exportAllLogbook($formType, $filters)
     {
-        // Implementasi export all logbook dengan filter
         $data = $this->getLogbookData($formType, $filters);
-
         if ($data->isEmpty()) {
             return redirect()->back()->with('error', 'Tidak ada data yang ditemukan untuk filter yang dipilih.');
         }
-
-        // Generate PDF menggunakan service yang ada
         return $this->generateLogbookPdf($formType, $data);
     }
+
+    private function getLogbookModel($formType)
+    {
+        return match ($formType) {
+            'pos_jaga' => new Logbook(),
+            'sweeping_pi' => new LogbookSweepingPI(),
+            'rotasi' => new LogbookRotasi(),
+            default => null,
+        };
+    }
+
     private function generateLogbookPdf($formType, $data)
     {
-        // Implementasi generate PDF untuk logbook
-        // Sesuaikan dengan template dan service yang ada
-
+        $pdfService = app(PdfService::class);
         $viewMapping = [
-            'pos_jaga' => 'superadmin.export.pdf.logbookPosJagaTemplate',
-            'sweeping_pi' => 'superadmin.export.pdf.logbookSweepingTemplate',
-            'rotasi' => 'superadmin.export.pdf.logbookRotasiTemplate',
-            'chief' => 'superadmin.export.pdf.logbookChiefTemplate',
+            'pos_jaga'    => 'superadmin.export.pdf.logbook.logbookPosJagaTemplate',
+            'sweeping_pi' => 'superadmin.export.pdf.logbook.logbookSweepingTemplate',
+            'rotasi'      => 'superadmin.export.pdf.logbook.logbookRotasiTemplate',
+            'chief'       => 'superadmin.export.pdf.logbook.logbookChiefTemplate',
         ];
-
         $viewName = $viewMapping[$formType] ?? null;
-
         if (!$viewName) {
             return redirect()->back()->with('error', 'Template tidak ditemukan untuk jenis logbook ini.');
         }
 
-        // Menggunakan PDF service yang sudah ada
-        // return $this->pdfService->generatePdfFromTemplate($viewName, $data, $formType);
+        $preparedData = $data->map(function ($model) use ($formType) {
+            switch ($formType) {
+                case 'pos_jaga':
+                    return $this->prepareLogbookFormData($model);
+                case 'sweeping_pi':
+                    return $this->prepareSweepingPIFormData($model);
+                case 'rotasi':
+                    $form = $this->prepareRotasiFormData($model);
+                    $form->officerLog = $this->prepareOfficerLogData($model);
+                    return $form;
+                default:
+                    return $model;
+            }
+        });
 
-        // Untuk sementara, return view untuk testing
-        return view($viewName, [
-            'data' => $data,
-            'formType' => $formType
-        ]);
+        return $pdfService->generatePdfFromTemplate($viewName, $preparedData, $formType);
     }
 
 
 
     //checklist
+
+    public function reviewChecklist(Request $request, $id)
+    {
+        $formType = $request->input('form_type');
+
+        if (!$formType) {
+            abort(400, 'Jenis checklist tidak disediakan.');
+        }
+
+        try {
+            switch ($formType) {
+                case 'kendaraan':
+                    return $this->reviewChecklistKendaraan($id);
+                case 'penyisiran':
+                    return $this->reviewChecklistPenyisiran($id);
+                case 'senpi':
+                    return $this->reviewChecklistSenpi($id);
+                case 'pencatatan_pi':
+                    return $this->reviewFormPencatatanPI($id);
+                case 'manual_book':
+                    return $this->reviewManualBook($id);
+                default:
+                    abort(404, 'Jenis checklist tidak valid.');
+            }
+        } catch (\Exception $e) {
+            Log::error("Error reviewing checklist: " . $e->getMessage());
+            abort(404, 'Data checklist tidak ditemukan.');
+        }
+    }
+
+    private function reviewChecklistKendaraan($id)
+    {
+        $checklist = ChecklistKendaraan::with([
+            'details.item',
+            'sender',
+            'receiver',
+            'approver'
+        ])->findOrFail($id);
+
+        return view('superadmin.export.pdf.checklist.checklistKendaraanTemplate', [
+            'forms' => collect([$checklist]),
+            'formType' => 'kendaraan'
+        ]);
+    }
+
+    private function reviewChecklistPenyisiran($id)
+    {
+        $checklist = ChecklistPenyisiran::with(['details.item', 'sender', 'receiver', 'approver'])->findOrFail($id);
+        return view('superadmin.export.pdf.checklist.checklistPenyisiranTemplate', [
+            'forms' => collect([$checklist]),
+            'formType' => 'penyisiran'
+        ]);
+    }
+
+    private function reviewChecklistSenpi($id)
+    {
+        $checklist = ChecklistSenpi::findOrFail($id);
+        return view('superadmin.export.pdf.checklist.checklistSenpiTemplate', [
+            'forms' => collect([$checklist]),
+            'formType' => 'senpi'
+        ]);
+    }
+
+    private function reviewFormPencatatanPI($id)
+    {
+        $checklist = FormPencatatanPI::with(['sender', 'approver'])->findOrFail($id);
+        return view('superadmin.export.pdf.checklist.checklistPencatatanPITemplate', [
+            'forms' => collect([$checklist]),
+            'formType' => 'pencatatan_pi'
+        ]);
+    }
+
+    private function reviewManualBook($id)
+    {
+        $checklist = ManualBook::with(['details', 'creator', 'approver'])->findOrFail($id);
+        return view('superadmin.export.pdf.checklist.checklistManualBookTemplate', [
+            'forms' => collect([$checklist]),
+            'formType' => 'manual_book'
+        ]);
+    }
+
     public function exportPdfChecklist(Request $request)
     {
         if ($request->has('export_type')) {
@@ -515,7 +695,7 @@ class ExportPdfController extends Controller
 
         switch ($formType) {
             case 'kendaraan':
-                $query = ChecklistKendaraan::with(['sender', 'receiver', 'approver'])
+                $query = ChecklistKendaraan::with(['sender', 'receiver', 'approver', 'details.item'])
                     ->orderBy('date', 'desc');
                 if ($startDate && $endDate) {
                     $query->whereBetween('date', [$startDate, $endDate]);
@@ -531,7 +711,7 @@ class ExportPdfController extends Controller
                 });
 
             case 'penyisiran':
-                $query = ChecklistPenyisiran::with(['sender', 'receiver', 'approver'])
+                $query = ChecklistPenyisiran::with(['sender', 'receiver', 'approver', 'details.item'])
                     ->orderBy('date', 'desc');
                 if ($startDate && $endDate) {
                     $query->whereBetween('date', [$startDate, $endDate]);
@@ -578,6 +758,27 @@ class ExportPdfController extends Controller
                     ];
                 });
 
+            case 'manual_book':
+                $query = ManualBook::with(['creator', 'approver', 'details'])
+                    ->orderBy('date', 'desc');
+                if ($startDate && $endDate) {
+                    $query->whereBetween('date', [$startDate, $endDate]);
+                }
+                if ($locationName) {
+                    $query->where('type', 'like', '%' . $locationName . '%');
+                }
+                return $query->get()->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'date' => $item->date,
+                        'petugas' => $item->creator,
+                        'shift' => $item->shift,
+                        'lokasi' => (object)['name' => $item->type],
+                        'status' => $item->status,
+                        'total_records' => $item->details->count(),
+                    ];
+                });
+
             default:
                 return collect();
         }
@@ -590,19 +791,14 @@ class ExportPdfController extends Controller
             return redirect()->back()->with('error', 'Silakan pilih "Jenis Checklist" untuk bisa mengekspor.');
         }
 
-        // Logic untuk export PDF berdasarkan jenis checklist
         if ($request->input('export_type') === 'selected') {
             $selectedIds = $request->input('selected_reports', []);
             if (empty($selectedIds)) {
                 return redirect()->back()->with('error', 'Pilih minimal satu data untuk diekspor!');
             }
-
-            // Export selected data
             return $this->exportSelectedChecklist($formType, $selectedIds);
         } elseif ($request->input('export_type') === 'all') {
             $filters = $request->only(['location', 'start_date', 'end_date']);
-
-            // Export all data with filters
             return $this->exportAllChecklist($formType, $filters);
         }
 
@@ -611,69 +807,72 @@ class ExportPdfController extends Controller
 
     private function exportSelectedChecklist($formType, $selectedIds)
     {
-        // Implementasi export selected checklist
-        // Sesuaikan dengan PDF service yang ada
-
-        switch ($formType) {
-            case 'kendaraan':
-                $data = ChecklistKendaraan::whereIn('id', $selectedIds)
-                    ->with(['sender', 'receiver', 'approver'])
-                    ->get();
-                break;
-
-            case 'penyisiran':
-                $data = ChecklistPenyisiran::whereIn('id', $selectedIds)
-                    ->with(['sender', 'receiver', 'approver'])
-                    ->get();
-                break;
-
-            case 'senpi':
-                $data = ChecklistSenpi::whereIn('id', $selectedIds)
-                    ->with(['creator'])
-                    ->get();
-                break;
-
-            case 'pencatatan_pi':
-                $data = FormPencatatanPI::whereIn('id', $selectedIds)
-                    ->with(['sender', 'approver'])
-                    ->get();
-                break;
-
-            default:
-                return redirect()->back()->with('error', 'Jenis checklist tidak valid.');
-        }
-
+        $data = $this->getChecklistDataForExport($formType, [], $selectedIds);
         if ($data->isEmpty()) {
             return redirect()->back()->with('error', 'Data yang dipilih tidak ditemukan.');
         }
-
-        // Generate PDF menggunakan service yang ada
         return $this->generateChecklistPdf($formType, $data);
     }
 
     private function exportAllChecklist($formType, $filters)
     {
-        // Implementasi export all checklist dengan filter
-        $data = $this->getChecklistData($formType, $filters);
-
+        $data = $this->getChecklistDataForExport($formType, $filters);
         if ($data->isEmpty()) {
             return redirect()->back()->with('error', 'Tidak ada data yang ditemukan untuk filter yang dipilih.');
         }
-
-        // Generate PDF menggunakan service yang ada
         return $this->generateChecklistPdf($formType, $data);
+    }
+
+    private function getChecklistDataForExport($formType, $filters = [], $ids = [])
+    {
+        $query = null;
+        switch ($formType) {
+            case 'kendaraan':
+                $query = ChecklistKendaraan::with(['details.item', 'sender', 'receiver', 'approver']);
+                break;
+            case 'penyisiran':
+                $query = ChecklistPenyisiran::with(['details.item', 'sender', 'receiver', 'approver']);
+                break;
+            case 'senpi':
+                $query = ChecklistSenpi::query();
+                break;
+            case 'pencatatan_pi':
+                $query = FormPencatatanPI::with(['sender', 'approver']);
+                break;
+            case 'manual_book':
+                $query = ManualBook::with(['creator', 'approver', 'details']);
+                break;
+            default:
+                return collect();
+        }
+
+        if (!empty($ids)) {
+            return $query->whereIn('id', $ids)->orderBy('date', 'desc')->get();
+        }
+
+        if (!empty($filters['start_date'])) {
+            $query->whereDate('date', '>=', $filters['start_date']);
+        }
+        if (!empty($filters['end_date'])) {
+            $query->whereDate('date', '<=', $filters['end_date']);
+        }
+        if (!empty($filters['location']) && $formType === 'manual_book') {
+            $query->where('type', 'like', '%' . $filters['location'] . '%');
+        }
+
+        return $query->orderBy('date', 'desc')->get();
     }
 
     private function generateChecklistPdf($formType, $data)
     {
-        // Implementasi generate PDF untuk checklist
-        // Sesuaikan dengan template dan service yang ada
+        $pdfService = app(PdfService::class);
 
         $viewMapping = [
-            'kendaraan' => 'superadmin.export.pdf.checklistKendaraanTemplate',
-            'penyisiran' => 'superadmin.export.pdf.checklistPenyisiranTemplate',
-            'senpi' => 'superadmin.export.pdf.checklistSenpiTemplate',
-            'pencatatan_pi' => 'superadmin.export.pdf.checklistPencatatanPITemplate',
+            'kendaraan' => 'superadmin.export.pdf.checklist.checklistKendaraanTemplate',
+            'penyisiran' => 'superadmin.export.pdf.checklist.checklistPenyisiranTemplate',
+            'senpi' => 'superadmin.export.pdf.checklist.checklistSenpiTemplate',
+            'pencatatan_pi' => 'superadmin.export.pdf.checklist.checklistPencatatanPITemplate',
+            'manual_book' => 'superadmin.export.pdf.checklist.checklistManualBookTemplate',
         ];
 
         $viewName = $viewMapping[$formType] ?? null;
@@ -681,14 +880,7 @@ class ExportPdfController extends Controller
         if (!$viewName) {
             return redirect()->back()->with('error', 'Template tidak ditemukan untuk jenis checklist ini.');
         }
-
-        // Menggunakan PDF service yang sudah ada
-        // return $this->pdfService->generatePdfFromTemplate($viewName, $data, $formType);
-
-        // Untuk sementara, return view untuk testing
-        return view($viewName, [
-            'data' => $data,
-            'formType' => $formType
-        ]);
+        
+        return $pdfService->generatePdfFromTemplate($viewName, $data, $formType);
     }
 }

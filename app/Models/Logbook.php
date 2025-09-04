@@ -118,4 +118,12 @@ class Logbook extends Model
     {
         return $this->hasMany(LogbookDetail::class, 'logbookID', 'logbookID');
     }
+    public function facility(): HasMany
+    {
+        return $this->hasMany(LogbookFacility::class, 'logbookID', 'logbookID');
+    }
+    public function personil(): HasMany
+    {
+        return $this->hasMany(LogbookStaff::class, 'logbookID', 'logbookID');
+    }
 }

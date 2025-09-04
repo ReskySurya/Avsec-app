@@ -32,6 +32,10 @@ class LogbookRotasi extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+    public function submitter()
+    {
+        return $this->belongsTo(User::class, 'submitted_by');
+    }
 
     // Relasi ke User (yang menyetujui)
     public function approver()

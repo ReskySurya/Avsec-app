@@ -35,7 +35,7 @@
                         {{-- Judul kolom diubah menjadi dinamis berdasarkan nilai shift --}}
                         <th class="border border-black px-1 sm:px-2 py-2 text-xs sm:text-sm font-bold text-center"
                             colspan="2">
-                            KONDISI SHIFT {{ ucfirst($checklist->shift) }}
+                           KONDISI SHIFT {{ strtoupper($checklist->shift) }}
                         </th>
                     </tr>
                     <tr class="bg-gray-100">
