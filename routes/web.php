@@ -46,7 +46,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     
     Route::get('/export/logbook', [ExportPdfController::class, 'exportPdfLogbook'])->name('export.logbook');
     Route::post('/export/logbook/filter', [ExportPdfController::class, 'filterLogbook'])->name('export.logbook.filter');
-    Route::get('/export/logbook/review/{report}', [ExportPdfController::class, 'reviewLogbook'])->name('export.logbook.review');
+    Route::get('/export/logbook/review/{id}', [ExportPdfController::class, 'reviewLogbook'])->name('export.logbook.review');
     
     
 

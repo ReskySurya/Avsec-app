@@ -220,23 +220,23 @@ class ExportPdfController extends Controller
 
 
     //logbook
-    public function reviewLogbook(Request $request, $logbookID)
+    public function reviewLogbook(Request $request, $id)
     {
         $formType = $request->input('form_type');
         if (!$formType) {
-            $formType = $this->detectLogbookType($logbookID);
+            $formType = $this->detectLogbookType($id);
         }
 
         try {
             switch ($formType) {
                 case 'pos_jaga':
-                    return $this->reviewPosJagaLogbook($logbookID);
+                    return $this->reviewPosJagaLogbook($id);
                 case 'sweeping_pi':
-                    return $this->reviewSweepingPILogbook($logbookID);
+                    return $this->reviewSweepingPILogbook($id);
                 case 'rotasi':
-                    return $this->reviewRotasiLogbook($logbookID);
+                    return $this->reviewRotasiLogbook($id);
                 case 'chief':
-                    return $this->reviewChiefLogbook($logbookID);
+                    return $this->reviewChiefLogbook($id);
                 default:
                     abort(404, 'Jenis logbook tidak ditemukan');
             }
@@ -249,7 +249,7 @@ class ExportPdfController extends Controller
     private function detectLogbookType($logbookID)
     {
         if (str_starts_with($logbookID, 'SPI-')) return 'sweeping_pi';
-        if (str_starts_with($logbookID, 'LRH-') || str_starts_with($logbookID, 'LRS-')) return 'rotasi';
+        if (str_starts_with($logbookID, 'LRH-') || str_starts_with($logbookID, 'LRP-')) return 'rotasi';
         if (str_starts_with($logbookID, 'CHF-')) return 'chief';
         return 'pos_jaga';
     }
@@ -274,7 +274,7 @@ class ExportPdfController extends Controller
 
     private function reviewRotasiLogbook($id)
     {
-        $rotasi = LogbookRotasi::with(['creator', 'submitter', 'approver', 'details.officerAssignment.user'])->findOrFail($id);
+        $rotasi = LogbookRotasi::with(['creator', 'approver', 'submitter', 'details.officerAssignment.officer'])->findOrFail($id);
         $form = $this->prepareRotasiFormData($rotasi);
         $form->officerLog = $this->prepareOfficerLogData($rotasi);
         return view('superadmin.export.pdf.logbook.logbookRotasiTemplate', [
@@ -355,15 +355,15 @@ class ExportPdfController extends Controller
                 if (!isset($officerLog[$officerId])) {
                     $officer = $officers->get($officerId);
                     $officerLog[$officerId] = [
-                        'officer_name' => $officer->name ?? 'Officer ' . $officerId,
+                        'officer_name' => $officer ? $officer->name : 'Officer Tidak Dikenal (' . $officerId . ')',
                         'roles' => [],
                         'keterangan' => []
                     ];
                 }
 
                 $roleData = [
-                    'start' => $detail->officerAssignment->start_time ?? '00:00',
-                    'end' => $detail->officerAssignment->end_time ?? '23:59',
+                    'start' => optional($detail->officerAssignment)->start_time ?? '00:00',
+                    'end' => optional($detail->officerAssignment)->end_time ?? '23:59',
                     'hhmd_random' => $detail->hhmd_random ?? '-',
                     'hhmd_unpredictable' => $detail->hhmd_unpredictable ?? '-',
                     'cek_random_barang' => $detail->cek_random_barang ?? '-',
@@ -458,7 +458,7 @@ class ExportPdfController extends Controller
                 return $query->orderBy('created_at', 'desc')->get();
 
             case 'rotasi':
-                $query = LogbookRotasi::with(['creator', 'approver', 'submitter', 'details.officerAssignment.user']);
+                $query = LogbookRotasi::with(['creator', 'approver', 'submitter', 'details.officerAssignment.officer']);
                 if (!empty($filters['location'])) {
                     $query->where('type', $filters['location']);
                 }

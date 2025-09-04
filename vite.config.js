@@ -13,7 +13,7 @@
 //         port: 5173, // atau port bebas lainnya
 //         strictPort: true,
 //         hmr: {
-//             host: '192.168.137.87', // <- Ganti dengan IP lokal kamu
+//             host: '192.168.0.100', // <- Ganti dengan IP lokal kamu
 //         },
 //     },
 // });

@@ -539,27 +539,36 @@
             modalContent.innerHTML = '<p class="text-center py-20">Loading preview...</p>';
             openModal();
 
+            console.log('Fetching preview from URL:', url);
             const response = await fetch(url);
+
+            console.log('Received response:', response);
+            console.log('Response Status:', response.status);
+            console.log('Response OK:', response.ok);
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
+            
             const html = await response.text();
+            console.log('Received HTML content length:', html.length);
 
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             const formContent = doc.querySelector('.page-break-after');
 
             if (formContent) {
+                console.log('Element .page-break-after FOUND. Injecting its innerHTML.');
                 // Inject the content and scale it to fit better in the modal
                 modalContent.innerHTML = `<div style="transform: scale(0.9); transform-origin: center center; width: 100%;">${formContent.innerHTML}</div>`;
             } else {
+                console.log('Element .page-break-after NOT FOUND. Injecting full HTML as fallback.');
                 modalContent.innerHTML = html; // Fallback
             }
 
         } catch (error) {
             console.error('Error fetching preview:', error);
-            console.log(url);
-            modalContent.innerHTML = '<p class="text-center py-20 text-red-500">Gagal memuat preview. Silakan coba lagi.</p>';
+            modalContent.innerHTML = `<p class="text-center py-20 text-red-500">Gagal memuat preview. Error: ${error.message}. Silakan cek console.</p>`;
         }
     }
 
