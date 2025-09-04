@@ -17,6 +17,11 @@ use App\Http\Controllers\DailyTest\WtmdController;
 use App\Http\Controllers\DailyTest\XrayController;
 use App\Http\Controllers\LogBook\LogbookPosJagaController;
 use App\Http\Controllers\LogBook\LogbookRotasiController;
+use App\Http\Controllers\LogBook\LogbookRotasiHBSCPController;
+use App\Http\Controllers\LogBook\LogbookRotasiPSCPController;
+use App\Http\Controllers\PMIKController;
+use App\Models\LogbookSweepingPI;
+use App\Models\ManualBook;
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
@@ -41,6 +46,20 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
 
     Route::get('/export/logbook', [ExportPdfController::class, 'exportPdfLogbook'])->name('export.logbook');
     Route::post('/export/logbook/filter', [ExportPdfController::class, 'filterLogbook'])->name('export.logbook.filter');
+
+    // Rute untuk Folder
+    Route::get('/folders/create', [PMIKController::class, 'create'])->name('folders.create');
+    Route::post('/folders', [PMIKController::class, 'store'])->name('folders.store');
+    Route::get('/folders/{folder}/edit', [PMIKController::class, 'edit'])->name('folders.edit');
+    Route::put('/folders/{folder}', [PMIKController::class, 'update'])->name('folders.update');
+    Route::delete('/folders/{folder}', [PMIKController::class, 'destroy'])->name('folders.destroy');
+
+    // Rute untuk Dokumen
+    Route::get('/folders/{folder}/documents/create', [PMIKController::class, 'createDocument'])->name('documents.create');
+    Route::post('/documents', [PMIKController::class, 'storeDocument'])->name('documents.store');
+    Route::get('/documents/{document}', [PMIKController::class, 'showDocument'])->name('documents.show');
+    Route::get('/documents/{document}/download', [PMIKController::class, 'download'])->name('documents.download');
+    Route::delete('/documents/{document}', [PMIKController::class, 'destroyDocument'])->name('documents.destroy');
 
 
     Route::get('/export/checklist', [ExportPdfController::class, 'exportPdfChecklist'])->name('export.checklist');
@@ -135,6 +154,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/daily-test/xray/review/{id}', [XrayController::class, 'reviewForm'])->name('xray.reviewForm');
     Route::patch('/daily-test/xray/update-status/{id}', [XrayController::class, 'updateStatus'])->name('xray.updateStatus');
     Route::post('/daily-test/xray/save-supervisor-signature/{id}', [XrayController::class, 'saveSupervisorSignature'])->name('xray.saveSupervisorSignature');
+
+    Route::get('/pmik', [PMIKController::class, 'index'])->name('pmik.index');
+    Route::get('/folders/{folder}', [PMIKController::class, 'show'])->name('folders.show');
+    Route::get('/documents/{document}/view', [PMIKController::class, 'view'])->name('documents.view');
+    Route::get('/documents/{document}/viewer', [PMIKController::class, 'showViewer'])->name('documents.viewer');
 });
 
 // Master Data Routes
