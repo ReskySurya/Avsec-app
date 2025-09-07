@@ -19,13 +19,19 @@ class LogbookChiefController extends Controller
 {
     public function index()
     {
-        $currentUserId = Auth::id();
+        // $currentUserId = Auth::id();
 
         $chiefLogbooks = LogbookChief::with('createdBy')
-            ->where('created_by', $currentUserId)
+
             ->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
             ->get();
+
+             // Cek jika user bukan superadmin, maka filter berdasarkan approver
+        if (!Auth::user()->isSuperAdmin()) {
+            $chiefLogbooks->where('created_by', Auth::id());
+        }
+        
 
         return view('logbook.chief.logbookLaporanLeader', [
             'chiefLogbooks' => $chiefLogbooks,
