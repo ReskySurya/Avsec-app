@@ -13,17 +13,20 @@ return new class extends Migration
     {
         Schema::create('logbook_staff', function (Blueprint $table) {
             $table->id();
-            $table->string('logbookID', 10);
+            $table->string('logbookID', 10)->nullable();
+            $table->string('logbook_chief_id', 20)->nullable();
             $table->unsignedBigInteger('staffID')->nullable();
-            $table->string('classification')->nullable(); 
-            $table->enum('description', ['hadir', 'izin', 'sakit','cuti'])->default('hadir'); 
+            $table->string('classification')->nullable();
+            $table->enum('description', ['hadir', 'izin', 'sakit','cuti'])->default('hadir');
             $table->timestamps();
 
             $table->foreign('logbookID')->references('logbookID')->on('logbooks')->onDelete('cascade');
+            $table->foreign('logbook_chief_id')->references('logbookID')->on('logbook_chief')->onDelete('cascade');
             $table->foreign('staffID')->references('id')->on('users')->onDelete('cascade');
-            
+
             // Index
             $table->index('logbookID');
+            $table->index('logbook_chief_id');
             $table->index('staffID');
         });
     }

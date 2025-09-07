@@ -72,9 +72,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
 
 // Supervisor Routes
 Route::middleware(['auth', 'role:supervisor'])->group(function () {
-    Route::get('/dashboard/supervisor', function () {
-        return view('supervisor.dashboardSupervisor');
-    })->name('dashboard.supervisor');
+    Route::get('/dashboard/supervisor', [DashboardController::class, 'indexSupervisor'])->name('dashboard.supervisor');
 
     // Route::get('/supervisor/dailytest-form',  [DashboardController::class, 'showDataDailyTest'])->name('supervisor.dailytest-form');
     // Route::get('/supervisor/logbook-form',  [DashboardController::class, 'showDataLogbook'])->name('supervisor.logbook-form');
@@ -85,8 +83,19 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
     // Route::get('/logbook-rotasi/detail/{logbook}', [LogbookRotasiController::class, 'show'])->name('supervisor.logbook-rotasi.detail');
     Route::post('/logbook-rotasi/approved/{id}', [LogbookRotasiController::class, 'approvedForm'])->name('supervisor.logbook-rotasi.approved');
 
-    // Review Logbook Chief
+    // Logbook Chief
     Route::get('/logbook/chief', [LogbookChiefController::class, 'index'])->name('logbook.chief.index');
+    Route::post('/logbook/chief/store', [LogbookChiefController::class, 'store'])->name('logbook.chief.store');
+    Route::post('/logbook/chief/add-kemajuan', [LogbookChiefController::class, 'storeKemajuan'])->name('logbook.chief.addKemajuan');
+    Route::post('/logbook/chief/add-personil', [LogbookChiefController::class, 'storePersonil'])->name('logbook.chief.addPersonil');
+    Route::post('/logbook/chief/add-facility', [LogbookChiefController::class, 'storeFacility'])->name('logbook.chief.addFacility');
+    Route::post('/logbook/chief/add-uraian', [LogbookChiefController::class, 'storeUraian'])->name('logbook.chief.addUraian');
+    Route::post('/logbook/chief/signature/send/{logbookID}', [LogbookChiefController::class, 'signatureSend'])->name('logbook.chief.signature.send');
+
+    Route::delete('/logbook/chief/delete/{logbook}', [LogbookChiefController::class, 'destory'])->name('logbook.chief.delete');
+
+    Route::get('/logbook/chief/detail/{id}', [LogbookChiefController::class, 'detail'])->name('logbook.chief.detail');
+    Route::get('/logbook/chief/review-laporan-leader/{logbookID}', [LogbookChiefController::class, 'reviewLogbook'])->name('logbook.chief.review.laporan.leader');
 
     // Review Checklist Kendaraan Motor Patroli
     // Route::get('/checklist-kendaraan-patroli/list', [DashboardController::class, 'showDataChecklistKendaraan'])->name('supervisor.checklist-kendaraan.list');
@@ -107,6 +116,8 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
     // Route::get('/checklist-manual-book/list', [DashboardController::class, 'showDataManualBook'])->name('supervisor.checklist-manualbook.list');
     // Route::get('/checklist-manual-book/detail/{manualBook}', [ManualBookController::class, 'show'])->name('supervisor.checklist-manualbook.detail');
     Route::patch('/checklist-manual-book/approve/{manualBook}', [ManualBookController::class, 'approveSignature'])->name('supervisor.checklist-manualbook.signature');
+
+
 });
 
 // Officer Routes

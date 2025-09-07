@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('logbook_chief', function (Blueprint $table) {
-            $table->string('id')->primary(); // Format: LTL-00001
+            $table->string('logbookID', 20)->primary(); // Format: LTL-DDMMYY-0X
+            $table->date('date');
             $table->string('grup')->nullable();
             $table->string('shift')->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
@@ -24,13 +25,24 @@ return new class extends Migration
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('approved_by')->references('id')->on('users')->onDelete('set null');
 
-
+            $table->index(['date', 'created_by']);
         });
 
-        Schema::create('logbook_chief_details', function (Blueprint $table) {
+        Schema::create('logbook_chief_kemajuan', function (Blueprint $table) {
             $table->id();
-            $table->string('logbook_id', 10);
+            $table->string('logbook_chief_id', 20);
+            $table->integer('jml_personil');
+            $table->integer('jml_hadir');
+            $table->integer('jml_kekuatan');
+            $table->text('materi');
+            $table->text('keterangan')->nullable();
             $table->timestamps();
+
+            // Foreign key constraint
+            $table->foreign('logbook_chief_id')->references('logbookID')->on('logbook_chief')->onDelete('cascade');
+
+            // Index
+            $table->index('logbook_chief_id');
         });
 
 

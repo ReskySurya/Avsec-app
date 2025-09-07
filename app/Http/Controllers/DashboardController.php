@@ -8,6 +8,7 @@ use App\Models\FormPencatatanPI;
 use App\Models\Location;
 use App\Models\Report;
 use App\Models\Logbook;
+use App\Models\LogbookChief;
 use App\Models\LogbookRotasi;
 use App\Models\LogbookRotasiHBSCP;
 use App\Models\LogbookRotasiPSCP;
@@ -249,4 +250,17 @@ class DashboardController extends Controller
         
     return view('supervisor.listFormPencatatanPI', compact('formPencatatanPI'));
 }
+    
+
+    public function indexSupervisor()
+    {
+        $perPage = 10;
+
+        $logbooksChief = LogbookChief::with('createdBy', 'approvedBy')
+            ->where('approved_by', Auth::id())
+            ->latest('date')
+            ->paginate($perPage);
+
+        return view('supervisor.dashboardSupervisor', compact('logbooksChief'));
+    }
 }

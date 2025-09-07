@@ -17,6 +17,7 @@ class LogbookDetail extends Model
 
     protected $fillable = [
         'logbookID',
+        'logbook_chief_id',
         'start_time',
         'end_time',
         'summary',
@@ -37,6 +38,11 @@ class LogbookDetail extends Model
     public function logbook(): BelongsTo
     {
         return $this->belongsTo(Logbook::class, 'logbookID', 'logbookID');
+    }
+
+    public function logbookChief(): BelongsTo
+    {
+        return $this->belongsTo(LogbookChief::class, 'logbook_chief_id', 'logbookID');
     }
 
     /**
