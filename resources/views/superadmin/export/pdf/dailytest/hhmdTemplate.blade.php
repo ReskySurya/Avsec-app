@@ -1,29 +1,27 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>HHMD Forms</title>
-    <style>
-        {!! file_get_contents(public_path('css/pdf.css')) !!}
-    </style>
+
+    <link rel="stylesheet" href="{{ public_path('css/pdf.css') }}">
 </head>
+
 <body class="m-0 p-0">
-@php
-    $logoAirportBase64 = base64_encode(file_get_contents(public_path('images/airport-security-logo.png')));
-    $logoInjourneyBase64 = base64_encode(file_get_contents(public_path('images/injourney-API.png')));
-@endphp
+
     @foreach($forms as $form)
     <div class="page-break-after">
-        <div class="bg-white p-4" style="width: 200mm;">
+        <div class="bg-white p-4" style="width: 210mm;">
             <div id="format" class="mx-auto">
                 <div class="border-t-2 border-x-2 border-black bg-white shadow-md py-2">
                     <table style="width: 100%;">
                         <tbody>
                             <tr>
                                 <td style="width: 20%; text-align: center; vertical-align: middle;">
-                                    <img src="data:image/png;base64,{{ $logoAirportBase64 }}" alt="Logo" style="width: 64px; height: 64px; display: inline-block;">
+                                    <img src="{{ public_path('images/airport-security-logo.png') }}" alt="Logo"
+                                        style="width: 64px; height: 64px; display: inline-block;">
                                 </td>
                                 <td style="width: 60%; text-align: center; vertical-align: middle;">
                                     <h3 style="font-size: 12px; font-weight: bold; line-height: 1.3;">
@@ -34,7 +32,8 @@
                                     </h3>
                                 </td>
                                 <td style="width: 20%; text-align: center; vertical-align: middle;">
-                                    <img src="data:image/png;base64,{{ $logoInjourneyBase64 }}" alt="Injourney Logo" style="width: 80px; height: 64px; display: inline-block;">
+                                    <img src="{{ public_path('images/injourney-API.png') }}" alt="Injourney Logo"
+                                        style="width: 100px; height: 84px; display: inline-block;">
                                 </td>
                             </tr>
                         </tbody>
@@ -62,42 +61,48 @@
                             </tr>
                             <tr class="border-b border-black">
                                 <th class="w-1/3 text-left p-2">Nomor dan Tanggal Sertifikat:</th>
-                                <td class="w-2/3 p-2">{{ $form->certificateInfo }}</td>
+                                <td class="w-2/3 p-2">{{ $form->certificateInfo ?? '-' }}</td>
                             </tr>
                         </tbody>
                     </table>
 
-                    <div class="px-4">
+                    <div class="px-4 ">
                         <div class="p-4">
                             <div class="mb-0">
                                 <label class="inline-flex items-center">
-                                    <input type="checkbox" class="custom-checkbox-alt" {{ $form->terpenuhi ? 'checked' : '' }} disabled>
+                                    <input type="checkbox" class="custom-checkbox-alt" {{ $form->terpenuhi ? 'checked' :
+                                    '' }} disabled>
                                     <span class="ml-2 text-sm">Terpenuhi</span>
                                 </label>
                             </div>
                             <div>
                                 <label class="inline-flex items-center">
-                                    <input type="checkbox" class="custom-checkbox-alt" {{ $form->tidakTerpenuhi ? 'checked' : '' }} disabled>
+                                    <input type="checkbox" class="custom-checkbox-alt" {{ !empty($form->tidakTerpenuhi)
+                                    ? 'checked' : '' }} disabled>
                                     <span class="ml-2 text-sm">Tidak Terpenuhi</span>
                                 </label>
                             </div>
                         </div>
                         <div class="border-x-2 border-t-2 border-black text-center items-center">
                             <div>
-                                <h2 class="font-bold mb-1">TEST 1</h2>
+                                <h2 class="font-bold mt-4 mb-1">TEST 1</h2>
                                 <div class="w-20 h-20 mx-auto border-2 border-black flex items-center justify-center">
-                                    <input type="checkbox" class="custom-checkbox-alt" {{ $form->test1 ? 'checked' : '' }} disabled>
+                                    <input type="checkbox" class="custom-checkbox-alt" {{ $form->test1 ? 'checked' : ''
+                                    }} disabled>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="border-x-2 border-black">
+                        <div class="border-x-2 border-black pt-4">
                             <div class="flex items-center mb-0 pl-4">
-                                <input type="checkbox" class="custom-checkbox-alt" {{ $form->testCondition1 ? 'checked' : '' }} disabled>
-                                <label class="ml-2 text-sm">Letak alat uji OTP dan HHMD pada saat pengujian harus > 1m dari benda logam lain disekelilingnya.</label>
+                                <input type="checkbox" class="custom-checkbox-alt" {{ $form->testCondition1 ? 'checked'
+                                : '' }} disabled>
+                                <label class="ml-2 text-sm">Letak alat uji OTP dan HHMD pada saat pengujian harus > 1m
+                                    dari benda logam lain disekelilingnya.</label>
                             </div>
                             <div class="flex items-center mb-0 pl-4">
-                                <input type="checkbox" class="custom-checkbox-alt" {{ $form->testCondition2 ? 'checked' : '' }} disabled>
+                                <input type="checkbox" class="custom-checkbox-alt" {{ $form->testCondition2 ? 'checked'
+                                : '' }} disabled>
                                 <label class="ml-2 text-sm">Jarak antara HHMD dan OTP > 3-5 cm.</label>
                             </div>
                         </div>
@@ -105,21 +110,23 @@
 
                     <div class="border-t-2 border-black p-4">
                         <div class="flex items-start">
-                            <label class="text-gray-700 font-bold mr-4">Hasil:</label>
+                            <label class="font-bold mr-4">Hasil:</label>
                             <div class="flex flex-col">
-                                <div class="flex items-center ">
-                                    <input type="radio" class="" {{ $form->result == 'pass' ? 'checked' : '' }} disabled>
-                                    <label class="text-sm">PASS</label>
+                                <div class="flex items-center">
+                                    <input type="radio" class="custom-radio" {{ $form->result == 'pass' ? 'checked' : ''
+                                    }} disabled>
+                                    <label class="ml-2 text-sm">PASS</label>
                                 </div>
-                                <div class="flex items-center ">
-                                    <input type="radio" class="" {{ $form->result == 'fail' ? 'checked' : '' }} disabled>
-                                    <label class="text-sm">FAIL</label>
+                                <div class="flex items-center">
+                                    <input type="radio" class="custom-radio" {{ $form->result == 'fail' ? 'checked' : ''
+                                    }} disabled>
+                                    <label class="ml-2 text-sm">FAIL</label>
                                 </div>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-bold mb-2">CATATAN:</label>
-                            <p>{{ $form->notes }}</p>
+                            <label class="block font-bold my-2">CATATAN:</label>
+                            <p>{{ $form->notes ?? 'tidak ada catatan' }}</p>
                         </div>
                     </div>
 
@@ -129,32 +136,32 @@
                             <div class="grid grid-rows-2 gap-2 items-center">
                                 <div class="text-center self-end">
                                     <h4 class="font-bold">{{ $form->officerName }}</h4>
-                                    <label class="text-gray-700 font-normal">1. Airport Security Officer</label>
+                                    <label class="font-normal">1. Airport Security Officer</label>
                                 </div>
                                 <div class="text-center self-end">
                                     <h4 class="font-bold">
-                                        @if($form->supervisor)
-                                            {{ $form->supervisor->name }}
-                                        @else
-                                            Nama Supervisor tidak tersedia
-                                        @endif
+                                        {{ $form->supervisor->name ?? 'Supervisor' }}
                                     </h4>
-                                    <label class="text-gray-700 font-normal">2. Airport Security Supervisor</label>
+                                    <label class="font-normal">2. Airport Security Supervisor</label>
                                 </div>
                             </div>
                             <div>
                                 <div class="flex flex-col items-center">
                                     @if($form->officer_signature)
-                                        <img src="{{ $form->officer_signature }}" alt="Tanda tangan Officer" style="width: 150px; height: auto;">
+                                    <img src="{{ $form->officer_signature }}"
+                                        alt="Tanda tangan Officer"
+                                        style="width: 200px; height: 100px; object-fit: contain;">
                                     @else
-                                        <p>Tanda tangan Officer tidak tersedia</p>
+                                    <div style="height: 60px; display: flex; align-items: center;">T/A</div>
                                     @endif
                                 </div>
-                                <div class="flex flex-col items-center">
+                                <div class="flex flex-col items-center mt-8">
                                     @if($form->supervisor_signature)
-                                        <img src="{{ $form->supervisor_signature }}" alt="Tanda tangan Supervisor" id="supervisorSignatureImage" style="width: 150px; height: auto;">
+                                    <img src="{{  $form->supervisor_signature }}"
+                                        alt="Tanda tangan Supervisor"
+                                        style="width: 200px; height: 100px; object-fit: contain;">
                                     @else
-                                        <p>Tanda tangan Supervisor tidak tersedia</p>
+                                    <div style="height: 100px; display: flex; align-items: center;">T/A</div>
                                     @endif
                                 </div>
                             </div>
@@ -166,4 +173,5 @@
     </div>
     @endforeach
 </body>
+
 </html>
