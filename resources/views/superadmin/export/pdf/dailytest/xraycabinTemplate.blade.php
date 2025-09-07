@@ -83,49 +83,209 @@
                             <div class="border-2 border-black mx-2 p-1">
                                 <table class="w-full">
                                     <tr>
-                                        <td class="text-center" style="width: 33%;">
-                                            <p class="text-xs">TEST 2a</p>
-                                            <div class="relative flex border-2 border-black h-20 w-24 mx-auto">
+                                        <td class="text-center" style="width: 30%; vertical-align: top;">
+                                            <p class="text-xs font-bold">TEST 2a</p>
+                                            <div class="relative flex border-2 border-black h-16 w-20 mx-auto">
                                                 <div class="bg-green-500 flex-1"></div>
                                                 <div class="bg-orange-500 flex-1"></div>
                                                 <div class="absolute inset-0 flex justify-center items-center">
                                                     <input type="checkbox" class="custom-checkbox-alt" {{ $form->test2aab ? 'checked' : '' }} disabled>
                                                 </div>
                                             </div>
-                                            <div class="mt-1">
-                                                <p class="text-xs inline-block">TEST 2b</p>
+                                            <div class="mt-1 text-right mr-4">
+                                                <p class="text-xs inline-block font-bold">TEST 2b</p>
                                                 <input type="checkbox" class="custom-checkbox-alt" {{ $form->test2bab ? 'checked' : '' }} disabled>
                                             </div>
                                         </td>
-                                        <td class="text-center" style="width: 33%;">
-                                            <p class="text-xs">TEST 3</p>
-                                            <table class="border-2 border-black mx-auto" style="width: 90%; height: 60px;">
+                                        <td class="text-center" style="width: 70%; vertical-align: top;">
+                                            <p class="text-xs font-bold">TEST 3</p>
+                                            <table class="border-2 border-black mx-auto" style="width: 95%; height: 40px;">
                                                 <tr class="h-full">
                                                     @foreach([14, 16, 18, 20, 22, 24, 26, 28, 30] as $val)
-                                                        <td class="border-r border-black relative bg-blue-100" style="width: 11.1%;">
-                                                            <input type="checkbox" class="custom-checkbox-alt absolute top-1.5" {{ $form->{'test3ab_'.$val} ? 'checked' : '' }} disabled>
-                                                            <div class="absolute w-full h-0.5 border-t border-black bg-black top-1/2"></div>
+                                                        <td class="border-r border-black relative bg-cyan-100" style="width: 11.1%;">
+                                                            <input type="checkbox" class="custom-checkbox-alt absolute top-1.5" style="left: 5px;" {{ $form->{'test3ab_'.$val} ? 'checked' : '' }} disabled>
                                                         </td>
                                                     @endforeach
                                                 </tr>
                                             </table>
-                                            <table class="mx-auto" style="width: 90%;">
+                                            <table class="mx-auto" style="width: 95%;">
                                                 <tr>
                                                     @foreach([14, 16, 18, 20, 22, 24, 26, 28, 30] as $val)
-                                                        <td class="text-center" style="width: 11.1%;">{{ $val }}</td>
+                                                        <td class="text-center text-xs" style="width: 11.1%;">{{ $val }}</td>
                                                     @endforeach
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td class="text-center" style="width: 33%;">
-                                            <p class="text-xs">TEST 5</p>
-                                            <div class="flex justify-center items-center">
-                                                @foreach(['05mm', '10mm', '15mm'] as $val)
-                                                <div class="w-12 h-12 border-2 border-black bg-green-200 flex justify-center items-center">
-                                                    <input type="checkbox" class="custom-checkbox-alt" {{ $form->{'test5ab_'.$val} ? 'checked' : '' }} disabled>
+                                    </tr>
+                                </table>
+                                <table class="w-full" style="margin-top: 5px; border-top: 1px solid black;">
+                                    <tr>
+                                        <td class="text-center" style="width: 35%; vertical-align: top;">
+                                            <p class="text-xs font-bold">TEST 1a & 1b</p>
+                                            <table class="mx-auto text-xs">
+                                                <tr>
+                                                    <td class="transform -rotate-90">AWG</td>
+                                                    <td class="transform -rotate-90">36</td>
+                                                    <td class="transform -rotate-90">32</td>
+                                                    <td class="transform -rotate-90">30</td>
+                                                    <td class="transform -rotate-90">24</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>1a</td>
+                                                    <td><input type="checkbox" class="custom-checkbox-alt" {{ $form->test1ab_36 ? 'checked' : '' }} disabled></td>
+                                                    <td><input type="checkbox" class="custom-checkbox-alt" {{ $form->test1ab_32 ? 'checked' : '' }} disabled></td>
+                                                    <td><input type="checkbox" class="custom-checkbox-alt" {{ $form->test1ab_30 ? 'checked' : '' }} disabled></td>
+                                                    <td><input type="checkbox" class="custom-checkbox-alt" {{ $form->test1ab_24 ? 'checked' : '' }} disabled></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>1b</td>
+                                                    <td><input type="checkbox" class="custom-checkbox-alt" {{ $form->test1bb_36_1 ? 'checked' : '' }} disabled></td>
+                                                    <td><input type="checkbox" class="custom-checkbox-alt" {{ $form->test1bb_32_1 ? 'checked' : '' }} disabled></td>
+                                                    <td><input type="checkbox" class="custom-checkbox-alt" {{ $form->test1bb_30_1 ? 'checked' : '' }} disabled></td>
+                                                    <td><input type="checkbox" class="custom-checkbox-alt" {{ $form->test1bb_24_1 ? 'checked' : '' }} disabled></td>
+                                                </tr>
+                                                 <tr>
+                                                    <td></td>
+                                                    <td><input type="checkbox" class="custom-checkbox-alt" {{ $form->test1bb_36_2 ? 'checked' : '' }} disabled></td>
+                                                    <td><input type="checkbox" class="custom-checkbox-alt" {{ $form->test1bb_32_2 ? 'checked' : '' }} disabled></td>
+                                                    <td><input type="checkbox" class="custom-checkbox-alt" {{ $form->test1bb_30_2 ? 'checked' : '' }} disabled></td>
+                                                    <td><input type="checkbox" class="custom-checkbox-alt" {{ $form->test1bb_24_2 ? 'checked' : '' }} disabled></td>
+                                                </tr>
+                                                 <tr>
+                                                    <td></td>
+                                                    <td><input type="checkbox" class="custom-checkbox-alt" {{ $form->test1bb_36_3 ? 'checked' : '' }} disabled></td>
+                                                    <td><input type="checkbox" class="custom-checkbox-alt" {{ $form->test1bb_32_3 ? 'checked' : '' }} disabled></td>
+                                                    <td><input type="checkbox" class="custom-checkbox-alt" {{ $form->test1bb_30_3 ? 'checked' : '' }} disabled></td>
+                                                    <td><input type="checkbox" class="custom-checkbox-alt" {{ $form->test1bb_24_3 ? 'checked' : '' }} disabled></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td class="text-center" style="width: 50%; vertical-align: top;">
+                                            <p class="text-xs font-bold">TEST 4</p>
+                                            <div class="bg-sky-400 p-1 border-2 border-black">
+                                                <span class="text-xs font-semibold">1.0 mm gaps: </span>
+                                                <span class="text-xs">H</span> <input type="checkbox" class="custom-checkbox-alt" {{ $form->test4ab_h10mm ? 'checked' : '' }} disabled>
+                                                <span class="text-xs">V</span> <input type="checkbox" class="custom-checkbox-alt" {{ $form->test4ab_v10mm ? 'checked' : '' }} disabled>
+                                            </div>
+                                            <div class="bg-sky-400 p-1 border-2 border-black mt-1">
+                                                <span class="text-xs font-semibold">1.5 mm gaps: </span>
+                                                <span class="text-xs">H</span> <input type="checkbox" class="custom-checkbox-alt" {{ $form->test4ab_h15mm ? 'checked' : '' }} disabled>
+                                                <span class="text-xs">V</span> <input type="checkbox" class="custom-checkbox-alt" {{ $form->test4ab_v15mm ? 'checked' : '' }} disabled>
+                                            </div>
+                                            <div class="bg-sky-400 p-1 border-2 border-black mt-1">
+                                                <span class="text-xs font-semibold">2.0 mm gaps: </span>
+                                                <span class="text-xs">H</span> <input type="checkbox" class="custom-checkbox-alt" {{ $form->test4ab_h20mm ? 'checked' : '' }} disabled>
+                                                <span class="text-xs">V</span> <input type="checkbox" class="custom-checkbox-alt" {{ $form->test4ab_v20mm ? 'checked' : '' }} disabled>
+                                            </div>
+                                        </td>
+                                        <td class="text-center" style="width: 15%; vertical-align: top;">
+                                            <p class="text-xs font-bold">TEST 5</p>
+                                            <div class="flex flex-col items-center">
+                                                <div class="flex items-center">
+                                                    <div class="w-8 h-8 border-2 border-black bg-green-200 flex justify-center items-center">
+                                                        <input type="checkbox" class="custom-checkbox-alt" {{ $form->test5ab_05mm ? 'checked' : '' }} disabled>
+                                                    </div>
+                                                    <span class="text-xs ml-1">0.05mm</span>
                                                 </div>
-                                                <span class="text-xs transform -rotate-90">{{ str_replace('mm', '.', $val) }}mm</span>
-                                                @endforeach
+                                                <div class="flex items-center mt-1">
+                                                    <div class="w-8 h-8 border-2 border-black bg-green-300 flex justify-center items-center">
+                                                        <input type="checkbox" class="custom-checkbox-alt" {{ $form->test5ab_10mm ? 'checked' : '' }} disabled>
+                                                    </div>
+                                                    <span class="text-xs ml-1">0.10mm</span>
+                                                </div>
+                                                <div class="flex items-center mt-1">
+                                                    <div class="w-8 h-8 border-2 border-black bg-green-400 flex justify-center items-center">
+                                                        <input type="checkbox" class="custom-checkbox-alt" {{ $form->test5ab_15mm ? 'checked' : '' }} disabled>
+                                                    </div>
+                                                    <span class="text-xs ml-1">0.15mm</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="border-t-2 border-black mt-2 pt-1">
+                            <h3 class="text-center font-bold">GENERATOR SAMPING</h3>
+                            <div class="border-2 border-black mx-2 p-1">
+                                <table class="w-full">
+                                    <tr>
+                                        <td class="text-center" style="width: 30%; vertical-align: top;">
+                                            <p class="text-xs font-bold">TEST 2a</p>
+                                            <div class="relative flex border-2 border-black h-16 w-20 mx-auto">
+                                                <div class="bg-green-500 flex-1"></div>
+                                                <div class="bg-orange-500 flex-1"></div>
+                                                <div class="absolute inset-0 flex justify-center items-center">
+                                                    <input type="checkbox" class="custom-checkbox-alt" {{ $form->test2ab ? 'checked' : '' }} disabled>
+                                                </div>
+                                            </div>
+                                            <div class="mt-1 text-right mr-4">
+                                                <p class="text-xs inline-block font-bold">TEST 2b</p>
+                                                <input type="checkbox" class="custom-checkbox-alt" {{ $form->test2bb ? 'checked' : '' }} disabled>
+                                            </div>
+                                        </td>
+                                        <td class="text-center" style="width: 70%; vertical-align: top;">
+                                            <p class="text-xs font-bold">TEST 3</p>
+                                            <table class="border-2 border-black mx-auto" style="width: 95%; height: 40px;">
+                                                <tr class="h-full">
+                                                    @foreach([14, 16, 18, 20, 22, 24, 26, 28, 30] as $val)
+                                                        <td class="border-r border-black relative bg-cyan-100" style="width: 11.1%;">
+                                                            <input type="checkbox" class="custom-checkbox-alt absolute top-1.5" style="left: 5px;" {{ $form->{'test3b_'.$val} ? 'checked' : '' }} disabled>
+                                                        </td>
+                                                    @endforeach
+                                                </tr>
+                                            </table>
+                                            <table class="mx-auto" style="width: 95%;">
+                                                <tr>
+                                                    @foreach([14, 16, 18, 20, 22, 24, 26, 28, 30] as $val)
+                                                        <td class="text-center text-xs" style="width: 11.1%;">{{ $val }}</td>
+                                                    @endforeach
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table class="w-full" style="margin-top: 5px; border-top: 1px solid black;">
+                                    <tr>
+                                        <td class="text-center" style="width: 85%; vertical-align: top;">
+                                            <p class="text-xs font-bold">TEST 4</p>
+                                            <div class="bg-sky-400 p-1 border-2 border-black">
+                                                <span class="text-xs font-semibold">1.0 mm gaps: </span>
+                                                <span class="text-xs">H</span> <input type="checkbox" class="custom-checkbox-alt" {{ $form->test4b_h10mm ? 'checked' : '' }} disabled>
+                                                <span class="text-xs">V</span> <input type="checkbox" class="custom-checkbox-alt" {{ $form->test4b_v10mm ? 'checked' : '' }} disabled>
+                                            </div>
+                                            <div class="bg-sky-400 p-1 border-2 border-black mt-1">
+                                                <span class="text-xs font-semibold">1.5 mm gaps: </span>
+                                                <span class="text-xs">H</span> <input type="checkbox" class="custom-checkbox-alt" {{ $form->test4b_h15mm ? 'checked' : '' }} disabled>
+                                                <span class="text-xs">V</span> <input type="checkbox" class="custom-checkbox-alt" {{ $form->test4b_v15mm ? 'checked' : '' }} disabled>
+                                            </div>
+                                            <div class="bg-sky-400 p-1 border-2 border-black mt-1">
+                                                <span class="text-xs font-semibold">2.0 mm gaps: </span>
+                                                <span class="text-xs">H</span> <input type="checkbox" class="custom-checkbox-alt" {{ $form->test4b_h20mm ? 'checked' : '' }} disabled>
+                                                <span class="text-xs">V</span> <input type="checkbox" class="custom-checkbox-alt" {{ $form->test4b_v20mm ? 'checked' : '' }} disabled>
+                                            </div>
+                                        </td>
+                                        <td class="text-center" style="width: 15%; vertical-align: top;">
+                                            <p class="text-xs font-bold">TEST 5</p>
+                                            <div class="flex flex-col items-center">
+                                                <div class="flex items-center">
+                                                    <div class="w-8 h-8 border-2 border-black bg-green-200 flex justify-center items-center">
+                                                        <input type="checkbox" class="custom-checkbox-alt" {{ $form->test5b_05mm ? 'checked' : '' }} disabled>
+                                                    </div>
+                                                    <span class="text-xs ml-1">0.05mm</span>
+                                                </div>
+                                                <div class="flex items-center mt-1">
+                                                    <div class="w-8 h-8 border-2 border-black bg-green-300 flex justify-center items-center">
+                                                        <input type="checkbox" class="custom-checkbox-alt" {{ $form->test5b_10mm ? 'checked' : '' }} disabled>
+                                                    </div>
+                                                    <span class="text-xs ml-1">0.10mm</span>
+                                                </div>
+                                                <div class="flex items-center mt-1">
+                                                    <div class="w-8 h-8 border-2 border-black bg-green-400 flex justify-center items-center">
+                                                        <input type="checkbox" class="custom-checkbox-alt" {{ $form->test5b_15mm ? 'checked' : '' }} disabled>
+                                                    </div>
+                                                    <span class="text-xs ml-1">0.15mm</span>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
