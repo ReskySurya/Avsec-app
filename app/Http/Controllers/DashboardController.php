@@ -7,6 +7,7 @@ use App\Models\ChecklistPenyisiran;
 use App\Models\Location;
 use App\Models\Report;
 use App\Models\Logbook;
+use App\Models\LogbookChief;
 use App\Models\LogbookRotasi;
 use App\Models\LogbookRotasiHBSCP;
 use App\Models\LogbookRotasiPSCP;
@@ -224,5 +225,17 @@ class DashboardController extends Controller
             ->paginate($perPage, ['*'], 'pscp_page');
 
         return view('supervisor.listManualBook', compact('manualBooksHBSCP', 'manualBooksPSCP'));
+    }
+
+    public function indexSupervisor()
+    {
+        $perPage = 10;
+
+        $logbooksChief = LogbookChief::with('createdBy', 'approvedBy')
+            ->where('approved_by', Auth::id())
+            ->latest('date')
+            ->paginate($perPage);
+
+        return view('supervisor.dashboardSupervisor', compact('logbooksChief'));
     }
 }

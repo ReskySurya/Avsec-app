@@ -10,6 +10,7 @@ class LogbookFacility extends Model
     protected $table = 'logbook_facility';
     protected $fillable = [
         'logbookID',
+        'logbook_chief_id',
         'facility',
         'quantity',
         'description',
@@ -18,5 +19,10 @@ class LogbookFacility extends Model
     public function logbook(): BelongsTo
     {
         return $this->belongsTo(Logbook::class, 'logbookID', 'logbookID');
+    }
+
+    public function logbookChief(): BelongsTo
+    {
+        return $this->belongsTo(LogbookChief::class, 'logbook_chief_id', 'logbookID');
     }
 }
