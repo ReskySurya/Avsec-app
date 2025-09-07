@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('logbook_details', function (Blueprint $table) {
             $table->id();
-            $table->string('logbookID', 10);
+            $table->string('logbookID', 10)->nullable();
+            $table->string('logbook_chief_id', 20)->nullable();
             $table->time('start_time');
             $table->time('end_time');
             $table->string('summary');
@@ -22,9 +23,11 @@ return new class extends Migration
 
             // Foreign key constraint
             $table->foreign('logbookID')->references('logbookID')->on('logbooks')->onDelete('cascade');
+            $table->foreign('logbook_chief_id')->references('logbookID')->on('logbook_chief')->onDelete('cascade');
 
             // Index
             $table->index('logbookID');
+            $table->index('logbook_chief_id');
         });
     }
 

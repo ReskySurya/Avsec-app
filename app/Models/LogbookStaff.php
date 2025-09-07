@@ -8,7 +8,8 @@ class LogbookStaff extends Model
     protected $table = 'logbook_staff';
     protected $fillable = [
         'logbookID',
-        'staffID', 
+        'logbook_chief_id',
+        'staffID',
         'classification',
         'description',
     ];
@@ -16,6 +17,11 @@ class LogbookStaff extends Model
     public function logbook(): BelongsTo
     {
         return $this->belongsTo(Logbook::class, 'logbookID', 'logbookID');
+    }
+
+    public function logbookChief(): BelongsTo
+    {
+        return $this->belongsTo(LogbookChief::class, 'logbook_chief_id', 'logbookID');
     }
 
     public function user(): BelongsTo
