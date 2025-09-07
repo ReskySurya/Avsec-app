@@ -31,9 +31,13 @@ class DashboardController extends Controller
             ->join('equipment', 'equipment_locations.equipment_id', '=', 'equipment.id')
             ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
             ->whereIn('equipment.name', $equipmentTypes)
-            ->where('reports.approvedByID', Auth::id())
             ->whereIn('reports.statusID', [1, 2, 3])
             ->with(['submittedBy', 'status']);
+
+        // Cek jika user bukan superadmin, maka filter berdasarkan approver
+        if (!Auth::user()->isSuperAdmin()) {
+            $query->where('reports.approvedByID', Auth::id());
+        }
 
         // Filter hanya jika statusFilter tidak kosong
         if (!empty($statusFilter)) {
@@ -72,12 +76,15 @@ class DashboardController extends Controller
     public function showDataLogbook(Request $request)
     {
         $statusFilter = $request->query('status', ''); // Default kosong untuk menampilkan semua
-        $userId = Auth::id(); // ID user yang sedang login
 
         $logbookQuery = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy'])
-            ->where('approvedID', $userId) // hanya data dengan approver/supervisor sesuai ID user
             ->whereIn('status', ['submitted', 'approved'])
             ->orderBy('date', 'desc');
+
+        // Cek jika user bukan superadmin, maka filter berdasarkan approver
+        if (!Auth::user()->isSuperAdmin()) {
+            $logbookQuery->where('approvedID', Auth::id());
+        }
 
         // Filter berdasarkan status jika dipilih
         if ($statusFilter) {
@@ -171,24 +178,21 @@ class DashboardController extends Controller
         // 1. Tentukan jumlah item per halaman untuk pagination
         $perPage = 10;
 
-        // 2. Ambil data untuk PSCP dengan pagination
-        // Kita menggunakan eager loading 'creator' untuk efisiensi query
-        $logbooksPSCP = LogbookRotasi::with('creator', 'approver')
-            ->where('approved_by', Auth::id())
-            ->where('type', 'pscp')
-            ->latest('date') // Urutkan berdasarkan tanggal terbaru
-            ->paginate($perPage, ['*'], 'pscp_page');
+        // 2. Query dasar untuk LogbookRotasi
+        $pscpQuery = LogbookRotasi::with('creator', 'approver')->where('type', 'pscp');
+        $hbscpQuery = LogbookRotasi::with('creator', 'approver')->where('type', 'hbscp');
 
-        // 3. Ambil data untuk HBSCP dengan pagination
-        $logbooksHBSCP = LogbookRotasi::with('creator', 'approver')
-            ->where('approved_by', Auth::id())
-            ->where('type', 'hbscp')
-            ->latest('date')
-            ->paginate($perPage, ['*'], 'hbscp_page');
+        // 3. Filter berdasarkan approver jika bukan superadmin
+        if (!Auth::user()->isSuperAdmin()) {
+            $pscpQuery->where('approved_by', Auth::id());
+            $hbscpQuery->where('approved_by', Auth::id());
+        }
 
-        // 4. Kirim kedua koleksi data ke view
-        // Nama variabel ($logbooksPSCP, $logbooksHBSCP) sengaja disamakan
-        // dengan view lama agar Anda tidak perlu mengubah kode di file Blade.
+        // 4. Ambil data dengan pagination
+        $logbooksPSCP = $pscpQuery->latest('date')->paginate($perPage, ['*'], 'pscp_page');
+        $logbooksHBSCP = $hbscpQuery->latest('date')->paginate($perPage, ['*'], 'hbscp_page');
+
+        // 5. Kirim kedua koleksi data ke view
         return view('supervisor.listLogbookRotasi', compact('logbooksPSCP', 'logbooksHBSCP'));
     }
 
@@ -240,17 +244,17 @@ class DashboardController extends Controller
     }
 
     public function showDataFormPencatatanPI()
-{
-    $perPage = 10;
-    
-    // Perbaikan: Hapus get() dan gunakan where() langsung pada query builder
-    $formPencatatanPI = FormPencatatanPI::where('approved_id', Auth::id())
-        ->latest('date')
-        ->paginate($perPage, ['*']);
-        
-    return view('supervisor.listFormPencatatanPI', compact('formPencatatanPI'));
-}
-    
+    {
+        $perPage = 10;
+
+        // Perbaikan: Hapus get() dan gunakan where() langsung pada query builder
+        $formPencatatanPI = FormPencatatanPI::where('approved_id', Auth::id())
+            ->latest('date')
+            ->paginate($perPage, ['*']);
+
+        return view('supervisor.listFormPencatatanPI', compact('formPencatatanPI'));
+    }
+
 
     public function indexSupervisor()
     {

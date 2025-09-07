@@ -59,4 +59,16 @@ class LogbookChief extends Model
         return $this->hasMany(LogbookDetail::class, 'logbook_chief_id', 'logbookID');
     }
 
+    public function facility() 
+    {
+        return $this->hasMany(LogbookFacility::class, 'logbook_chief_id', 'logbookID');
+    }
+    public function personil()
+    {
+        return $this->hasMany(LogbookStaff::class, 'logbook_chief_id', 'logbookID');
+    }
+    public function kemajuan()
+    {
+        return $this->hasMany(LogbookChiefKemajuan::class, 'logbook_chief_id', 'logbookID');
+    }
 }

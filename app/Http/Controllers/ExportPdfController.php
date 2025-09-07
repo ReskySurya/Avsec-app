@@ -10,6 +10,7 @@ use App\Models\ChecklistSenpi;
 use App\Models\Equipment;
 use App\Models\EquipmentLocation;
 use App\Models\FormPencatatanPI;
+use App\Models\LogbookChief;
 use App\Models\LogbookRotasi;
 use App\Models\ManualBook;
 use App\Models\Report;
@@ -282,17 +283,10 @@ class ExportPdfController extends Controller
         ]);
     }
 
-    private function reviewChiefLogbook($chiefID)
+    private function reviewChiefLogbook($logbookID)
     {
-        $form = new \stdClass();
-        $form->chiefID = $chiefID;
-        $form->date = now();
-        $form->aktivitas = 'Inspeksi Rutin';
-        $form->lokasi = 'Semua Area';
-        $form->chief = 'Chief Security';
-        $form->status = 'submitted';
-        $form->notes = 'Tidak ada catatan khusus.';
-        $form->chiefSignature = null;
+        $logbook = LogbookChief::with(['details', 'createdBy', 'approvedBy', 'facility', 'personil.user','kemajuan'])->findOrFail($logbookID);
+        $form = $this->prepareLogbookChief($logbook);
         return view('superadmin.export.pdf.logbook.logbookChiefTemplate', [
             'forms' => collect([$form]),
         ]);
@@ -401,6 +395,33 @@ class ExportPdfController extends Controller
         $form->personil = $logbook->personil;
         return $form;
     }
+    
+    
+    private function prepareLogbookChief(LogbookChief $logbook)
+    {
+        $form = new \stdClass();
+        $form->logbookID = $logbook->logbookID;
+        $form->date = $logbook->date;
+        $form->grup = $logbook->grup;
+        $form->shift = $logbook->shift;
+        $form->status = 'Approved';
+        $form->senderName = $logbook->createdBy->name ?? 'N/A';
+        $form->receiverName = $logbook->approvedBy->name ?? 'N/A';
+        $form->senderSignature = $logbook->senderSignature;
+        $form->approvedSignature = $logbook->approvedSignature;
+        $form->logbookDetails = $logbook->details;
+        $form->facility = $logbook->facility;
+        $form->personil = $logbook->personil;
+        $form->kemajuan = $logbook->kemajuan;
+
+        // For template compatibility
+        $form->lokasi = $logbook->grup;
+        $form->chief = $logbook->createdBy->name ?? 'N/A';
+        $form->notes = $logbook->notes ?? 'Tidak ada catatan khusus.';
+        $form->chiefSignature = $logbook->senderSignature;
+
+        return $form;
+    }
 
     public function exportPdfLogbook(Request $request)
     {
@@ -467,17 +488,19 @@ class ExportPdfController extends Controller
                 return $query->orderBy('date', 'desc')->get();
 
             case 'chief':
-                // Return dummy data for chief since model doesn't exist yet
-                return collect([
-                    (object) [
-                        'chiefID' => 'CHF-001',
-                        'date' => now(),
-                        'aktivitas' => 'Inspeksi Rutin',
-                        'lokasi' => 'Semua Area',
-                        'chief' => 'Chief Security',
-                        'status' => 'submitted'
-                    ]
-                ]);
+                $query = LogbookChief::with(['createdBy']);
+                if ($startDate) $query->whereDate('date', '>=', $startDate);
+                if ($endDate) $query->whereDate('date', '<=', $endDate);
+                return $query->orderBy('date', 'desc')->get()->map(function ($item) {
+                    return [
+                        'logbookID' => $item->logbookID,
+                        'date' => $item->date,
+                        'grup' => $item->grup,
+                        'shift' => $item->shift,
+                        'senderName' => $item->createdBy->name ?? 'N/A',
+                        'status' => 'approved',
+                    ];
+                });
 
             default:
                 return collect();
@@ -562,6 +585,8 @@ class ExportPdfController extends Controller
                     $form = $this->prepareRotasiFormData($model);
                     $form->officerLog = $this->prepareOfficerLogData($model);
                     return $form;
+                case 'chief':
+                    return $this->prepareLogbookChief($model);
                 default:
                     return $model;
             }
@@ -880,7 +905,7 @@ class ExportPdfController extends Controller
         if (!$viewName) {
             return redirect()->back()->with('error', 'Template tidak ditemukan untuk jenis checklist ini.');
         }
-        
+
         return $pdfService->generatePdfFromTemplate($viewName, $data, $formType);
     }
 }

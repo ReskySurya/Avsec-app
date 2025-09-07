@@ -43,12 +43,12 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::get('/export', [ExportPdfController::class, 'index'])->name('export.index');
     Route::get('/export/dailytest', [ExportPdfController::class, 'exportPdfDailyTest'])->name('export.dailytest');
     Route::get('/export/daily-test/review/{report}', [ExportPdfController::class, 'reviewDailyTest'])->name('export.dailytest.review');
-    
+
     Route::get('/export/logbook', [ExportPdfController::class, 'exportPdfLogbook'])->name('export.logbook');
     Route::post('/export/logbook/filter', [ExportPdfController::class, 'filterLogbook'])->name('export.logbook.filter');
     Route::get('/export/logbook/review/{id}', [ExportPdfController::class, 'reviewLogbook'])->name('export.logbook.review');
-    
-    
+
+
 
     // Rute untuk Folder
     Route::get('/folders/create', [PMIKController::class, 'create'])->name('folders.create');
@@ -84,7 +84,7 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
     Route::post('/logbook-rotasi/approved/{id}', [LogbookRotasiController::class, 'approvedForm'])->name('supervisor.logbook-rotasi.approved');
 
     // Logbook Chief
-    Route::get('/logbook/chief', [LogbookChiefController::class, 'index'])->name('logbook.chief.index');
+    // Route::get('/logbook/chief', [LogbookChiefController::class, 'index'])->name('logbook.chief.index');
     Route::post('/logbook/chief/store', [LogbookChiefController::class, 'store'])->name('logbook.chief.store');
     Route::post('/logbook/chief/add-kemajuan', [LogbookChiefController::class, 'storeKemajuan'])->name('logbook.chief.addKemajuan');
     Route::post('/logbook/chief/add-personil', [LogbookChiefController::class, 'storePersonil'])->name('logbook.chief.addPersonil');
@@ -116,8 +116,6 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
     // Route::get('/checklist-manual-book/list', [DashboardController::class, 'showDataManualBook'])->name('supervisor.checklist-manualbook.list');
     // Route::get('/checklist-manual-book/detail/{manualBook}', [ManualBookController::class, 'show'])->name('supervisor.checklist-manualbook.detail');
     Route::patch('/checklist-manual-book/approve/{manualBook}', [ManualBookController::class, 'approveSignature'])->name('supervisor.checklist-manualbook.signature');
-
-
 });
 
 // Officer Routes
@@ -137,6 +135,8 @@ Route::middleware(['auth', 'role:officer'])->group(function () {
 
 // Daily Test Routes
 Route::middleware(['auth'])->group(function () {
+    Route::get('/logbook/chief', [LogbookChiefController::class, 'index'])->name('logbook.chief.index');
+
     //Tampilan Superadmin dan Supervisor
     Route::get('/supervisor/dailytest-form',  [DashboardController::class, 'showDataDailyTest'])->name('supervisor.dailytest-form');
     Route::get('/supervisor/logbook-form',  [DashboardController::class, 'showDataLogbook'])->name('supervisor.logbook-form');
@@ -226,7 +226,7 @@ Route::middleware(['auth'])->group(function () {
     // Logbook Supervisor & Superadmin
     Route::get('/logbook-rotasi/list', [DashboardController::class, 'showDataLogbookRotasi'])->name('supervisor.logbook-rotasi.list');
     Route::get('/logbook-rotasi/detail/{logbook}', [LogbookRotasiController::class, 'show'])->name('supervisor.logbook-rotasi.detail');
-    
+
     Route::get('/sweepingpi', [LogbookSweppingPIController::class, 'indexSweepingPI'])->name('sweepingPI.index');
 
     Route::get('/sweepingpi/manage/{tenantID}', [LogbookSweppingPIController::class, 'indexSweepingPIManage'])->name('sweepingPI.manage.index');

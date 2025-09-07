@@ -200,13 +200,13 @@
                                             Tanggal
                                         </th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Aktivitas
+                                            Grup
                                         </th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Lokasi
+                                            Shift
                                         </th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Chief
+                                            Team Leader
                                         </th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Status
@@ -313,8 +313,8 @@
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+            // hour: '2-digit',
+            // minute: '2-digit'
         });
     }
 
@@ -461,19 +461,19 @@
                             ${formatDate(item.date)}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            ${item.aktivitas || 'N/A'}
+                            ${item.grup || 'N/A'}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            ${item.lokasi || 'N/A'}
+                            ${item.shift || 'N/A'}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            ${item.chief || 'N/A'}
+                            ${item.senderName || 'N/A'}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             ${createStatusBadge(item.status)}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
-                            ${createCheckbox(item.chiefID)}
+                            ${createCheckbox(item.logbookID)}
                         </td>
                     `;
                     break;
