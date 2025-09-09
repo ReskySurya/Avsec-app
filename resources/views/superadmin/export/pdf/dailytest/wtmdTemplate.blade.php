@@ -5,41 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>WTMD Forms</title>
-    <style>
-        {!! file_get_contents(public_path('css/pdf.css')) !!}
-    </style>
+    <link rel="stylesheet" href="{{ public_path('css/pdf.css') }}">
 </head>
 <body class="m-0 p-0">
-@php
-    $logoAirportBase64 = base64_encode(file_get_contents(public_path('images/airport-security-logo.png')));
-    $logoInjourneyBase64 = base64_encode(file_get_contents(public_path('images/injourney-API.png')));
-    $tampakDepanBase64 = base64_encode(file_get_contents(public_path('images/tampakdepan.png')));
-    $tampakBelakangBase64 = base64_encode(file_get_contents(public_path('images/tampakbelakang.png')));
-@endphp
+
     @foreach($forms as $form)
     <div class="page-break-after">
-        <div class="bg-white p-4" style="width: 200mm;">
+        <div class="bg-white p-4" style="width: 210mm;">
             <div id="format" class="mx-auto">
-                <div class="border-t-2 border-x-2 border-black bg-white shadow-md py-2">
-                    <table style="width: 100%;">
-                        <tbody>
-                            <tr>
-                                <td style="width: 20%; text-align: center; vertical-align: middle;">
-                                    <img src="data:image/png;base64,{{ $logoAirportBase64 }}" alt="Logo" style="width: 64px; height: 64px; display: inline-block;">
-                                </td>
-                                <td style="width: 60%; text-align: center; vertical-align: middle;">
-                                    <h3 style="font-size: 12px; font-weight: bold; line-height: 1.3;">
-                                        CHECK LIST PENGUJIAN HARIAN<br>
-                                        GAWANG PENDETEKSI LOGAM<br>
-                                        (WALK THROUGH METAL DETECTOR/WTMD)
-                                    </h3>
-                                </td>
-                                <td style="width: 20%; text-align: center; vertical-align: middle;">
-                                    <img src="data:image/png;base64,{{ $logoInjourneyBase64 }}" alt="Injourney Logo" style="width: 80px; height: 64px; display: inline-block;">
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="border-t-2 border-x-2 border-black bg-white shadow-md px-4 py-2">
+                    <div class="flex items-center justify-between">
+                        <img src="{{ public_path('images/airport-security-logo.png') }}" alt="Airport Security Logo" class="w-16 h-16 object-contain">
+                        <h1 class="text-xl font-bold text-center flex-grow px-2">
+                            CHECK LIST PENGUJIAN HARIAN<br>
+                            GAWANG PENDETEKSI LOGAM<br>
+                            (WALK THROUGH METAL DETECTOR/WTMD)
+                        </h1>
+                        <img src="{{ public_path('images/injourney-API.png') }}" alt="Injourney Logo" class="w-16 h-16 object-contain">
+                    </div>
                 </div>
 
                 <div class="border-2 border-black bg-white shadow">
@@ -68,84 +51,139 @@
                         </tbody>
                     </table>
 
-                    <div class="px-4 py-2">
-                        <div class="mb-2">
-                            <label class="inline-flex items-center">
-                                <input type="checkbox" class="custom-checkbox-alt" {{ $form->terpenuhi ? 'checked' : '' }} disabled>
-                                <span class="ml-2 text-sm">Terpenuhi</span>
-                            </label>
-                            <label class="inline-flex items-center ml-4">
-                                <input type="checkbox" class="custom-checkbox-alt" {{ $form->tidakTerpenuhi ? 'checked' : '' }} disabled>
-                                <span class="ml-2 text-sm">Tidak Terpenuhi</span>
-                            </label>
+                    <div class="px-4">
+                        <div class="p-2">
+                            <div class="mb-0">
+                                <label class="inline-flex items-center">
+                                    <input class="custom-checkbox-alt" type="checkbox" {{ $form->terpenuhi ? 'checked' : '' }} disabled>
+                                    <span class="ml-2 text-sm">Terpenuhi</span>
+                                </label>
+                            </div>
+                            <div>
+                                <label class="inline-flex items-center">
+                                    <input class="custom-checkbox-alt" type="checkbox" {{ $form->tidakTerpenuhi ? 'checked' : '' }} disabled>
+                                    <span class="ml-2 text-sm">Tidak Terpenuhi</span>
+                                </label>
+                            </div>
                         </div>
+                        <div class="grid grid-cols-2 border-x-2 border-t-2 border-black text-center items-center">
+                            <div class="relative">
+                                <div>
+                                    <img src="{{ public_path('images/tampakdepan.png') }}" alt="tampakdepan"
+                                        class="w-[115px] h-auto mx-auto object-contain">
+                                    <p class="text-sm font-semibold text-center mt-2">DEPAN</p>
+                                </div>
 
-                        <div style="display: flex; justify-content: space-around; align-items: flex-start;">
-                            <!-- Tampak Depan -->
-                            <div style="text-align: center; position: relative;">
-                                <img src="data:image/png;base64,{{ $tampakDepanBase64 }}" alt="Tampak Depan" style="width: 150px; margin-bottom: 5px;">
-                                <div style="position: absolute; top: 20px; left: -60px; font-size: 10px;">
-                                    TEST 1
-                                    <div style="display: flex; align-items: center;">
-                                        <div style="margin-right: 5px;">
-                                            IN <input type="checkbox" class="custom-checkbox-alt" {{ $form->test1_in_depan ? 'checked' : '' }} disabled><br>
-                                            OUT <input type="checkbox" class="custom-checkbox-alt" {{ $form->test1_out_depan ? 'checked' : '' }} disabled>
-                                        </div>
-                                        <span>&rarr;</span>
-                                    </div>
-                                </div>
-                                <div style="position: absolute; top: 120px; left: -60px; font-size: 10px;">
-                                    TEST 2
-                                     <div style="display: flex; align-items: center;">
-                                        <div style="margin-right: 5px;">
-                                            IN <input type="checkbox" class="custom-checkbox-alt" {{ $form->test2_in_depan ? 'checked' : '' }} disabled><br>
-                                            OUT <input type="checkbox" class="custom-checkbox-alt" {{ $form->test2_out_depan ? 'checked' : '' }} disabled>
-                                        </div>
-                                        <span>&rarr;</span>
-                                    </div>
-                                </div>
-                                <div style="position: absolute; top: 70px; right: -60px; font-size: 10px;">
-                                    TEST 4
-                                     <div style="display: flex; align-items: center;">
-                                        <span>&larr;</span>
-                                        <div style="margin-left: 5px;">
-                                            IN <input type="checkbox" class="custom-checkbox-alt" {{ $form->test4_in_depan ? 'checked' : '' }} disabled><br>
-                                            OUT <input type="checkbox" class="custom-checkbox-alt" {{ $form->test4_out_depan ? 'checked' : '' }} disabled>
+                                <div class="absolute inset-0 flex flex-col items-start pl-10 pt-36 pointer-events-auto">
+                                    <div class="mb-1">
+                                        <div class="flex items-center gap-1">
+                                            <div class="flex flex-col gap-2">
+                                                <div class="flex items-center gap-1 pl-2.5">
+                                                    <span class="text-[10px]">IN</span>
+                                                    <input class="custom-checkbox-alt" type="checkbox" {{$form->test1_in_depan ? 'checked' : '' }} disabled>
+                                                </div>
+                                                <div class="flex items-center gap-1">
+                                                    <span class="text-[10px]">OUT</span>
+                                                    <input class="custom-checkbox-alt" type="checkbox" {{$form->test1_out_depan ? 'checked' : '' }} disabled>
+                                                </div>
+                                            </div>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4"
+                                                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                            </svg>
+                                            <span class="text-xs font-bold">TEST 1</span>
                                         </div>
                                     </div>
+
+                                    <div class="mb-20">
+                                        <div class="flex items-center gap-1">
+                                            <div class="flex flex-col gap-2">
+                                                <div class="flex items-center gap-1 pl-2.5">
+                                                    <span class="text-[10px]">IN</span>
+                                                    <input class="custom-checkbox-alt" type="checkbox" {{$form->test2_in_depan ? 'checked' : '' }} disabled>
+                                                </div>
+                                                <div class="flex items-center gap-1">
+                                                    <span class="text-[10px]">OUT</span>
+                                                    <input class="custom-checkbox-alt" type="checkbox" {{$form->test2_out_depan ? 'checked' : '' }} disabled>
+                                                </div>
+                                            </div>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4"
+                                                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                            </svg>
+                                            <span class="text-xs font-bold">TEST 2</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-8">
+                                        <div class="flex items-center gap-1">
+                                            <div class="flex flex-col gap-2">
+                                                <div class="flex items-center gap-1 pl-2.5">
+                                                    <span class="text-[10px]">IN</span>
+                                                    <input class="custom-checkbox-alt" type="checkbox" {{$form->test4_in_depan ? 'checked' : '' }} disabled>
+                                                </div>
+                                                <div class="flex items-center gap-1">
+                                                    <span class="text-[10px]">OUT</span>
+                                                    <input class="custom-checkbox-alt" type="checkbox" {{$form->test4_out_depan ? 'checked' : '' }} disabled>
+                                                </div>
+                                            </div>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4"
+                                                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                            </svg>
+                                            <span class="text-xs font-bold">TEST 4</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <strong>DEPAN</strong>
                             </div>
 
-                            <!-- Tampak Belakang -->
-                            <div style="text-align: center; position: relative;">
-                                <img src="data:image/png;base64,{{ $tampakBelakangBase64 }}" alt="Tampak Belakang" style="width: 150px; margin-bottom: 5px;">
-                                <div style="position: absolute; top: 70px; left: -60px; font-size: 10px;">
-                                    TEST 3
-                                     <div style="display: flex; align-items: center;">
-                                        <div style="margin-right: 5px;">
-                                            IN <input type="checkbox" class="custom-checkbox-alt" {{ $form->test3_in_belakang ? 'checked' : '' }} disabled><br>
-                                            OUT <input type="checkbox" class="custom-checkbox-alt" {{ $form->test3_out_belakang ? 'checked' : '' }} disabled>
+                            <div class="relative">
+                                <div>
+                                    <img src="{{ public_path('images/tampakbelakang.png') }}" alt="tampakbelakang"
+                                        class="w-[115px] h-auto mx-auto object-contain">
+                                    <p class="text-sm font-semibold text-center mt-2">BELAKANG</p>
+                                </div>
+
+                                <div class="absolute inset-0 flex flex-col items-end pr-10 pt-4 pointer-events-auto">
+                                    <div class="mt-36">
+                                        <div class="flex items-center gap-1">
+                                            <span class="text-xs font-bold">TEST 3</span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 rotate-180"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4"
+                                                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                            </svg>
+                                            <div class="flex flex-col gap-2">
+                                                <div class="flex items-center gap-1 pr-2.5">
+                                                    <input class="custom-checkbox-alt" type="checkbox" {{$form->test3_in_belakang ? 'checked' : '' }} disabled>
+                                                    <span class="text-[10px]">IN</span>
+                                                </div>
+                                                <div class="flex items-center gap-1">
+                                                    <input class="custom-checkbox-alt" type="checkbox" {{$form->test3_out_belakang ? 'checked' : '' }} disabled>
+                                                    <span class="text-[10px]">OUT</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <span>&rarr;</span>
                                     </div>
                                 </div>
-                                <strong>BELAKANG</strong>
                             </div>
                         </div>
                     </div>
 
                     <div class="border-t-2 border-black p-4">
-                        <div class="flex items-start">
+                        <div class="flex items-start mb-4">
                             <label class="text-gray-700 font-bold mr-4">Hasil:</label>
                             <div class="flex flex-col">
-                                <div class="flex items-center ">
-                                    <input type="radio" class="" {{ $form->result == 'pass' ? 'checked' : '' }} disabled>
-                                    <label class="text-sm">PASS</label>
+                                <div class="flex items-center mb-0">
+                                    <input class="custom-checkbox-alt" type="radio" class="custom-radio" {{ $form->result == 'pass' ? 'checked' : '' }} disabled>
+                                    <label class="text-sm ml-2">PASS</label>
                                 </div>
-                                <div class="flex items-center ">
-                                    <input type="radio" class="" {{ $form->result == 'fail' ? 'checked' : '' }} disabled>
-                                    <label class="text-sm">FAIL</label>
+                                <div class="flex items-center">
+                                    <input class="custom-checkbox-alt" type="radio" class="custom-radio" {{ $form->result == 'fail' ? 'checked' : '' }} disabled>
+                                    <label class="text-sm ml-2">FAIL</label>
                                 </div>
                             </div>
                         </div>
@@ -156,7 +194,7 @@
                     </div>
 
                     <div class="border-t-2 border-black px-4 py-2">
-                        <h3 class="text-sm font-bold mb-1">Personel Pengamanan Penerbangan</h3>
+                        <h3 class="text-sm font-bold">Personel Pengamanan Penerbangan</h3>
                         <div class="grid grid-cols-2 gap-4">
                             <div class="grid grid-rows-2 gap-2 items-center">
                                 <div class="text-center self-end">
@@ -177,14 +215,18 @@
                             <div>
                                 <div class="flex flex-col items-center">
                                     @if($form->officer_signature)
-                                        <img src="{{ $form->officer_signature }}" alt="Tanda tangan Officer" style="width: 150px; height: auto;">
+                                        <img src="{{ $form->officer_signature }}" alt="Tanda tangan Officer"
+                                            class="object-contain"
+                                            style="width: 100px; height: 75px;">
                                     @else
                                         <p>Tanda tangan Officer tidak tersedia</p>
                                     @endif
                                 </div>
                                 <div class="flex flex-col items-center">
                                     @if($form->supervisor_signature)
-                                        <img src="{{ $form->supervisor_signature }}" alt="Tanda tangan Supervisor" id="supervisorSignatureImage" style="width: 150px; height: auto;">
+                                        <img src="{{ $form->supervisor_signature }}" alt="Tanda tangan Supervisor"
+                                            class="object-contain"
+                                            style="width: 150px; height: 75px;">
                                     @else
                                         <p>Tanda tangan Supervisor tidak tersedia</p>
                                     @endif

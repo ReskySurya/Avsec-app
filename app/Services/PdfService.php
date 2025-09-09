@@ -2,36 +2,41 @@
 
 namespace App\Services;
 
-// 1. Ganti 'use' statement dari DomPDF ke Laravel PDF
 use Spatie\LaravelPdf\Facades\Pdf;
 use Illuminate\Support\Collection;
 
 class PdfService
 {
     /**
-     * Membuat file PDF dari satu jenis template dan kumpulan data menggunakan spatie/laravel-pdf.
+     * Membuat file PDF dari satu jenis template dan kumpulan data.
      *
-     * @param string $viewName Nama file Blade yang akan digunakan sebagai template.
-     * @param Collection $forms Data laporan yang akan ditampilkan.
-     * @param string $formType Nama tipe form untuk penamaan file (e.g., 'HHMD').
+     * @param string $viewName Nama file Blade.
+     * @param Collection $forms Data laporan.
+     * @param string $formType Nama tipe form.
+     * @param string $paperSize Ukuran kertas (e.g., 'A4', 'F4').
      * @return \Illuminate\Http\Response
      */
-    public function generatePdfFromTemplate(string $viewName, Collection $forms, string $formType)
+    public function generatePdfFromTemplate(string $viewName, Collection $forms, string $formType, string $paperSize = 'A4')
     {
-        // 2. Siapkan data untuk view. Kita tidak perlu lagi Base64 encode.
-        //    Cukup kirim data 'forms' saja. Gambar akan dipanggil langsung di Blade.
         $viewData = [
             'forms' => $forms,
         ];
 
-        // 3. Buat nama file yang dinamis
         $fileName = strtolower($formType) . '-report-' . date('Y-m-d-His') . '.pdf';
 
-        // 4. Gunakan sintaks baru dari spatie/laravel-pdf.
-        //    Jauh lebih sederhana dan mudah dibaca.
-        return Pdf::view($viewName, $viewData)
-            ->format('A4') // Mengatur format kertas ke A4
-            ->margins(10, 10, 10, 10) // Mengatur margin (top, right, bottom, left) dalam milimeter
-            ->download($fileName);
+        $pdf = Pdf::view($viewName, $viewData)
+                  ->margins(10, 10, 10, 10);
+
+        // Cek apakah ukuran kertas adalah F4
+        if ($paperSize === 'F4') {
+            // Gunakan paperSize() untuk ukuran kustom
+            // F4 memiliki dimensi 215.9 mm x 330.2 mm
+            $pdf->paperSize(215.9, 330.2);
+        } else {
+            // Gunakan format() untuk ukuran standar seperti A4
+            $pdf->format($paperSize);
+        }
+
+        return $pdf->download($fileName);
     }
 }
