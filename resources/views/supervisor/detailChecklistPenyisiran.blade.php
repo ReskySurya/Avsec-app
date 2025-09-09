@@ -25,7 +25,7 @@
                         </th>
                         <th
                             class="border border-black px-1 sm:px-2 py-2 text-xs sm:text-sm font-bold min-w-[200px] sm:w-64" rowspan="2">
-                            PEMERIKSAAN KONDISI KENDARAAN
+                            PEMERIKSAAN AREA
                         </th>
                         {{-- Judul kolom diubah menjadi dinamis berdasarkan nilai shift --}}
                         <th class="border border-black px-1 sm:px-2 py-2 text-xs sm:text-sm font-bold text-center"
