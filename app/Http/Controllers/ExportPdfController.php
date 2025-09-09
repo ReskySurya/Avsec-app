@@ -127,10 +127,18 @@ class ExportPdfController extends Controller
                 'xraybagasi' => 'superadmin.export.pdf.dailytest.xraybagasiTemplate',
             ];
 
+            $paperSizeMapping = [
+                'hhmd'       => 'A4',
+                'wtmd'       => 'A4',
+                'xraycabin'  => 'F4', // F4 untuk X-Ray Cabin
+                'xraybagasi' => 'F4', // F4 untuk X-Ray Bagasi
+            ];
+
             if (!isset($viewMapping[$type])) {
                 return redirect()->back()->with('error', 'Jenis Form tidak valid atau tidak memiliki template.');
             }
             $viewName = $viewMapping[$type];
+            $paperSize = $paperSizeMapping[$type] ?? 'A4';
 
             $exportQuery = Report::query()->where('statusID', 2); // Can only export approved reports.
 
@@ -170,7 +178,7 @@ class ExportPdfController extends Controller
             }
 
             $formsForView = $reportsToExport->map(fn($report) => $this->prepareFormData($report));
-            return $pdfService->generatePdfFromTemplate($viewName, $formsForView, $formType);
+            return $pdfService->generatePdfFromTemplate($viewName, $formsForView, $formType, $paperSize);
         }
 
         $equipmentTypes = ['hhmd', 'wtmd', 'xraycabin', 'xraybagasi'];
@@ -880,7 +888,7 @@ class ExportPdfController extends Controller
         if (!$viewName) {
             return redirect()->back()->with('error', 'Template tidak ditemukan untuk jenis checklist ini.');
         }
-        
+
         return $pdfService->generatePdfFromTemplate($viewName, $data, $formType);
     }
 }
