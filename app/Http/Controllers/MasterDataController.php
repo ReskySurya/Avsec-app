@@ -37,31 +37,30 @@ class MasterDataController extends Controller
                         ->orWhere('description', 'like', "%{$searchTable}%");
                 });
             })
-            ->paginate(5, ['*'], 'equipmentLocationsPage') // paginate with custom page query string
-            ->appends(request()->query());
-        // $equipmentList = Equipment::with('creator')->orderBy('name')->get();
+            ->get();
+        $equipmentList = Equipment::with('creator')->orderBy('name')->get();
 
-        // $locationList = Location::with('creator')->orderBy('name')->get();
+        $locationList = Location::with('creator')->orderBy('name')->get();
         // Equipment
-        $equipmentList = Equipment::with('creator')
-            ->when($searchTable, function ($query) use ($searchTable) {
-                $query->where('name', 'like', "%{$searchTable}%")
-                    ->orWhere('merkType', 'like', "%{$searchTable}%")
-                    ->orWhere('description', 'like', "%{$searchTable}%");
-            })
-            ->orderBy('id')
-            ->paginate(5, ['*'], 'equipmentPage')
-            ->appends(request()->query());
+        // $equipmentList = Equipment::with('creator')
+        //     ->when($searchTable, function ($query) use ($searchTable) {
+        //         $query->where('name', 'like', "%{$searchTable}%")
+        //             ->orWhere('merkType', 'like', "%{$searchTable}%")
+        //             ->orWhere('description', 'like', "%{$searchTable}%");
+        //     })
+        //     ->orderBy('id')
+        //     ->paginate(5, ['*'], 'equipmentPage')
+        //     ->appends(request()->query());
 
-        // Location
-        $locationList = Location::with('creator')
-            ->when($searchTable, function ($query) use ($searchTable) {
-                $query->where('name', 'like', "%{$searchTable}%")
-                    ->orWhere('description', 'like', "%{$searchTable}%");
-            })
-            ->orderBy('id')
-            ->paginate(5, ['*'], 'locationPage')
-            ->appends(request()->query());
+        // // Location
+        // $locationList = Location::with('creator')
+        //     ->when($searchTable, function ($query) use ($searchTable) {
+        //         $query->where('name', 'like', "%{$searchTable}%")
+        //             ->orWhere('description', 'like', "%{$searchTable}%");
+        //     })
+        //     ->orderBy('id')
+        //     ->paginate(5, ['*'], 'locationPage')
+        //     ->appends(request()->query());
 
         return view('master-data.equipment-locations.index', compact(
             'equipmentLocations',

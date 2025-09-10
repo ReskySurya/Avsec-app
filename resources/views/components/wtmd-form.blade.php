@@ -294,11 +294,11 @@
                                     <div class="mt-2 flex space-x-2">
                                         <button type="button" id="clearSignature"
                                             class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
-                                            Clear
+                                            Hapus
                                         </button>
                                         <button type="button" id="saveSubmitterSignature"
                                             class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
-                                            Save Signature
+                                            Simpan
                                         </button>
                                     </div>
                                     <input type="hidden" name="submitterSignature" id="submitterSignatureData">
@@ -335,7 +335,7 @@
                 <div class="mt-4">
                     <button type="submit" id="submitButton"
                         class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-200">
-                        <span id="buttonText">Submit Form</span>
+                        <span id="buttonText">Kirim Form</span>
                         <span id="buttonLoading" class="hidden">
                             <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block"
                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -345,7 +345,7 @@
                                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                                 </path>
                             </svg>
-                            Submitting...
+                            Mengirim...
                         </span>
                     </button>
                 </div>

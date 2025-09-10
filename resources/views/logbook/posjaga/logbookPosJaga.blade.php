@@ -95,7 +95,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                         </svg>
                     </button>
-                    <form action="{{ route('logbook.destroy', $logbook->logbookID) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus entry ini?')">
+                    <form action="{{ route('logbook.destroy', $logbook->logbookID) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors duration-200" @click.stop>
@@ -111,8 +111,8 @@
                 <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
-                <p class="text-gray-500 text-lg">Belum ada entry logbook</p>
-                <p class="text-gray-400">Tambahkan entry pertama Anda</p>
+                <p class="text-gray-500 text-lg">Belum ada data logbook</p>
+                <p class="text-gray-400">Tambahkan data pertama Anda</p>
             </div>
             @endforelse
         </div>
@@ -183,7 +183,7 @@
                             </button>
                             <form action="{{ route('logbook.destroy', $logbook->logbookID) }}"
                                 method="POST"
-                                onsubmit="event.stopPropagation(); return confirm('Yakin ingin menghapus entry ini?')">
+                                onsubmit="event.stopPropagation(); return confirm('Yakin ingin menghapus data ini?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit"
@@ -209,8 +209,8 @@
                                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                                 </path>
                             </svg>
-                            <p class="text-gray-500 text-lg">Belum ada entry logbook</p>
-                            <p class="text-gray-400">Tambahkan entry pertama Anda</p>
+                            <p class="text-gray-500 text-lg">Belum ada data logbook</p>
+                            <p class="text-gray-400">Tambahkan data pertama Anda</p>
                         </td>
                     </tr>
                     @endforelse

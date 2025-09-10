@@ -256,9 +256,7 @@
                     @endforeach
                 </tbody>
             </table>
-            <div class="px-4 py-3 bg-white border-t border-gray-200">
-                {{ $equipmentLocations->links() }}
-            </div>
+           
         </div>
     </div>
 
@@ -350,9 +348,9 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
-                        @forelse($equipmentList as $equipment)
+                        @forelse($equipmentList as $index => $equipment)
                         <tr class="hover:bg-gray-50 transition-colors duration-200">
-                            <td class="px-2 py-4 text-blue-600 font-bold">{{ $equipment->id }}</td>
+                            <td class="px-2 py-4 text-blue-600 font-bold">{{ $index + 1 }}</td>
                             <td class="px-2 py-4 text-gray-900 font-semibold">{{ $equipment->name }}</td>
                             <td class="px-2 py-4 text-gray-600">{{ Str::limit($equipment->description, 80) }}</td>
                             <td class="px-2 py-4 text-gray-500">{{ $equipment->creator->name ?? 'N/A' }}</td>
@@ -401,9 +399,7 @@
                         @endforelse
                     </tbody>
                 </table>
-                <div class="px-4 py-3 bg-white border-t border-gray-200">
-                    {{ $equipmentList->links() }}
-                </div>
+               
             </div>
         </div>
     </div>
@@ -496,9 +492,9 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
-                        @forelse($locationList as $location)
+                        @forelse($locationList as $index => $location)
                         <tr class="hover:bg-gray-50 transition-colors duration-200">
-                            <td class="px-5 py-4 text-purple-600 font-bold">{{ $location->id }}</td>
+                            <td class="px-5 py-4 text-purple-600 font-bold">{{ $index + 1 }}</td>
                             <td class="px-5 py-4 text-gray-900 font-semibold">{{ $location->name }}</td>
                             <td class="px-5 py-4 text-gray-600">{{ Str::limit($location->description, 80) }}</td>
                             <td class="px-5 py-4 text-gray-500">{{ $location->creator->name ?? 'N/A' }}</td>
@@ -549,9 +545,7 @@
                         @endforelse
                     </tbody>
                 </table>
-                <div class="px-4 py-3 bg-white border-t border-gray-200">
-                    {{ $locationList->links() }}
-                </div>
+               
             </div>
         </div>
     </div>
