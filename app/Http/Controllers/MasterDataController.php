@@ -119,6 +119,7 @@ class MasterDataController extends Controller
             'equipment_id' => 'required|exists:equipment,id',
             'location_id' => 'required|exists:locations,id',
             'merk_type' => 'nullable|string|max:255',
+            'certificateInfo' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:1000',
         ]);
 
@@ -137,6 +138,7 @@ class MasterDataController extends Controller
                 'equipment_id' => $request->equipment_id,
                 'location_id' => $request->location_id,
                 'merk_type' => $request->merk_type,
+                'certificateInfo' => $request->certificate,
                 'description' => $request->description,
             ]);
 

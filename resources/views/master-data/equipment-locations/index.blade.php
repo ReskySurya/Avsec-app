@@ -50,7 +50,7 @@
             <button @click="activeTab = 'equipmentLocations'"
                 :class="{'bg-white text-indigo-600 shadow-md': activeTab === 'equipmentLocations', 'text-gray-500': activeTab !== 'equipmentLocations'}"
                 class="w-full text-center px-4 py-3 rounded-lg font-semibold transition-all duration-300">
-                Relasi
+                Equipment & Location
             </button>
             <button @click="activeTab = 'equipment'"
                 :class="{'bg-white text-blue-600 shadow-md': activeTab === 'equipment', 'text-gray-500': activeTab !== 'equipment'}"
@@ -104,7 +104,7 @@
                     <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
-                    Tambah Relasi
+                    Tambah Data
                 </button>
             </div>
         </div>
@@ -693,6 +693,15 @@
                         class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-indigo-500 focus:outline-none transition-colors duration-200"
                         value="{{ old('merk_type') }}" placeholder="Masukkan merk/type (opsional)">
                     @error('merk_type')
+                    <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Certificate</label>
+                    <input type="text" name="certificate"
+                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-indigo-500 focus:outline-none transition-colors duration-200"
+                        value="{{ old('certificate') }}" placeholder="Masukkan Certificate (opsional)">
+                    @error('certificate')
                     <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
                     @enderror
                 </div>

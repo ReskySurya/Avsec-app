@@ -732,7 +732,7 @@ class ExportPdfController extends Controller
             return $this->processChecklistExport($request);
         }
 
-        $locations = Location::whereIn('name', $this->allowedLocationLogbook)
+        $locations = Location::whereIn('name', $this->locationLogbookRotasi)
             ->orderBy('name')
             ->get();
 

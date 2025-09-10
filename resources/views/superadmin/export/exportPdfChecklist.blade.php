@@ -245,6 +245,13 @@
         } else {
             console.error('Table not found:', `table-${formType}`);
         }
+
+        const locationFilter = document.getElementById('location-filter');
+        if (formType === 'kendaraan'|| formType === 'senpi' || formType === 'pencatatan_pi' || formType === 'penyisiran') {
+            locationFilter.classList.add('hidden');
+        } else {
+            locationFilter.classList.remove('hidden');
+        }
     }
 
     function formatDate(dateString) {

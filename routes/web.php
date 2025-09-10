@@ -48,7 +48,9 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::post('/export/logbook/filter', [ExportPdfController::class, 'filterLogbook'])->name('export.logbook.filter');
     Route::get('/export/logbook/review/{id}', [ExportPdfController::class, 'reviewLogbook'])->name('export.logbook.review');
 
-
+    Route::get('/export/checklist', [ExportPdfController::class, 'exportPdfChecklist'])->name('export.checklist');
+    Route::post('/export/checklist/filter', [ExportPdfController::class, 'filterChecklist'])->name('export.checklist.filter');
+    Route::get('/export/checklist/review/{report}', [ExportPdfController::class, 'reviewChecklist'])->name('export.checklist.review');
 
     // Rute untuk Folder
     Route::get('/folders/create', [PMIKController::class, 'create'])->name('folders.create');
@@ -63,11 +65,6 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::get('/documents/{document}', [PMIKController::class, 'showDocument'])->name('documents.show');
     Route::get('/documents/{document}/download', [PMIKController::class, 'download'])->name('documents.download');
     Route::delete('/documents/{document}', [PMIKController::class, 'destroyDocument'])->name('documents.destroy');
-
-
-    Route::get('/export/checklist', [ExportPdfController::class, 'exportPdfChecklist'])->name('export.checklist');
-    Route::post('/export/checklist/filter', [ExportPdfController::class, 'filterChecklist'])->name('export.checklist.filter');
-    Route::get('/export/checklist/review/{report}', [ExportPdfController::class, 'reviewChecklist'])->name('export.checklist.review');
 });
 
 // Supervisor Routes
@@ -94,8 +91,8 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
 
     Route::delete('/logbook/chief/delete/{logbook}', [LogbookChiefController::class, 'destory'])->name('logbook.chief.delete');
 
-    Route::get('/logbook/chief/detail/{id}', [LogbookChiefController::class, 'detail'])->name('logbook.chief.detail');
-    Route::get('/logbook/chief/review-laporan-leader/{logbookID}', [LogbookChiefController::class, 'reviewLogbook'])->name('logbook.chief.review.laporan.leader');
+    // Route::get('/logbook/chief/detail/{id}', [LogbookChiefController::class, 'detail'])->name('logbook.chief.detail');
+    // Route::get('/logbook/chief/review-laporan-leader/{logbookID}', [LogbookChiefController::class, 'reviewLogbook'])->name('logbook.chief.review.laporan.leader');
 
     // Review Checklist Kendaraan Motor Patroli
     // Route::get('/checklist-kendaraan-patroli/list', [DashboardController::class, 'showDataChecklistKendaraan'])->name('supervisor.checklist-kendaraan.list');
@@ -135,7 +132,10 @@ Route::middleware(['auth', 'role:officer'])->group(function () {
 
 // Daily Test Routes
 Route::middleware(['auth'])->group(function () {
+    //Tampilan Superadmin dan Supervisor Logbook Chief 
     Route::get('/logbook/chief', [LogbookChiefController::class, 'index'])->name('logbook.chief.index');
+    Route::get('/logbook/chief/detail/{id}', [LogbookChiefController::class, 'detail'])->name('logbook.chief.detail');
+    Route::get('/logbook/chief/review-laporan-leader/{logbookID}', [LogbookChiefController::class, 'reviewLogbook'])->name('logbook.chief.review.laporan.leader');
 
     //Tampilan Superadmin dan Supervisor
     Route::get('/supervisor/dailytest-form',  [DashboardController::class, 'showDataDailyTest'])->name('supervisor.dailytest-form');
