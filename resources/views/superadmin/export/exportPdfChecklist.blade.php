@@ -277,7 +277,7 @@
     }
 
     function getCheckbox(id) {
-        return `<input type="checkbox" name="selected_ids[]" value="${id}" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">`;
+        return `<input type="checkbox" name="selected_reports[]" value="${id}" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">`;
     }
 
     function updateTable(formType, checklists) {
@@ -390,7 +390,7 @@
     async function previewData() {
         const formData = new FormData(document.getElementById('exportForm'));
         const formType = formData.get('form_type');
-        const selectedIds = formData.getAll('selected_ids[]');
+        const selectedIds = formData.getAll('selected_reports[]');
 
         if (selectedIds.length === 0) {
             alert('Silakan pilih minimal satu data untuk preview');
@@ -476,7 +476,7 @@
 
     function exportSelected() {
         const form = document.getElementById('exportForm');
-        if (form.querySelectorAll('input[name="selected_ids[]"]:checked').length === 0) {
+        if (form.querySelectorAll('input[name="selected_reports[]"]:checked').length === 0) {
             alert('Pilih minimal satu data untuk diekspor!');
             return;
         }
