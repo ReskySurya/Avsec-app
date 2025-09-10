@@ -290,10 +290,10 @@
                 </div>
                 <h3 class="text-lg font-semibold text-gray-700 mb-2">Belum Ada Personil</h3>
                 <p class="text-gray-500 mb-4">Tambahkan personil untuk logbook ini</p>
-                <button @click="openAddPersonil = true"
+                <!-- <button @click="openAddPersonil = true"
                     class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-md">
                     Tambah Personil
-                </button>
+                </button> -->
             </div>
             @endforelse
         </div>
@@ -615,10 +615,10 @@
                 </div>
                 <h3 class="text-lg font-semibold text-gray-700 mb-2">Belum Ada Fasilitas</h3>
                 <p class="text-gray-500 mb-4">Tambahkan fasilitas untuk logbook ini</p>
-                <button @click="openAddFasilitas = true"
+                <!-- <button @click="openAddFasilitas = true"
                     class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-md">
                     Tambah Fasilitas
-                </button>
+                </button> -->
             </div>
             @endforelse
         </div>
@@ -1041,10 +1041,10 @@
                 </div>
                 <h3 class="text-lg font-semibold text-gray-700 mb-2">Belum Ada Uraian Kegiatan</h3>
                 <p class="text-gray-500 mb-4">Tambahkan uraian kegiatan untuk logbook ini</p>
-                <button @click="openAddDetailUraian = true"
+                <!-- <button @click="openAddDetailUraian = true"
                     class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-md">
                     Tambah Uraian Kegiatan
-                </button>
+                </button> -->
             </div>
             @endforelse
         </div>

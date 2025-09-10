@@ -3,7 +3,7 @@
 @section('title', 'Logbook Sweeping Prohibited Items')
 
 @section('content')
-<div x-data="{}" class="container mx-auto p-4 max-w-full mt-20">
+<div x-data="{}" class="container mx-auto p-4 max-w-full lg:mt-16">
 
     <!-- Header -->
     <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl shadow-xl p-8 mb-8">
