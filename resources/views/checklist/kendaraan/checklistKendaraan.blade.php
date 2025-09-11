@@ -3,8 +3,8 @@
 @section('title', 'Check List Pengecekan Harian Kendaraan Patroli')
 
 @section('content')
-<div x-data='checklistForm(@json($mobilChecklist), @json($motorChecklist), {{ isset($checklist) ? ' true' : 'false' }})'
-    class="mx-auto p-2 sm:p-4 min-h-screen pt-5 sm:pt-20">
+<div x-data='checklistForm(@json($mobilChecklist), @json($motorChecklist), @json($existingChecklists), {{ isset($checklist) ? '
+    true' : 'false' }})' class="mx-auto p-2 sm:p-4 min-h-screen pt-5 sm:pt-20">
     @if(session('success'))
     <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition
         class="bg-gradient-to-r from-green-400 to-green-500 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl mb-4 sm:mb-6 shadow-lg border-l-4 border-green-600 text-sm sm:text-base">
@@ -64,18 +64,18 @@
                     <label class="block text-xs sm:text-sm font-semibold text-gray-700">Tanggal & Waktu
                         Pengujian:</label>
                     <div class="flex items-center space-x-1 sm:space-x-2">
-                        <input type="datetime-local" name="date" id="date" x-model="testDateTime"
+                        {{-- PERBAIKAN: Pisahkan date dan time untuk validasi yang lebih mudah --}}
+                        <input type="date" name="date" id="date" x-model="selectedDate" @change="validateCombination()"
                             class="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base">
-                        <div
-                            class="px-2 sm:px-4 py-2 sm:py-3 bg-gray-100 border border-gray-300 rounded-lg text-xs sm:text-sm font-medium">
-                            WIB
-                        </div>
+                        <input type="time" name="time" id="time" x-model="selectedTime"
+                            class="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base">
                     </div>
                 </div>
                 <div class="space-y-1 sm:space-y-2">
                     <label for="type" class="block text-xs sm:text-sm font-semibold text-gray-700">Jenis
                         Kendaraan:</label>
-                    <select name="type" x-model="selectedVehicle"
+                    {{-- PERBAIKAN: Tambahkan trigger @change untuk validasi --}}
+                    <select name="type" x-model="selectedVehicle" @change="validateCombination()"
                         class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base">
                         <option value="mobil">Mobil Patroli</option>
                         <option value="motor">Motor Patroli</option>
@@ -83,7 +83,8 @@
                 </div>
                 <div class="space-y-1 sm:space-y-2">
                     <label for="shift" class="block text-xs sm:text-sm font-semibold text-gray-700">Shift:</label>
-                    <select name="shift" x-model="selectedShift"
+                    {{-- PERBAIKAN: Tambahkan trigger @change untuk validasi --}}
+                    <select name="shift" x-model="selectedShift" @change="validateCombination()"
                         class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base">
                         <option value="pagi">Shift Pagi</option>
                         <option value="malam">Shift Malam</option>
@@ -100,7 +101,8 @@
                 <div class="block lg:hidden space-y-3">
                     <template x-for="(category, categoryIndex) in getCurrentChecklist()" :key="categoryIndex">
                         <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                            <div class="bg-blue-600 text-white px-3 sm:px-4 py-2 sm:py-3 font-semibold text-sm" x-text="category.name">
+                            <div class="bg-blue-600 text-white px-3 sm:px-4 py-2 sm:py-3 font-semibold text-sm"
+                                x-text="category.name">
                             </div>
                             <div class="p-3 sm:p-4 space-y-3">
                                 <template x-for="(item, itemIndex) in category.items" :key="itemIndex">
@@ -131,13 +133,10 @@
                                             <div>
                                                 <label :for="`notes_${item.id}`"
                                                     class="text-xs font-medium text-gray-600">Catatan:</label>
-                                                <textarea
-                                                    :name="`items[${item.id}][notes]`"
-                                                    :id="`notes_${item.id}`"
+                                                <textarea :name="`items[${item.id}][notes]`" :id="`notes_${item.id}`"
                                                     x-model="formData[item.id].notes"
                                                     class="mt-1 w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-xs sm:text-sm"
-                                                    placeholder="Opsional..."
-                                                    rows="2"></textarea>
+                                                    placeholder="Opsional..." rows="2"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -199,11 +198,8 @@
                                     </td>
                                     <td class="border border-gray-300 px-3 sm:px-4 py-2 sm:py-3">
                                         <template x-if="!row.isCategory">
-                                            <textarea
-                                                :name="`items[${row.id}][notes]`"
-                                                :id="`desktop_notes_${row.id}`"
-                                                x-model="formData[row.id].notes"
-                                                rows="1"
+                                            <textarea :name="`items[${row.id}][notes]`" :id="`desktop_notes_${row.id}`"
+                                                x-model="formData[row.id].notes" rows="1"
                                                 class="w-full px-2 py-1 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-xs sm:text-sm"
                                                 placeholder="Opsional..."></textarea>
                                         </template>
@@ -219,9 +215,12 @@
                 class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-4 sm:pt-6 border-t border-gray-200">
                 <button type="button" onclick="window.history.back()"
                     class="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-200 font-medium text-sm sm:text-base">Kembali</button>
-                <button type="button" @click="openFinishDialog"
-                    class="w-full sm:w-auto px-4 sm:px-8 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition duration-200 font-medium shadow-lg text-sm sm:text-base">Simpan
-                    Checklist</button>
+                {{-- PERBAIKAN: Tambahkan :disabled dan class dinamis --}}
+                <button type="button" @click="openFinishDialog" :disabled="isSubmitDisabled"
+                    :class="isSubmitDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'"
+                    class="w-full sm:w-auto px-4 sm:px-8 py-2 sm:py-3 text-white rounded-lg transition duration-200 font-medium shadow-lg text-sm sm:text-base">
+                    Simpan Checklist
+                </button>
             </div>
         </form>
     </div>
@@ -316,143 +315,186 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.data('checklistForm', (mobilChecklist, motorChecklist, isEditMode = false) => ({
-            // State Properties
-            selectedVehicle: 'mobil',
-            selectedShift: 'pagi',
-            testDateTime: new Date().toISOString().slice(0, 16),
-            isFinishDialogOpen: false,
-            signaturePad: null,
-            errors: {},
+    Alpine.data('checklistForm', (mobilChecklist, motorChecklist, existingChecklists, isEditMode = false) => ({
+        // STATE UTAMA
+        mobilChecklist: mobilChecklist,
+        motorChecklist: motorChecklist,
+        existingChecklists: existingChecklists,
+        formData: {},
+        errors: {},
 
-            // Data
-            mobilChecklist: mobilChecklist,
-            motorChecklist: motorChecklist,
+        // STATE UNTUK KONTROL UI
+        selectedVehicle: 'mobil',
+        selectedShift: 'pagi',
+        selectedDate: new Date().toISOString().slice(0, 10), // Hanya tanggal
+        selectedTime: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }), // Hanya waktu
+        isFinishDialogOpen: false,
+        isSubmitDisabled: false,
+        signaturePad: null,
 
-            init() {
+        // FUNGSI INISIALISASI
+        init() {
+            this.initializeFormData();
+            this.validateCombination(); // Cek validasi saat halaman dimuat
+
+            // Perhatikan setiap perubahan pada form untuk validasi ulang
+            this.$watch('selectedVehicle', () => {
                 this.initializeFormData();
-                this.$watch('selectedVehicle', () => {
-                    this.initializeFormData();
-                });
-            },
+                this.validateCombination();
+            });
+        },
 
-            // State untuk menyimpan notes
-            formData: {},
-
-            // Methods
-            getCurrentChecklist() {
-                return this.selectedVehicle === 'mobil' ? this.mobilChecklist : this.motorChecklist;
-            },
-
-            // Method untuk menginisialisasi form data
-            initializeFormData() {
-                const checklist = this.getCurrentChecklist();
-                if (!checklist || !Array.isArray(checklist)) return;
-
-                checklist.forEach(category => {
-                    if (category.items && Array.isArray(category.items)) {
-                        category.items.forEach(item => {
-                            if (!this.formData[item.id]) {
-                                this.formData[item.id] = {
-                                    is_ok: null,
-                                    notes: ''
-                                };
-                            }
-                        });
-                    }
-                });
-            },
-
-            getFlattenedRows() {
-                const checklist = this.getCurrentChecklist();
-                if (!checklist || !Array.isArray(checklist)) return [];
-                const rows = [];
-                let itemNumber = 1;
-                checklist.forEach((category, categoryIndex) => {
-                    rows.push({
-                        index: `cat-${categoryIndex}`,
-                        isCategory: true,
-                        letter: category.letter || '',
-                        name: category.name || ''
+        initializeFormData() {
+            const checklist = this.getCurrentChecklist();
+            if (!checklist || !Array.isArray(checklist)) return;
+            let newFormData = {};
+            checklist.forEach(category => {
+                if (category.items && Array.isArray(category.items)) {
+                    category.items.forEach(item => {
+                        newFormData[item.id] = { is_ok: null, notes: '' };
                     });
-                    if (category.items && Array.isArray(category.items)) {
-                        category.items.forEach((item, itemIndex) => {
-                            rows.push({
-                                index: `item-${categoryIndex}-${itemIndex}`,
-                                isCategory: false,
-                                number: itemNumber++,
-                                name: item.name,
-                                id: item.id
-                            });
+                }
+            });
+            this.formData = newFormData;
+        },
+
+        // FUNGSI UNTUK TAMPILAN
+        getCurrentChecklist() {
+            return this.selectedVehicle === 'mobil' ? this.mobilChecklist : this.motorChecklist;
+        },
+
+        getFlattenedRows() {
+            // ... (Fungsi ini sudah benar, tidak perlu diubah) ...
+            const checklist = this.getCurrentChecklist();
+            if (!checklist || !Array.isArray(checklist)) return [];
+            const rows = [];
+            let itemNumber = 1;
+            checklist.forEach((category, categoryIndex) => {
+                rows.push({
+                    index: `cat-${categoryIndex}`, isCategory: true,
+                    letter: category.letter || '', name: category.name || ''
+                });
+                if (category.items && Array.isArray(category.items)) {
+                    category.items.forEach((item, itemIndex) => {
+                        rows.push({
+                            index: `item-${categoryIndex}-${itemIndex}`, isCategory: false,
+                            number: itemNumber++, name: item.name, id: item.id
                         });
-                    }
-                });
-                return rows;
-            },
-
-            openFinishDialog() {
-                this.isFinishDialogOpen = true;
-                this.$nextTick(() => {
-                    // Hanya inisialisasi signature pad jika belum ada
-                    if (!this.signaturePad && this.$refs.signatureCanvas) {
-                        this.initializeSignaturePad();
-                    }
-                });
-            },
-
-            initializeSignaturePad() {
-                const canvas = this.$refs.signatureCanvas;
-                if (!canvas) return;
-
-                const ratio = Math.max(window.devicePixelRatio || 1, 1);
-                canvas.width = canvas.offsetWidth * ratio;
-                canvas.height = canvas.offsetHeight * ratio;
-                canvas.getContext("2d").scale(ratio, ratio);
-
-                this.signaturePad = new SignaturePad(canvas, {
-                    backgroundColor: 'rgb(255, 255, 255)'
-                });
-            },
-
-            clearSignature() {
-                if (this.signaturePad) {
-                    this.signaturePad.clear();
-                    this.$refs.signatureData.value = '';
+                    });
                 }
-            },
+            });
+            return rows;
+        },
 
-            submitForm() {
-                if (this.validateForm()) {
-                    this.$refs.checklistForm.submit();
-                }
-            },
+        // FUNGSI UTAMA UNTUK VALIDASI DAN SUBMIT
+        validateCombination() {
+            if (isEditMode) return; // Jangan validasi jika sedang edit
 
-            validateForm() {
-                this.errors = {}; // Reset errors
+            const isExists = this.existingChecklists.some(item =>
+                item.date === this.selectedDate &&
+                item.shift === this.selectedShift &&
+                item.type === this.selectedVehicle
+            );
 
-                // 1. Validasi tanda tangan
-                const signatureDataInput = this.$refs.signatureData;
-                if (this.signaturePad && !this.signaturePad.isEmpty()) {
-                    signatureDataInput.value = this.signaturePad.toDataURL('image/png');
+            if (isExists) {
+                if (!this.isSubmitDisabled) { // Tampilkan alert hanya jika status berubah
+                    setTimeout(() => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Sudah Ada!',
+                            text: `Formulir untuk shift '${this.selectedShift}' pada tanggal ini telah diinputkan. Silakan ganti shift, tanggal, atau jenis kendaraan.`,
+                            confirmButtonColor: '#3085d6',
+                            allowOutsideClick: false
+                        });
+                    }, 100);
                 }
-                if (!signatureDataInput.value) {
-                    this.errors.signature = 'Tanda tangan wajib diisi.';
-                }
-
-                // 2. Validasi dropdown
-                if (!this.$refs.receivedID.value) {
-                    this.errors.receivedID = 'Mohon pilih Officer yang Menerima.';
-                }
-                if (!this.$refs.approvedID.value) {
-                    this.errors.approvedID = 'Mohon pilih Supervisor yang Mengetahui.';
-                }
-
-                return Object.keys(this.errors).length === 0;
+                this.isSubmitDisabled = true;
+            } else {
+                this.isSubmitDisabled = false;
             }
-        }));
-    });
+        },
+
+        openFinishDialog() {
+            // Cek ulang sebelum membuka modal
+            this.validateCombination();
+            if (this.isSubmitDisabled) {
+                Swal.fire({
+                    icon: 'warning', title: 'Tidak Dapat Melanjutkan',
+                    text: `Formulir untuk shift '${this.selectedShift}' sudah ada. Silakan ganti pilihan Anda.`,
+                });
+                return;
+            }
+
+            this.isFinishDialogOpen = true;
+            this.$nextTick(() => {
+                if (!this.signaturePad && this.$refs.signatureCanvas) {
+                    this.initializeSignaturePad();
+                }
+            });
+        },
+
+        submitForm() {
+            // Reset error sebelum validasi ulang
+            this.errors = {};
+            let isValid = true;
+
+            // 1. Validasi tanda tangan
+            const signatureDataInput = this.$refs.signatureData;
+            if (this.signaturePad && !this.signaturePad.isEmpty()) {
+                signatureDataInput.value = this.signaturePad.toDataURL('image/png');
+            }
+            if (!signatureDataInput.value) {
+                this.errors.signature = 'Tanda tangan wajib diisi.';
+                isValid = false;
+            }
+
+            // 2. Validasi dropdown
+            if (!this.$refs.receivedID.value) {
+                this.errors.receivedID = 'Mohon pilih Officer yang Menerima.';
+                isValid = false;
+            }
+            if (!this.$refs.approvedID.value) {
+                this.errors.approvedID = 'Mohon pilih Supervisor yang Mengetahui.';
+                isValid = false;
+            }
+
+            // 3. Pengecekan akhir untuk data duplikat
+            if (this.isSubmitDisabled) {
+                isValid = false;
+            }
+
+            // Jika semua validasi lolos, submit form
+            if (isValid) {
+                this.$refs.checklistForm.submit();
+            } else {
+                this.isFinishDialogOpen = false; // Tutup modal jika ada error
+                // Cukup tampilkan error di bawah field, tidak perlu SweetAlert lagi
+            }
+        },
+
+        // FUNGSI UNTUK SIGNATURE PAD
+        initializeSignaturePad() {
+            // ... (Fungsi ini sudah benar, tidak perlu diubah) ...
+            const canvas = this.$refs.signatureCanvas;
+            if (!canvas) return;
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext("2d").scale(ratio, ratio);
+            this.signaturePad = new SignaturePad(canvas, { backgroundColor: 'rgb(255, 255, 255)' });
+        },
+
+        clearSignature() {
+            if (this.signaturePad) {
+                this.signaturePad.clear();
+                this.$refs.signatureData.value = '';
+            }
+        }
+    }));
+});
 </script>
 
 <style>

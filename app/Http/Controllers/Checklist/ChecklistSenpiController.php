@@ -12,11 +12,29 @@ use Illuminate\Support\Str;
 
 class ChecklistSenpiController extends Controller
 {
-    public function indexChecklistSenpi()
+    public function indexChecklistSenpi(Request $request)
     {
         $currentuser = Auth::user();
-        $senpi = ChecklistSenpi::orderBy('date', 'desc')->get();
 
+        // 1. Mulai dengan query builder, bukan langsung mengeksekusi
+        $query = ChecklistSenpi::query();
+
+        // 2. Cek apakah ada input 'search' dari view
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            // 3. Tambahkan kondisi WHERE untuk mencari di beberapa kolom sekaligus
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('agency', 'LIKE', "%{$search}%")
+                    ->orWhere('licenseNumber', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // 4. Urutkan dan gunakan paginate() untuk memecah data per halaman
+        $senpi = $query->orderBy('date', 'desc')->paginate(10); // Anda bisa ganti 10 sesuai kebutuhan
+
+        // 5. Kembalikan view dengan data yang sudah difilter dan dipaginasi
         return view('checklist.senpi.checklistSenpi', compact('senpi', 'currentuser'));
     }
 

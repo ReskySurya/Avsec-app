@@ -3,6 +3,61 @@
 @section('content')
 <div class="max-w-6xl mx-auto px-2 sm:px-4 py-4 sm:py-6 lg:pt-20">
 
+    {{-- Filter Section --}}
+    <div class="mb-4 sm:mb-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+                <div class="flex items-center">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-800">Filter Data</h3>
+                    @if(request()->query('status'))
+                    <a href="{{ url()->current() }}"
+                        class="ml-3 text-xs sm:text-sm text-blue-600 hover:text-blue-800 flex items-center">
+                        <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        Clear Filter
+                    </a>
+                    @endif
+                </div>
+
+                <div class="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+                    <div class="flex items-center">
+                        <label for="statusFilter" class="text-xs sm:text-sm text-gray-600 mr-2">Status:</label>
+                        <select id="statusFilter"
+                            class="text-xs sm:text-sm border border-gray-300 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            onchange="applyFilter(this.value)">
+                            <option value="">Semua Status</option>
+                            <option value="draft" {{ request()->query('status') === 'draft' ? 'selected' : '' }}>Draft
+                            </option>
+                            <option value="submitted" {{ request()->query('status') === 'submitted' ? 'selected' : ''
+                                }}>Menunggu Persetujuan</option>
+                            <option value="approved" {{ request()->query('status') === 'approved' ? 'selected' : ''
+                                }}>Selesai</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            @if(request()->query('status'))
+            <div class="mt-3 flex flex-wrap gap-2">
+                <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    Status: {{ ucfirst(request()->query('status')) }}
+                    <a href="{{ url()->current() }}" class="ml-1.5 inline-flex items-center">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                    </a>
+                </span>
+            </div>
+            @endif
+        </div>
+    </div>
+
     {{-- Checklist Kendaraan Mobil Patroli --}}
     <div class="mb-8 sm:mb-10">
         <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
@@ -12,10 +67,17 @@
                     class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
                     <div>
                         <h2 class="text-lg sm:text-xl font-bold text-white">Checklist Kendaraan Mobil Patroli</h2>
+                        {{-- PERBAIKAN: Tampilkan total data yang difilter --}}
+                        <p class="text-blue-100 text-xs sm:text-sm mt-1">
+                            {{ $checklistsMobil->total() }} data ditemukan
+                            @if(request()->query('status'))
+                                (difilter berdasarkan status: "{{ ucfirst(request()->query('status')) }}")
+                            @endif
+                        </p>
                     </div>
-                    <div
-                        class="bg-blue-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full font-semibold text-xs sm:text-sm">
-                        {{ $checklistsMobil->count() }} Data
+                    <div class="bg-blue-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full font-semibold text-xs sm:text-sm">
+                        {{-- PERBAIKAN: Tampilkan jumlah data di halaman ini dan totalnya --}}
+                        {{ $checklistsMobil->firstItem() ?? 0 }}-{{ $checklistsMobil->lastItem() ?? 0 }} dari {{ $checklistsMobil->total() }} Data
                     </div>
                 </div>
             </div>
@@ -274,8 +336,7 @@
                 </table>
             </div>
 
-            {{-- Pagination --}}
-            @if(method_exists($checklistsMobil, 'links'))
+            @if($checklistsMobil->hasPages())
             <div class="mt-4 sm:mt-6 px-2 sm:px-4 pb-4 flex justify-center">
                 {{ $checklistsMobil->links() }}
             </div>
@@ -305,10 +366,17 @@
                     class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
                     <div>
                         <h2 class="text-lg sm:text-xl font-bold text-white">Checklist Kendaraan Motor Patroli</h2>
+                        {{-- PERBAIKAN: Tampilkan total data yang difilter --}}
+                         <p class="text-green-100 text-xs sm:text-sm mt-1">
+                            {{ $checklistsMotor->total() }} data ditemukan
+                            @if(request()->query('status'))
+                                (difilter berdasarkan status: "{{ ucfirst(request()->query('status')) }}")
+                            @endif
+                        </p>
                     </div>
-                    <div
-                        class="bg-green-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full font-semibold text-xs sm:text-sm">
-                        {{ $checklistsMotor->count() }} Data
+                    <div class="bg-green-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full font-semibold text-xs sm:text-sm">
+                         {{-- PERBAIKAN: Tampilkan jumlah data di halaman ini dan totalnya --}}
+                        {{ $checklistsMotor->firstItem() ?? 0 }}-{{ $checklistsMotor->lastItem() ?? 0 }} dari {{ $checklistsMotor->total() }} Data
                     </div>
                 </div>
             </div>
@@ -568,7 +636,7 @@
             </div>
 
             {{-- Pagination --}}
-            @if(method_exists($checklistsMotor, 'links'))
+            @if($checklistsMotor->hasPages())
             <div class="mt-4 sm:mt-6 px-2 sm:px-4 pb-4 flex justify-center">
                 {{ $checklistsMotor->links() }}
             </div>
@@ -576,6 +644,20 @@
         </div>
     </div>
 </div>
+
+<script>
+    function applyFilter(status) {
+        const url = new URL(window.location);
+        if (status) {
+            url.searchParams.set('status', status);
+        } else {
+            url.searchParams.delete('status');
+        }
+        url.searchParams.delete('mobil_page'); // Reset pagination mobil
+        url.searchParams.delete('motor_page'); // Reset pagination motor
+        window.location.href = url.toString();
+    }
+</script>
 
 <style>
     /* Responsive Design */

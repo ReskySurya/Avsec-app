@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class ChecklistKendaraanController extends Controller
 {
@@ -64,15 +65,32 @@ class ChecklistKendaraanController extends Controller
 
         $supervisors = User::whereHas('role', fn($q) => $q->where('name', Role::SUPERVISOR))->get();
 
+        $existingChecklists = ChecklistKendaraan::where('date', '>=', Carbon::now()->subMonths(3))
+            ->get(['date', 'shift', 'type'])
+            ->map(function ($item) {
+                return [
+                    'date' => $item->date->format('Y-m-d'), // Format tanggal agar konsisten
+                    'shift' => $item->shift,
+                    'type' => $item->type,
+                ];
+            });
+
         // 5. Kirim data yang sudah diformat ke view
-        return view('checklist.kendaraan.checklistKendaraan', compact('mobilChecklist', 'motorChecklist', 'checklist', 'officers', 'supervisors'));
+        return view('checklist.kendaraan.checklistKendaraan', compact('mobilChecklist', 'motorChecklist', 'checklist', 'officers', 'supervisors', 'existingChecklists'));
     }
 
     public function store(Request $request)
     {
         // 1. Validasi yang disesuaikan dengan skema database
         $validated = $request->validate([
-            'date' => 'required|date',
+            'date' => [
+                'required',
+                'date',
+                Rule::unique('checklist_kendaraan')->where(function ($query) use ($request) {
+                    return $query->where('shift', $request->shift)
+                                ->where('type', $request->type);
+                }),
+            ],
             'type' => 'required|in:mobil,motor',
             'shift' => 'required|in:pagi,malam',
             'items' => 'required|array',
@@ -81,6 +99,9 @@ class ChecklistKendaraanController extends Controller
             'signature' => 'required|string',
             'receivedID' => 'required|exists:users,id',
             'approvedID' => 'required|exists:users,id',
+        ],
+        [
+            'date.unique' => "Formulir untuk shift {$request->shift} pada tanggal ini sudah ada.",
         ]);
 
         DB::beginTransaction();

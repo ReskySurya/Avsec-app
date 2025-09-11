@@ -13,7 +13,7 @@ export default defineConfig({
         port: 5173, // atau port bebas lainnya
         strictPort: true,
         hmr: {
-            host: '192.168.0.105', // <- Ganti dengan IP lokal kamu
+            host: '192.168.1.8', // <- Ganti dengan IP lokal kamu
         },
     },
 });

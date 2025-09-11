@@ -208,17 +208,58 @@
         </div>
     </div>
 
+    <div class="mb-4 sm:mb-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4">
+            <form action="{{ route('checklist.senpi.index') }}" method="GET">
+                <div class="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                    <div class="relative flex-grow w-full">
+                        <input type="text" name="search"
+                            placeholder="Cari berdasarkan nama, instansi, atau no. surat izin..."
+                            value="{{ request('search') }}"
+                            class="w-full pl-10 pr-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <button type="submit"
+                        class="w-full sm:w-auto px-5 py-2 sm:py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors shadow text-sm sm:text-base">
+                        Cari
+                    </button>
+                    @if(request('search'))
+                    <a href="{{ route('checklist.senpi.index') }}"
+                        class="w-full sm:w-auto text-center px-5 py-2 sm:py-3 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300 transition-colors text-sm sm:text-base">
+                        Reset
+                    </a>
+                    @endif
+                </div>
+            </form>
+        </div>
+    </div>
+
     {{-- Mobile: Card Layout --}}
     <div class="block lg:hidden space-y-3 mb-6">
-        <div class="bg-white shadow-lg rounded-xl border border-gray-200 p-3">
-            <div class="flex justify-between items-center mb-3">
-                <h2 class="text-lg font-bold text-gray-800">Data Checklist Senjata Api</h2>
+        <div class="bg-white shadow-md rounded-2xl border border-gray-100 p-4 sm:p-6">
+            <div class="flex flex-col justify-between items-center gap-3">
+                <!-- Title -->
+                <h2 class="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                    Data Checklist Senjata Api
+                </h2>
+
+                <!-- Button -->
                 <button @click="openAddModal()"
-                    class="px-3 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors shadow text-sm">
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-center font-medium rounded-xl hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-sm text-sm sm:text-base">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
                     Tambah
                 </button>
             </div>
         </div>
+
 
         @forelse($senpi as $index => $item)
         <div class="bg-white shadow-sm rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">

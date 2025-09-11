@@ -196,30 +196,63 @@ class DashboardController extends Controller
         return view('supervisor.listLogbookRotasi', compact('logbooksPSCP', 'logbooksHBSCP'));
     }
 
-    public function showDataChecklistKendaraan()
+    public function showDataChecklistKendaraan(Request $request)
     {
         $perPage = 10;
+        $status = $request->query('status'); // 1. Ambil nilai 'status' dari URL
 
-        $checklistsMobil = ChecklistKendaraan::with('sender')
-            ->where('type', 'mobil')
-            ->latest('date')
+        // --- Query untuk Mobil ---
+        // 2. Mulai bangun query untuk mobil
+        $queryMobil = ChecklistKendaraan::with('sender')->where('type', 'mobil');
+
+        // 3. Terapkan filter status jika ada
+        if ($status) {
+            $queryMobil->where('status', $status);
+        }
+
+        // 4. Eksekusi query mobil dengan urutan dan pagination
+        $checklistsMobil = $queryMobil->latest('date')
             ->paginate($perPage, ['*'], 'mobil_page');
 
-        $checklistsMotor = ChecklistKendaraan::with('sender')
-            ->where('type', 'motor')
-            ->latest('date')
+        // --- Query untuk Motor ---
+        // 2. Mulai bangun query untuk motor
+        $queryMotor = ChecklistKendaraan::with('sender')->where('type', 'motor');
+
+        // 3. Terapkan filter status yang sama jika ada
+        if ($status) {
+            $queryMotor->where('status', $status);
+        }
+
+        // 4. Eksekusi query motor dengan urutan dan pagination
+        $checklistsMotor = $queryMotor->latest('date')
             ->paginate($perPage, ['*'], 'motor_page');
+
+        // 5. (PENTING) Agar link pagination di kedua tabel mengingat filter
+        $checklistsMobil->appends($request->query());
+        $checklistsMotor->appends($request->query());
 
         return view('supervisor.listChecklistKendaraan', compact('checklistsMobil', 'checklistsMotor'));
     }
 
-    public function showDataChecklistPenyisiran()
+    public function showDataChecklistPenyisiran(Request $request)
     {
         $perPage = 10;
+        $status = $request->query('status'); // Ambil nilai 'status' dari URL
 
-        $checklistsPenyisiran = ChecklistPenyisiran::with('sender')
-            ->latest('date')
-            ->paginate($perPage, ['*']);
+        // Mulai bangun query tanpa langsung mengeksekusinya
+        $query = ChecklistPenyisiran::with('sender');
+
+        // Tambahkan filter HANYA JIKA parameter 'status' ada di URL
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        // Setelah filter diterapkan, baru urutkan dan lakukan pagination
+        $checklistsPenyisiran = $query->latest('date')
+            ->paginate($perPage);
+
+        // Penting: Agar link pagination tetap membawa filter status
+        $checklistsPenyisiran->appends($request->query());
 
         return view('supervisor.listChecklistPenyisiran', compact('checklistsPenyisiran'));
     }
@@ -245,7 +278,7 @@ class DashboardController extends Controller
         }
 
         $perPage = 10;
-        
+
         // Eksekusi query HBSCP yang sudah difilter (jika ada) dan tambahkan pagination
         $manualBooksHBSCP = $queryHBSCP->latest('date')
             ->paginate($perPage, ['*'], 'hbscp_page');
@@ -261,14 +294,25 @@ class DashboardController extends Controller
         return view('supervisor.listManualBook', compact('manualBooksHBSCP', 'manualBooksPSCP'));
     }
 
-    public function showDataFormPencatatanPI()
+    public function showDataFormPencatatanPI(Request $request)
     {
         $perPage = 10;
+        $status = $request->query('status'); // 1. Ambil nilai 'status' dari URL
 
-        // Perbaikan: Hapus get() dan gunakan where() langsung pada query builder
-        $formPencatatanPI = FormPencatatanPI::where('approved_id', Auth::id())
-            ->latest('date')
-            ->paginate($perPage, ['*']);
+        // 2. Mulai membangun query, jangan langsung dieksekusi dengan paginate()
+        $query = FormPencatatanPI::where('approved_id', Auth::id());
+
+        // 3. Tambahkan filter status HANYA JIKA parameter 'status' ada di URL
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        // 4. Setelah semua filter diterapkan, baru eksekusi query dengan urutan dan pagination
+        $formPencatatanPI = $query->latest('date')
+            ->paginate($perPage);
+
+        // 5. (PENTING) Agar link pagination mengingat filter yang sedang aktif
+        $formPencatatanPI->appends($request->query());
 
         return view('supervisor.listFormPencatatanPI', compact('formPencatatanPI'));
     }

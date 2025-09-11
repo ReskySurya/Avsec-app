@@ -3,6 +3,63 @@
 @section('content')
 <div class="max-w-6xl mx-auto px-2 sm:px-4 py-4 sm:py-6 lg:pt-20">
 
+    {{-- Filter Section --}}
+    <div class="mb-4 sm:mb-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+                <div class="flex items-center">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-800">Filter Data</h3>
+                    {{-- PERBAIKAN: Menggunakan url()->current() untuk link reset --}}
+                    @if(request()->query('status'))
+                    <a href="{{ url()->current() }}"
+                        class="ml-3 text-xs sm:text-sm text-blue-600 hover:text-blue-800 flex items-center">
+                        <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        Clear Filter
+                    </a>
+                    @endif
+                </div>
+
+                <div class="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+                    <div class="flex items-center">
+                        <label for="statusFilter" class="text-xs sm:text-sm text-gray-600 mr-2">Status:</label>
+                        <select id="statusFilter"
+                            class="text-xs sm:text-sm border border-gray-300 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            onchange="applyFilter(this.value)">
+                            <option value="">Semua Status</option>
+                            <option value="draft" {{ request()->query('status') === 'draft' ? 'selected' : '' }}>Draft
+                            </option>
+                            <option value="submitted" {{ request()->query('status') === 'submitted' ? 'selected' : ''
+                                }}>Menunggu Persetujuan</option>
+                            <option value="approved" {{ request()->query('status') === 'approved' ? 'selected' : ''
+                                }}>Selesai</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Active Filter Tags --}}
+            @if(request()->query('status'))
+            <div class="mt-3 flex flex-wrap gap-2">
+                <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    Status: {{ ucfirst(request()->query('status')) }}
+                    <a href="{{ url()->current() }}" class="ml-1.5 inline-flex items-center">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                    </a>
+                </span>
+            </div>
+            @endif
+        </div>
+    </div>
+
     {{-- Checklist Penyisiran Ruang Tunggu --}}
     <div class="mb-8 sm:mb-10">
         <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
@@ -12,10 +69,19 @@
                     class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
                     <div>
                         <h2 class="text-lg sm:text-xl font-bold text-white">Checklist Penyisiran Ruang Tunggu</h2>
+                        {{-- PERBAIKAN: Tampilkan total data yang difilter --}}
+                        <p class="text-blue-100 text-xs sm:text-sm mt-1">
+                            {{ $checklistsPenyisiran->total() }} data ditemukan
+                            @if(request()->query('status'))
+                            (difilter berdasarkan status: "{{ ucfirst(request()->query('status')) }}")
+                            @endif
+                        </p>
                     </div>
                     <div
                         class="bg-blue-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full font-semibold text-xs sm:text-sm">
-                        {{ $checklistsPenyisiran->count() }} Data
+                        {{-- PERBAIKAN: Tampilkan jumlah data di halaman ini dan totalnya --}}
+                        {{ $checklistsPenyisiran->firstItem() ?? 0 }}-{{ $checklistsPenyisiran->lastItem() ?? 0 }} dari
+                        {{ $checklistsPenyisiran->total() }} Data
                     </div>
                 </div>
             </div>
@@ -275,14 +341,37 @@
             </div>
 
             {{-- Pagination --}}
-            @if(method_exists($checklistsPenyisiran, 'links'))
+            @if($checklistsPenyisiran->hasPages())
             <div class="mt-4 sm:mt-6 px-2 sm:px-4 pb-4 flex justify-center">
+                {{-- Ini sudah benar karena controller sudah menambahkan appends() --}}
                 {{ $checklistsPenyisiran->links() }}
             </div>
             @endif
         </div>
     </div>
 </div>
+
+<script>
+    function applyFilter(status) {
+        // Membuat objek URL dari alamat halaman saat ini
+        const url = new URL(window.location);
+
+        // Jika status memiliki nilai (bukan "Semua Status")
+        if (status) {
+            // Atur parameter 'status' di URL
+            url.searchParams.set('status', status);
+        } else {
+            // Jika memilih "Semua Status", hapus parameter 'status'
+            url.searchParams.delete('status');
+        }
+
+        // Selalu reset ke halaman pertama saat filter diubah
+        url.searchParams.delete('page');
+
+        // Arahkan browser ke URL yang baru
+        window.location.href = url.toString();
+    }
+</script>
 
 <style>
     /* Responsive Design */
