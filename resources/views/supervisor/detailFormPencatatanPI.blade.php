@@ -3,31 +3,51 @@
 @section('title', 'Detail Form Pencatatan PI')
 
 @section('content')
-<div class="max-w-4xl mx-auto px-4 py-6 lg:pt-20">
+<div class="max-w-4xl mx-auto py-6 lg:pt-20">
 
-    <div class="flex justify-start pb-4">
-        <a href="{{ route('supervisor.form-pencatatan-pi.list') }}" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 font-medium transition-colors">Kembali ke daftar</a>
+    <div class="pb-4">
+        <a href="{{ route('supervisor.form-pencatatan-pi.list') }}"
+            class="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-2xl shadow-sm
+               hover:bg-gray-100 hover:shadow-md hover:scale-[1.02]
+               active:scale-[0.98]
+               font-medium transition-all duration-200
+               text-sm sm:text-base">
+            <!-- Ikon panah kiri -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-4 h-4 sm:w-5 sm:h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+            <span>Kembali ke daftar</span>
+        </a>
     </div>
+
+
     <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
         {{-- Header --}}
-        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-5">
-            <div class="flex justify-between items-center">
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-4 sm:px-6 sm:py-5">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
-                    <h2 class="text-xl font-bold text-white mb-1">Detail Form Pencatatan PI</h2>
-                    <p class="text-sm text-blue-200">ID: {{ $pencatatanPI->id }}</p>
+                    <h2 class="text-lg sm:text-xl font-bold text-white mb-1">Detail Form Pencatatan PI</h2>
+                    <p class="text-xs sm:text-sm text-blue-200">ID: {{ $pencatatanPI->id }}</p>
                 </div>
-                <div class="text-right">
+                <div class="w-full sm:w-auto">
                     @if($pencatatanPI->status === 'approved')
-                    <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-green-100 text-green-800">
-                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    <span
+                        class="inline-flex items-center px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold bg-green-100 text-green-800 w-full sm:w-auto justify-center">
+                        <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clip-rule="evenodd"></path>
                         </svg>
                         Disetujui
                     </span>
                     @elseif($pencatatanPI->status === 'submitted')
-                    <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800">
-                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 001.414-1.414L11 9.586V5z" clip-rule="evenodd"></path>
+                    <span
+                        class="inline-flex items-center px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold bg-yellow-100 text-yellow-800 w-full sm:w-auto justify-center">
+                        <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 001.414-1.414L11 9.586V5z"
+                                clip-rule="evenodd"></path>
                         </svg>
                         Menunggu Persetujuan
                     </span>
@@ -37,51 +57,59 @@
         </div>
 
         {{-- Body --}}
-        <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="p-4 sm:p-6">
+            <div class="grid grid-cols-1 gap-6">
                 {{-- Kolom Kiri --}}
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-500">Tanggal</label>
-                        <p class="mt-1 text-sm font-semibold text-gray-900">{{ \Carbon\Carbon::parse($pencatatanPI->date)->translatedFormat('d F Y') }}</p>
+                        <label class="block text-xs sm:text-sm font-medium text-gray-500">Tanggal</label>
+                        <p class="mt-1 text-sm sm:text-base font-semibold text-gray-900">{{
+                            \Carbon\Carbon::parse($pencatatanPI->date)->translatedFormat('d F Y') }}</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-500">Grup</label>
-                        <p class="mt-1 text-sm font-semibold text-gray-900">{{ $pencatatanPI->grup }}</p>
+                        <label class="block text-xs sm:text-sm font-medium text-gray-500">Grup</label>
+                        <p class="mt-1 text-sm sm:text-base font-semibold text-gray-900">{{ $pencatatanPI->grup }}</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-500">Nama Pemilik</label>
-                        <p class="mt-1 text-sm font-semibold text-gray-900">{{ $pencatatanPI->name_person }}</p>
+                        <label class="block text-xs sm:text-sm font-medium text-gray-500">Nama Pemilik</label>
+                        <p class="mt-1 text-sm sm:text-base font-semibold text-gray-900">{{ $pencatatanPI->name_person
+                            }}</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-500">Instansi</label>
-                        <p class="mt-1 text-sm font-semibold text-gray-900">{{ $pencatatanPI->agency }}</p>
+                        <label class="block text-xs sm:text-sm font-medium text-gray-500">Instansi</label>
+                        <p class="mt-1 text-sm sm:text-base font-semibold text-gray-900">{{ $pencatatanPI->agency }}</p>
                     </div>
                 </div>
 
                 {{-- Kolom Kanan --}}
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-500">Jenis PI</label>
-                        <p class="mt-1 text-sm font-semibold text-gray-900">{{ $pencatatanPI->jenis_PI }}</p>
+                        <label class="block text-xs sm:text-sm font-medium text-gray-500">Jenis PI</label>
+                        <p class="mt-1 text-sm sm:text-base font-semibold text-gray-900">{{ $pencatatanPI->jenis_PI }}
+                        </p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-500">Jam Masuk / Keluar</label>
-                        <p class="mt-1 text-sm font-semibold text-gray-900">{{ $pencatatanPI->in_time }} / {{ $pencatatanPI->out_time ?? '-' }}</p>
+                        <label class="block text-xs sm:text-sm font-medium text-gray-500">Jam Masuk / Keluar</label>
+                        <p class="mt-1 text-sm sm:text-base font-semibold text-gray-900">{{ $pencatatanPI->in_time }} /
+                            {{ $pencatatanPI->out_time ?? '-' }}</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-500">Jumlah Masuk / Keluar</label>
-                        <p class="mt-1 text-sm font-semibold text-gray-900">{{ $pencatatanPI->in_quantity }} / {{ $pencatatanPI->out_quantity ?? '-' }}</p>
+                        <label class="block text-xs sm:text-sm font-medium text-gray-500">Jumlah Masuk / Keluar</label>
+                        <p class="mt-1 text-sm sm:text-base font-semibold text-gray-900">{{ $pencatatanPI->in_quantity
+                            }} / {{ $pencatatanPI->out_quantity ?? '-' }}</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-500">Keterangan</label>
-                        <p class="mt-1 text-sm text-gray-800 rounded-lg">{{ $pencatatanPI->summary ?? 'Tidak ada keterangan.' }}</p>
+                        <label class="block text-xs sm:text-sm font-medium text-gray-500">Keterangan</label>
+                        <p class="mt-1 text-sm sm:text-base text-gray-800 rounded-lg">{{ $pencatatanPI->summary ??
+                            'Tidak ada keterangan.' }}</p>
                     </div>
                 </div>
             </div>
-            <div class="mt-12">
+
+            <div class="mt-8 sm:mt-12">
                 {{-- Date Section --}}
-                <form id="signatureForm" action="{{ route('supervisor.form-pencatatan-pi.signature', $pencatatanPI->id) }}" method="POST">
+                <form id="signatureForm"
+                    action="{{ route('supervisor.form-pencatatan-pi.signature', $pencatatanPI->id) }}" method="POST">
                     @csrf
                     <div class="text-center mb-6">
                         @php
@@ -91,10 +119,11 @@
                         9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
                         ];
                         @endphp
-                        <p class="text-sm">Yogyakarta,
+                        <p class="text-xs sm:text-sm">Yogyakarta,
                             @if(isset($pencatatanPI))
-                            {{ $pencatatanPI->created_at->format('d') }} {{ $bulan[(int)$pencatatanPI->created_at->format('n')] }} {{
-                                $pencatatanPI->created_at->format('Y') }}
+                            {{ $pencatatanPI->created_at->format('d') }} {{
+                            $bulan[(int)$pencatatanPI->created_at->format('n')] }} {{
+                            $pencatatanPI->created_at->format('Y') }}
                             @else
                             {{ date('d') }} {{ $bulan[(int)date('n')] }} {{ date('Y') }}
                             @endif
@@ -102,44 +131,54 @@
                     </div>
 
                     {{-- Signature Grid Layout (Sender & Receiver) --}}
-                    <div class="grid grid-cols-2 gap-4 text-center">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         {{-- Kolom Kiri: Yang Menyerahkan (Sender) --}}
-                        <div>
-                            <p class="text-sm font-semibold">Yang Menyerahkan</p>
-                            <div class="w-48 mx-auto h-28 flex flex-col items-center justify-center">
+                        <div class="text-center">
+                            <p class="text-xs sm:text-sm font-semibold mb-3">Yang Menyerahkan</p>
+                            <div
+                                class="w-full max-w-[192px] mx-auto h-24 sm:h-28 flex flex-col items-center justify-center">
                                 @if($pencatatanPI->senderSignature)
-                                <img src="data:image/png;base64,{{ $pencatatanPI->senderSignature }}" alt="TTD Yang Menyerahkan"
-                                    class="max-h-24 max-w-full object-contain">
+                                <img src="data:image/png;base64,{{ $pencatatanPI->senderSignature }}"
+                                    alt="TTD Yang Menyerahkan" class="max-h-20 sm:max-h-24 max-w-full object-contain">
                                 @else
                                 <div class="border-b border-dotted border-black w-full h-1"></div>
                                 @endif
                             </div>
-                            <p class="text-sm font-semibold">
+                            <p class="text-xs sm:text-sm font-semibold mt-2">
                                 ({{ $pencatatanPI->sender->name ?? '...' }})
                             </p>
                         </div>
-                        <div>
-                            <p class="text-sm font-semibold">Yang Mengetahui</p>
+
+                        <div class="text-center">
+                            <p class="text-xs sm:text-sm font-semibold mb-3">Yang Mengetahui</p>
                             @if($pencatatanPI->approvedSignature)
-                            <img src="data:image/png;base64,{{ $pencatatanPI->approvedSignature }}" alt="TTD Penerima" class="mx-auto mt-2 h-24 border rounded">
+                            <img src="data:image/png;base64,{{ $pencatatanPI->approvedSignature }}" alt="TTD Penerima"
+                                class="mx-auto mt-2 h-20 sm:h-24 border rounded">
                             @else
                             {{-- Tampilkan canvas hanya jika user yang login adalah penerima --}}
                             @if(Auth::id() == $pencatatanPI->approved_id)
-                            <div class="w-48 mx-auto mb-2 h-28 flex flex-col items-center justify-center">
+                            <div
+                                class="w-full max-w-[192px] mx-auto mb-2 h-24 sm:h-28 flex flex-col items-center justify-center">
                                 <canvas id="signature-canvas" class="w-full h-full"></canvas>
                             </div>
-                            <button type="button" id="clear-signature" class="text-sm text-blue-600 hover:underline mt-1 no-print">Hapus</button>
+                            <button type="button" id="clear-signature"
+                                class="text-xs sm:text-sm text-blue-600 hover:underline mt-1 no-print">Hapus</button>
                             @else
-                            <div class="mx-auto mt-2 h-24 w-48 border rounded flex items-center justify-center text-sm text-gray-500">Menunggu TTD</div>
+                            <div
+                                class="mx-auto mt-2 h-20 sm:h-24 w-full max-w-[192px] border rounded flex items-center justify-center text-xs sm:text-sm text-gray-500">
+                                Menunggu TTD</div>
                             @endif
                             @endif
-                            <p class="mt-2 text-sm font-semibold">({{ $pencatatanPI->approver->name ?? 'N/A' }})</p>
+                            <p class="mt-2 text-xs sm:text-sm font-semibold">({{ $pencatatanPI->approver->name ?? 'N/A'
+                                }})</p>
                         </div>
                     </div>
+
                     @if(!$pencatatanPI->approvedSignature && Auth::id() == $pencatatanPI->approved_id)
                     <div class="mt-6 text-center no-print">
                         <input type="hidden" name="approvedSignature" id="approvedSignature">
-                        <button type="submit" class="px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-lg">
+                        <button type="submit"
+                            class="px-6 py-2.5 sm:px-8 sm:py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-lg text-sm sm:text-base">
                             Simpan Tanda Tangan
                         </button>
                     </div>
