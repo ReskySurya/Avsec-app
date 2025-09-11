@@ -229,17 +229,22 @@ class DashboardController extends Controller
         $perPage = 10;
 
         $manualBooksHBSCP = ManualBook::with('creator', 'details')
-            ->where('approved_by', Auth::id())
+            // ->where('approved_by', Auth::id())
             ->where('type', 'hbscp')
             ->latest('date')
             ->paginate($perPage, ['*'], 'hbscp_page');
 
+
         $manualBooksPSCP = ManualBook::with('creator', 'details')
-            ->where('approved_by', Auth::id())
+            // ->where('approved_by', Auth::id())
             ->where('type', 'pscp')
             ->latest('date')
             ->paginate($perPage, ['*'], 'pscp_page');
 
+        if (!Auth::user()->isSuperAdmin()) {
+            $manualBooksHBSCP->where('approved_by', Auth::id());
+            $manualBooksPSCP->where('approved_by', Auth::id());
+        }
         return view('supervisor.listManualBook', compact('manualBooksHBSCP', 'manualBooksPSCP'));
     }
 
@@ -247,8 +252,13 @@ class DashboardController extends Controller
     {
         $perPage = 10;
 
-        // Perbaikan: Hapus get() dan gunakan where() langsung pada query builder
-        $formPencatatanPI = FormPencatatanPI::where('approved_id', Auth::id())
+        $query = FormPencatatanPI::query();
+
+        if (!Auth::user()->isSuperAdmin()) {
+            $query->where('approved_id', Auth::id());
+        }
+
+        $formPencatatanPI = $query
             ->latest('date')
             ->paginate($perPage, ['*']);
 

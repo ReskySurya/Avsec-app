@@ -255,7 +255,7 @@
                     </div>
                     <div>
                         <label for="grup" class="block text-xs sm:text-sm font-semibold text-gray-700 mb-1 sm:mb-2">Grup</label>
-                        <select id="grup" name="grup" class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 text-sm sm:text-base">
+                        <select required id="grup" name="grup" class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 text-sm sm:text-base">
                             <option value="">Pilih Grup</option>
                             <option value="A">A</option>
                             <option value="B">B</option>

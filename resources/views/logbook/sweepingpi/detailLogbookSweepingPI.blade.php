@@ -3,14 +3,14 @@
 @section('title', 'Logbook Sweeping Prohibited Items')
 
 @section('content')
-<div class="container mx-auto p-2 sm:p-4 w-screen overflow-x-auto mt-16">
+<div class="container w-full pt-4 ps-4 pb-4 overflow-x-auto lg:mt-16">
     <!-- Enhanced Header with Gradient -->
     <div class="bg-gradient-to-br from-blue-500 to-teal-600 rounded-lg sm:rounded-2xl shadow-xl p-4 sm:p-6 mb-4 sm:mb-6 text-white relative overflow-hidden">
         <!-- Background Pattern -->
         <div class="absolute inset-0 bg-white bg-opacity-10">
             <div class="absolute inset-0" style="background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 20px 20px;"></div>
         </div>
-        
+
         <div class="relative z-10">
             <div class="flex items-center mb-4">
                 <button onclick="history.back()" class="text-white hover:text-blue-200 mr-4 p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition-all duration-200 hover:scale-105">
@@ -26,7 +26,7 @@
             </div>
 
             <!-- Enhanced Progress Cards with Animation -->
-            <div class="grid grid-cols-3 gap-3 sm:gap-4">
+            <div class="grid grid-cols-3 gap-2 sm:gap-4">
                 <div class="bg-white bg-opacity-15 backdrop-blur-sm rounded-xl p-3 sm:p-4 text-center transform hover:scale-105 transition-all duration-200 border border-white border-opacity-20">
                     <div class="text-xl sm:text-3xl font-bold text-white mb-1" id="completion-rate">0%</div>
                     <div class="text-indigo-100 text-xs sm:text-sm font-medium">Selesai</div>
@@ -69,35 +69,10 @@
             </div>
         </div>
 
-        <!-- Enhanced Mobile View Toggle -->
-        <div class="block sm:hidden bg-gradient-to-r from-gray-50 to-blue-50 p-4 border-b">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                    <svg class="w-5 h-5 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
-                        <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path>
-                    </svg>
-                    <span class="text-sm font-semibold text-gray-700">Mode Tampilan:</span>
-                </div>
-                <div class="flex bg-white rounded-xl p-1 shadow-lg border border-gray-200">
-                    <button onclick="toggleMobileView('table')" id="btn-table" class="mobile-view-btn active px-4 py-2 text-xs font-semibold rounded-lg transition-all duration-200 flex items-center space-x-1">
-                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
-                        </svg>
-                        <span>Tabel</span>
-                    </button>
-                    <button onclick="toggleMobileView('cards')" id="btn-cards" class="mobile-view-btn px-4 py-2 text-xs font-semibold rounded-lg transition-all duration-200 flex items-center space-x-1">
-                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path>
-                        </svg>
-                        <span>Kartu</span>
-                    </button>
-                </div>
-            </div>
-        </div>
+
 
         <!-- Table Container -->
-        <div id="table-view" class="overflow-x-auto">
+        <div id="table-view" class="overflow-x-auto hidden lg:block">
             <table class="min-w-full checklist-table border-collapse">
                 <thead class="bg-gradient-to-r from-gray-100 to-gray-200">
                     <tr>
@@ -119,7 +94,7 @@
         </div>
 
         <!-- Enhanced Mobile Card View -->
-        <div id="cards-view" class="hidden p-4 space-y-4" style="display: none;">
+        <div id="cards-view" class="block lg:hidden p-4 space-y-4">
             <div id="cards-container">
                 <!-- Cards will be populated by JavaScript -->
             </div>
@@ -219,20 +194,58 @@
 </div>
 
 <style>
+    /* Hapus CSS display: none, ganti dengan: */
+
     .checklist-table {
-        border-collapse: separate;
-        border-spacing: 0;
+        min-width: 600px;
+        max-width: none;
+        /* Hilangkan max-width */
+        width: max-content;
+        /* Biarkan tabel selebar kontennya */
+    }
+
+    #table-view {
+        max-width: 75vw;
+        /* Batasi container */
+        overflow-x: auto;
+        /* Enable horizontal scroll */
+        overflow-y: visible;
+    }
+
+    /* Optional: Tambahkan indikator scroll */
+    #table-view::after {
+        /* content: "← Geser untuk melihat hari lainnya →"; */
+        display: block;
+        text-align: center;
+        color: #6b7280;
+        font-size: 12px;
+        padding: 4px;
+        background: #f9fafb;
     }
 
     .checklist-cell {
-        width: 50px;
-        min-width: 50px;
-        padding: 8px 4px;
+        width: calc((100vw - 180px - 32px) / 7);
+        /* Dinamis berdasarkan viewport */
+        min-width: 40px;
+        /* Minimal width untuk mobile */
+        max-width: 65px;
+        /* Maksimal width untuk desktop */
+        padding: 6px 2px;
         text-align: center;
         border-right: 1px solid #e5e7eb;
         background-color: white;
         vertical-align: middle;
         position: relative;
+        font-size: 10px;
+    }
+
+    @media (min-width: 480px) {
+        .checklist-cell {
+            width: calc((100vw - 220px - 32px) / 7);
+            min-width: 45px;
+            padding: 8px 3px;
+            font-size: 11px;
+        }
     }
 
     @media (min-width: 640px) {
@@ -240,26 +253,38 @@
             width: 65px;
             min-width: 65px;
             padding: 10px 6px;
+            font-size: 12px;
         }
     }
 
     .item-name-cell {
-        min-width: 200px;
-        width: 200px;
-        padding: 12px 16px;
+        width: 180px;
+        /* Fixed width untuk mobile */
+        min-width: 180px;
+        padding: 8px 12px;
         word-wrap: break-word;
         white-space: normal;
-        line-height: 1.4;
+        line-height: 1.3;
         vertical-align: middle;
-        font-size: 13px;
+        font-size: 11px;
         background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         border-right: 2px solid #e2e8f0 !important;
     }
 
+    @media (min-width: 480px) {
+        .item-name-cell {
+            width: 220px;
+            min-width: 220px;
+            padding: 10px 14px;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+    }
+
     @media (min-width: 640px) {
         .item-name-cell {
-            min-width: 280px;
             width: 280px;
+            min-width: 280px;
             padding: 16px 20px;
             font-size: 14px;
             line-height: 1.5;
@@ -267,23 +292,33 @@
     }
 
     .item-header-cell {
-        min-width: 200px;
-        width: 200px;
-        font-size: 12px;
+        width: 180px;
+        min-width: 180px;
+        font-size: 10px;
+        padding: 8px 12px;
+    }
+
+    @media (min-width: 480px) {
+        .item-header-cell {
+            width: 220px;
+            min-width: 220px;
+            font-size: 11px;
+        }
     }
 
     @media (min-width: 640px) {
         .item-header-cell {
-            min-width: 280px;
             width: 280px;
+            min-width: 280px;
             font-size: 14px;
+            padding: 12px 20px;
         }
     }
 
     .note-button {
-        width: 22px;
-        height: 22px;
-        border-radius: 6px;
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
         border: 2px solid #d1d5db;
         background: white;
         color: #6b7280;
@@ -291,8 +326,16 @@
         align-items: center;
         justify-content: center;
         transition: all 0.3s ease;
-        font-size: 10px;
+        font-size: 8px;
         cursor: pointer;
+    }
+
+    @media (min-width: 480px) {
+        .note-button {
+            width: 20px;
+            height: 20px;
+            font-size: 9px;
+        }
     }
 
     @media (min-width: 640px) {
@@ -300,6 +343,7 @@
             width: 24px;
             height: 24px;
             font-size: 12px;
+            border-radius: 6px;
         }
     }
 
@@ -334,7 +378,7 @@
         left: -100%;
         width: 100%;
         height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
         transition: left 0.5s;
     }
 
@@ -358,6 +402,7 @@
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
+        margin-bottom: 16px;
     }
 
     .item-card:before {
@@ -377,7 +422,7 @@
     }
 
     .item-card h4 {
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 700;
         color: #1f2937;
         margin-bottom: 12px;
@@ -387,22 +432,35 @@
         gap: 8px;
     }
 
+    @media (min-width: 480px) {
+        .item-card h4 {
+            font-size: 16px;
+        }
+    }
+
     .days-grid {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 6px;
+        gap: 4px;
         margin-bottom: 16px;
-        padding: 12px;
+        padding: 8px;
         background: #f8fafc;
         border-radius: 12px;
         border: 1px solid #e2e8f0;
     }
 
+    @media (min-width: 480px) {
+        .days-grid {
+            gap: 6px;
+            padding: 12px;
+        }
+    }
+
     .day-cell {
         text-align: center;
-        padding: 8px 4px;
-        border-radius: 10px;
-        min-height: 50px;
+        padding: 6px 2px;
+        border-radius: 8px;
+        min-height: 45px;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -413,23 +471,38 @@
         border: 2px solid #e5e7eb;
     }
 
+    @media (min-width: 480px) {
+        .day-cell {
+            padding: 8px 4px;
+            min-height: 50px;
+            border-radius: 10px;
+        }
+    }
+
     .day-cell:hover {
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
     }
 
     .day-number {
-        font-size: 11px;
+        font-size: 10px;
         color: #6b7280;
-        margin-bottom: 4px;
+        margin-bottom: 3px;
         font-weight: 600;
+    }
+
+    @media (min-width: 480px) {
+        .day-number {
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
     }
 
     /* Enhanced Checkbox styles */
     .mobile-checkbox {
-        width: 24px;
-        height: 24px;
-        border: 3px solid;
+        width: 20px;
+        height: 20px;
+        border: 2px solid;
         border-radius: 50%;
         transition: all 0.4s ease;
         cursor: pointer;
@@ -437,6 +510,21 @@
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+
+    @media (min-width: 480px) {
+        .mobile-checkbox {
+            width: 22px;
+            height: 22px;
+            border-width: 3px;
+        }
+    }
+
+    @media (min-width: 640px) {
+        .mobile-checkbox {
+            width: 24px;
+            height: 24px;
+        }
     }
 
     .mobile-checkbox.checked {
@@ -465,10 +553,19 @@
         box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
     }
 
+    /* Table container untuk memastikan no horizontal scroll */
+    .table-container {
+        width: 100%;
+        max-width: 100vw;
+        overflow: visible;
+        /* Ubah dari overflow-x-auto */
+    }
+
     /* Ensure sticky positioning works properly */
     .sticky {
         position: -webkit-sticky;
         position: sticky;
+        z-index: 10;
     }
 
     /* Enhanced table hover effects */
@@ -479,18 +576,24 @@
 
     .checklist-table tr:hover td {
         background-color: #f8fafc;
-        transform: scale(1.01);
     }
 
     .checklist-table tr:hover .sticky {
         background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
     }
 
+
     .cell-content {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 4px;
+        gap: 2px;
+    }
+
+    @media (min-width: 480px) {
+        .cell-content {
+            gap: 4px;
+        }
     }
 
     @media (min-width: 640px) {
@@ -499,47 +602,76 @@
         }
     }
 
-    /* Enhanced scrollbar for mobile table */
-    @media (max-width: 639px) {
-        .overflow-x-auto::-webkit-scrollbar {
-            height: 6px;
-        }
-        
-        .overflow-x-auto::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 6px;
-        }
-        
-        .overflow-x-auto::-webkit-scrollbar-thumb {
-            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
-            border-radius: 6px;
-        }
-        
-        .overflow-x-auto::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(45deg, #1d4ed8, #1e40af);
+    /* Responsive improvements untuk header */
+    .header-icon {
+        width: 12px;
+        height: 12px;
+    }
+
+    @media (min-width: 480px) {
+        .header-icon {
+            width: 14px;
+            height: 14px;
         }
     }
 
-    /* Responsive improvements */
-    @media (max-width: 639px) {
-        .checklist-table th {
-            font-size: 11px;
-            padding: 8px 4px;
+    @media (min-width: 640px) {
+        .header-icon {
+            width: 16px;
+            height: 16px;
         }
-        
-        .checklist-table td {
-            font-size: 12px;
+    }
+
+    /* Checkbox di dalam cell */
+    .table-checkbox {
+        width: 16px;
+        height: 16px;
+        border: 2px solid #d1d5db;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+    }
+
+    @media (min-width: 480px) {
+        .table-checkbox {
+            width: 18px;
+            height: 18px;
         }
+    }
+
+    @media (min-width: 640px) {
+        .table-checkbox {
+            width: 20px;
+            height: 20px;
+        }
+    }
+
+    .table-checkbox.checked {
+        background: linear-gradient(135deg, #10b981, #059669);
+        border-color: #10b981;
+        color: white;
+    }
+
+    .table-checkbox.missed {
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        border-color: #f59e0b;
     }
 
     /* Animation classes */
     @keyframes pulse-success {
-        0%, 100% { 
-            transform: scale(1); 
+
+        0%,
+        100% {
+            transform: scale(1);
             box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
         }
-        50% { 
-            transform: scale(1.1); 
+
+        50% {
+            transform: scale(1.05);
             box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
         }
     }
@@ -554,6 +686,7 @@
             transform: translateX(100%);
             opacity: 0;
         }
+
         to {
             transform: translateX(0);
             opacity: 1;
@@ -575,9 +708,76 @@
             opacity: 0;
             transform: translateY(20px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
+        }
+    }
+
+    /* Container utama */
+    .main-container {
+        max-width: 100vw;
+        overflow-x: hidden;
+        padding: 8px;
+    }
+
+    @media (min-width: 480px) {
+        .main-container {
+            padding: 12px;
+        }
+    }
+
+    @media (min-width: 640px) {
+        .main-container {
+            padding: 16px;
+        }
+    }
+
+    /* Responsive text untuk legend */
+    .legend-text {
+        font-size: 10px;
+        line-height: 1.3;
+    }
+
+    @media (min-width: 480px) {
+        .legend-text {
+            font-size: 11px;
+            line-height: 1.4;
+        }
+    }
+
+    @media (min-width: 640px) {
+        .legend-text {
+            font-size: 12px;
+            line-height: 1.5;
+        }
+    }
+
+    /* Responsive grid untuk legend */
+    .legend-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    @media (min-width: 480px) {
+        .legend-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .legend-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .legend-grid {
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
         }
     }
 </style>
@@ -595,7 +795,7 @@
     let saveTimeout = null;
     let currentModalItem = null;
     let currentModalDay = null;
-    let currentMobileView = 'table'; // 'table' or 'cards'
+
 
     let statistics = {
         completion_rate: 0,
@@ -700,26 +900,7 @@
         console.log('📝 Daily notes after initialization:', dailyNotes);
     }
 
-    function toggleMobileView(view) {
-        currentMobileView = view;
-        
-        // Update button styles
-        document.getElementById('btn-table').classList.toggle('active', view === 'table');
-        document.getElementById('btn-cards').classList.toggle('active', view === 'cards');
-        
-        // Show/hide views
-        const tableView = document.getElementById('table-view');
-        const cardsView = document.getElementById('cards-view');
-        
-        if (view === 'table') {
-            tableView.style.display = 'block';
-            cardsView.style.display = 'none';
-        } else {
-            tableView.style.display = 'none';
-            cardsView.style.display = 'block';
-            cardsView.classList.remove('hidden');
-        }
-    }
+
 
     function renderTable() {
         console.log('🔄 Starting renderTable...');
@@ -908,7 +1089,7 @@
 
                 for (let day = 0; day < daysInMonth; day++) {
                     const hasNote = dailyNotes[day] && dailyNotes[day].trim() !== '';
-                    
+
                     cardsHtml += `
                         <button
                             type="button"
@@ -1096,7 +1277,7 @@
     function formatDailyNotesForBackend(dailyNotes) {
         console.log('🐛 formatDailyNotesForBackend input:', dailyNotes);
         console.log('🐛 currentYear:', currentYear, 'currentMonth:', currentMonth);
-        
+
         const formattedNotes = [];
         const daysInMonth = getDaysInMonth();
 
@@ -1105,7 +1286,7 @@
                 // PERBAIKAN: Gunakan format tanggal yang lebih explicit
                 const dayNumber = day + 1; // Convert 0-based to 1-based
                 const dateString = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
-                
+
                 const noteItem = {
                     tanggal: dateString,
                     notes: dailyNotes[day]

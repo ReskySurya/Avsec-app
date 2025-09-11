@@ -4,6 +4,27 @@
 
 @section('content')
 <div x-data="checklistForm()" class="mx-auto p-0 sm:p-6 min-h-screen pt-5 sm:pt-20">
+    @if(session('success'))
+    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition class="bg-gradient-to-r from-blue-400 to-blue-500 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl mb-4 sm:mb-6 shadow-lg border-l-4 border-blue-600 text-sm sm:text-base">
+        <div class="flex items-center">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            {{ session('success') }}
+        </div>
+    </div>
+    @endif
+
+    @if(session('error'))
+    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition class="bg-gradient-to-r from-red-400 to-red-500 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl mb-4 sm:mb-6 shadow-lg border-l-4 border-red-600 text-sm sm:text-base">
+        <div class="flex items-center">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            {{ session('error') }}
+        </div>
+    </div>
+    @endif
     <div class="bg-white shadow-xl rounded-2xl overflow-hidden mb-8 border border-gray-100">
         <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-6 py-6 text-white">
             <h3 class="text-2xl font-bold mb-1">Edit Data Pencatatan PI</h3>
@@ -182,6 +203,17 @@
             submitForm() {
                 const approvedId = document.getElementById('supervisor_id').value;
                 const signatureDataInput = document.getElementById('senderSignature');
+                const outTime = document.getElementById('out_time').value;
+                const inTime = document.getElementById('in_time').value;
+
+                if (!outTime) {
+                    alert('Mohon isi jam keluar.');
+                    return;
+                }
+                if (!inTime) {
+                    alert('Mohon isi jam masuk.');
+                    return;
+                }
 
                 if (!approvedId) {
                     alert('Mohon pilih supervisor yang mengetahui.');

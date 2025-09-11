@@ -19,25 +19,29 @@ class FormPencatatanPIController extends Controller
 
     public function storeChecklistPencatatanPI(Request $request)
     {
-        $request->validate([
-            'date' => 'required|date',
-            'grup' => 'nullable|string|max:255',
-            'in_time' => 'nullable|date_format:H:i',
-            'out_time' => 'nullable|date_format:H:i',
-            'name_person' => 'nullable|string|max:255',
-            'agency' => 'nullable|string|max:255',
-            'jenis_PI' => 'nullable|string|max:255',
-            'in_quantity' => 'nullable|string|max:255',
-            'out_quantity' => 'nullable|string|max:255',
-            'summary' => 'nullable|string',
-            'status' => 'nullable|enum:draft,submitted,approved',
-            'approved_id' => 'nullable|integer',
-            'approvedSignature' => 'nullable|string'
-        ]);
+        try {
+            $request->validate([
+                'date' => 'required|date',
+                'grup' => 'required|string|max:255',
+                'in_time' => 'required|date_format:H:i',
+                'out_time' => 'nullable|date_format:H:i',
+                'name_person' => 'required|string|max:255',
+                'agency' => 'required|string|max:255',
+                'jenis_PI' => 'required|string|max:255',
+                'in_quantity' => 'required|string|max:255',
+                'out_quantity' => 'nullable|string|max:255',
+                'summary' => 'nullable|string',
+                'status' => 'nullable|enum:draft,submitted,approved',
+                'approved_id' => 'nullable|integer',
+                'approvedSignature' => 'nullable|string'
+            ]);
 
-        FormPencatatanPI::create($request->all());
+            FormPencatatanPI::create($request->all());
 
-        return redirect()->route('checklist.pencatatanpi.index')->with('success', 'Data berhasil ditambahkan.');
+            return redirect()->route('checklist.pencatatanpi.index')->with('success', 'Data berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat memproses permintaan Anda. Silakan coba lagi.');
+        }
     }
 
     public function destroyChecklistPencatatanPI($id)
@@ -60,14 +64,14 @@ class FormPencatatanPIController extends Controller
     {
         $request->validate([
             'date' => 'required|date',
-            'grup' => 'nullable|string|max:255',
-            'in_time' => 'nullable|date_format:H:i',
-            'out_time' => 'nullable|date_format:H:i',
-            'name_person' => 'nullable|string|max:255',
-            'agency' => 'nullable|string|max:255',
-            'jenis_PI' => 'nullable|string|max:255',
-            'in_quantity' => 'nullable|string|max:255',
-            'out_quantity' => 'nullable|string|max:255',
+            'grup' => 'required|string|max:255',
+            'in_time' => 'required|date_format:H:i',
+            'out_time' => 'required|date_format:H:i',
+            'name_person' => 'required|string|max:255',
+            'agency' => 'required|string|max:255',
+            'jenis_PI' => 'required|string|max:255',
+            'in_quantity' => 'required|string|max:255',
+            'out_quantity' => 'required|string|max:255',
             'summary' => 'nullable|string',
             'senderSignature' => 'required|string',
             'approved_id' => 'required|integer|exists:users,id',
@@ -78,24 +82,27 @@ class FormPencatatanPIController extends Controller
         if (preg_match('/^data:image\/(\w+);base64,/', $signature, $type)) {
             $signature = substr($signature, strpos($signature, ',') + 1);
         }
-        $pencatatanPI->update([
-            'date' => $request->date,
-            'grup' => $request->grup,
-            'in_time' => $request->in_time,
-            'out_time' => $request->out_time,
-            'name_person' => $request->name_person,
-            'agency' => $request->agency,
-            'jenis_PI' => $request->jenis_PI,
-            'in_quantity' => $request->in_quantity,
-            'out_quantity' => $request->out_quantity,
-            'summary' => $request->summary,
-            'status' => 'submitted',
-            'sender_id' => Auth::id(),
-            'senderSignature' => $signature,
-            'approved_id' => $request->approved_id,
-        ]);
-
-        return redirect()->route('checklist.pencatatanpi.index')->with('success', 'Data berhasil diperbarui dan dikirim.');
+        try {
+            $pencatatanPI->update([
+                'date' => $request->date,
+                'grup' => $request->grup,
+                'in_time' => $request->in_time,
+                'out_time' => $request->out_time,
+                'name_person' => $request->name_person,
+                'agency' => $request->agency,
+                'jenis_PI' => $request->jenis_PI,
+                'in_quantity' => $request->in_quantity,
+                'out_quantity' => $request->out_quantity,
+                'summary' => $request->summary,
+                'status' => 'submitted',
+                'sender_id' => Auth::id(),
+                'senderSignature' => $signature,
+                'approved_id' => $request->approved_id,
+            ]);
+            return redirect()->route('checklist.pencatatanpi.index')->with('success', 'Data berhasil diperbarui dan dikirim.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Harap isi semua field yang diperlukan. Error: ');
+        }
     }
 
     public function showDetailPencatatanPI($id)
@@ -107,7 +114,7 @@ class FormPencatatanPIController extends Controller
     public function storeSignatureApproved(Request $request, $id)
     {
         $request->validate([
-            'approvedSignature' => 'nullable|string',
+            'approvedSignature' => 'required|string',
         ]);
 
         $pencatatanPI = FormPencatatanPI::findOrFail($id);
