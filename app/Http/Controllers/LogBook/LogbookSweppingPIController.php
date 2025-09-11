@@ -21,20 +21,40 @@ use Illuminate\View\View;
 class LogbookSweppingPIController extends Controller
 {
     //superadmin tampilan sweeping PI
-    public function indexSweepingPI()
+    public function indexSweepingPI(Request $request)
     {
-        $tenantList = Tenant::orderBy('tenantID')->get();
-        return view('superadmin.sweeping-pi.index', ['tenantList' => $tenantList]);
+        $search = $request->input('search');
+        $tenantQuery = Tenant::query();
+        if ($search) {
+            $tenantQuery->where('tenant_name', 'like', '%' . $search . '%')
+                        ->orWhere('tenantID', 'like', '%' . $search . '%');
+        }
+        $tenantList = $tenantQuery->orderBy('tenantID')->get();
+
+        return view('superadmin.sweeping-pi.index', [
+            'tenantList' => $tenantList,
+            'search' => $search
+        ]);
     }
-    public function indexSweepingPIManage($tenantID)
+    public function indexSweepingPIManage(Request $request, $tenantID)
     {
-        $tenant = Tenant::all()
-            ->where('tenantID', $tenantID)
-            ->first();
+        $tenant = Tenant::where('tenantID', $tenantID)->firstOrFail();
+
         $prohibitedItems = ProhibitedItem::where('tenantID', $tenantID)
             ->orderBy('items_name')
             ->get();
+
+        // Get filter inputs
+        $filterBulan = $request->input('filter_bulan');
+        $filterTahun = $request->input('filter_tahun');
+
         $sweepingPI = LogbookSweepingPI::where('tenantID', $tenantID)
+            ->when($filterBulan, function ($query, $bulan) {
+                return $query->where('bulan', $bulan);
+            })
+            ->when($filterTahun, function ($query, $tahun) {
+                return $query->where('tahun', $tahun);
+            })
             ->orderBy('tahun', 'desc')
             ->orderBy('bulan', 'desc')
             ->get();
@@ -44,6 +64,8 @@ class LogbookSweppingPIController extends Controller
             'tenantID' => $tenantID,
             'prohibitedItems' => $prohibitedItems,
             'sweepingPI' => $sweepingPI,
+            'filterBulan' => $filterBulan, // Pass filter values back
+            'filterTahun' => $filterTahun,
         ]);
     }
     public function storeSweepingPI(Request $request)
@@ -286,11 +308,22 @@ class LogbookSweppingPIController extends Controller
     }
 
     //officer tampilan logbook sweeping PI
-    public function index()
+    public function index(Request $request)
     {
-        $tenantList = Tenant::orderBy('tenantID')->get();
+        $search = $request->input('search');
+
+        $tenantQuery = Tenant::query();
+
+        if ($search) {
+            $tenantQuery->where('tenant_name', 'like', '%' . $search . '%')
+                        ->orWhere('tenantID', 'like', '%' . $search . '%');
+        }
+
+        $tenantList = $tenantQuery->orderBy('tenantID')->get();
+
         return view('logbook.sweepingpi.logbookSweppingPI', [
-            'tenantList' => $tenantList
+            'tenantList' => $tenantList,
+            'search' => $search // Pass search term back
         ]);
     }
     public function indexLogbookSweepingPIDetail(Request $request, $tenantID): View

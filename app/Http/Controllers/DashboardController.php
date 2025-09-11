@@ -90,6 +90,7 @@ class DashboardController extends Controller
         if ($statusFilter) {
             $logbookQuery->where('status', $statusFilter);
         }
+        
 
         $logbookEntries = $logbookQuery->get()
             ->map(function ($logbook) {
@@ -173,9 +174,11 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function showDataLogbookRotasi()
+    public function showDataLogbookRotasi(Request $request)
     {
         // 1. Tentukan jumlah item per halaman untuk pagination
+        $status = $request->get('status', ''); // Default kosong untuk menampilkan semua
+
         $perPage = 10;
 
         // 2. Query dasar untuk LogbookRotasi
@@ -188,12 +191,22 @@ class DashboardController extends Controller
             $hbscpQuery->where('approved_by', Auth::id());
         }
 
+        // Filter berdasarkan status jika dipilih
+        if ($status) {
+            $pscpQuery->where('status', $status);
+            $hbscpQuery->where('status', $status);
+        }
+
         // 4. Ambil data dengan pagination
         $logbooksPSCP = $pscpQuery->latest('date')->paginate($perPage, ['*'], 'pscp_page');
         $logbooksHBSCP = $hbscpQuery->latest('date')->paginate($perPage, ['*'], 'hbscp_page');
 
         // 5. Kirim kedua koleksi data ke view
-        return view('supervisor.listLogbookRotasi', compact('logbooksPSCP', 'logbooksHBSCP'));
+        return view('supervisor.listLogbookRotasi', 
+        compact(
+            'logbooksPSCP',
+             'logbooksHBSCP',
+        ));
     }
 
     public function showDataChecklistKendaraan(Request $request)

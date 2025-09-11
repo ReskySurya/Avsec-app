@@ -2960,9 +2960,9 @@ video {
   padding: 0;
 }
 
-/* .page-break-after {
+.page-break-after {
   page-break-after: always;
-} */
+}
 
 .hover\:-translate-y-1:hover {
   --tw-translate-y: -0.25rem;
