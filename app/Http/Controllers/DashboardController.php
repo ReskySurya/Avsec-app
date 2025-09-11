@@ -224,21 +224,34 @@ class DashboardController extends Controller
         return view('supervisor.listChecklistPenyisiran', compact('checklistsPenyisiran'));
     }
 
-    public function showDataManualBook()
+    public function showDataManualBook(Request $request)
     {
-        $perPage = 10;
+        $status = $request->get('status');
 
-        $manualBooksHBSCP = ManualBook::with('creator', 'details')
-            // ->where('approved_by', Auth::id())
-            ->where('type', 'hbscp')
-            ->latest('date')
+        // Query dasar untuk HBSCP
+        $queryHBSCP = ManualBook::with('creator', 'details')
+            ->where('approved_by', Auth::id())
+            ->where('type', 'hbscp');
+
+        // Query dasar untuk PSCP
+        $queryPSCP = ManualBook::with('creator', 'details')
+            ->where('approved_by', Auth::id())
+            ->where('type', 'pscp');
+
+        // Terapkan filter status jika ada, dengan melanjutkan query yang sudah ada
+        if ($status) {
+            $queryHBSCP->where('status', $status);
+            $queryPSCP->where('status', $status);
+        }
+
+        $perPage = 10;
+        
+        // Eksekusi query HBSCP yang sudah difilter (jika ada) dan tambahkan pagination
+        $manualBooksHBSCP = $queryHBSCP->latest('date')
             ->paginate($perPage, ['*'], 'hbscp_page');
 
-
-        $manualBooksPSCP = ManualBook::with('creator', 'details')
-            // ->where('approved_by', Auth::id())
-            ->where('type', 'pscp')
-            ->latest('date')
+        // Eksekusi query PSCP yang sudah difilter (jika ada) dan tambahkan pagination
+        $manualBooksPSCP = $queryPSCP->latest('date')
             ->paginate($perPage, ['*'], 'pscp_page');
 
         if (!Auth::user()->isSuperAdmin()) {
@@ -252,13 +265,8 @@ class DashboardController extends Controller
     {
         $perPage = 10;
 
-        $query = FormPencatatanPI::query();
-
-        if (!Auth::user()->isSuperAdmin()) {
-            $query->where('approved_id', Auth::id());
-        }
-
-        $formPencatatanPI = $query
+        // Perbaikan: Hapus get() dan gunakan where() langsung pada query builder
+        $formPencatatanPI = FormPencatatanPI::where('approved_id', Auth::id())
             ->latest('date')
             ->paginate($perPage, ['*']);
 

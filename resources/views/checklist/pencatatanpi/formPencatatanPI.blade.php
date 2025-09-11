@@ -276,7 +276,7 @@
                     </div>
                     <div>
                         <label for="out_time" class="block text-xs sm:text-sm font-semibold text-gray-700 mb-1 sm:mb-2">Jam Keluar</label>
-                        <input type="time" id="out_time" name="out_time" class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 text-sm sm:text-base">
+                        <input readonly type="time" id="out_time" name="out_time" class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 text-sm sm:text-base">
                     </div>
                     <div>
                         <label for="jenis_PI" class="block text-xs sm:text-sm font-semibold text-gray-700 mb-1 sm:mb-2">Jenis PI</label>
@@ -288,7 +288,7 @@
                     </div>
                     <div>
                         <label for="out_quantity" class="block text-xs sm:text-sm font-semibold text-gray-700 mb-1 sm:mb-2">Jumlah Keluar</label>
-                        <input type="text" id="out_quantity" name="out_quantity" class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 text-sm sm:text-base" placeholder="0">
+                        <input readonly type="text" id="out_quantity" name="out_quantity" class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 text-sm sm:text-base" placeholder="0">
                     </div>
                     <div class="sm:col-span-2 lg:col-span-3">
                         <label for="summary" class="block text-xs sm:text-sm font-semibold text-gray-700 mb-1 sm:mb-2">Keterangan</label>
