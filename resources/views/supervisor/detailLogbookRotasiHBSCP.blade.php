@@ -18,8 +18,10 @@
                 </a>
             </div>
         </div>
+        
 
         <div class="p-4 sm:p-6 space-y-6">
+            
             {{-- Logbook Info Card --}}
             <div class="bg-gray-50 p-4 sm:p-6 rounded-xl border border-gray-200">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
