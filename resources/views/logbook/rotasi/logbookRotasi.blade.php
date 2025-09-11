@@ -16,38 +16,38 @@
 
     @if(session('success'))
     <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition
-        class="bg-gradient-to-r from-blue-400 to-blue-500 text-white px-6 py-4 rounded-xl mb-6 shadow-lg border-l-4 border-blue-600">
+        class="bg-gradient-to-r from-blue-400 to-blue-500 text-white px-4 sm:px-6 py-4 rounded-xl mb-6 shadow-lg border-l-4 border-blue-600 mx-4 sm:mx-0">
         <div class="flex items-center">
-            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
             </svg>
-            {{ session('success') }}
+            <span class="text-sm sm:text-base">{{ session('success') }}</span>
         </div>
     </div>
     @endif
     @if(session('error'))
     <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition
-        class="bg-gradient-to-r from-red-400 to-red-500 text-white px-6 py-4 rounded-xl mb-6 shadow-lg border-l-4 border-red-600">
+        class="bg-gradient-to-r from-red-400 to-red-500 text-white px-4 sm:px-6 py-4 rounded-xl mb-6 shadow-lg border-l-4 border-red-600 mx-4 sm:mx-0">
         <div class="flex items-center">
-            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            {{ session('error') }}
+            <span class="text-sm sm:text-base">{{ session('error') }}</span>
         </div>
     </div>
     @endif
 
-    <div class="bg-white shadow-xl rounded-2xl overflow-hidden mb-8 border border-gray-100">
-        <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-6 py-6 text-white">
-            <div class="flex flex-col sm:flex-row justify-between items-start">
-                <div>
-                    <h3 class="text-2xl font-bold mb-1">Logbook Rotasi</h3>
-                    <p class="text-blue-100">Catatan aktivitas harian rotasi PSCP dan HBSCP.</p>
+    <div class="bg-white shadow-xl rounded-none sm:rounded-2xl overflow-hidden mb-8 border-0 sm:border border-gray-100 mx-0 sm:mx-0">
+        <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-4 sm:px-6 py-4 sm:py-6 text-white">
+            <div class="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:justify-between sm:items-start">
+                <div class="flex-1">
+                    <h3 class="text-xl sm:text-2xl font-bold mb-1">Logbook Rotasi</h3>
+                    <p class="text-blue-100 text-sm sm:text-base">Catatan aktivitas harian rotasi PSCP dan HBSCP.</p>
                 </div>
                 <button @click="openLogbook = true"
-                    class="bg-white text-blue-600 hover:bg-blue-50 px-6 py-3 mt-3 sm:mt-0 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl w-full sm:w-auto">
-                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="bg-white text-blue-600 hover:bg-blue-50 px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl w-full sm:w-auto text-sm sm:text-base">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
                     Tambah Data
@@ -56,16 +56,17 @@
         </div>
 
         {{-- === KONTEN UTAMA YANG DIRUBAH (TAB & TABEL DINAMIS) === --}}
-        <div class="p-6">
+        <div class="p-4 sm:p-6">
+            <!-- Mobile Tab Navigation -->
             <div class="mb-4 border-b border-gray-200">
-                <div class="flex space-x-2">
+                <div class="flex space-x-1 sm:space-x-2 overflow-x-auto">
                     <a href="{{ route('logbookRotasi.index', ['type' => 'pscp']) }}"
-                        class="px-4 py-2 text-sm font-medium rounded-t-lg transition-colors duration-200
+                        class="flex-shrink-0 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-t-lg transition-colors duration-200 whitespace-nowrap
                               {{ $typeForm === 'pscp' ? 'bg-blue-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100' }}">
                         Rotasi PSCP
                     </a>
                     <a href="{{ route('logbookRotasi.index', ['type' => 'hbscp']) }}"
-                        class="px-4 py-2 text-sm font-medium rounded-t-lg transition-colors duration-200
+                        class="flex-shrink-0 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-t-lg transition-colors duration-200 whitespace-nowrap
                               {{ $typeForm === 'hbscp' ? 'bg-teal-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100' }}">
                         Rotasi HBSCP
                     </a>
@@ -84,19 +85,19 @@
     <div x-show="openLogbook" x-transition
         class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
         <div @click.away="openLogbook = false" x-data="{ selectedRotasi: '', selectedTempatJaga: '' }"
-            class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
-            <div class="bg-gradient-to-r from-blue-500 to-teal-600 text-white p-6 rounded-t-2xl">
-                <h2 class="text-2xl font-bold">Tambah Entry Logbook Rotasi</h2>
-                <p class="text-blue-100">Tambahkan catatan rotasi harian Anda.</p>
+            class="bg-white w-full max-w-md rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="bg-gradient-to-r from-blue-500 to-teal-600 text-white p-4 sm:p-6 rounded-t-2xl sticky top-0 z-10">
+                <h2 class="text-xl sm:text-2xl font-bold">Tambah Entry Logbook Rotasi</h2>
+                <p class="text-blue-100 text-sm sm:text-base">Tambahkan catatan rotasi harian Anda.</p>
             </div>
 
-            <form action="{{ route('logbookRotasi.store') }}" method="POST" class="p-6 space-y-4">
+            <form action="{{ route('logbookRotasi.store') }}" method="POST" class="p-4 sm:p-6 space-y-4">
                 @csrf
                 {{-- Input Tanggal --}}
                 <div>
                     <label for="date" class="block text-sm font-semibold text-gray-700 mb-2">Tanggal</label>
                     <input type="date" id="date" name="date" required
-                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200"
+                        class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 text-sm sm:text-base"
                         readonly>
                     @error('date') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                 </div>
@@ -105,7 +106,7 @@
                 <div>
                     <label for="type" class="block text-sm font-semibold text-gray-700 mb-2">Area Rotasi</label>
                     <select id="type" name="type" required x-model="selectedRotasi" @change="selectedTempatJaga = ''"
-                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
+                        class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 text-sm sm:text-base">
                         <option value="">Pilih Rotasi</option>
                         <option value="PSCP">PSCP</option>
                         <option value="HBSCP">HBSCP</option>
@@ -119,8 +120,8 @@
 
                     {{-- Opsi untuk PSCP --}}
                     <select name="tempat_jaga" x-show="selectedRotasi === 'PSCP'" x-model="selectedTempatJaga"
-                        :disabled="selectedRotasi !== 'PSCP'" {{-- <<< TAMBAHKAN INI --}}
-                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none">
+                        :disabled="selectedRotasi !== 'PSCP'"
+                        class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none text-sm sm:text-base">
                         <option value="">Pilih Tempat Jaga PSCP</option>
                         @foreach($pscpOptions as $value => $label)
                         <option value="{{ $value }}">{{ $label }}</option>
@@ -129,8 +130,8 @@
 
                     {{-- Opsi untuk HBSCP --}}
                     <select name="tempat_jaga" x-show="selectedRotasi === 'HBSCP'" x-model="selectedTempatJaga"
-                        :disabled="selectedRotasi !== 'HBSCP'" {{-- <<< TAMBAHKAN INI --}}
-                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none">
+                        :disabled="selectedRotasi !== 'HBSCP'"
+                        class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none text-sm sm:text-base">
                         <option value="">Pilih Tempat Jaga HBSCP</option>
                         @foreach($hbscpOptions as $value => $label)
                         <option value="{{ $value }}">{{ $label }}</option>
@@ -140,61 +141,55 @@
 
                 {{-- Input Jam & Input Tambahan --}}
                 <div class="space-y-4" x-show="selectedTempatJaga" x-transition>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label for="start_time" class="block text-sm font-semibold text-gray-700 mb-2">Jam
-                                Mulai</label>
+                            <label for="start_time" class="block text-sm font-semibold text-gray-700 mb-2">Jam Mulai</label>
                             <input type="time" name="start_time" required
-                                class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none">
+                                class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none text-sm sm:text-base">
                         </div>
                         <div>
-                            <label for="end_time" class="block text-sm font-semibold text-gray-700 mb-2">Jam
-                                Selesai</label>
+                            <label for="end_time" class="block text-sm font-semibold text-gray-700 mb-2">Jam Selesai</label>
                             <input type="time" name="end_time" required
-                                class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none">
+                                class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none text-sm sm:text-base">
                         </div>
                     </div>
 
                     {{-- Counter untuk HHMD --}}
                     <div x-show="selectedRotasi === 'PSCP' && selectedTempatJaga === 'hhmd_petugas'"
-                        class="grid grid-cols-2 gap-4 pt-2 border-t">
+                        class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t">
                         <div>
-                            <label for="hhmd_random" class="block text-sm font-semibold text-gray-700 mb-2">HHMD
-                                Random</label>
+                            <label for="hhmd_random" class="block text-sm font-semibold text-gray-700 mb-2">HHMD Random</label>
                             <input type="number" name="hhmd_random" value="0"
-                                class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none">
+                                class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none text-sm sm:text-base">
                         </div>
                         <div>
-                            <label for="hhmd_unpredictable" class="block text-sm font-semibold text-gray-700 mb-2">HHMD
-                                Unpredictable</label>
+                            <label for="hhmd_unpredictable" class="block text-sm font-semibold text-gray-700 mb-2">HHMD Unpredictable</label>
                             <input type="number" name="hhmd_unpredictable" value="0"
-                                class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none">
+                                class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none text-sm sm:text-base">
                         </div>
                     </div>
 
                     {{-- Counter untuk Manual Kabin --}}
                     <div x-show="selectedRotasi === 'PSCP' && selectedTempatJaga === 'manual_kabin_petugas'"
-                        class="grid grid-cols-2 gap-4 pt-2 border-t">
+                        class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t">
                         <div>
-                            <label for="cek_random_barang" class="block text-sm font-semibold text-gray-700 mb-2">Cek
-                                Random Barang</label>
+                            <label for="cek_random_barang" class="block text-sm font-semibold text-gray-700 mb-2">Cek Random Barang</label>
                             <input type="number" name="cek_random_barang" value="0"
-                                class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none">
+                                class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none text-sm sm:text-base">
                         </div>
                         <div>
-                            <label for="barang_unpredictable"
-                                class="block text-sm font-semibold text-gray-700 mb-2">Barang Unpredictable</label>
+                            <label for="barang_unpredictable" class="block text-sm font-semibold text-gray-700 mb-2">Barang Unpredictable</label>
                             <input type="number" name="barang_unpredictable" value="0"
-                                class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none">
+                                class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none text-sm sm:text-base">
                         </div>
                     </div>
                 </div>
 
-                <div class="flex justify-end space-x-3 pt-4">
+                <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-4 sticky bottom-0 bg-white">
                     <button type="button" @click="openLogbook = false"
-                        class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium">Batal</button>
+                        class="px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium text-sm sm:text-base">Batal</button>
                     <button type="submit"
-                        class="px-6 py-3 bg-gradient-to-r from-blue-500 to-teal-600 text-white rounded-xl hover:from-blue-600 hover:to-teal-700 transition-all duration-200 font-medium shadow-lg">Simpan</button>
+                        class="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-500 to-teal-600 text-white rounded-xl hover:from-blue-600 hover:to-teal-700 transition-all duration-200 font-medium shadow-lg text-sm sm:text-base">Simpan</button>
                 </div>
             </form>
         </div>
@@ -206,29 +201,28 @@
         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform scale-100"
         x-transition:leave-end="opacity-0 transform scale-95"
         class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
-        <div @click.away="openEditLogbook = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
-            <div class="bg-gradient-to-r from-blue-500 to-teal-600 text-white p-6 rounded-t-2xl">
-                <h2 class="text-2xl font-bold">Edit Entry Logbook</h2>
-                <p class="text-blue-100">Ubah informasi logbook</p>
+        <div @click.away="openEditLogbook = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="bg-gradient-to-r from-blue-500 to-teal-600 text-white p-4 sm:p-6 rounded-t-2xl sticky top-0 z-10">
+                <h2 class="text-xl sm:text-2xl font-bold">Edit Entry Logbook</h2>
+                <p class="text-blue-100 text-sm sm:text-base">Ubah informasi logbook</p>
             </div>
-            <form :action="'{{ url('/logbook/posjaga') }}/' + editLogbookData.logbookID" method="POST" class="p-6">
+            <form :action="'{{ url('/logbook/posjaga') }}/' + editLogbookData.logbookID" method="POST" class="p-4 sm:p-6">
                 @csrf
                 @method('PATCH')
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal</label>
                     <input type="date" name="date" required x-model="editLogbookData.date"
-                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
+                        class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 text-sm sm:text-base">
                     @error('date')
                     <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
                     @enderror
                 </div>
 
                 <div class="mb-6">
-                    <label for="edit_location_area_id" class="block text-sm font-semibold text-gray-700 mb-2">Area Pos
-                        Jaga</label>
+                    <label for="edit_location_area_id" class="block text-sm font-semibold text-gray-700 mb-2">Area Pos Jaga</label>
                     <select id="edit_location_area_id" name="location_area_id" required
                         x-model="editLogbookData.location_area_id"
-                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
+                        class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 text-sm sm:text-base">
                         <option value="">Pilih Lokasi</option>
                         @if(isset($locations))
                         @foreach($locations as $location)
@@ -246,7 +240,7 @@
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Grup</label>
                     <select name="grup" required x-model="editLogbookData.grup"
-                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
+                        class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 text-sm sm:text-base">
                         <option value="">Pilih Grup</option>
                         <option value="A">A</option>
                         <option value="B">B</option>
@@ -259,7 +253,7 @@
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Dinas / Shift</label>
                     <select name="shift" required x-model="editLogbookData.shift"
-                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
+                        class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 text-sm sm:text-base">
                         <option value="">Pilih Dinas/Shift</option>
                         <option value="Pagi">Pagi</option>
                         <option value="Malam">Malam</option>
@@ -268,13 +262,13 @@
                     <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="flex justify-end space-x-3">
+                <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
                     <button type="button" @click="openEditLogbook = false"
-                        class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium">
+                        class="px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium text-sm sm:text-base">
                         Batal
                     </button>
                     <button type="submit"
-                        class="px-6 py-3 bg-gradient-to-r from-blue-500 to-teal-600 text-white rounded-xl hover:from-blue-600 hover:to-teal-700 transition-all duration-200 font-medium shadow-lg">
+                        class="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-500 to-teal-600 text-white rounded-xl hover:from-blue-600 hover:to-teal-700 transition-all duration-200 font-medium shadow-lg text-sm sm:text-base">
                         Update
                     </button>
                 </div>
@@ -285,13 +279,13 @@
     <div x-show="openFinishDialog" x-transition
         x-on:transitionend="if(openFinishDialog){ initializeSignaturePad(); }"
         class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
-        <div @click.away="openFinishDialog = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
-            <div class="bg-gradient-to-r from-blue-500 to-teal-600 text-white p-6 rounded-t-2xl">
-                <h2 class="text-2xl font-bold">Konfirmasi Penyelesaian Shift</h2>
-                <p class="text-blue-100">Lengkapi data untuk menyelesaikan logbook.</p>
+        <div @click.away="openFinishDialog = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="bg-gradient-to-r from-blue-500 to-teal-600 text-white p-4 sm:p-6 rounded-t-2xl sticky top-0 z-10">
+                <h2 class="text-xl sm:text-2xl font-bold">Konfirmasi Penyelesaian Shift</h2>
+                <p class="text-blue-100 text-sm sm:text-base">Lengkapi data untuk menyelesaikan logbook.</p>
             </div>
 
-            <form action="{{ route('logbookRotasi.submit', $logbook->id) }}" method="POST" class="p-6"
+            <form action="{{ route('logbookRotasi.submit', $logbook->id) }}" method="POST" class="p-4 sm:p-6"
                 onsubmit="return handleSignatureSubmit(event)">
                 @csrf
                 @method('PUT')
@@ -299,7 +293,7 @@
                     {{-- Tanda Tangan --}}
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Tanda Tangan Digital Anda</label>
-                        <div class="relative w-full h-40 border-2 border-gray-200 rounded-lg bg-white">
+                        <div class="relative w-full h-32 sm:h-40 border-2 border-gray-200 rounded-lg bg-white">
                             <canvas id="signature-canvas" class="w-full h-full"></canvas>
                         </div>
                         <input type="hidden" name="signature" id="signature-data" value="">
@@ -312,10 +306,9 @@
 
                     {{-- Pilih Supervisor --}}
                     <div>
-                        <label for="approvedID" class="block text-sm font-semibold text-gray-700 mb-2">Diketahui Oleh
-                            (Supervisor)</label>
+                        <label for="approvedID" class="block text-sm font-semibold text-gray-700 mb-2">Diketahui Oleh (Supervisor)</label>
                         <select name="approvedID" id="approvedID"
-                            class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none"
+                            class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none text-sm sm:text-base"
                             required>
                             <option value="">Pilih Supervisor</option>
                             @foreach($supervisors as $supervisor)
@@ -325,12 +318,11 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end space-x-3 pt-6 mt-4 border-t">
+                <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-6 mt-4 border-t sticky bottom-0 bg-white">
                     <button type="button" @click="openFinishDialog = false"
-                        class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 font-medium">Batal</button>
+                        class="px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 font-medium text-sm sm:text-base">Batal</button>
                     <button type="submit"
-                        class="px-6 py-3 bg-gradient-to-r from-blue-500 to-teal-600 text-white rounded-xl hover:from-blue-600 hover:to-teal-700 font-medium shadow-lg">Konfirmasi
-                        & Kirim</button>
+                        class="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-500 to-teal-600 text-white rounded-xl hover:from-blue-600 hover:to-teal-700 font-medium shadow-lg text-sm sm:text-base">Konfirmasi & Kirim</button>
                 </div>
             </form>
         </div>
@@ -338,39 +330,94 @@
     @endif
 </div>
 
-{{-- Custom Scrollbar Styles --}}
+{{-- Enhanced Responsive Styles --}}
 <style>
+    /* Base responsive improvements */
+    @media (max-width: 640px) {
+        .min-h-screen {
+            min-height: 100vh;
+        }
+        
+        /* Ensure full width on mobile */
+        .mx-auto {
+            margin-left: 0;
+            margin-right: 0;
+        }
+        
+        /* Remove border radius on mobile for full screen effect */
+        .rounded-none {
+            border-radius: 0;
+        }
+    }
+
+    /* Scrollbar improvements */
     .scrollbar-thin {
         scrollbar-width: thin;
-    }
-
-    .scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
-        background-color: #d1d5db;
-    }
-
-    .scrollbar-track-gray-100::-webkit-scrollbar-track {
-        background-color: #f3f4f6;
+        scrollbar-color: #d1d5db #f3f4f6;
     }
 
     .scrollbar-thin::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
+        width: 4px;
+        height: 4px;
     }
 
     .scrollbar-thin::-webkit-scrollbar-thumb {
         background-color: #d1d5db;
-        border-radius: 3px;
+        border-radius: 2px;
     }
 
     .scrollbar-thin::-webkit-scrollbar-track {
         background-color: #f3f4f6;
     }
+
+    /* Modal improvements for mobile */
+    @media (max-width: 640px) {
+        .fixed.inset-0 > div {
+            margin: 1rem;
+            max-height: calc(100vh - 2rem);
+        }
+        
+        /* Sticky headers and footers in modals */
+        .sticky {
+            position: sticky;
+            z-index: 20;
+        }
+        
+        /* Better touch targets */
+        button {
+            min-height: 44px;
+        }
+        
+        input, select {
+            min-height: 44px;
+        }
+    }
+
+    /* Enhanced table responsiveness */
+    .overflow-x-auto {
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    /* Animation improvements */
+    .transition-all {
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 200ms;
+    }
+
+    /* Focus improvements */
+    .focus\:border-blue-500:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
 </style>
 
 <script>
-    // Bagian 1: Logika yang berjalan setelah halaman siap (DOM)
+    // Enhanced responsive JavaScript
     document.addEventListener('DOMContentLoaded', function() {
-        // Setel tanggal saat ini untuk input tanggal di modal "Tambah Data"
+        // Set current date for date input
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -381,13 +428,13 @@
             dateInput.value = formattedDate;
         }
 
-        // Validasi form "Tambah Data"
+        // Form validation
         const routeLogbookStore = "{{ route('logbook.store') }}";
         const form = document.querySelector(`form[action="${routeLogbookStore}"]`);
         if (form) {
             form.addEventListener('submit', function(e) {
-                const grup = form.querySelector('#grup').value;
-                const shift = form.querySelector('#shift').value;
+                const grup = form.querySelector('#grup')?.value;
+                const shift = form.querySelector('#shift')?.value;
 
                 if (!grup || !shift) {
                     e.preventDefault();
@@ -397,7 +444,7 @@
             });
         }
 
-        // Reset form "Tambah Data" saat modal ditutup
+        // Reset form when modal is closed
         const resetForm = () => {
             if (form) {
                 form.reset();
@@ -407,44 +454,58 @@
             }
         };
 
-        // Tambahkan event listener untuk tombol tutup modal "Tambah Data"
+        // Add event listeners for modal close buttons
         const closeButtons = document.querySelectorAll('[x-on\\:click="openLogbook = false"]');
         closeButtons.forEach(button => {
             button.addEventListener('click', resetForm);
         });
+
+        // Enhanced mobile viewport handling
+        const setViewportHeight = () => {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        };
+
+        window.addEventListener('resize', setViewportHeight);
+        window.addEventListener('orientationchange', setViewportHeight);
+        setViewportHeight();
     });
 
-    // Bagian 2: Logika untuk Signature Pad & Modal Konfirmasi
+    // Signature Pad Logic (Enhanced for mobile)
     let signaturePadInstance;
 
     function initializeSignaturePad() {
         const canvas = document.getElementById('signature-canvas');
         if (!canvas) {
-            console.error("Elemen canvas tidak ditemukan!");
+            console.error("Canvas element not found!");
             return;
         }
 
-        // --- PERUBAHAN UTAMA ---
-        // Cek jika canvas sudah siap (memiliki dimensi). Jika tidak, tunggu dan coba lagi.
+        // Wait for canvas to be ready
         if (canvas.offsetWidth === 0) {
-            setTimeout(initializeSignaturePad, 100); // Coba lagi setelah 100ms
+            setTimeout(initializeSignaturePad, 100);
             return;
         }
 
-        // Hindari membuat instance baru jika sudah ada. Cukup bersihkan.
+        // Clear existing instance if any
         if (signaturePadInstance) {
             signaturePadInstance.clear();
             return;
         }
 
-        // Inisialisasi hanya jika belum ada instance
+        // Initialize signature pad
         const ratio = Math.max(window.devicePixelRatio || 1, 1);
         canvas.width = canvas.offsetWidth * ratio;
         canvas.height = canvas.offsetHeight * ratio;
         canvas.getContext("2d").scale(ratio, ratio);
 
         signaturePadInstance = new SignaturePad(canvas, {
-            backgroundColor: 'rgb(255, 255, 255)' // Latar belakang putih
+            backgroundColor: 'rgb(255, 255, 255)',
+            penColor: 'rgb(0, 0, 0)',
+            minWidth: 1,
+            maxWidth: 3,
+            throttle: 16,
+            minDistance: 5
         });
 
         const statusEl = document.getElementById('signature-status');
@@ -454,14 +515,14 @@
                 statusEl.className = 'text-xs text-green-600';
             }
         });
+
+        // Enhanced touch handling for mobile
+        canvas.style.touchAction = 'none';
     }
 
     function clearSignature() {
-        // Cukup panggil inisialisasi. Fungsi ini sudah cerdas untuk menangani
-        // apakah perlu membuat instance baru atau hanya membersihkan yang sudah ada.
         initializeSignaturePad();
 
-        // Atur ulang status teks setelah dibersihkan
         if(signaturePadInstance){
             const statusEl = document.getElementById('signature-status');
             if (statusEl) {
@@ -481,7 +542,6 @@
             return false;
         }
 
-        // Pastikan signature pad sudah diinisialisasi sebelum cek isEmpty
         if (!signaturePadInstance || signaturePadInstance.isEmpty()) {
             alert('Mohon berikan tanda tangan Anda.');
             event.preventDefault();
@@ -492,11 +552,10 @@
         return confirm('Apakah Anda yakin ingin menyelesaikan logbook ini?');
     }
 
-    // Listener Alpine.js (tidak berubah, tetapi sekarang memanggil fungsi yang lebih andal)
+    // Alpine.js integration
     document.addEventListener('alpine:init', () => {
         Alpine.watch('openFinishDialog', (value) => {
             if (value) {
-                // tunggu animasi modal selesai, lalu inisialisasi
                 setTimeout(initializeSignaturePad, 50);
             }
         });
