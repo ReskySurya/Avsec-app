@@ -2,7 +2,7 @@
 
 @section('title', 'Logbook Sweeping Prohibited Items')
 @section('content')
-<div class="container mx-auto p-3 sm:p-4 lg:p-6 max-w-full overflow-x-auto lg:mt-16">
+<div class="container mx-auto p-3 sm:p-4 lg:p-6 max-w-full overflow-x-auto">
     <!-- Header -->
     <a href="{{ route('sweepingPI.index') }}" class="inline-flex items-center px-3 sm:px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs sm:text-sm font-semibold rounded-lg shadow transition mb-4 sm:mb-6">
         <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -40,6 +40,47 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="bg-white rounded-xl sm:rounded-2xl shadow-lg mb-4 sm:mb-6 border border-gray-100 overflow-hidden">
+        <details class="group" {{ (isset($filterBulan) && !empty($filterBulan)) || (isset($filterTahun) && !empty($filterTahun)) ? 'open' : '' }}>
+            <summary class="flex items-center justify-between p-4 sm:p-6 cursor-pointer list-none">
+                <span class="text-base font-medium text-gray-800">Filter Options</span>
+                <svg class="w-5 h-5 text-gray-500 transform transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </summary>
+            <div class="p-4 sm:p-6 border-t border-gray-200">
+                <form action="{{ route('sweepingPI.manage.index', ['tenantID' => $tenantID]) }}" method="GET">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4 items-end">
+                        <div class="sm:col-span-1">
+                            <label for="filter_bulan" class="block text-sm font-medium text-gray-700">Filter Bulan</label>
+                            <select name="filter_bulan" id="filter_bulan" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                <option value="">Semua Bulan</option>
+                                @for ($i = 1; $i <= 12; $i++)
+                                    <option value="{{ $i }}" {{ (isset($filterBulan) && $filterBulan == $i) ? 'selected' : '' }}>
+                                    {{ \Carbon\Carbon::create()->month($i)->format('F') }}
+                                    </option>
+                                    @endfor
+                            </select>
+                        </div>
+                        <div class="sm:col-span-1">
+                            <label for="filter_tahun" class="block text-sm font-medium text-gray-700">Filter Tahun</label>
+                            <input type="number" name="filter_tahun" id="filter_tahun" min="2020" max="{{ date('Y') + 5 }}"
+                                value="{{ $filterTahun ?? '' }}" placeholder="Contoh: {{ date('Y') }}"
+                                class="mt-1 block w-full pl-3 pr-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                        </div>
+                        <div class="sm:col-span-1 flex space-x-2">
+                            <button type="submit" class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                Filter
+                            </button>
+                            <a href="{{ route('sweepingPI.manage.index', ['tenantID' => $tenantID]) }}" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                Reset
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </details>
     </div>
 
     <!-- Alert Messages -->

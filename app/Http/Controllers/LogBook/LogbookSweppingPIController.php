@@ -48,17 +48,14 @@ class LogbookSweppingPIController extends Controller
         $filterBulan = $request->input('filter_bulan');
         $filterTahun = $request->input('filter_tahun');
 
-        $sweepingQuery = LogbookSweepingPI::where('tenantID', $tenantID);
-
-        if ($filterBulan) {
-            $sweepingQuery->where('bulan', $filterBulan);
-        }
-
-        if ($filterTahun) {
-            $sweepingQuery->where('tahun', $filterTahun);
-        }
-
-        $sweepingPI = $sweepingQuery->orderBy('tahun', 'desc')
+        $sweepingPI = LogbookSweepingPI::where('tenantID', $tenantID)
+            ->when($filterBulan, function ($query, $bulan) {
+                return $query->where('bulan', $bulan);
+            })
+            ->when($filterTahun, function ($query, $tahun) {
+                return $query->where('tahun', $tahun);
+            })
+            ->orderBy('tahun', 'desc')
             ->orderBy('bulan', 'desc')
             ->get();
 
