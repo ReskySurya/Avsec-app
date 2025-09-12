@@ -3,7 +3,12 @@
 @section('title', 'Superadmin Dashboard')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:mt-20">
+<div x-data="{
+    isModalOpen: false,
+    modalTitle: '',
+    modalData: {},
+    modalBreakdownTitle: 'Lokasi'
+}" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:mt-20">
     <!-- Header -->
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900">
@@ -14,191 +19,50 @@
         </p>
     </div>
 
-    <!-- Other stats can go here -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div class="bg-white p-6 rounded-lg shadow-lg">
-            <h3 class="text-lg font-semibold text-gray-800 mb-2">Informasi Pengguna</h3>
-            <ul class="text-gray-600 space-y-1">
-                <li><strong>Nama:</strong> {{ Auth::user()->name }}</li>
-                <li><strong>NIP:</strong> {{ Auth::user()->nip ?? '-' }}</li>
-                <li><strong>Email:</strong> {{ Auth::user()->email }}</li>
-                <li><strong>Role:</strong> {{ Auth::user()->role->name }}</li>
-            </ul>
-        </div>
-        <div class="bg-white p-6 rounded-lg shadow-lg">
-            <h3 class="text-lg font-semibold text-gray-800 mb-2">Menu Cepat</h3>
-            <div class="flex flex-wrap gap-2">
-                <a href="{{ route('users-management.index') }}" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 text-sm font-medium">Manajemen Pengguna</a>
-                <a href="{{ route('equipment-locations.index') }}" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 text-sm font-medium">Manajemen Equipment</a>
-                <a href="{{ route('tenant-management.index') }}" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 text-sm font-medium">Manajemen Tenant</a>
+    @include('superadmin.partials.user-info')
+
+    @include('superadmin.partials.dailytest-stats')
+    @include('superadmin.partials.logbook-stats')
+    @include('superadmin.partials.checklist-stats')
+
+    <!-- Modal -->
+    <div x-show="isModalOpen" x-transition class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
+        <div @click.away="isModalOpen = false" class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl">
+            <div class="bg-gradient-to-r from-blue-500 to-cyan-600 text-white p-6 rounded-t-2xl">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold" x-text="`Detail untuk ${modalTitle}`"></h2>
+                    <button @click="isModalOpen = false" class="text-blue-100 hover:text-white text-3xl leading-none">&times;</button>
+                </div>
+                <p class="text-blue-100">Rincian jumlah form per <span x-text="modalBreakdownTitle.toLowerCase()"></span> untuk hari ini.</p>
+            </div>
+            <div class="p-6 max-h-[60vh] overflow-y-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" x-text="modalBreakdownTitle"></th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Form Disetujui</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Form</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <template x-for="(data, key) in modalData" :key="key">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" x-text="key"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" x-text="data.approved"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" x-text="data.total"></td>
+                            </tr>
+                        </template>
+                        <template x-if="Object.keys(modalData).length === 0">
+                            <tr>
+                                <td colspan="3" class="text-center py-8 text-gray-500">Tidak ada data rincian untuk ditampilkan.</td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-
-    <!-- Daily Test Statistics -->
-    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-        <h2 class="text-xl font-bold text-gray-800 mb-1">Persentase Penyelesaian Daily Test</h2>
-        <p class="text-sm text-gray-500 mb-4 border-b pb-2">Statistik untuk hari ini, {{ now()->translatedFormat('l, d F Y') }}</p>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
-            @if(isset($dailyTestStats))
-            @foreach($dailyTestStats as $type => $stats)
-            <div class="bg-gray-50 p-5 rounded-xl shadow-inner border border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-700">{{ $type }}</h3>
-                <p class="text-gray-500 text-sm mt-1">
-                    {{ $stats['approved'] }} dari {{ $stats['total'] }} form telah disetujui.
-                </p>
-                <div class="relative pt-1 mt-4">
-                    <div class="gauge-container">
-                        <div class="gauge">
-                            <div class="gauge-background">
-                                <div class="gauge-fill" style="--percentage: {{ ($stats['percentage'] / 100) * 360 }}deg;"></div>
-                            </div>
-                            <div class="gauge-center">
-                                <div class="gauge-percentage">{{ $stats['percentage'] }}</div>
-                                <div class="gauge-label">PERCENT</div>
-                            </div>
-                            <div class="gauge-scale">
-                                <span>0</span>
-                                <span>100</span>
-                            </div>
-                        </div>
-                    </div>
-                    <p class="text-right text-sm font-semibold text-blue-700 mt-1">{{ $stats['percentage'] }}%</p>
-                </div>
-            </div>
-            @endforeach
-            @else
-            <p class="text-gray-500 col-span-4">Data statistik Daily Test tidak tersedia.</p>
-            @endif
-        </div>
-    </div>
-
-    <!-- Logbook Statistics -->
-    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-        <h2 class="text-xl font-bold text-gray-800 mb-1">Persentase Penyelesaian Logbook</h2>
-        <p class="text-sm text-gray-500 mb-4 border-b pb-2">Statistik untuk hari ini, {{ now()->translatedFormat('l, d F Y') }}</p>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
-            @if(isset($logbookStats))
-            @foreach($logbookStats as $type => $stats)
-            <div class="bg-gray-50 p-5 rounded-xl shadow-inner border border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-700">{{ $type }}</h3>
-                <p class="text-gray-500 text-sm mt-1">
-                    {{ $stats['approved'] }} dari {{ $stats['total'] }} logbook telah disetujui.
-                </p>
-                <div class="relative pt-1 mt-4">
-                    <div class="gauge-container">
-                        <div class="gauge">
-                            <div class="gauge-background">
-                                <div class="gauge-fill" style="--percentage: {{ ($stats['percentage'] / 100) * 360 }}deg;"></div>
-                            </div>
-                            <div class="gauge-center">
-                                <div class="gauge-percentage">{{ $stats['percentage'] }}</div>
-                                <div class="gauge-label">PERCENT</div>
-                            </div>
-                            <div class="gauge-scale">
-                                <span>0</span>
-                                <span>100</span>
-                            </div>
-                        </div>
-                    </div>
-                    <p class="text-right text-sm font-semibold text-green-700 mt-1">{{ $stats['percentage'] }}%</p>
-                </div>
-            </div>
-            @endforeach
-            <div class="bg-gray-50 p-5 rounded-xl shadow-inner border border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-700">Sweeping PI</h3>
-                <p class="text-gray-500 text-sm mt-1">
-                    Logika penyelesaian untuk logbook ini belum dapat ditentukan.
-                </p>
-                <div class="relative pt-1 mt-4">
-                    <div class="gauge-container">
-                        <div class="gauge">
-                            <div class="gauge-background">
-                                <div class="gauge-fill" style="--percentage: {{ ($stats['percentage'] / 100) * 360 }}deg;"></div>
-                            </div>
-                            <div class="gauge-center">
-                                <div class="gauge-percentage">{{ $stats['percentage'] }}</div>
-                                <div class="gauge-label">PERCENT</div>
-                            </div>
-                            <div class="gauge-scale">
-                                <span>0</span>
-                                <span>100</span>
-                            </div>
-                        </div>
-                    </div>
-                    <p class="text-right text-sm font-semibold text-gray-700 mt-1">N/A</p>
-                </div>
-            </div>
-            @else
-            <p class="text-gray-500 col-span-4">Data statistik logbook tidak tersedia.</p>
-            @endif
-        </div>
-    </div>
-
-    <!-- Checklist Statistics -->
-    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-        <h2 class="text-xl font-bold text-gray-800 mb-1">Persentase Penyelesaian Checklist</h2>
-        <p class="text-sm text-gray-500 mb-4 border-b pb-2">Statistik untuk hari ini, {{ now()->translatedFormat('l, d F Y') }}</p>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 pt-4">
-            @if(isset($checklistStats))
-            @foreach($checklistStats as $type => $stats)
-            <div class="bg-gray-50 p-5 rounded-xl shadow-inner border border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-700">{{ $type }}</h3>
-                <p class="text-gray-500 text-sm mt-1">
-                    {{ $stats['approved'] }} dari {{ $stats['total'] }} checklist telah disetujui.
-                </p>
-                <div class="relative pt-1 mt-4">
-                    <div class="gauge-container">
-                        <div class="gauge">
-                            <div class="gauge-background">
-                                <div class="gauge-fill" style="--percentage: {{ ($stats['percentage'] / 100) * 360 }}deg;"></div>
-                            </div>
-                            <div class="gauge-center">
-                                <div class="gauge-percentage">{{ $stats['percentage'] }}</div>
-                                <div class="gauge-label">PERCENT</div>
-                            </div>
-                            <div class="gauge-scale">
-                                <span>0</span>
-                                <span>100</span>
-                            </div>
-                        </div>
-                    </div>
-                    <p class="text-right text-sm font-semibold text-purple-700 mt-1">{{ $stats['percentage'] }}%</p>
-                </div>
-            </div>
-            @endforeach
-            <div class="bg-gray-50 p-5 rounded-xl shadow-inner border border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-700">Senjata Api</h3>
-                <p class="text-gray-500 text-sm mt-1">
-                    Logika penyelesaian untuk checklist ini belum dapat ditentukan.
-                </p>
-                <div class="relative pt-1 mt-4">
-                    <div class="gauge-container">
-                        <div class="gauge">
-                            <div class="gauge-background">
-                                <div class="gauge-fill" style="--percentage: {{ ($stats['percentage'] / 100) * 360 }}deg;"></div>
-                            </div>
-                            <div class="gauge-center">
-                                <div class="gauge-percentage">{{ $stats['percentage'] }}</div>
-                                <div class="gauge-label">PERCENT</div>
-                            </div>
-                            <div class="gauge-scale">
-                                <span>0</span>
-                                <span>100</span>
-                            </div>
-                        </div>
-                    </div>
-                    <p class="text-right text-sm font-semibold text-gray-700 mt-1">N/A</p>
-                </div>
-            </div>
-            @else
-            <p class="text-gray-500 col-span-5">Data statistik checklist tidak tersedia.</p>
-            @endif
-        </div>
-    </div>
-
 </div>
-
 <style>
     .gauge-container {
         display: inline-block;
