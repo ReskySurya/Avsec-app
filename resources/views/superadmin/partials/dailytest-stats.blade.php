@@ -15,7 +15,7 @@
                 <div class="gauge-container">
                     <div class="gauge">
                         <div class="gauge-background">
-                            <div class="gauge-fill" style="--percentage: {{ ($stats['percentage'] / 100) * 180 }}deg;"></div>
+                            <div class="gauge-fill" style="--percentage: {{ ($stats['percentage'] / 100) * 360 }}deg;"></div>
                         </div>
                         <div class="gauge-center">
                             <div class="gauge-percentage">{{ $stats['percentage'] }}</div>
