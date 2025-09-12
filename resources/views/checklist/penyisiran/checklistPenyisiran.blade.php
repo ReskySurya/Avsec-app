@@ -379,6 +379,22 @@
     </div>
 </div>
 
+@if(session('duplicate_error'))
+<script>
+    // Menunggu halaman selesai dimuat sebelum menjalankan script
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+            icon: 'error',
+            title: 'Data Duplikat!',
+            // Ambil pesan error yang kita kirim dari controller
+            text: "{{ session('duplicate_error') }}",
+            confirmButtonText: 'Mengerti',
+            confirmButtonColor: '#DC2626', // Warna merah
+        });
+    });
+</script>
+@endif
+
 {{-- Signature Pad Library --}}
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
 

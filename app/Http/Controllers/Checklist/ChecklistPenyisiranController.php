@@ -55,6 +55,23 @@ class ChecklistPenyisiranController extends Controller
 
     public function storeChecklistPenyisiran(Request $request)
     {
+
+        $existingChecklist = ChecklistPenyisiran::where('date', $request->date)->first();
+
+        if ($existingChecklist) {
+            // Format tanggal agar mudah dibaca
+            $formattedDate = Carbon::parse($existingChecklist->date)->isoFormat('D MMMM YYYY');
+
+            // Buat pesan error sesuai permintaan
+            $errorMessage = "Data untuk tanggal {$formattedDate} sudah diisi oleh Grup {$existingChecklist->grup}.";
+
+            // Kembalikan ke halaman form dengan pesan error khusus untuk SweetAlert
+            return redirect()
+                ->back()
+                ->with('duplicate_error', $errorMessage)
+                ->withInput(); // withInput() agar data yang sudah diisi tidak hilang
+        }
+
         Log::info('Request data:', $request->all());
 
         // 1. Validasi input dengan field names yang sesuai
@@ -217,7 +234,7 @@ class ChecklistPenyisiranController extends Controller
         ])
             ->find($id);
 
-        // Cek apakah data ditemukan                                                                       
+        // Cek apakah data ditemukan
         if (!$checklist) {
             return redirect()->back()->with('error', 'Checklist Penyisiran tidak ditemukan.');
         }

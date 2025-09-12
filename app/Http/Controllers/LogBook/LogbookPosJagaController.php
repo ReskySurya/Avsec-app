@@ -13,8 +13,9 @@ use App\Models\LogbookStaff;
 use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use Illuminate\Support\Carbon;
 
-\Carbon\Carbon::setLocale('id');
+Carbon::setLocale('id');
 
 use Illuminate\Support\Facades\Log;
 
@@ -58,6 +59,30 @@ class LogbookPosJagaController extends Controller
 
     public function store(Request $request)
     {
+
+        $existingLogbook = Logbook::where('date', $request->date)
+            ->where('location_area_id', $request->location_area_id)
+            ->where('shift', $request->shift)
+            ->first();
+
+        if ($existingLogbook) {
+            // Ambil nama lokasi untuk pesan error yang lebih informatif
+            $location = Location::find($existingLogbook->location_area_id);
+            $locationName = $location ? $location->name : 'area yang dipilih';
+
+            // Format tanggal agar mudah dibaca
+            $formattedDate = Carbon::parse($existingLogbook->date)->isoFormat('D MMMM YYYY');
+
+            // Buat pesan error sesuai permintaan
+            $errorMessage = "Logbook untuk {$locationName} pada tanggal {$formattedDate} shift {$existingLogbook->shift} sudah ada.";
+
+            // Kembalikan ke halaman form dengan pesan error khusus untuk SweetAlert
+            return redirect()
+                ->back()
+                ->with('duplicate_error', $errorMessage)
+                ->withInput(); // withInput() agar data yang sudah diisi tidak hilang
+        }
+
         $request->validate([
             'date' => 'required|date',
             'location_area_id' => 'required|exists:locations,id',
