@@ -1,19 +1,21 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>@yield('title', 'AVSEC App')</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    <!-- Vite -->
+    @vite(['resources/css/app.css', 'resources/css/pdf.css', 'resources/js/app.js'])
+
+    <!-- External Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.5.3/signature_pad.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @stack('styles')
-
 </head>
 <body class="bg-gray-100">
     @auth
@@ -101,7 +103,6 @@
         });
     </script>
 
-    {{-- DITAMBAHKAN: Tempat untuk menampung script dari halaman lain --}}
     @stack('scripts')
 </body>
 </html>

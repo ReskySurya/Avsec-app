@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Checklist;
 
 use App\Http\Controllers\Controller;
 use App\Models\ChecklistItem;
-use App\Models\ChecklistItemKendaraan;
 use App\Models\ChecklistKendaraan;
 use App\Models\ChecklistKendaraanDetail;
 use App\Models\User;
@@ -21,13 +20,13 @@ class ChecklistKendaraanController extends Controller
 {
     public function indexChecklistKendaraan()
     {
-        // 1. Ambil semua item dari database (Pastikan nama model benar: ChecklistItem)
+        // Ambil semua item dari database
         $items = ChecklistItem::orderBy('category')->orderBy('id')->get();
 
-        // 2. Kelompokkan item berdasarkan tipe kendaraan (mobil/motor)
+        // Kelompokkan item berdasarkan tipe kendaraan
         $groupedItems = $items->groupBy('type');
 
-        // 3. Format data untuk checklist mobil sesuai struktur yang diharapkan view
+        // Format data untuk checklist mobil
         $mobilItems = $groupedItems->get('mobil', collect());
         $mobilChecklist = $mobilItems->groupBy('category')
             ->map(function ($items, $categoryName) {
@@ -38,12 +37,12 @@ class ChecklistKendaraanController extends Controller
             })
             ->values()
             ->map(function ($category, $index) {
-                $category['letter'] = chr(65 + $index); // Menghasilkan A, B, C, ...
+                $category['letter'] = chr(65 + $index);
                 return $category;
             })
             ->all();
 
-        // 4. Format data untuk checklist motor
+        // Format data untuk checklist motor
         $motorItems = $groupedItems->get('motor', collect());
         $motorChecklist = $motorItems->groupBy('category')
             ->map(function ($items, $categoryName) {
@@ -55,74 +54,74 @@ class ChecklistKendaraanController extends Controller
             ->values()
             ->all();
 
-        // INI PERUBAHAN UTAMA: Buat instance baru, bukan mengambil data lama
+        // Buat instance baru
         $checklist = new ChecklistKendaraan();
 
         // Ambil data user untuk dropdown
         $officers = User::whereHas('role', fn($q) => $q->where('name', Role::OFFICER))
-            ->where('id', '!=', Auth::id()) // Pastikan tidak mengambil user yang sedang login
+            ->where('id', '!=', Auth::id())
             ->get();
 
         $supervisors = User::whereHas('role', fn($q) => $q->where('name', Role::SUPERVISOR))->get();
 
-        $existingChecklists = ChecklistKendaraan::where('date', '>=', Carbon::now()->subMonths(3))
-            ->get(['date', 'shift', 'type'])
-            ->map(function ($item) {
-                return [
-                    'date' => $item->date->format('Y-m-d'), // Format tanggal agar konsisten
-                    'shift' => $item->shift,
-                    'type' => $item->type,
-                ];
-            });
-
-        // 5. Kirim data yang sudah diformat ke view
-        return view('checklist.kendaraan.checklistKendaraan', compact('mobilChecklist', 'motorChecklist', 'checklist', 'officers', 'supervisors', 'existingChecklists'));
+        return view(
+            'checklist.kendaraan.checklistKendaraan',
+            compact('mobilChecklist', 'motorChecklist', 'checklist', 'officers', 'supervisors')
+        );
     }
 
     public function store(Request $request)
     {
-        // 1. Validasi yang disesuaikan dengan skema database
+        // Validasi dengan pesan error yang lebih jelas
         $validated = $request->validate([
             'date' => [
                 'required',
                 'date',
                 Rule::unique('checklist_kendaraan')->where(function ($query) use ($request) {
                     return $query->where('shift', $request->shift)
-                                ->where('type', $request->type);
+                        ->where('type', $request->type)
+                        ->whereDate('date', $request->date); // Pastikan perbandingan tanggal benar
                 }),
             ],
             'type' => 'required|in:mobil,motor',
             'shift' => 'required|in:pagi,malam',
             'items' => 'required|array',
             'items.*.is_ok' => 'required|boolean',
-            'items.*.notes' => 'nullable|string|max:1000', // Validasi tambahan untuk notes
+            'items.*.notes' => 'nullable|string|max:1000',
             'signature' => 'required|string',
             'receivedID' => 'required|exists:users,id',
             'approvedID' => 'required|exists:users,id',
-        ],
-        [
-            'date.unique' => "Formulir untuk shift {$request->shift} pada tanggal ini sudah ada.",
+        ], [
+            'date.unique' => "Formulir untuk shift {$request->shift} pada tanggal " .
+                Carbon::parse($request->date)->format('d-m-Y') .
+                " untuk kendaraan {$request->type} sudah ada.",
+            'date.required' => 'Tanggal wajib diisi.',
+            'type.required' => 'Jenis kendaraan wajib dipilih.',
+            'shift.required' => 'Shift wajib dipilih.',
+            'items.required' => 'Item checklist wajib diisi.',
+            'signature.required' => 'Tanda tangan wajib diisi.',
+            'receivedID.required' => 'Officer yang menerima wajib dipilih.',
+            'approvedID.required' => 'Supervisor yang mengetahui wajib dipilih.',
         ]);
 
         DB::beginTransaction();
         try {
-            // Hapus prefix dari data base64 signature (sudah benar)
+            // Proses signature
             $signature = $validated['signature'];
             if (str_starts_with($signature, 'data:image/')) {
                 $signature = substr($signature, strpos($signature, ',') + 1);
             }
 
-            // 2. Pembuatan ID dinamis sesuai format di migrasi
+            // Buat ID dinamis
             $prefix = $validated['type'] === 'mobil' ? 'CML' : 'CMT';
             $datePart = Carbon::parse($validated['date'])->format('ymd');
 
-            // Loop untuk memastikan ID unik (best practice)
             do {
                 $randomPart = strtoupper(Str::random(5));
                 $id = "{$prefix}-{$datePart}-{$randomPart}";
             } while (ChecklistKendaraan::find($id));
 
-            // 3. Buat record utama ChecklistKendaraan dengan data yang sudah diformat
+            // Buat record utama
             $checklist = ChecklistKendaraan::create([
                 'id' => $id,
                 'date' => Carbon::parse($validated['date'])->format('Y-m-d'),
@@ -135,7 +134,7 @@ class ChecklistKendaraanController extends Controller
                 'senderSignature' => $signature,
             ]);
 
-            // 5. Simpan detail item checklist (sudah benar)
+            // Simpan detail item checklist
             foreach ($validated['items'] as $itemId => $result) {
                 ChecklistKendaraanDetail::create([
                     'checklist_kendaraan_id' => $checklist->id,
@@ -146,10 +145,14 @@ class ChecklistKendaraanController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('checklist.kendaraan.index')->with('success', 'Checklist kendaraan berhasil disimpan.');
+            return redirect()->route('checklist.kendaraan.index')
+                ->with('success', 'Checklist kendaraan berhasil disimpan.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Gagal menyimpan checklist: ' . $e->getMessage())->withInput();
+            Log::error('Error saving checklist: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'Gagal menyimpan checklist: ' . $e->getMessage())
+                ->withInput();
         }
     }
 

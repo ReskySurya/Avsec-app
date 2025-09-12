@@ -13,7 +13,7 @@
 //         port: 5173, // atau port bebas lainnya
 //         strictPort: true,
 //         hmr: {
-//             host: '192.168.0.105', // <- Ganti dengan IP lokal kamu
+//             host: '192.168.1.8', // <- Ganti dengan IP lokal kamu
 //         },
 //     },
 // });
@@ -25,7 +25,7 @@ import laravel from 'laravel-vite-plugin';
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js'],
+            input: ['resources/css/app.css', 'resources/css/pdf.css', 'resources/js/app.js'],
             refresh: true,
         }),
     ],

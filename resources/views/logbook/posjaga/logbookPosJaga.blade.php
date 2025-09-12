@@ -386,6 +386,22 @@
     </div>
 </div>
 
+@if(session('duplicate_error'))
+<script>
+    // Menunggu halaman selesai dimuat sebelum menjalankan script
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+            icon: 'error',
+            title: 'Data Duplikat!',
+            // Ambil pesan error yang kita kirim dari controller
+            html: `{!! session('duplicate_error') !!}`,
+            confirmButtonText: 'Mengerti',
+            confirmButtonColor: '#DC2626', // Warna merah
+        });
+    });
+</script>
+@endif
+
 {{-- Custom Scrollbar Styles --}}
 <style>
     .scrollbar-thin {
