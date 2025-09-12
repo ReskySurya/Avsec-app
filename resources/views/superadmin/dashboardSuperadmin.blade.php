@@ -1,94 +1,139 @@
 @extends('layouts.app')
 
-@section('title', 'Admin Dashboard')
+@section('title', 'Superadmin Dashboard')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 py-6 lg:mt-20">
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <h1 class="text-3xl font-bold text-gray-900 mb-4">
-            SuperAdmin Dashboard
+<div x-data="{
+    isModalOpen: false,
+    modalTitle: '',
+    modalData: {},
+    modalBreakdownTitle: 'Lokasi'
+}" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:mt-20">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">
+            Superadmin Dashboard
         </h1>
-        <p class="text-gray-600 mb-6">
-            Selamat datang, {{ Auth::user()->name }}! Anda login sebagai Super Admin.
+        <p class="text-gray-600 mt-1">
+            Selamat datang, {{ Auth::user()->name }}!
         </p>
+    </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div class="bg-blue-50 p-4 rounded-lg">
-                <h3 class="text-lg font-semibold text-blue-800 mb-2">Informasi Pengguna</h3>
-                <ul class="text-blue-600">
-                    <li><strong>Nama:</strong> {{ Auth::user()->name }}</li>
-                    <li><strong>NIP:</strong> {{ Auth::user()->nip }}</li>
-                    <li><strong>Email:</strong> {{ Auth::user()->email }}</li>
-                    <li><strong>Role:</strong> {{ Auth::user()->role->name }}</li>
-                    @if(Auth::user()->lisensi)
-                        <li><strong>Lisensi:</strong> {{ Auth::user()->lisensi }}</li>
-                    @endif
-                </ul>
+    @include('superadmin.partials.user-info')
+
+    @include('superadmin.partials.dailytest-stats')
+    @include('superadmin.partials.logbook-stats')
+    @include('superadmin.partials.checklist-stats')
+
+    <!-- Modal -->
+    <div x-show="isModalOpen" x-transition class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
+        <div @click.away="isModalOpen = false" class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl">
+            <div class="bg-gradient-to-r from-blue-500 to-cyan-600 text-white p-6 rounded-t-2xl">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold" x-text="`Detail untuk ${modalTitle}`"></h2>
+                    <button @click="isModalOpen = false" class="text-blue-100 hover:text-white text-3xl leading-none">&times;</button>
+                </div>
+                <p class="text-blue-100">Rincian jumlah form per <span x-text="modalBreakdownTitle.toLowerCase()"></span> untuk hari ini.</p>
             </div>
-
-            <div class="bg-purple-50 p-4 rounded-lg">
-                <h3 class="text-lg font-semibold text-purple-800 mb-2">Statistik</h3>
-                <ul class="text-purple-600">
-                    <li><strong>Total Pengguna:</strong> 10</li>
-                    <li><strong>Total Laporan:</strong> 25</li>
-                    <li><strong>Laporan Pending:</strong> 5</li>
-                    <li><strong>Laporan Selesai:</strong> 20</li>
-                </ul>
+            <div class="p-6 max-h-[60vh] overflow-y-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" x-text="modalBreakdownTitle"></th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Form Disetujui</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Form</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <template x-for="(data, key) in modalData" :key="key">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" x-text="key"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" x-text="data.approved"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" x-text="data.total"></td>
+                            </tr>
+                        </template>
+                        <template x-if="Object.keys(modalData).length === 0">
+                            <tr>
+                                <td colspan="3" class="text-center py-8 text-gray-500">Tidak ada data rincian untuk ditampilkan.</td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
             </div>
         </div>
-
-        <div class="bg-green-50 p-4 rounded-lg mb-6">
-            <h3 class="text-lg font-semibold text-green-800 mb-2">Menu Admin</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <a href="#" class="bg-white p-3 rounded shadow hover:shadow-md transition-shadow">
-                    <h4 class="font-semibold text-green-700">Manajemen Pengguna</h4>
-                    <p class="text-sm text-green-600">Tambah, edit, dan hapus pengguna</p>
-                </a>
-                <a href="#" class="bg-white p-3 rounded shadow hover:shadow-md transition-shadow">
-                    <h4 class="font-semibold text-green-700">Manajemen Role</h4>
-                    <p class="text-sm text-green-600">Atur role dan permission</p>
-                </a>
-                <a href="#" class="bg-white p-3 rounded shadow hover:shadow-md transition-shadow">
-                    <h4 class="font-semibold text-green-700">Konfigurasi Sistem</h4>
-                    <p class="text-sm text-green-600">Pengaturan aplikasi</p>
-                </a>
-            </div>
-        </div>
-
-        <!-- <div class="bg-yellow-50 p-4 rounded-lg">
-            <h3 class="text-lg font-semibold text-yellow-800 mb-2">Laporan Terbaru</h3>
-            <table class="min-w-full bg-white">
-                <thead>
-                    <tr>
-                        <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase">ID</th>
-                        <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase">Judul</th>
-                        <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
-                        <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase">Tanggal</th>
-                        <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="py-2 px-4 border-b border-gray-200">1</td>
-                        <td class="py-2 px-4 border-b border-gray-200">Laporan Kerusakan Peralatan</td>
-                        <td class="py-2 px-4 border-b border-gray-200"><span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">Pending</span></td>
-                        <td class="py-2 px-4 border-b border-gray-200">2023-06-10</td>
-                        <td class="py-2 px-4 border-b border-gray-200">
-                            <a href="#" class="text-blue-500 hover:text-blue-700">Lihat</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="py-2 px-4 border-b border-gray-200">2</td>
-                        <td class="py-2 px-4 border-b border-gray-200">Pemeliharaan Rutin</td>
-                        <td class="py-2 px-4 border-b border-gray-200"><span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Selesai</span></td>
-                        <td class="py-2 px-4 border-b border-gray-200">2023-06-08</td>
-                        <td class="py-2 px-4 border-b border-gray-200">
-                            <a href="#" class="text-blue-500 hover:text-blue-700">Lihat</a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div> -->
     </div>
 </div>
+<style>
+    .gauge-container {
+        display: inline-block;
+        text-align: center;
+        width: 160px;
+    }
+
+    .gauge {
+        position: relative;
+        width: 140px;
+        height: 70px;
+        margin: 0 auto 10px;
+    }
+
+    .gauge-background {
+        width: 140px;
+        height: 70px;
+        background: #e0e0e0;
+        border-radius: 70px 70px 0 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .gauge-fill {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 140px;
+        height: 70px;
+        background: conic-gradient(from 180deg, #4ade80 0deg, #4ade80 var(--percentage), transparent var(--percentage));
+        border-radius: 70px 70px 0 0;
+        transition: all 0.8s ease-in-out;
+    }
+
+    .gauge-center {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        width: 120px;
+        height: 60px;
+        background: white;
+        border-radius: 60px 60px 0 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 2;
+    }
+
+    .gauge-percentage {
+        font-size: 28px;
+        font-weight: bold;
+        color: #333;
+        line-height: 1;
+    }
+
+    .gauge-label {
+        font-size: 11px;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .gauge-scale {
+        bottom: -5px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+        color: #999;
+    }
+</style>
 @endsection

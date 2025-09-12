@@ -38,6 +38,41 @@
         </div>
     </div>
 
+    <!-- Filter and Search Section -->
+    <div class="mb-6 bg-white p-4 rounded-lg shadow-sm border">
+        <form method="GET" action="{{ route('checklist-items.index') }}">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                <div>
+                    <label for="search" class="sr-only">Search</label>
+                    <input type="text" name="search" id="search" placeholder="Cari item atau kategori..." 
+                           value="{{ $filters['search'] ?? '' }}"
+                           class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                </div>
+                <div>
+                    <label for="type" class="sr-only">Filter by Type</label>
+                    <select name="type" id="type" class=" p-2 w-full border-gray-300 border rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Semua Tipe</option>
+                        @if(isset($types))
+                            @foreach($types as $type)
+                                <option value="{{ $type }}" {{ (isset($filters['type']) && $filters['type'] == $type) ? 'selected' : '' }}>
+                                    {{ ucfirst($type) }}
+                                </option>
+                            @endforeach
+                        @endif
+                    </select>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button type="submit" class="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Filter
+                    </button>
+                    <a href="{{ route('checklist-items.index') }}" class="w-full md:w-auto text-center bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors">
+                        Reset
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
     <!-- Alert Messages with Enhanced Design -->
     @if(session('success'))
     <div class="bg-gradient-to-r from-green-400 to-green-500 text-white px-6 py-4 rounded-xl mb-6 shadow-lg border-l-4 border-green-600 animate-pulse">
@@ -87,7 +122,7 @@
                 <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
                     <div class="flex justify-between items-start mb-3">
                         <h4 class="font-semibold text-gray-900 text-lg">{{ $item->name }}</h4>
-                        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">{{ $item->type ?? 'Tidak ada Tipe' }}</span>
+                        <span class="text-sm text-blue-800 px-2 py-1 font-bold ">{{ $item->type ?? 'Tidak ada Tipe' }}</span>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-xs text-gray-500">{{ $item->category ?? 'Tidak ada Kategori' }}</span>
@@ -140,10 +175,10 @@
                                 <div class="text-sm font-medium text-gray-900">{{ $item->name }}</div>
                             </td>
                             <td class="px-6 py-4">
-                                <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">{{ $item->type ?? 'Tidak ada Tipe' }}</span>
+                                <span class="px-2 py-1 text-sm font-medium text-blue-800 ">{{ $item->type ?? 'Tidak ada Tipe' }}</span>
                             </td>
                             <td class="px-6 py-4">
-                                <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">{{ $item->category ?? 'Tidak ada Kategori' }}</span>
+                                <span class="px-2 py-1 text-sm font-medium text-blue-800 ">{{ $item->category ?? '-' }}</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->created_at->format('d/m/Y') ?? '-' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">

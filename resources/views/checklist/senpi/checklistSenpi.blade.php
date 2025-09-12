@@ -110,7 +110,7 @@
 
             <form method="POST"
                 :action="editMode ? '{{ url('/checklist-senpi/update') }}/' + editData.id : '{{ route('checklist.senpi.store') }}'"
-                class="p-3 sm:p-6 space-y-4 sm:space-y-6">
+                class="p-3 sm:p-6">
                 @csrf
                 <template x-if="editMode">
                     <input type="hidden" name="_method" value="POST">

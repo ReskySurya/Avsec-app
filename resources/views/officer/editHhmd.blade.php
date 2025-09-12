@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-1 py-8">
-    <div class="bg-white shadow-md w-fit rounded pt-6 pb-8 mb-4">
+<div class="container mx-auto px-2 py-4 lg:mt-20 lg:px-28 ">
+    <div class="bg-white shadow-md rounded px-4 sm:px-8 pt-6 pb-8 mb-4 w-full max-w-full">
         <h1 class="text-2xl font-bold pl-6">Edit Formulir HHMD</h1>
 
         @if (session('status'))

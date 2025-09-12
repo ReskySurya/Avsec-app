@@ -17,24 +17,40 @@ use Illuminate\Support\Facades\Log;
 
 class LogbookChiefController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // $currentUserId = Auth::id();
+        $query = LogbookChief::with('createdBy');
 
-        $chiefLogbooks = LogbookChief::with('createdBy')
+        // Filter by date range if provided
+        if ($request->filled('start_date')) {
+            try {
+                $query->whereDate('date', '>=', Carbon::parse($request->start_date)->format('Y-m-d'));
+            } catch (\Exception $e) {
+                Log::warning('Invalid start_date format for filtering logbook chief: ' . $request->start_date);
+            }
+        }
 
-            ->orderBy('date', 'desc')
+        if ($request->filled('end_date')) {
+            try {
+                $query->whereDate('date', '<=', Carbon::parse($request->end_date)->format('Y-m-d'));
+            } catch (\Exception $e) {
+                Log::warning('Invalid end_date format for filtering logbook chief: ' . $request->end_date);
+            }
+        }
+
+        // Cek jika user bukan superadmin, maka filter berdasarkan pembuat
+        if (!Auth::user()->isSuperAdmin()) {
+            $query->where('created_by', Auth::id());
+        }
+
+        $chiefLogbooks = $query->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
             ->get();
 
-             // Cek jika user bukan superadmin, maka filter berdasarkan approver
-        if (!Auth::user()->isSuperAdmin()) {
-            $chiefLogbooks->where('created_by', Auth::id());
-        }
-        
-
         return view('logbook.chief.logbookLaporanLeader', [
             'chiefLogbooks' => $chiefLogbooks,
+            'filterStartDate' => $request->start_date,
+            'filterEndDate' => $request->end_date,
         ]);
     }
 
@@ -59,6 +75,33 @@ class LogbookChiefController extends Controller
         } catch (\Exception $e) {
             Log::error('Error creating logbook: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal membuat logbook. Silakan coba lagi.');
+        }
+    }
+
+    public function update(Request $request, LogbookChief $logbook)
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'grup' => 'required|string|max:10',
+            'shift' => 'required|string|max:20',
+        ]);
+
+        try {
+            // Pastikan user yang mengedit adalah pembuat logbook atau superadmin
+            if (Auth::id() !== $logbook->created_by && !Auth::user()->isSuperAdmin()) {
+                abort(403, 'Unauthorized action.');
+            }
+
+            $logbook->update([
+                'date' => $request->date,
+                'grup' => $request->grup,
+                'shift' => $request->shift,
+            ]);
+
+            return redirect()->back()->with('success', 'Logbook updated successfully.');
+        } catch (\Exception $e) {
+            Log::error('Error updating logbook: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal memperbarui logbook. Silakan coba lagi.');
         }
     }
 
@@ -356,6 +399,59 @@ class LogbookChiefController extends Controller
             ]);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Logbook tidak ditemukan');
+        }
+    }
+
+    public function signatureReceive(Request $request, $logbookID)
+    {
+        // FIX 1: Mengubah kunci validasi agar sesuai dengan nama input form ('signature')
+        $request->validate([
+            'signature' => 'required|string',
+        ], [
+            'signature.required' => 'Tanda tangan wajib diberikan.',
+        ]);
+
+        try {
+            $logbook = LogbookChief::find($logbookID);
+
+            // 1. Verifikasi bahwa logbook sudah dikirim
+            if (!$logbook->senderSignature) {
+                return redirect()->back()->with('error', 'Logbook ini belum diserahkan oleh pembuat.');
+            }
+
+            // 2. Verifikasi bahwa user saat ini adalah approver yang ditunjuk
+            if ($logbook->approved_by !== Auth::id()) {
+                abort(403, 'Anda tidak memiliki wewenang untuk mengkonfirmasi logbook ini.');
+            }
+
+            // 3. Verifikasi bahwa logbook belum dikonfirmasi
+            if ($logbook->approvedSignature) {
+                return redirect()->back()->with('error', 'Logbook ini sudah dikonfirmasi sebelumnya.');
+            }
+
+            // FIX 2: Menggunakan satu variabel konsisten untuk data tanda tangan
+            $signature = $request->signature;
+
+            // Hapus prefix data URL
+            if (preg_match('/^data:image\/(\w+);base64,/', $signature, $type)) {
+                $signature = substr($signature, strpos($signature, ',') + 1);
+            }
+
+            // Update logbook
+            $logbook->approvedSignature = $signature;
+            // $logbook->approved_at = now(); // DIHAPUS: Kemungkinan kolom tidak ada di database dan menyebabkan error
+            $logbook->save();
+
+            return redirect()->route('logbook.chief.index')
+                ->with('success', 'Logbook berhasil dikonfirmasi dengan tanda tangan Anda.');
+        } catch (\Exception $e) {
+            Log::error('Receiver Signature Error: ' . $e->getMessage(), [
+                'logbookID' => $logbookID,
+                'user_id' => Auth::id(),
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan saat menyimpan tanda tangan: ' . $e->getMessage());
         }
     }
 }

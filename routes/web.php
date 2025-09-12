@@ -36,9 +36,7 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Admin Routes
 Route::middleware(['auth', 'role:superadmin'])->group(function () {
-    Route::get('/dashboard/superadmin', function () {
-        return view('superadmin.dashboardSuperadmin');
-    })->name('dashboard.superadmin');
+    Route::get('/dashboard/superadmin', [DashboardController::class, 'indexSuperadmin'])->name('dashboard.superadmin');
 
     Route::get('/export', [ExportPdfController::class, 'index'])->name('export.index');
     Route::get('/export/dailytest', [ExportPdfController::class, 'exportPdfDailyTest'])->name('export.dailytest');
@@ -89,7 +87,10 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
     Route::post('/logbook/chief/add-uraian', [LogbookChiefController::class, 'storeUraian'])->name('logbook.chief.addUraian');
     Route::post('/logbook/chief/signature/send/{logbookID}', [LogbookChiefController::class, 'signatureSend'])->name('logbook.chief.signature.send');
 
+    Route::put('/logbook/chief/{logbook}', [LogbookChiefController::class, 'update'])->name('logbook.chief.update');
     Route::delete('/logbook/chief/delete/{logbook}', [LogbookChiefController::class, 'destory'])->name('logbook.chief.delete');
+
+    Route::post('/logbook/chief/review/{logbookID}/receive', [LogbookChiefController::class, 'signatureReceive'])->name('logbook.chief.signature.receive');
 
     // Route::get('/logbook/chief/detail/{id}', [LogbookChiefController::class, 'detail'])->name('logbook.chief.detail');
     // Route::get('/logbook/chief/review-laporan-leader/{logbookID}', [LogbookChiefController::class, 'reviewLogbook'])->name('logbook.chief.review.laporan.leader');

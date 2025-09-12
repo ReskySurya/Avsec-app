@@ -72,6 +72,25 @@
             </div>
         </div>
 
+        <div class="p-6 border-b border-gray-200">
+            <form method="GET" action="{{ route('tenant-management.index') }}">
+                <div class="flex space-x-2">
+                    <div class="flex-grow">
+                        <label for="search" class="sr-only">Search</label>
+                        <input type="text" name="search" id="search" placeholder="Cari berdasarkan ID, Nama Tenant, atau Supervisor..." 
+                               value="{{ $searchTerm ?? '' }}"
+                               class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                    </div>
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                        Cari
+                    </button>
+                    <a href="{{ route('tenant-management.index') }}" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors font-semibold">
+                        Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+
         <!-- Mobile Card View -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6 md:hidden">
             @forelse($tenantList ?? [] as $index => $tenant)

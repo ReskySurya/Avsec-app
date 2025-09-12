@@ -472,13 +472,25 @@ class MasterDataController extends Controller
     }
 
     // Tenant Management
-    public function indexTenantManagement()
+    public function indexTenantManagement(Request $request)
     {
-        $tenantList = Tenant::orderBy('tenantID')->get();
-        return view(
-            'master-data.tenant-management.index',
-            ['tenantList' => $tenantList]
-        );
+        $query = Tenant::query();
+
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('tenant_name', 'like', "%{$searchTerm}%")
+                  ->orWhere('tenantID', 'like', "%{$searchTerm}%")
+                  ->orWhere('supervisorName', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        $tenantList = $query->orderBy('tenant_name')->get();
+
+        return view('master-data.tenant-management.index', [
+            'tenantList' => $tenantList,
+            'searchTerm' => $request->search,
+        ]);
     }
 
     public function storeTenant(Request $request)
@@ -635,12 +647,33 @@ class MasterDataController extends Controller
     }
 
     //Checklist Items Kendaraan
-    public function indexChecklistItems()
+    public function indexChecklistItems(Request $request)
     {
-        $checklistItems = ChecklistItem::all();
+        $query = ChecklistItem::query();
+
+        // Filter by type
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        // Filter by search term
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', "%{$searchTerm}%")
+                  ->orWhere('category', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        $checklistItems = $query->orderBy('name')->get();
+
+        // Get all unique types for the filter dropdown
+        $types = ChecklistItem::select('type')->distinct()->pluck('type');
 
         return view('master-data.checklist-items.index', [
-            'checklistItems' => $checklistItems
+            'checklistItems' => $checklistItems,
+            'types' => $types,
+            'filters' => $request->only(['type', 'search']),
         ]);
     }
 
@@ -648,7 +681,7 @@ class MasterDataController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:checklist_items,name',
-            'category' => 'required|string|max:50',
+            'category' => 'nullable|string|max:50',
             'type' => 'required|string|max:50',
         ]);
 
@@ -670,7 +703,7 @@ class MasterDataController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:checklist_items,name,' . $id,
-            'category' => 'required|string|max:50',
+            'category' => 'nullable|string|max:50',
             'type' => 'required|string|max:50',
         ]);
 
