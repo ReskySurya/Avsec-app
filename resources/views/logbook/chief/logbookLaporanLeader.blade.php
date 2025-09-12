@@ -285,7 +285,67 @@
         </div>
     </div>
 
-    {{-- Modal Edit Logbook (Dihilangkan karena tidak ada di controller dan menyebabkan error) --}}
+    {{-- Modal Edit Logbook --}}
+    <div x-show="openEditLogbook" x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100"
+        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform scale-100"
+        x-transition:leave-end="opacity-0 transform scale-95"
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
+        <div @click.away="openEditLogbook = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-t-2xl">
+                <h2 class="text-2xl font-bold">Edit Entry Logbook</h2>
+                <p class="text-blue-100">Perbarui catatan pos jaga</p>
+            </div>
+            <form :action="`/logbook/chief/${editLogbookData.logbookID}`" method="POST" class="p-6">
+                @csrf
+                @method('PUT')
+                <div class="mb-6">
+                    <label for="edit_date" class="block text-sm font-semibold text-gray-700 mb-2">Tanggal</label>
+                    <input type="date" id="edit_date" name="date" required x-model="editLogbookData.date"
+                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
+                    @error('date')
+                    <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="mb-6">
+                    <label for="edit_grup" class="block text-sm font-semibold text-gray-700 mb-2">Grup</label>
+                    <select id="edit_grup" name="grup" required x-model="editLogbookData.grup"
+                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
+                        <option value="">Pilih Grup</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                    </select>
+                    @error('grup')
+                    <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="mb-6">
+                    <label for="edit_shift" class="block text-sm font-semibold text-gray-700 mb-2">Dinas / Shift</label>
+                    <select id="edit_shift" name="shift" required x-model="editLogbookData.shift"
+                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
+                        <option value="">Pilih Dinas/Shift</option>
+                        <option value="Pagi">Pagi</option>
+                        <option value="Malam">Malam</option>
+                    </select>
+                    @error('shift')
+                    <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" @click="openEditLogbook = false"
+                        class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium">
+                        Batal
+                    </button>
+                    <button type="submit"
+                        class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 font-medium shadow-lg">
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 {{-- Custom Scrollbar Styles --}}
