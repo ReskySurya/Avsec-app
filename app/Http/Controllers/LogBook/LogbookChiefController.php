@@ -17,24 +17,40 @@ use Illuminate\Support\Facades\Log;
 
 class LogbookChiefController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // $currentUserId = Auth::id();
+        $query = LogbookChief::with('createdBy');
 
-        $chiefLogbooks = LogbookChief::with('createdBy')
+        // Filter by date range if provided
+        if ($request->filled('start_date')) {
+            try {
+                $query->whereDate('date', '>=', Carbon::parse($request->start_date)->format('Y-m-d'));
+            } catch (\Exception $e) {
+                Log::warning('Invalid start_date format for filtering logbook chief: ' . $request->start_date);
+            }
+        }
 
-            ->orderBy('date', 'desc')
+        if ($request->filled('end_date')) {
+            try {
+                $query->whereDate('date', '<=', Carbon::parse($request->end_date)->format('Y-m-d'));
+            } catch (\Exception $e) {
+                Log::warning('Invalid end_date format for filtering logbook chief: ' . $request->end_date);
+            }
+        }
+
+        // Cek jika user bukan superadmin, maka filter berdasarkan pembuat
+        if (!Auth::user()->isSuperAdmin()) {
+            $query->where('created_by', Auth::id());
+        }
+
+        $chiefLogbooks = $query->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
             ->get();
 
-             // Cek jika user bukan superadmin, maka filter berdasarkan approver
-        if (!Auth::user()->isSuperAdmin()) {
-            $chiefLogbooks->where('created_by', Auth::id());
-        }
-        
-
         return view('logbook.chief.logbookLaporanLeader', [
             'chiefLogbooks' => $chiefLogbooks,
+            'filterStartDate' => $request->start_date,
+            'filterEndDate' => $request->end_date,
         ]);
     }
 

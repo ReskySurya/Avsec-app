@@ -36,9 +36,7 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Admin Routes
 Route::middleware(['auth', 'role:superadmin'])->group(function () {
-    Route::get('/dashboard/superadmin', function () {
-        return view('superadmin.dashboardSuperadmin');
-    })->name('dashboard.superadmin');
+    Route::get('/dashboard/superadmin', [DashboardController::class, 'indexSuperadmin'])->name('dashboard.superadmin');
 
     Route::get('/export', [ExportPdfController::class, 'index'])->name('export.index');
     Route::get('/export/dailytest', [ExportPdfController::class, 'exportPdfDailyTest'])->name('export.dailytest');

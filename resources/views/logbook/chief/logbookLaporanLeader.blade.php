@@ -55,6 +55,29 @@
             </div>
         </div>
 
+        <div class="p-6 bg-gray-50 border-b border-gray-200 ">
+            <form method="GET" action="{{ route('logbook.chief.index') }}">
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end ">
+                    <div class="sm:col-span-1">
+                        <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Mulai</label>
+                        <input type="date" name="start_date" id="start_date" value="{{ $filterStartDate ?? '' }}" class="block w-full focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div class="sm:col-span-1">
+                        <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Selesai</label>
+                        <input type="date" name="end_date" id="end_date" value="{{ $filterEndDate ?? '' }}" class="block w-full focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div class="sm:col-span-2 flex items-end space-x-2 pt-5">
+                        <button type="submit" class="w-full sm:w-auto bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                            Filter
+                        </button>
+                        <a href="{{ route('logbook.chief.index') }}" class="w-full sm:w-auto text-center bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors font-semibold">
+                            Reset
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6 md:hidden">
             @forelse($chiefLogbooks ?? [] as $logbook)
             <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200"

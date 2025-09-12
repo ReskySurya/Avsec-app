@@ -13,6 +13,7 @@ use App\Models\LogbookRotasi;
 use App\Models\LogbookRotasiHBSCP;
 use App\Models\LogbookRotasiPSCP;
 use App\Models\ManualBook;
+use App\Models\ReportStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -297,5 +298,43 @@ class DashboardController extends Controller
             ->paginate($perPage);
 
         return view('supervisor.dashboardSupervisor', compact('logbooksChief'));
+    }
+
+    public function indexSuperadmin()
+    {
+        $stats = [];
+        $equipmentTypes = ['hhmd', 'wtmd', 'xraycabin', 'xraybagasi'];
+        
+        $approvedStatus = ReportStatus::where('name', 'approved')->first();
+        $approvedStatusId = $approvedStatus ? $approvedStatus->id : null;
+
+        foreach ($equipmentTypes as $type) {
+            $totalReports = Report::whereHas('equipmentLocation.equipment', function ($query) use ($type) {
+                $query->where('name', $type);
+            })->count();
+
+            $approvedReports = 0;
+            if ($approvedStatusId) {
+                $approvedReports = Report::whereHas('equipmentLocation.equipment', function ($query) use ($type) {
+                    $query->where('name', $type);
+                })->where('statusID', $approvedStatusId)->count();
+            }
+
+            $percentage = ($totalReports > 0) ? round(($approvedReports / $totalReports) * 100) : 0;
+
+            $key = $type;
+            if ($type === 'hhmd') $key = 'HHMD';
+            if ($type === 'wtmd') $key = 'WTMD';
+            if ($type === 'xraycabin') $key = 'X-Ray Cabin';
+            if ($type === 'xraybagasi') $key = 'X-Ray Bagasi';
+
+            $stats[$key] = [
+                'total' => $totalReports,
+                'approved' => $approvedReports,
+                'percentage' => $percentage,
+            ];
+        }
+
+        return view('superadmin.dashboardSuperadmin', ['dailyTestStats' => $stats]);
     }
 }
