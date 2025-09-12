@@ -302,22 +302,23 @@ class DashboardController extends Controller
 
     public function indexSuperadmin()
     {
-        $stats = [];
+        // Daily Test Stats
+        $dailyTestStats = [];
         $equipmentTypes = ['hhmd', 'wtmd', 'xraycabin', 'xraybagasi'];
-        
         $approvedStatus = ReportStatus::where('name', 'approved')->first();
         $approvedStatusId = $approvedStatus ? $approvedStatus->id : null;
 
         foreach ($equipmentTypes as $type) {
             $totalReports = Report::whereHas('equipmentLocation.equipment', function ($query) use ($type) {
                 $query->where('name', $type);
-            })->count();
+            })->whereDate('created_at', today())->count();
 
             $approvedReports = 0;
             if ($approvedStatusId) {
                 $approvedReports = Report::whereHas('equipmentLocation.equipment', function ($query) use ($type) {
                     $query->where('name', $type);
-                })->where('statusID', $approvedStatusId)->count();
+                })->where('statusID', $approvedStatusId)
+                  ->whereDate('created_at', today())->count();
             }
 
             $percentage = ($totalReports > 0) ? round(($approvedReports / $totalReports) * 100) : 0;
@@ -328,13 +329,86 @@ class DashboardController extends Controller
             if ($type === 'xraycabin') $key = 'X-Ray Cabin';
             if ($type === 'xraybagasi') $key = 'X-Ray Bagasi';
 
-            $stats[$key] = [
+            $dailyTestStats[$key] = [
                 'total' => $totalReports,
                 'approved' => $approvedReports,
                 'percentage' => $percentage,
             ];
         }
 
-        return view('superadmin.dashboardSuperadmin', ['dailyTestStats' => $stats]);
+        // Logbook Stats
+        $logbookStats = [];
+
+        $totalPosJaga = Logbook::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->count();
+        $approvedPosJaga = Logbook::where('status', 'approved')->whereDate('created_at', today())->count();
+        $percentagePosJaga = ($totalPosJaga > 0) ? round(($approvedPosJaga / $totalPosJaga) * 100) : 0;
+        $logbookStats['Pos Jaga'] = [
+            'total' => $totalPosJaga,
+            'approved' => $approvedPosJaga,
+            'percentage' => $percentagePosJaga,
+        ];
+
+        $totalRotasi = LogbookRotasi::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->count();
+        $approvedRotasi = LogbookRotasi::where('status', 'approved')->whereDate('created_at', today())->count();
+        $percentageRotasi = ($totalRotasi > 0) ? round(($approvedRotasi / $totalRotasi) * 100) : 0;
+        $logbookStats['Rotasi Personil'] = [
+            'total' => $totalRotasi,
+            'approved' => $approvedRotasi,
+            'percentage' => $percentageRotasi,
+        ];
+
+        $totalChief = LogbookChief::whereNotNull('senderSignature')->whereDate('created_at', today())->count();
+        $approvedChief = LogbookChief::whereNotNull('approvedSignature')->whereDate('created_at', today())->count();
+        $percentageChief = ($totalChief > 0) ? round(($approvedChief / $totalChief) * 100) : 0;
+        $logbookStats['Laporan Chief'] = [
+            'total' => $totalChief,
+            'approved' => $approvedChief,
+            'percentage' => $percentageChief,
+        ];
+
+        // Checklist Stats
+        $checklistStats = [];
+
+        $totalKendaraan = ChecklistKendaraan::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->count();
+        $approvedKendaraan = ChecklistKendaraan::where('status', 'approved')->whereDate('created_at', today())->count();
+        $percentageKendaraan = ($totalKendaraan > 0) ? round(($approvedKendaraan / $totalKendaraan) * 100) : 0;
+        $checklistStats['Kendaraan'] = [
+            'total' => $totalKendaraan,
+            'approved' => $approvedKendaraan,
+            'percentage' => $percentageKendaraan,
+        ];
+
+        $totalPenyisiran = ChecklistPenyisiran::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->count();
+        $approvedPenyisiran = ChecklistPenyisiran::where('status', 'approved')->whereDate('created_at', today())->count();
+        $percentagePenyisiran = ($totalPenyisiran > 0) ? round(($approvedPenyisiran / $totalPenyisiran) * 100) : 0;
+        $checklistStats['Penyisiran'] = [
+            'total' => $totalPenyisiran,
+            'approved' => $approvedPenyisiran,
+            'percentage' => $percentagePenyisiran,
+        ];
+
+        $totalPI = FormPencatatanPI::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->count();
+        $approvedPI = FormPencatatanPI::where('status', 'approved')->whereDate('created_at', today())->count();
+        $percentagePI = ($totalPI > 0) ? round(($approvedPI / $totalPI) * 100) : 0;
+        $checklistStats['Pencatatan PI'] = [
+            'total' => $totalPI,
+            'approved' => $approvedPI,
+            'percentage' => $percentagePI,
+        ];
+
+        $totalManualBook = ManualBook::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->count();
+        $approvedManualBook = ManualBook::where('status', 'approved')->whereDate('created_at', today())->count();
+        $percentageManualBook = ($totalManualBook > 0) ? round(($approvedManualBook / $totalManualBook) * 100) : 0;
+        $checklistStats['Manual Book'] = [
+            'total' => $totalManualBook,
+            'approved' => $approvedManualBook,
+            'percentage' => $percentageManualBook,
+        ];
+
+        return view('superadmin.dashboardSuperadmin', [
+            'dailyTestStats' => $dailyTestStats,
+            'logbookStats' => $logbookStats,
+            'checklistStats' => $checklistStats
+        ]);
     }
 }
