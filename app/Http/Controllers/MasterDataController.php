@@ -13,6 +13,7 @@ use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 class MasterDataController extends Controller
@@ -318,11 +319,10 @@ class MasterDataController extends Controller
     public function storeUserManagement(Request $request)
     {
         try {
-            // Validate the request data
+            // 1. Hapus validasi password
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:users',
-                'password' => 'required|string|min:8',
                 'role_id' => 'required|exists:roles,id',
             ]);
 
@@ -333,10 +333,11 @@ class MasterDataController extends Controller
             $user = User::create([
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
-                'password' => bcrypt($validatedData['password']),
+                'password' => Hash::make('P4ssword'), // Set default password
                 'role_id' => $validatedData['role_id'],
                 'nip' => $request->nip,
-                'lisensi' => $request->lisensi
+                'lisensi' => $request->lisensi,
+                'must_change_password' => true,
             ]);
 
             // Commit transaction
@@ -380,17 +381,7 @@ class MasterDataController extends Controller
                 'nip' => $request->nip,
                 'lisensi' => $request->lisensi
             ]);
-            if ($request->filled('password')) {
-                $request->validate([
-                    'password' => 'required|string|min:8'
-                ]);
-                $user->update([
-                    'password' => bcrypt($request->password)
-                ]);
-            }
             DB::commit();
-
-            // ---- PERUBAHAN DIMULAI DARI SINI ----
 
             // Ambil data user yang sudah terupdate beserta relasinya
             $updatedUser = User::with('role')->find($user->id);
@@ -471,6 +462,21 @@ class MasterDataController extends Controller
         }
     }
 
+    public function resetPassword($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+            $user->password = Hash::make('P4ssword');
+            $user->must_change_password = true; // Set flag agar user dipaksa ganti password
+            $user->save();
+
+            return response()->json(['success' => true, 'message' => 'Password user berhasil direset ke "P4ssword".']);
+        } catch (\Exception $e) {
+            Log::error('Gagal reset password: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Gagal mereset password.'], 500);
+        }
+    }
+
     // Tenant Management
     public function indexTenantManagement(Request $request)
     {
@@ -480,8 +486,8 @@ class MasterDataController extends Controller
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('tenant_name', 'like', "%{$searchTerm}%")
-                  ->orWhere('tenantID', 'like', "%{$searchTerm}%")
-                  ->orWhere('supervisorName', 'like', "%{$searchTerm}%");
+                    ->orWhere('tenantID', 'like', "%{$searchTerm}%")
+                    ->orWhere('supervisorName', 'like', "%{$searchTerm}%");
             });
         }
 
@@ -661,7 +667,7 @@ class MasterDataController extends Controller
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('name', 'like', "%{$searchTerm}%")
-                  ->orWhere('category', 'like', "%{$searchTerm}%");
+                    ->orWhere('category', 'like', "%{$searchTerm}%");
             });
         }
 

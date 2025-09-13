@@ -139,9 +139,39 @@
                                     class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Aktif</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <div class="flex space-x-2">
-                                    <button class="btn-edit text-blue-600 hover:text-blue-900">Edit</button>
-                                    <button class="btn-hapus text-red-600 hover:text-red-900">Hapus</button>
+                                <div class="flex items-center space-x-2">
+                                    <!-- Edit Button -->
+                                    <button
+                                        class="btn-edit group relative inline-flex items-center justify-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform hover:scale-105"
+                                        title="Edit Data">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        <span class="sr-only">Edit</span>
+                                    </button>
+
+                                    <!-- Delete Button -->
+                                    <button
+                                        class="btn-hapus group relative inline-flex items-center justify-center px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transform hover:scale-105"
+                                        title="Hapus Data">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        <span class="sr-only">Hapus</span>
+                                    </button>
+
+                                    <!-- Reset Button -->
+                                    <button
+                                        class="btn-reset group relative inline-flex items-center justify-center px-3 py-2 bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transform hover:scale-105"
+                                        title="Reset Password">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                        <span class="sr-only">Reset</span>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -170,9 +200,39 @@
                                 <p class="text-xs text-gray-400">NIP: <span class="data-nip">{{ $officer->nip }}</span>
                                     • Lisensi: <span class="data-lisensi">
                                         {{ $officer->lisensi }}</span></p>
-                                <div class="mt-2 flex space-x-3">
-                                    <button class="btn-edit text-blue-600 hover:text-blue-900 text-sm">Edit</button>
-                                    <button class="btn-hapus text-red-600 hover:text-red-900 text-sm">Hapus</button>
+                                <div class="mt-3 flex flex-wrap gap-2">
+                                    <!-- Edit Button -->
+                                    <button
+                                        class="btn-edit inline-flex items-center px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 hover:text-blue-800 text-sm font-medium rounded-lg border border-blue-200 hover:border-blue-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1">
+                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        Edit
+                                    </button>
+
+                                    <!-- Delete Button -->
+                                    <button
+                                        class="btn-hapus inline-flex items-center px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 hover:text-red-800 text-sm font-medium rounded-lg border border-red-200 hover:border-red-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1">
+                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        Hapus
+                                    </button>
+
+                                    <!-- Reset Button -->
+                                    <button
+                                        class="btn-reset inline-flex items-center px-3 py-1.5 bg-yellow-50 hover:bg-yellow-100 text-yellow-700 hover:text-yellow-800 text-sm font-medium rounded-lg border border-yellow-200 hover:border-yellow-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-1">
+                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                        Reset
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -295,9 +355,39 @@
                                     class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Aktif</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <div class="flex space-x-2">
-                                    <button class="btn-edit text-blue-600 hover:text-blue-900">Edit</button>
-                                    <button class="btn-hapus text-red-600 hover:text-red-900">Hapus</button>
+                                <div class="flex items-center space-x-2">
+                                    <!-- Edit Button -->
+                                    <button
+                                        class="btn-edit group relative inline-flex items-center justify-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform hover:scale-105"
+                                        title="Edit Data">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        <span class="sr-only">Edit</span>
+                                    </button>
+
+                                    <!-- Delete Button -->
+                                    <button
+                                        class="btn-hapus group relative inline-flex items-center justify-center px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transform hover:scale-105"
+                                        title="Hapus Data">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        <span class="sr-only">Hapus</span>
+                                    </button>
+
+                                    <!-- Reset Button -->
+                                    <button
+                                        class="btn-reset group relative inline-flex items-center justify-center px-3 py-2 bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transform hover:scale-105"
+                                        title="Reset Password">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                        <span class="sr-only">Reset</span>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -326,9 +416,39 @@
                                 <p class="text-xs text-gray-400">NIP: <span class="data-nip">{{ $supervisor->nip
                                         }}</span> • Lisensi: <span class="data-lisensi">
                                         {{ $supervisor->lisensi }}</span></p>
-                                <div class="mt-2 flex space-x-3">
-                                    <button class="btn-edit text-blue-600 hover:text-blue-900 text-sm">Edit</button>
-                                    <button class="btn-hapus text-red-600 hover:text-red-900 text-sm">Hapus</button>
+                                <div class="mt-3 flex flex-wrap gap-2">
+                                    <!-- Edit Button -->
+                                    <button
+                                        class="btn-edit inline-flex items-center px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 hover:text-blue-800 text-sm font-medium rounded-lg border border-blue-200 hover:border-blue-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1">
+                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        Edit
+                                    </button>
+
+                                    <!-- Delete Button -->
+                                    <button
+                                        class="btn-hapus inline-flex items-center px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 hover:text-red-800 text-sm font-medium rounded-lg border border-red-200 hover:border-red-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1">
+                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        Hapus
+                                    </button>
+
+                                    <!-- Reset Button -->
+                                    <button
+                                        class="btn-reset inline-flex items-center px-3 py-1.5 bg-yellow-50 hover:bg-yellow-100 text-yellow-700 hover:text-yellow-800 text-sm font-medium rounded-lg border border-yellow-200 hover:border-yellow-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-1">
+                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                        Reset
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -451,9 +571,39 @@
                                     class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Aktif</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <div class="flex space-x-2">
-                                    <button class="btn-edit text-blue-600 hover:text-blue-900">Edit</button>
-                                    <button class="btn-hapus text-red-600 hover:text-red-900">Hapus</button>
+                                <div class="flex items-center space-x-2">
+                                    <!-- Edit Button -->
+                                    <button
+                                        class="btn-edit group relative inline-flex items-center justify-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform hover:scale-105"
+                                        title="Edit Data">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        <span class="sr-only">Edit</span>
+                                    </button>
+
+                                    <!-- Delete Button -->
+                                    <button
+                                        class="btn-hapus group relative inline-flex items-center justify-center px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transform hover:scale-105"
+                                        title="Hapus Data">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        <span class="sr-only">Hapus</span>
+                                    </button>
+
+                                    <!-- Reset Button -->
+                                    <button
+                                        class="btn-reset group relative inline-flex items-center justify-center px-3 py-2 bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transform hover:scale-105"
+                                        title="Reset Password">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                        <span class="sr-only">Reset</span>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -482,9 +632,39 @@
                                 <p class="text-xs text-gray-400">NIP: <span class="data-nip">{{ $superadmin->nip
                                         }}</span> • Lisensi: <span class="data-lisensi">
                                         {{ $superadmin->lisensi }}</span></p>
-                                <div class="mt-2 flex space-x-3">
-                                    <button class="btn-edit text-blue-600 hover:text-blue-900 text-sm">Edit</button>
-                                    <button class="btn-hapus text-red-600 hover:text-red-900 text-sm">Hapus</button>
+                                <div class="mt-3 flex flex-wrap gap-2">
+                                    <!-- Edit Button -->
+                                    <button
+                                        class="btn-edit inline-flex items-center px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 hover:text-blue-800 text-sm font-medium rounded-lg border border-blue-200 hover:border-blue-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1">
+                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        Edit
+                                    </button>
+
+                                    <!-- Delete Button -->
+                                    <button
+                                        class="btn-hapus inline-flex items-center px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 hover:text-red-800 text-sm font-medium rounded-lg border border-red-200 hover:border-red-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1">
+                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        Hapus
+                                    </button>
+
+                                    <!-- Reset Button -->
+                                    <button
+                                        class="btn-reset inline-flex items-center px-3 py-1.5 bg-yellow-50 hover:bg-yellow-100 text-yellow-700 hover:text-yellow-800 text-sm font-medium rounded-lg border border-yellow-200 hover:border-yellow-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-1">
+                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                        Reset
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -525,12 +705,10 @@
 
 <div id="modalTambah" class="fixed inset-0 z-50 overflow-y-auto hidden">
     <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        <!-- Background overlay -->
         <div class="fixed inset-0 transition-opacity" aria-hidden="true">
             <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
         </div>
 
-        <!-- Modal panel -->
         <div
             class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
             <form id="formTambah" action="{{ route('users-management.store') }}" method="POST">
@@ -539,11 +717,11 @@
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div class="mb-4">
                         <h3 class="text-lg font-medium text-gray-900 mb-2">Tambah User Baru</h3>
-                        <p class="text-sm text-gray-500">Isi informasi user dengan lengkap</p>
+                        <p class="text-sm text-gray-500">Isi informasi user dengan lengkap. Password akan diatur default
+                            menjadi "P4ssword".</p>
                     </div>
 
                     <div class="space-y-4">
-                        <!-- Role -->
                         <div>
                             <label for="role_id" class="block text-sm font-medium text-gray-700">Role</label>
                             <select name="role_id" id="role_id"
@@ -556,7 +734,6 @@
                             </select>
                         </div>
 
-                        <!-- Nama -->
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
                             <input type="text" name="name" id="name"
@@ -564,7 +741,6 @@
                                 required>
                         </div>
 
-                        <!-- NIP -->
                         <div>
                             <label for="nip" class="block text-sm font-medium text-gray-700">NIP</label>
                             <input type="text" name="nip" id="nip"
@@ -572,7 +748,6 @@
                                 required>
                         </div>
 
-                        <!-- Lisensi -->
                         <div>
                             <label for="lisensi" class="block text-sm font-medium text-gray-700">Lisensi</label>
                             <input type="text" name="lisensi" id="lisensi"
@@ -580,7 +755,6 @@
                                 required>
                         </div>
 
-                        <!-- Email -->
                         <div>
                             <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
                             <input type="email" name="email" id="email"
@@ -588,22 +762,6 @@
                                 required>
                         </div>
 
-                        <!-- Password -->
-                        <div>
-                            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                            <input type="password" name="password" id="password"
-                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                required>
-                        </div>
-
-                        <!-- Konfirmasi Password -->
-                        <div>
-                            <label for="password_confirmation"
-                                class="block text-sm font-medium text-gray-700">Konfirmasi Password</label>
-                            <input type="password" name="password_confirmation" id="password_confirmation"
-                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                required>
-                        </div>
                     </div>
                 </div>
 
@@ -689,23 +847,6 @@
                                 class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                 required>
                         </div>
-
-                        <!-- Password -->
-                        <div>
-                            <label for="edit_password" class="block text-sm font-medium text-gray-700">Password Baru
-                                (Opsional)</label>
-                            <input type="password" name="password" id="edit_password"
-                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                            <p class="mt-1 text-xs text-gray-500">Biarkan kosong jika tidak ingin mengubah password</p>
-                        </div>
-
-                        <!-- Konfirmasi Password -->
-                        <div>
-                            <label for="edit_password_confirmation"
-                                class="block text-sm font-medium text-gray-700">Konfirmasi Password Baru</label>
-                            <input type="password" name="password_confirmation" id="edit_password_confirmation"
-                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        </div>
                     </div>
                 </div>
 
@@ -780,6 +921,14 @@
                 const userId = userRow.getAttribute('data-user-id');
                 handleDelete(userId, userRow);
             }
+
+            if (target.closest('.btn-reset')) {
+                e.preventDefault();
+                const userRow = target.closest('[data-user-id]');
+                const userId = userRow.getAttribute('data-user-id');
+                const userName = userRow.querySelector('.data-name').textContent.trim();
+                handleReset(userId, userName);
+    }
         });
 
         // === Logika Modal & Form ===
@@ -806,8 +955,6 @@
                     if (user.roles && user.roles.length > 0) {
                         formEdit.querySelector('#edit_role_id').value = user.roles[0].id;
                     }
-                    formEdit.querySelector('#edit_password').value = '';
-                    formEdit.querySelector('#edit_password_confirmation').value = '';
                     showModal(modalEdit);
                 })
                 .catch(error => {
@@ -843,6 +990,45 @@
                             userRow.remove();
                         } else {
                             throw new Error(data.message || 'Gagal menghapus data.');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({ icon: 'error', title: 'Gagal', text: error.message });
+                    });
+                }
+            });
+        }
+
+        function handleReset(userId, userName) {
+            Swal.fire({
+                title: 'Reset Password?',
+                html: `Anda yakin ingin mereset password untuk <strong>${userName}</strong> ke password default?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f59e0b', // warna kuning
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, reset!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/users-management/reset/${userId}`, {
+                        method: 'POST',
+                        headers: {
+                            "X-CSRF-TOKEN": csrfToken,
+                            "X-Requested-With": "XMLHttpRequest",
+                            "Accept": "application/json",
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: data.message
+                            });
+                        } else {
+                            throw new Error(data.message || 'Gagal mereset password.');
                         }
                     })
                     .catch(error => {

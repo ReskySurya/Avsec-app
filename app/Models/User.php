@@ -19,6 +19,7 @@ class User extends Authenticatable
         'lisensi',
         'email',
         'password',
+        'must_change_password',
         'role_id',
     ];
 
