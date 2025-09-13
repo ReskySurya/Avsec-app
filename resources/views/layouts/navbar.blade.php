@@ -69,7 +69,7 @@
                 <div class="ml-3 relative">
                     <div class="flex items-center">
                         <span class="mr-2 hidden sm:block text-sm">{{ auth()->user()->name }}</span>
-                        <form method="GET" action="{{ route('logout') }}">
+                        <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="bg-red-700 hover:bg-red-800 text-white text-sm px-3 py-1 rounded flex items-center">
                                 <span class="hidden sm:inline">Logout</span>

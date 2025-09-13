@@ -20,7 +20,6 @@
     </div>
 
     @include('superadmin.partials.user-info')
-
     @include('superadmin.partials.dailytest-stats')
     @include('superadmin.partials.logbook-stats')
     @include('superadmin.partials.checklist-stats')
