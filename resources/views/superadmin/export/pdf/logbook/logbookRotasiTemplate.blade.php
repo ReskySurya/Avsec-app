@@ -43,7 +43,7 @@
                         <div class="grid grid-cols-2 gap-y-2 text-sm text-gray-700">
                             <p>HARI / TANGGAL
                                 <span class="font-semibold">
-                                    : {{ \Carbon\Carbon::parse($form->date)->translatedFormat('l, d F Y') }}
+                                    : {{ \Carbon\Carbon::parse($form->date)->locale('id')->translatedFormat('l, d F Y') }}
                                 </span>
                             </p>
                             <p>TIPE ROTASI <span class="font-semibold">: {{ strtoupper($form->type) }}</span></p>

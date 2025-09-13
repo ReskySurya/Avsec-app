@@ -37,7 +37,7 @@
                     <div class="pt-3 mb-6 text-sm">
                         <div class="grid grid-cols-2 gap-y-2">
                             @php $checklistDate = \Carbon\Carbon::parse($checklist->date); @endphp
-                            <p>HARI / TANGGAL: <span class="font-semibold">{{ $checklistDate->translatedFormat('l, d F Y') }}</span></p>
+                            <p>HARI / TANGGAL: <span class="font-semibold">{{ $checklistDate->locale('id')->translatedFormat('l, d F Y') }}</span></p>
                             <p>GRUP: <span class="font-semibold">{{ $checklist->grup ?? 'N/A' }}</span></p>
                             <p>WAKTU MASUK: <span class="font-semibold">{{ $checklist->in_time ?? 'N/A' }}</span></p>
                             <p>WAKTU KELUAR: <span class="font-semibold">{{ $checklist->out_time ?? 'N/A' }}</span></p>

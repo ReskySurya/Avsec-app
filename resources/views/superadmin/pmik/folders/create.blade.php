@@ -3,7 +3,7 @@
 @section('title', 'Buat Folder Baru')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:mt-20">
 
     <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 max-w-2xl mx-auto">
         {{-- Header --}}

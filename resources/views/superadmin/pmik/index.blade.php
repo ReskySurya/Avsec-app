@@ -3,7 +3,7 @@
 @section('title', 'PM dan IK')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:mt-20">
     {{-- Header --}}
     <div class="flex flex-wrap justify-between items-center gap-4 mb-8">
         <h1 class="text-3xl font-bold text-gray-800">Dokumen PM & IK</h1>

@@ -37,7 +37,7 @@
                     <div class=" pt-3 mb-6 text-sm">
                         <div class="grid grid-cols-2 gap-y-2">
                             @php $checklistDate = \Carbon\Carbon::parse($checklist->date); @endphp
-                            <p>HARI / TANGGAL: <span class="font-semibold">{{ $checklistDate->translatedFormat('l, d F Y') }}</span></p>
+                            <p>HARI / TANGGAL: <span class="font-semibold">{{ $checklistDate->locale('id')->translatedFormat('l, d F Y') }}</span></p>
                             <p>POS JAGA: <span class="font-semibold">{{ $checklist->type ?? 'N/A' }}</span></p>
                             <p>SHIFT: <span class="font-semibold">{{ $checklist->shift ?? 'N/A' }}</span></p>
                         </div>

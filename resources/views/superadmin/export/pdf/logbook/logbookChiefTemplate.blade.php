@@ -43,7 +43,7 @@
                         <div class="grid grid-cols-2 gap-y-2 text-sm text-gray-700">
                             <p>HARI / TANGGAL
                                 <span class="font-semibold">
-                                    : {{ \Carbon\Carbon::parse($chief->date)->translatedFormat('l, d F Y') }}
+                                    : {{ \Carbon\Carbon::parse($chief->date)->locale('id')->translatedFormat('l, d F Y') }}
                                 </span>
                             </p>
                             <p>GRUP <span class="font-semibold">: {{ $chief->grup }}</span></p>

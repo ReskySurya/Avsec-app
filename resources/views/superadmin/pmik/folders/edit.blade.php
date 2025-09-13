@@ -3,7 +3,7 @@
 @section('title', 'Edit Folder')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:mt-20">
     {{-- Breadcrumbs --}}
     <div class="text-sm breadcrumbs mb-6">
         <ul>

@@ -46,7 +46,7 @@
                             @endphp
                             <p>HARI / TANGGAL
                                 <span class="font-semibold">
-                                    : {{ $checklistDate->translatedFormat('l, d F Y') }}
+                                    : {{ $checklistDate->locale('id')->translatedFormat('l, d F Y') }}
                                 </span>
                             </p>
                             <p>SHIFT <span class="font-semibold">: {{ strtoupper($checklist->shift ?? 'PAGI') }}</span></p>
