@@ -68,6 +68,7 @@ class LogbookChiefController extends Controller
                 'date' => $request->date,
                 'grup' => $request->grup,
                 'shift' => $request->shift,
+                'status' => 'draft',
                 'created_by' => Auth::id(), // Aman, diambil dari user yang login
             ]);
 
@@ -151,6 +152,11 @@ class LogbookChiefController extends Controller
             ->orderBy('name', 'asc')
             ->get();
 
+        $supervisors = User::whereHas('role', function ($query) {
+            $query->where('name', Role::SUPERVISOR);
+        })
+        ->where('id', '!=', Auth::id())
+        ->get();
 
         return view('logbook.chief.detailLaporanLeader', [
             'logbook' => $logbook,
@@ -160,6 +166,7 @@ class LogbookChiefController extends Controller
             'uraianKegiatan' => $uraianKegiatan,
             'availableOfficers' => $availableOfficers,
             'allOfficers' => $allOfficers,
+            'supervisors' => $supervisors
         ]);
     }
 
@@ -177,7 +184,6 @@ class LogbookChiefController extends Controller
         $validated = $request->validate([
             'jml_personil' => 'required|integer|min:0',
             'jml_hadir'    => 'required|integer|min:0|max:' . $request->jml_personil,
-            'jml_kekuatan' => 'required|integer|min:0',
             'materi'       => 'required|string|max:1000',
             'keterangan'   => 'required|string|max:1000',
         ]);
@@ -196,7 +202,6 @@ class LogbookChiefController extends Controller
                 'logbook_chief_id' => $logbookId,
                 'jml_personil'     => $validated['jml_personil'],
                 'jml_hadir'        => $validated['jml_hadir'],
-                'jml_kekuatan'     => $validated['jml_kekuatan'],
                 'materi'           => $validated['materi'],
                 'keterangan'       => $validated['keterangan'],
             ]);
@@ -213,6 +218,66 @@ class LogbookChiefController extends Controller
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.');
+        }
+    }
+
+    public function updateKemajuan(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'logbook_chief_id' => 'required|exists:logbook_chief,logbookID',
+            'jml_personil' => 'required|integer|min:0',
+            'jml_hadir'    => 'required|integer|min:0|max:' . $request->jml_personil,
+            'materi'       => 'required|string|max:1000',
+            'keterangan'   => 'required|string|max:1000',
+        ]);
+
+        try {
+            $kemajuan = LogbookChiefKemajuan::findOrFail($id);
+            $logbook = LogbookChief::findOrFail($kemajuan->logbook_chief_id);
+
+            // Pastikan user memiliki akses
+            if ($logbook->created_by !== Auth::id()) {
+                abort(403, 'Unauthorized access.');
+            }
+
+            $kemajuan->update($validated);
+
+            return redirect()->back()->with('success', 'Kemajuan personil berhasil diperbarui.');
+        } catch (\Exception $e) {
+            Log::error('Error updating kemajuan personil: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'kemajuan_id' => $id,
+                'input' => $request->all(),
+            ]);
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan saat memperbarui data. Silakan coba lagi.');
+        }
+    }
+
+    public function destroyKemajuan($id)
+    {
+        try {
+            $kemajuan = LogbookChiefKemajuan::findOrFail($id);
+            $logbook = LogbookChief::findOrFail($kemajuan->logbook_chief_id);
+
+            // Pastikan user memiliki akses
+            if ($logbook->created_by !== Auth::id()) {
+                abort(403, 'Unauthorized access.');
+            }
+
+            $kemajuan->delete();
+
+            return redirect()->back()->with('success', 'Kemajuan personil berhasil dihapus.');
+        } catch (\Exception $e) {
+            Log::error('Error deleting kemajuan personil: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'kemajuan_id' => $id,
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan saat menghapus data. Silakan coba lagi.');
         }
     }
 
@@ -270,6 +335,84 @@ class LogbookChiefController extends Controller
         }
     }
 
+    public function updatePersonil(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'logbook_chief_id' => 'required|exists:logbook_chief,logbookID',
+            'staffID' => 'required|exists:users,id',
+            'description' => 'required|in:hadir,izin,sakit,cuti',
+        ]);
+
+        try {
+            $personil = LogbookStaff::findOrFail($id);
+            $logbook = LogbookChief::findOrFail($personil->logbook_chief_id);
+
+            // Pastikan user memiliki akses
+            if ($logbook->created_by !== Auth::id()) {
+                abort(403, 'Unauthorized access.');
+            }
+
+            // Cek apakah personil sudah ada di logbook ini (kecuali dirinya sendiri)
+            $existingPersonil = LogbookStaff::where('logbook_chief_id', $request->logbook_chief_id)
+                ->where('staffID', $request->staffID)
+                ->where('id', '!=', $id)
+                ->first();
+
+            if ($existingPersonil) {
+                return redirect()->back()
+                    ->with('error', 'Personil sudah terdaftar dalam logbook ini.')
+                    ->withInput();
+            }
+
+            // Ambil data user
+            $user = User::findOrFail($request->staffID);
+
+            $personil->update([
+                'logbook_chief_id' => $validated['logbook_chief_id'],
+                'staffID' => $validated['staffID'],
+                'classification' => $user->lisensi ?? null,
+                'description' => $validated['description'],
+            ]);
+
+            return redirect()->back()->with('success', 'Personil berhasil diperbarui!');
+        } catch (\Exception $e) {
+            Log::error('Error updating personil: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'personil_id' => $id,
+                'input' => $request->all(),
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Gagal memperbarui personil. Silakan coba lagi.')
+                ->withInput();
+        }
+    }
+
+    public function destroyPersonil($id)
+    {
+        try {
+            $personil = LogbookStaff::findOrFail($id);
+            $logbook = LogbookChief::findOrFail($personil->logbook_chief_id);
+
+            // Pastikan user memiliki akses
+            if ($logbook->created_by !== Auth::id()) {
+                abort(403, 'Unauthorized access.');
+            }
+
+            $personil->delete();
+
+            return redirect()->back()->with('success', 'Personil berhasil dihapus!');
+        } catch (\Exception $e) {
+            Log::error('Error deleting personil: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'personil_id' => $id,
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Gagal menghapus personil. Silakan coba lagi.');
+        }
+    }
+
     public function storeFacility(Request $request)
     {
         $request->validate([
@@ -292,6 +435,45 @@ class LogbookChiefController extends Controller
             return redirect()->back()
                 ->with('error', 'Gagal menambahkan Fasilitas. Silakan coba lagi.')
                 ->withInput();
+        }
+    }
+
+    public function updateFacility(Request $request, $id)
+    {
+        $request->validate([
+            'logbook_chief_id'   => 'required|exists:logbook_chief,logbookID',
+            'facility'  => 'required|string|max:255',
+            'quantity'  => 'required|integer|min:1',
+            'description'   => 'required|string|max:1000',
+        ]);
+
+        try {
+            $facility = LogbookFacility::findOrFail($id);
+            $facility->update([
+                'logbook_chief_id' => $request->logbook_chief_id,
+                'facility'  => $request->facility,
+                'quantity'  => $request->quantity,
+                'description'   => $request->description,
+            ]);
+
+            return redirect()->back()->with('success', 'Fasilitas berhasil diperbarui!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Gagal memperbarui Fasilitas. Silakan coba lagi.')
+                ->withInput();
+        }
+    }
+
+    public function destroyFacility($id)
+    {
+        try {
+            $facility = LogbookFacility::findOrFail($id);
+            $facility->delete();
+
+            return redirect()->back()->with('success', 'Fasilitas berhasil dihapus!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Gagal menghapus Fasilitas. Silakan coba lagi.');
         }
     }
 
@@ -319,6 +501,47 @@ class LogbookChiefController extends Controller
             return redirect()->back()
                 ->with('error', 'Gagal menambahkan uraian kegiatan. Silakan coba lagi.')
                 ->withInput(); // Kembalikan input yang sudah diisi
+        }
+    }
+
+    public function updateUraian(Request $request, $id)
+    {
+        $request->validate([
+            'logbook_chief_id'   => 'required|exists:logbook_chief,logbookID',
+            'start_time'  => 'required|date_format:H:i',
+            'end_time'  => 'required|date_format:H:i',
+            'summary'     => 'required|string|max:255',
+            'description' => 'required|string',
+        ]);
+
+        try {
+            $uraian = LogbookDetail::findOrFail($id);
+            $uraian->update([
+                'logbook_chief_id' => $request->logbook_chief_id,
+                'start_time' => $request->start_time,
+                'end_time' => $request->end_time,
+                'summary' => $request->summary,
+                'description' => $request->description,
+            ]);
+
+            return redirect()->back()->with('success', 'Uraian kegiatan berhasil diperbarui!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Gagal memperbarui uraian kegiatan. Silakan coba lagi.')
+                ->withInput(); // Kembalikan input yang sudah diisi
+        }
+    }
+
+    public function destroyUraian($id)
+    {
+        try {
+            $uraian = LogbookDetail::findOrFail($id);
+            $uraian->delete();
+
+            return redirect()->back()->with('success', 'Uraian kegiatan berhasil dihapus!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Gagal menghapus uraian kegiatan. Silakan coba lagi.');
         }
     }
 
@@ -352,6 +575,7 @@ class LogbookChiefController extends Controller
 
             // Update dengan menggunakan fill dan save untuk menghindari masalah timestamps
             $logbook->fill([
+                'status' => 'submitted',
                 'senderSignature' => $signature,
                 'approved_by' => $request->approved_by,
             ]);
@@ -439,6 +663,7 @@ class LogbookChiefController extends Controller
 
             // Update logbook
             $logbook->approvedSignature = $signature;
+            $logbook->status = 'approved';
             // $logbook->approved_at = now(); // DIHAPUS: Kemungkinan kolom tidak ada di database dan menyebabkan error
             $logbook->save();
 

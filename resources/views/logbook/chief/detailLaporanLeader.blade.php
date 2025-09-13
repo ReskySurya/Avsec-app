@@ -79,6 +79,13 @@
             quantity: '',
             description: ''
         },
+        editKemajuanData: {
+            id: null,
+            jml_personil: '',
+            jml_hadir: '',
+            materi: '',
+            keterangan: ''
+        },
         openEditDetailFn(id, startTime, endTime, summary, description) {
             // Function yang sudah ada...
             this.editDetailData.id = id;
@@ -108,7 +115,7 @@
             this.editDetailData.description = description;
             this.openEditDetailUraian = true;
         },
-        openEditPersonilFn(id, staffID, nama, classification, description) {  // Tambahkan parameter staffID
+        openEditPersonilFn(id, staffID, nama, classification, description) {
             this.editPersonilData.id = id;
             this.editPersonilData.staffID = staffID;
             this.editPersonilData.nama = nama || '';
@@ -123,11 +130,12 @@
             this.editFacilityData.description = description;
             this.openEditFasilitas = true;
         },
-        openEditKemajuanFn(id, facility, quantity, description) {
+        openEditKemajuanFn(id, jml_personil, jml_hadir, materi, keterangan) {
             this.editKemajuanData.id = id;
-            this.editKemajuanData.facility = facility;
-            this.editKemajuanData.quantity = quantity;
-            this.editKemajuanData.description = description;
+            this.editKemajuanData.jml_personil = jml_personil;
+            this.editKemajuanData.jml_hadir = jml_hadir;
+            this.editKemajuanData.materi = materi;
+            this.editKemajuanData.keterangan = keterangan;
             this.openEditKemajuan = true;
         }
     }">
@@ -182,7 +190,8 @@
                 <div class=" rounded-lg ">
                     <ul class="text-blue-600">
                         <li><strong>ID:</strong> {{ $logbook->logbookID ?? 'N/A' }}</li>
-                        <li><strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($logbook->tanggal)->locale('id')->translatedFormat('l,
+                        <li><strong>Tanggal:</strong> {{
+                            \Carbon\Carbon::parse($logbook->tanggal)->locale('id')->translatedFormat('l,
                             d F Y') }}</li>
                     </ul>
                 </div>
@@ -217,9 +226,8 @@
             </div>
         </div>
 
-        <!-- Mobile Card View Kemajuan Personil -->
         <div class="grid grid-cols-1 gap-3 md:hidden p-4">
-            @forelse($facility ?? [] as $index => $items)
+            @forelse($kemajuanPersonil ?? [] as $index => $items)
             <div
                 class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow duration-200">
                 <!-- Header Card -->
@@ -229,36 +237,108 @@
                             <div class="bg-white bg-opacity-20 p-2 rounded-lg">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 008 10.172V5L8 4z">
+                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
                                     </path>
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="font-semibold text-lg">{{ $items->facility ?? 'Unknown Equipment' }}
-                                </h3>
+                                <h3 class="font-semibold text-lg">Kemajuan Personil #{{ $index + 1 }}</h3>
+                                <p class="text-blue-100 text-sm">Data Kehadiran Personil</p>
                             </div>
                         </div>
                         <div class="text-center">
                             <div class="bg-white bg-opacity-25 px-3 py-1 rounded-full">
-                                <span class="font-bold text-lg">{{ $items->quantity }}</span>
+                                <span class="font-bold text-lg">{{ $items->jml_hadir }}/{{ $items->jml_personil
+                                    }}</span>
                             </div>
+                            <p class="text-xs text-blue-100 mt-1">Hadir/Total</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Content -->
                 <div class="p-4">
-                    <!-- Description -->
-                    <div class="mb-4">
-                        <p class="text-gray-800 text-sm">{{ $items->description ?: 'Tidak ada keterangan' }}</p>
+                    <!-- Data Grid -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <!-- Jumlah Personil -->
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <div class="bg-blue-100 p-1 rounded">
+                                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <h4 class="text-sm font-semibold text-gray-700">Jumlah Personil</h4>
+                            </div>
+                            <p class="text-2xl font-bold text-blue-600">{{ $items->jml_personil }}</p>
+                        </div>
+
+                        <!-- Jumlah Hadir -->
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <div class="bg-green-100 p-1 rounded">
+                                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <h4 class="text-sm font-semibold text-gray-700">Jumlah Hadir</h4>
+                            </div>
+                            <p class="text-2xl font-bold text-green-600">{{ $items->jml_hadir }}</p>
+                        </div>
                     </div>
+
+                    <!-- Isi Materi -->
+                    @if($items->materi)
+                    <div class="mb-4">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <div class="bg-purple-100 p-1 rounded">
+                                <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
+                                    </path>
+                                </svg>
+                            </div>
+                            <h4 class="text-sm font-semibold text-gray-700">Isi Materi</h4>
+                        </div>
+                        <div class="bg-purple-50 rounded-lg p-3">
+                            <p class="text-gray-800 text-sm">{{ $items->materi }}</p>
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Keterangan -->
+                    @if($items->keterangan)
+                    <div class="mb-4">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <div class="bg-orange-100 p-1 rounded">
+                                <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <h4 class="text-sm font-semibold text-gray-700">Keterangan</h4>
+                        </div>
+                        <div class="bg-orange-50 rounded-lg p-3">
+                            <p class="text-gray-800 text-sm">{{ $items->keterangan }}</p>
+                        </div>
+                    </div>
+                    @endif
 
                     <!-- Action Buttons -->
                     <div class="flex justify-end space-x-2">
                         <!-- Edit Button -->
                         <button type="button"
                             class="flex items-center space-x-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors duration-200"
-                            @click="openEditKemajuanFn({{ $items->id }}, '{{ $items->facility ?? '' }}', {{ $items->quantity }}, '{{ addslashes($items->description ?? '') }}')">
+                            @click="openEditKemajuanFn({{ $items->id }}, '{{ $items->jml_personil }}', '{{ $items->jml_hadir }}', '{{ addslashes($items->materi ?? '') }}', '{{ addslashes($items->keterangan ?? '') }}')">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
@@ -268,9 +348,9 @@
                         </button>
 
                         <!-- Delete Button -->
-                        <form action="{{ route('logbook.facility.delete', $items->id) }}" method="POST"
+                        <form action="{{ route('logbook.chief.deleteKemajuan', $items->id) }}" method="POST"
                             class="inline-block"
-                            onsubmit="return confirmDelete('Apakah Anda yakin ingin menghapus fasilitas ini?')">
+                            onsubmit="return confirmDelete('Apakah Anda yakin ingin menghapus data kemajuan personil ini?')">
                             @csrf
                             @method('DELETE')
                             <button type="submit"
@@ -291,32 +371,32 @@
                 <div class="bg-blue-100 p-6 rounded-2xl mb-4 inline-block">
                     <svg class="w-12 h-12 text-blue-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 008 10.172V5L8 4z">
+                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
                         </path>
                     </svg>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-700 mb-2">Belum Ada Fasilitas</h3>
-                <p class="text-gray-500 mb-4">Tambahkan fasilitas untuk logbook ini</p>
-                <button @click="openAddKemajuan = true"
-                    class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-md">
-                    Tambah Fasilitas
-                </button>
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">Belum Ada Data Kemajuan Personil</h3>
+                <p class="text-gray-500 mb-4">Tambahkan data kemajuan personil untuk logbook ini</p>
             </div>
             @endforelse
         </div>
 
-        <!-- Desktop Table View Fasilitas -->
+        <!-- Desktop Table View Kemajuan Personil -->
         <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hidden md:block">
             <table class="min-w-full">
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">No</th>
-                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Jumlah Personil</th>
-                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Jumlah Hadir</th>
-                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Jumlah Kekuatan</th>
-                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Isi Materi</th>
-                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Keterangan</th>
-                        <th class="px-5 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Aksi</th>
+                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Jumlah
+                            Personil</th>
+                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Jumlah
+                            Hadir</th>
+                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Isi
+                            Materi</th>
+                        <th class="px-5 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            Keterangan</th>
+                        <th class="px-5 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Aksi
+                        </th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -325,7 +405,6 @@
                         <td class="px-5 py-4 text-sky-600 font-bold">{{ $index + 1 }}</td>
                         <td class="px-5 py-4">{{ $items->jml_personil }}</td>
                         <td class="px-5 py-4">{{ $items->jml_hadir }}</td>
-                        <td class="px-5 py-4">{{ $items->jml_kekuatan }}</td>
                         <td class="px-5 py-4">{{ $items->materi ?? 'N/A' }}</td>
                         <td class="px-5 py-4">{{ $items->keterangan ?? 'N/A' }}</td>
                         <td class="px-5 py-4 flex justify-center space-x-2" @click.stop>
@@ -333,7 +412,7 @@
                             <button type="button"
                                 class="p-2 bg-yellow-100 text-yellow-700 rounded-full hover:bg-yellow-200 transition-colors duration-200"
                                 title="Edit Kemajuan"
-                                @click="openEditKemajuanFn({{ $items->id }}, '{{ $items->jml_personil }}, {{ $items->jml_hadir }}, {{ $items->jml_kekuatan }}, '{{ $items->materi ?? '' }}', '{{ addslashes($items->keterangan ?? '') }}')">
+                                @click="openEditKemajuanFn({{ $items->id }}, '{{ $items->jml_personil }}', '{{ $items->jml_hadir }}', '{{ addslashes($items->materi ?? '') }}', '{{ addslashes($items->keterangan ?? '') }}')">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
@@ -342,14 +421,14 @@
                             </button>
 
                             <!-- Delete button -->
-                            <form action="{{ route('logbook.facility.delete',$items->id) }}" method="POST"
+                            <form action="{{ route('logbook.chief.deleteKemajuan',$items->id) }}" method="POST"
                                 class="inline-block"
-                                onsubmit="return confirmDelete('Apakah Anda yakin ingin menghapus fasilitas ini?')">
+                                onsubmit="return confirmDelete('Apakah Anda yakin ingin menghapus Kemajuan Personil ini?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit"
                                     class="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors duration-200"
-                                    title="Hapus Fasilitas">
+                                    title="Hapus Kemajuan Personil">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
@@ -381,7 +460,7 @@
         <div @click.away="openAddKemajuan = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
             <div class="bg-gradient-to-r from-sky-500 to-indigo-600 text-white p-6 rounded-t-2xl">
                 <h2 class="text-2xl font-bold">Tambah Kemajuan Personil</h2>
-                <p class="text-blue-100">Masukkan data Kemajuan Personil baru</p>
+                <p class="text-blue-100">Masukkan Data Kemajuan Personil baru</p>
             </div>
 
             <form action="{{ route('logbook.chief.addKemajuan') }}" method="POST" class="p-6">
@@ -402,18 +481,8 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Jumlah Hadir</label>
                     <input type="number" name="jml_hadir" value="{{ old('jml_hadir') }}"
                         class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('jml_hadir') border-red-500 @enderror"
-                        placeholder="Masukkan jumlah fasilitas" required>
+                        placeholder="Masukkan Jumlah Hadir" required>
                     @error('jml_hadir')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="mb-2 sm:mb-4">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Jumlah Kekuatan</label>
-                    <input type="number" name="jml_kekuatan" value="{{ old('jml_kekuatan') }}"
-                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('jml_kekuatan') border-red-500 @enderror"
-                        placeholder="Masukkan jumlah fasilitas" required>
-                    @error('jml_kekuatan')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -422,7 +491,7 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Materi Apel</label>
                     <textarea name="materi" rows="3"
                         class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('materi') border-red-500 @enderror"
-                        placeholder="Masukkan keterangan fasilitas" required>{{ old('materi') }}</textarea>
+                        placeholder="Masukkan Materi Apel" required>{{ old('materi') }}</textarea>
                     @error('materi')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
@@ -432,7 +501,7 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Keterangan</label>
                     <textarea name="keterangan" rows="3"
                         class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('keterangan') border-red-500 @enderror"
-                        placeholder="Masukkan keterangan fasilitas" required>{{ old('keterangan') }}</textarea>
+                        placeholder="Masukkan Keterangan Kegiatan" required>{{ old('keterangan') }}</textarea>
                     @error('keterangan')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
@@ -452,7 +521,6 @@
         </div>
     </div>
 
-    <!-- Modal Edit Fasilitas -->
     <div x-show="openEditKemajuan" x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100"
         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform scale-100"
@@ -460,46 +528,60 @@
         class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
         <div @click.away="openEditKemajuan = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
             <div class="bg-gradient-to-r from-sky-500 to-indigo-600 text-white p-6 rounded-t-2xl">
-                <h2 class="text-2xl font-bold">Edit Fasilitas</h2>
-                <p class="text-blue-100">Perbarui data fasilitas</p>
+                <h2 class="text-2xl font-bold">Edit Kemajuan Personil</h2>
+                <p class="text-blue-100">Perbarui Data Kemajuan Personil</p>
             </div>
 
-            <form x-bind:action="`{{ url('/logbook/facility/update') }}/${editFacilityData.id}`" method="POST"
-                class="p-6">
+            <form x-bind:action="`/logbook/chief/update-kemajuan/${editKemajuanData.id}`" method="POST" class="p-6">
                 @csrf
-                @method('POST')
-                <input type="hidden" name="logbookID" value="{{ $logbook->logbookID ?? '' }}">
+                @method('PUT') {{-- Gunakan PUT atau PATCH untuk update --}}
 
-                <div class="mb-2 sm:mb-4">
-                    <label for="facility" class="block text-sm font-semibold text-gray-700 mb-2">Nama
-                        Fasilitas</label>
-                    <input type="text" name="facility" x-model="editFacilityData.facility"
-                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('facility') border-red-500 @enderror"
-                        value="{{ old('facility') }}" placeholder="Masukkan nama fasilitas" required>
-                    @error('facility')
+                <input type="hidden" name="logbook_chief_id" value="{{ $logbook->logbookID ?? '' }}">
+
+                <div class="mb-4">
+                    <label for="edit_jml_personil" class="block text-sm font-semibold text-gray-700 mb-2">Jumlah Total
+                        Personil</label>
+                    <input type="number" id="edit_jml_personil" name="jml_personil"
+                        x-model="editKemajuanData.jml_personil"
+                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('jml_personil') border-red-500 @enderror"
+                        placeholder="Masukkan jumlah total personil" required>
+                    @error('jml_personil')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
-                <div class="mb-2 sm:mb-4">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Jumlah</label>
-                    <input type="number" name="quantity" x-model="editFacilityData.quantity"
-                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('quantity') border-red-500 @enderror"
-                        placeholder="Masukkan jumlah fasilitas" required>
-                    @error('quantity')
+                <div class="mb-4">
+                    <label for="edit_jml_hadir" class="block text-sm font-semibold text-gray-700 mb-2">Jumlah
+                        Hadir</label>
+                    <input type="number" id="edit_jml_hadir" name="jml_hadir" x-model="editKemajuanData.jml_hadir"
+                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('jml_hadir') border-red-500 @enderror"
+                        placeholder="Masukkan jumlah personil yang hadir" required>
+                    @error('jml_hadir')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
-                <div class="mb-2 sm:mb-4">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Keterangan</label>
-                    <textarea name="description" rows="3" x-model="editFacilityData.description"
-                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('description') border-red-500 @enderror"
-                        placeholder="Masukkan keterangan fasilitas" required></textarea>
-                    @error('description')
+                <div class="mb-4">
+                    <label for="edit_materi" class="block text-sm font-semibold text-gray-700 mb-2">Materi</label>
+                    <textarea id="edit_materi" name="materi" rows="3" x-model="editKemajuanData.materi"
+                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('materi') border-red-500 @enderror"
+                        placeholder="Masukkan materi yang disampaikan" required></textarea>
+                    @error('materi')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
+
+                <div class="mb-4">
+                    <label for="edit_keterangan"
+                        class="block text-sm font-semibold text-gray-700 mb-2">Keterangan</label>
+                    <textarea id="edit_keterangan" name="keterangan" rows="3" x-model="editKemajuanData.keterangan"
+                        class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('keterangan') border-red-500 @enderror"
+                        placeholder="Masukkan keterangan tambahan" required></textarea>
+                    @error('keterangan')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
 
                 <div class="flex justify-end space-x-3">
                     <button type="button" @click="openEditKemajuan = false"
@@ -581,7 +663,7 @@
                         </button>
 
                         <!-- Delete Button -->
-                        <form action="{{ route('logbook.staff.delete', $items->id) }}" method="POST"
+                        <form action="{{ route('logbook.chief.deletePersonil', $items->id) }}" method="POST"
                             class="inline-block"
                             onsubmit="return confirmDelete('Apakah Anda yakin ingin menghapus personil ini?')">
                             @csrf
@@ -663,7 +745,7 @@
                                 </svg>
                             </button>
                             <!-- Delete button -->
-                            <form action="{{ route('logbook.staff.delete',$items->id) }}" method="POST"
+                            <form action="{{ route('logbook.chief.deletePersonil',$items->id) }}" method="POST"
                                 class="inline-block"
                                 onsubmit="return confirmDelete('Apakah Anda yakin ingin menghapus personil ini?')">
                                 @csrf
@@ -774,10 +856,11 @@
                 <p class="text-blue-100">Ubah informasi personil</p>
             </div>
 
-            <form x-bind:action="`{{ url('/logbook/staff/update') }}/${editPersonilData.id}`" method="POST" class="p-6">
+            <form x-bind:action="`{{ url('/logbook/chief/update-personil') }}/${editPersonilData.id}`" method="POST"
+                class="p-6">
                 @csrf
-                @method('POST')
-                <input type="hidden" name="logbookID" value="{{ $logbook->logbookID ?? '' }}">
+                @method('PUT')
+                <input type="hidden" name="logbook_chief_id" value="{{ $logbook->logbookID ?? '' }}">
 
                 <div class="mb-2 sm:mb-4">
                     <label for="edit_staffID" class="block text-gray-700 font-semibold text-sm sm:text-sm mb-1 sm:mb-2">
@@ -788,19 +871,12 @@
                         class="w-full border-2 px-4 py-3 rounded-xl focus:border-sky-500 focus:outline-none transition-colors duration-200"
                         required>
                         <option value="">Pilih Officer</option>
-                        @foreach($allOfficers as $officer)
-                        @php
-                        $isCurrentOfficer = isset($editPersonilData['staffID']) &&
-                        $editPersonilData['staffID'] == $officer->id;
-                        $isAvailable = !in_array($officer->id, $personil->pluck('staffID')->toArray());
-                        @endphp
 
-                        @if($isCurrentOfficer || $isAvailable)
+                        @foreach($allOfficers as $officer)
                         <option value="{{ $officer->id }}" data-lisensi="{{ $officer->lisensi }}"
-                            :selected="$isCurrentOfficer">
+                            :disabled="{{ $personil->pluck('staffID')->toJson() }}.includes({{ $officer->id }}) && {{ $officer->id }} != editPersonilData.staffID">
                             {{ $officer->name }} - {{ $officer->lisensi }}
                         </option>
-                        @endif
                         @endforeach
                     </select>
 
@@ -906,7 +982,7 @@
                         </button>
 
                         <!-- Delete Button -->
-                        <form action="{{ route('logbook.facility.delete', $items->id) }}" method="POST"
+                        <form action="{{ route('logbook.chief.deleteFacility', $items->id) }}" method="POST"
                             class="inline-block"
                             onsubmit="return confirmDelete('Apakah Anda yakin ingin menghapus fasilitas ini?')">
                             @csrf
@@ -980,7 +1056,7 @@
                             </button>
 
                             <!-- Delete button -->
-                            <form action="{{ route('logbook.facility.delete',$items->id) }}" method="POST"
+                            <form action="{{ route('logbook.chief.deleteFacility',$items->id) }}" method="POST"
                                 class="inline-block"
                                 onsubmit="return confirmDelete('Apakah Anda yakin ingin menghapus fasilitas ini?')">
                                 @csrf
@@ -1083,11 +1159,11 @@
                 <p class="text-blue-100">Perbarui data fasilitas</p>
             </div>
 
-            <form x-bind:action="`{{ url('/logbook/facility/update') }}/${editFacilityData.id}`" method="POST"
+            <form x-bind:action="`{{ url('/logbook/chief/update-facility') }}/${editFacilityData.id}`" method="POST"
                 class="p-6">
                 @csrf
-                @method('POST')
-                <input type="hidden" name="logbookID" value="{{ $logbook->logbookID ?? '' }}">
+                @method('PUT')
+                <input type="hidden" name="logbook_chief_id" value="{{ $logbook->logbookID ?? '' }}">
 
                 <div class="mb-2 sm:mb-4">
                     <label for="facility" class="block text-sm font-semibold text-gray-700 mb-2">Nama
@@ -1146,9 +1222,9 @@
                         class="w-full sm:w-auto px-4 py-2 bg-blue-400 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold shadow transition">
                         + Tambah Uraian Kegiatan
                     </button>
-                    <div class="flex items-center justify-center space-x-2">
+                    <div class="flex items-center space-x-2">
                         <a href="{{ route('logbook.chief.review.laporan.leader', $logbook->logbookID) }}"
-                            class="inline-flex items-center px-3 py-1.5 border border-blue-300 text-sm font-medium rounded-md text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors duration-200">
+                            class="w-full inline-flex items-center justify-center px-3 py-1.5 border border-blue-300 text-sm font-medium rounded-xl text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors duration-200">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -1182,9 +1258,8 @@
                     <p class="text-blue-100">Konfirmasi penyelesaian logbook shift hari ini</p>
                 </div>
 
-                <form
-                    action="{{ route('logbook.chief.signature.send', $logbook->logbookID ?? '') }}"
-                    method="POST" class="p-6" onsubmit="return handleSignatureSubmit(event)">
+                <form action="{{ route('logbook.chief.signature.send', $logbook->logbookID ?? '') }}" method="POST"
+                    class="p-6" onsubmit="return handleSignatureSubmit(event)">
                     @csrf
                     @method('POST')
                     <div class="mb-6">
@@ -1230,13 +1305,6 @@
                             class="block text-gray-700 font-bold text-xs sm:text-base mb-1 sm:mb-2">Pilih
                             Supervisor yang Mengetahui:
                         </label>
-
-                        @php
-                        $supervisors = \App\Models\User::whereHas('role', function ($query) {
-                        $query->where('name', \App\Models\Role::SUPERVISOR);
-                        })->get();
-                        @endphp
-
                         <select name="approved_by" id="approved_by"
                             class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base" required>
                             <option value="">Pilih Supervisor</option>
@@ -1306,7 +1374,7 @@
                         </button>
 
                         <!-- Delete Button -->
-                        <form action="{{ route('logbook.detail.delete', $items->id) }}" method="POST"
+                        <form action="{{ route('logbook.chief.deleteUraian', $items->id) }}" method="POST"
                             class="inline-block"
                             onsubmit="return confirmDelete('Apakah Anda yakin ingin menghapus uraian kegiatan ini?')">
                             @csrf
@@ -1381,7 +1449,7 @@
                             </button>
 
                             <!-- Delete button with better confirmation -->
-                            <form action="{{ route('logbook.detail.delete', $items->id) }}" method="POST"
+                            <form action="{{ route('logbook.chief.deleteUraian', $items->id) }}" method="POST"
                                 class="inline-block"
                                 onsubmit="return confirmDelete('Apakah Anda yakin ingin menghapus uraian kegiatan ini?')">
                                 @csrf
@@ -1491,9 +1559,9 @@
                 <h2 class="text-2xl font-bold">Edit Uraian Kegiatan</h2>
                 <p class="text-blue-100">Ubah informasi uraian kegiatan</p>
             </div>
-            <form x-bind:action="`/logbook/detail/update/${editDetailData.id}`" method="POST" class="p-6">
+            <form x-bind:action="`/logbook/chief/update-uraian/${editDetailData.id}`" method="POST" class="p-6">
                 @csrf
-                @method('POST')
+                @method('PUT')
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Waktu</label>
                     <div class="flex space-x-4">

@@ -17,6 +17,7 @@ class LogbookChief extends Model
         'date',
         'grup',
         'shift',
+        'status',
         'created_by',
         'approved_by',
         'senderSignature',
@@ -59,7 +60,7 @@ class LogbookChief extends Model
         return $this->hasMany(LogbookDetail::class, 'logbook_chief_id', 'logbookID');
     }
 
-    public function facility() 
+    public function facility()
     {
         return $this->hasMany(LogbookFacility::class, 'logbook_chief_id', 'logbookID');
     }

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->date('date');
             $table->string('grup')->nullable();
             $table->string('shift')->nullable();
+            $table->enum('status', ['draft', 'submitted', 'approved'])->default('draft');
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('approved_by')->nullable();
             $table->text('senderSignature')->nullable();
@@ -33,7 +34,6 @@ return new class extends Migration
             $table->string('logbook_chief_id', 20);
             $table->integer('jml_personil');
             $table->integer('jml_hadir');
-            $table->integer('jml_kekuatan');
             $table->text('materi');
             $table->text('keterangan')->nullable();
             $table->timestamps();

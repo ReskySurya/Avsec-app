@@ -12,7 +12,6 @@ class LogbookChiefKemajuan extends Model
         'logbook_chief_id',
         'jml_personil',
         'jml_hadir',
-        'jml_kekuatan',
         'materi',
         'keterangan',
     ];

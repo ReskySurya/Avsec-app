@@ -81,15 +81,26 @@ Route::middleware(['auth', 'role:supervisor', 'password.changed'])->group(functi
 
     // Logbook Chief
     Route::post('/logbook/chief/store', [LogbookChiefController::class, 'store'])->name('logbook.chief.store');
-    Route::post('/logbook/chief/add-kemajuan', [LogbookChiefController::class, 'storeKemajuan'])->name('logbook.chief.addKemajuan');
-    Route::post('/logbook/chief/add-personil', [LogbookChiefController::class, 'storePersonil'])->name('logbook.chief.addPersonil');
-    Route::post('/logbook/chief/add-facility', [LogbookChiefController::class, 'storeFacility'])->name('logbook.chief.addFacility');
-    Route::post('/logbook/chief/add-uraian', [LogbookChiefController::class, 'storeUraian'])->name('logbook.chief.addUraian');
-    Route::post('/logbook/chief/signature/send/{logbookID}', [LogbookChiefController::class, 'signatureSend'])->name('logbook.chief.signature.send');
-
     Route::put('/logbook/chief/{logbook}', [LogbookChiefController::class, 'update'])->name('logbook.chief.update');
     Route::delete('/logbook/chief/delete/{logbook}', [LogbookChiefController::class, 'destory'])->name('logbook.chief.delete');
 
+    Route::post('/logbook/chief/add-kemajuan', [LogbookChiefController::class, 'storeKemajuan'])->name('logbook.chief.addKemajuan');
+    Route::put('/logbook/chief/update-kemajuan/{id}', [LogbookChiefController::class, 'updateKemajuan'])->name('logbook.chief.updateKemajuan');
+    Route::delete('/logbook/chief/delete-kemajuan/{id}', [LogbookChiefController::class, 'destroyKemajuan'])->name('logbook.chief.deleteKemajuan');
+
+    Route::post('/logbook/chief/add-personil', [LogbookChiefController::class, 'storePersonil'])->name('logbook.chief.addPersonil');
+    Route::put('/logbook/chief/update-personil/{id}', [LogbookChiefController::class, 'updatePersonil'])->name('logbook.chief.updatePersonil');
+    Route::delete('/logbook/chief/delete-personil/{id}', [LogbookChiefController::class, 'destroyPersonil'])->name('logbook.chief.deletePersonil');
+
+    Route::post('/logbook/chief/add-facility', [LogbookChiefController::class, 'storeFacility'])->name('logbook.chief.addFacility');
+    Route::put('/logbook/chief/update-facility/{id}', [LogbookChiefController::class, 'updateFacility'])->name('logbook.chief.updateFacility');
+    Route::delete('/logbook/chief/delete-facility/{id}', [LogbookChiefController::class, 'destroyFacility'])->name('logbook.chief.deleteFacility');
+
+    Route::post('/logbook/chief/add-uraian', [LogbookChiefController::class, 'storeUraian'])->name('logbook.chief.addUraian');
+    Route::put('/logbook/chief/update-uraian/{id}', [LogbookChiefController::class, 'updateUraian'])->name('logbook.chief.updateUraian');
+    Route::delete('/logbook/chief/delete-uraian/{id}', [LogbookChiefController::class, 'destroyUraian'])->name('logbook.chief.deleteUraian');
+
+    Route::post('/logbook/chief/signature/send/{logbookID}', [LogbookChiefController::class, 'signatureSend'])->name('logbook.chief.signature.send');
     Route::post('/logbook/chief/review/{logbookID}/receive', [LogbookChiefController::class, 'signatureReceive'])->name('logbook.chief.signature.receive');
 
     // Review Checklist Kendaraan Motor Patroli

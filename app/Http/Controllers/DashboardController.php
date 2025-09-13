@@ -10,8 +10,6 @@ use App\Models\Report;
 use App\Models\Logbook;
 use App\Models\LogbookChief;
 use App\Models\LogbookRotasi;
-use App\Models\LogbookRotasiHBSCP;
-use App\Models\LogbookRotasiPSCP;
 use App\Models\ManualBook;
 use App\Models\ReportStatus;
 use Illuminate\Http\Request;
@@ -91,7 +89,7 @@ class DashboardController extends Controller
         if ($statusFilter) {
             $logbookQuery->where('status', $statusFilter);
         }
-        
+
 
         $logbookEntries = $logbookQuery->get()
             ->map(function ($logbook) {
@@ -203,7 +201,7 @@ class DashboardController extends Controller
         $logbooksHBSCP = $hbscpQuery->latest('date')->paginate($perPage, ['*'], 'hbscp_page');
 
         // 5. Kirim kedua koleksi data ke view
-        return view('supervisor.listLogbookRotasi', 
+        return view('supervisor.listLogbookRotasi',
         compact(
             'logbooksPSCP',
              'logbooksHBSCP',
@@ -337,6 +335,7 @@ class DashboardController extends Controller
         $perPage = 10;
 
         $logbooksChief = LogbookChief::with('createdBy', 'approvedBy')
+            ->where('status', 'submitted')
             ->where('approved_by', Auth::id())
             ->latest('date')
             ->paginate($perPage);

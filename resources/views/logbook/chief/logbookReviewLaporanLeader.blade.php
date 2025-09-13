@@ -19,7 +19,7 @@
     </a>
     @else
     {{-- Jika belum ada tanda tangan pengirim, kembali ke halaman sebelumnya --}}
-    <a href="javascript:history.back()"
+    <a href="{{ route('logbook.chief.detail', ['id' => $logbook->logbookID]) }}"
         class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-semibold rounded-lg shadow transition">
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -61,7 +61,6 @@
                 <th class="border border-black px-2 py-1 w-10">No</th>
                 <th class="border border-black px-2 py-1 w-20">Jumlah Personil</th>
                 <th class="border border-black px-2 py-1 w-20">Jumlah Hadir</th>
-                <th class="border border-black px-2 py-1 w-20">Jumlah Kekuatan</th>
                 <th class="border border-black px-2 py-1">Materi</th>
                 <th class="border border-black px-2 py-1 w-20">Keterangan</th>
             </tr>
@@ -72,7 +71,6 @@
                 <td class="border border-black px-2 py-1 text-center">{{ $index + 1 }}</td>
                 <td class="border border-black px-2 py-1 text-center">{{ $item->jml_personil }}</td>
                 <td class="border border-black px-2 py-1 text-center">{{ $item->jml_hadir }}</td>
-                <td class="border border-black px-2 py-1 text-center">{{ $item->jml_kekuatan }}</td>
                 <td class="border border-black px-2 py-1">{{ $item->materi }}</td>
                 <td class="border border-black px-2 py-1 text-center">{{ $item->keterangan }}</td>
             </tr>
