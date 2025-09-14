@@ -963,12 +963,17 @@
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
                 checkDate.setHours(0, 0, 0, 0);
-                const isMissed = checkDate < today && !isChecked;
+                const isPast = checkDate < today;
+                const isMissed = isPast && !isChecked;
+                const isDisabled = isPast;
 
                 // Get checkbox class
                 let checkboxClass;
                 if (isChecked) {
                     checkboxClass = 'border-green-500 bg-green-500';
+                    if (isPast) {
+                        checkboxClass += ' cursor-not-allowed opacity-70';
+                    }
                 } else if (isMissed) {
                     checkboxClass = 'border-yellow-500 bg-yellow-100 cursor-not-allowed opacity-60';
                 } else {
@@ -983,10 +988,10 @@
                     <div class="cell-content">
                         <button
                             type="button"
-                            class="${checkboxSize} border-2 rounded transition-all duration-200 ${!isMissed ? 'hover:scale-110' : ''} relative ${checkboxClass}"
-                            ${isMissed ? 'disabled' : ''}
-                            onclick="${isMissed ? '' : `toggleCheck(${itemIndex}, ${day})`}"
-                            title="${isMissed ? `Terlewat - ${item.items_name} tanggal ${day + 1}` : `Toggle checklist ${item.items_name} tanggal ${day + 1}`}">
+                            class="${checkboxSize} border-2 rounded transition-all duration-200 ${!isDisabled ? 'hover:scale-110' : ''} relative ${checkboxClass}"
+                            ${isDisabled ? 'disabled' : ''}
+                            onclick="${isDisabled ? '' : `toggleCheck(${itemIndex}, ${day})`}"
+                            title="${isMissed ? `Terlewat - ${item.items_name} tanggal ${day + 1}` : (isPast && isChecked) ? `Sudah dicek (Terkunci)` : `Toggle checklist ${item.items_name} tanggal ${day + 1}`}">
                         
                             ${isChecked ? `
                             <svg class="${iconSize} text-white absolute inset-0 m-auto" fill="currentColor" viewBox="0 0 20 20">
@@ -1045,11 +1050,16 @@
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
                 checkDate.setHours(0, 0, 0, 0);
-                const isMissed = checkDate < today && !isChecked;
+                const isPast = checkDate < today;
+                const isMissed = isPast && !isChecked;
+                const isDisabled = isPast;
 
                 let checkboxClass;
                 if (isChecked) {
                     checkboxClass = 'checked';
+                    if (isPast) {
+                        checkboxClass += ' cursor-not-allowed opacity-70';
+                    }
                 } else if (isMissed) {
                     checkboxClass = 'missed';
                 } else {
@@ -1062,9 +1072,9 @@
                         <button
                             type="button"
                             class="mobile-checkbox ${checkboxClass}"
-                            ${isMissed ? 'disabled' : ''}
-                            onclick="${isMissed ? '' : `toggleCheck(${itemIndex}, ${day})`}"
-                            title="${isMissed ? `Terlewat - ${item.items_name} tanggal ${day + 1}` : `Toggle checklist ${item.items_name} tanggal ${day + 1}`}">
+                            ${isDisabled ? 'disabled' : ''}
+                            onclick="${isDisabled ? '' : `toggleCheck(${itemIndex}, ${day})`}"
+                            title="${isMissed ? `Terlewat - ${item.items_name} tanggal ${day + 1}` : (isPast && isChecked) ? `Sudah dicek (Terkunci)` : `Toggle checklist ${item.items_name} tanggal ${day + 1}`}">
                             ${isChecked ? `
                             <svg class="w-3 h-3 text-white absolute inset-0 m-auto" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>

@@ -48,6 +48,7 @@
                         </tbody>
                     </table>
 
+
                     <div class="px-4">
                         <div class="p-2">
                             <div class="mb-0">
@@ -63,117 +64,117 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 border-x-2 border-t-2 border-black text-center items-center">
-                            <div class="relative ">
-                                <div >
+
+                        <!-- Updated Test Layout Section -->
+                        <div class="grid grid-cols-2 border-x-2 border-t-2 border-black text-center">
+                            <!-- DEPAN Section -->
+                            <div class="relative  pt-12 pb-4">
+                                <!-- Human Figure Placeholder -->
+                                <div class="relative mx-auto w-24 h-48 sm:w-32 sm:h-64  rounded-lg mb-4 flex items-center justify-center ">
                                     <img src="{{asset('images/tampakdepan.png')}}" alt="tampakdepan"
                                         class="w-full scale-75">
-                                    <p class="text-sm font-semibold pb-20">DEPAN</p>
-                                </div>
 
-                                <div class="absolute inset-0 flex flex-col items-start pt-20 lg:pt-64 pointer-events-auto ">
-                                    <div class="mb-1">
+                                    <!-- Test Points for DEPAN -->
+                                    <!-- TEST 1 - Top Left -->
+                                    <div class="absolute -left-4 sm:-left-20 top-8 sm:top-12">
                                         <div class="flex items-center gap-1">
-                                            <div class="flex flex-col gap-2">
-                                                <div class="flex items-center gap-1 pl-2.5">
-                                                    <span class="text-[10px]">IN</span>
-                                                    <input type="checkbox"
+                                            <div class="flex flex-col gap-1">
+                                                <div class="flex items-center gap-1">
+                                                    <span class="text-xs font-medium">IN</span>
+                                                    <input type="checkbox" class="ml-3"
                                                         {{$form->reportDetails->first()->test1_in_depan ? 'checked' : '' }} disabled>
                                                 </div>
                                                 <div class="flex items-center gap-1">
-                                                    <span class="text-[10px]">OUT</span>
+                                                    <span class="text-xs font-medium">OUT</span>
                                                     <input type="checkbox"
                                                         {{$form->reportDetails->first()->test1_out_depan ? 'checked' : '' }} disabled>
                                                 </div>
                                             </div>
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4"
-                                                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                             </svg>
                                             <span class="text-xs font-bold">TEST 1</span>
                                         </div>
                                     </div>
 
-                                    <div class="mb-28">
+                                    <!-- TEST 2 - Middle Left -->
+                                    <div class="absolute -left-4 sm:-left-20 top-20 sm:top-28">
                                         <div class="flex items-center gap-1">
-                                            <div class="flex flex-col gap-2">
-                                                <div class="flex items-center gap-1 pl-2.5">
-                                                    <span class="text-[10px]">IN</span>
-                                                    <input type="checkbox"
+                                            <div class="flex flex-col gap-1">
+                                                <div class="flex items-center gap-1">
+                                                    <span class="text-xs font-medium">IN</span>
+                                                    <input type="checkbox" class="ml-3"
                                                         {{$form->reportDetails->first()->test2_in_depan ? 'checked' : '' }} disabled>
                                                 </div>
                                                 <div class="flex items-center gap-1">
-                                                    <span class="text-[10px]">OUT</span>
+                                                    <span class="text-xs font-medium">OUT</span>
                                                     <input type="checkbox"
                                                         {{$form->reportDetails->first()->test2_out_depan ? 'checked' : '' }} disabled>
                                                 </div>
                                             </div>
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4"
-                                                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                             </svg>
                                             <span class="text-xs font-bold">TEST 2</span>
                                         </div>
                                     </div>
 
-                                    <div class="mb-8">
+                                    <!-- TEST 4 - Bottom Left -->
+                                    <div class="absolute -left-4 sm:-left-20 bottom-2 sm:bottom-4">
                                         <div class="flex items-center gap-1">
-                                            <div class="flex flex-col gap-2">
-                                                <div class="flex items-center gap-1 pl-2.5">
-                                                    <span class="text-[10px]">IN</span>
-                                                    <input type="checkbox"
+                                            <div class="flex flex-col gap-1">
+                                                <div class="flex items-center gap-1">
+                                                    <span class="text-xs font-medium">IN</span>
+                                                    <input type="checkbox" class="ml-3"
                                                         {{$form->reportDetails->first()->test4_in_depan ? 'checked' : '' }} disabled>
                                                 </div>
                                                 <div class="flex items-center gap-1">
-                                                    <span class="text-[10px]">OUT</span>
+                                                    <span class="text-xs font-medium">OUT</span>
                                                     <input type="checkbox"
                                                         {{$form->reportDetails->first()->test4_out_depan ? 'checked' : '' }} disabled>
                                                 </div>
                                             </div>
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4"
-                                                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                             </svg>
                                             <span class="text-xs font-bold">TEST 4</span>
                                         </div>
                                     </div>
                                 </div>
+                                <p class="text-sm font-semibold pt-4">DEPAN</p>
                             </div>
 
-                            <div class="relative">
-                                <div>
+                            <!-- BELAKANG Section -->
+                            <div class="relative pt-12 pb-4">
+                                <!-- Human Figure Placeholder -->
+                                <div class="relative mx-auto w-24 h-48 sm:w-32 sm:h-64 rounded-lg mb-4 flex items-center justify-center">
                                     <img src="{{asset('images/tampakbelakang.png')}}" alt="tampakbelakang"
                                         class="w-full scale-75">
-                                    <p class="text-sm font-semibold pb-20">BELAKANG</p>
-                                </div>
 
-                                <div class="absolute inset-0 flex flex-col items-end pr-2 pt-4 pointer-events-auto">
-                                    <div class="mt-52">
+                                    <!-- Test Points for BELAKANG -->
+                                    <!-- TEST 3 - Middle Right -->
+                                    <div class="absolute -right-10 sm:-right-20 top-20 sm:top-28">
                                         <div class="flex items-center gap-1">
                                             <span class="text-xs font-bold">TEST 3</span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 rotate-180"
-                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4"
-                                                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                            <svg class="w-4 h-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                             </svg>
-                                            <div class="flex flex-col gap-2">
-                                                <div class="flex items-center gap-1 pr-2.5">
+                                            <div class="flex flex-col gap-1">
+                                                <div class="flex items-center gap-1">
                                                     <input type="checkbox"
                                                         {{$form->reportDetails->first()->test3_in_belakang ? 'checked' : '' }} disabled>
-                                                    <span class="text-[10px]">IN</span>
+                                                    <span class="text-xs font-medium">IN</span>
                                                 </div>
                                                 <div class="flex items-center gap-1">
                                                     <input type="checkbox"
                                                         {{$form->reportDetails->first()->test3_out_belakang ? 'checked' : '' }} disabled>
-                                                    <span class="text-[10px]">OUT</span>
+                                                    <span class="text-xs font-medium">OUT</span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                                <p class="text-sm font-semibold pt-4">BELAKANG</p>
                             </div>
                         </div>
                     </div>

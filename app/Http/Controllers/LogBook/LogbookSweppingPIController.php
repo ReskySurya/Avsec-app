@@ -609,11 +609,28 @@ class LogbookSweppingPIController extends Controller
 
                     // Update checklist data for this item
                     $updateData = [];
+                    $isSuperAdmin = Auth::user()->hasRole('superadmin');
+
                     foreach ($request->checklist_data[$index] as $dayIndex => $isChecked) {
                         $day = $dayIndex + 1; // Convert 0-based to 1-based
                         if ($day >= 1 && $day <= 31) {
+
+                            if (!checkdate($logbook->bulan, $day, $logbook->tahun)) {
+                                continue;
+                            }
+
+                            $logbookDate = Carbon::create($logbook->tahun, $logbook->bulan, $day);
+                            $today = Carbon::today();
+                            
                             $field = 'tanggal_' . $day;
-                            $updateData[$field] = $isChecked ? 1 : 0;
+                            $newValue = $isChecked ? 1 : 0;
+                            $oldValue = $detail->$field;
+
+                            if ($newValue != $oldValue) {
+                                if ($logbookDate->isSameDay($today) || $isSuperAdmin) {
+                                    $updateData[$field] = $newValue;
+                                }
+                            }
                         }
                     }
 
