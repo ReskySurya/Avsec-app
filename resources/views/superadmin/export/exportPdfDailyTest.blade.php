@@ -82,6 +82,7 @@
 
                     <!-- Filter Button -->
                     <div class="mb-6">
+                     
                         <button type="button" onclick="resetFilters()"
                             class="ml-2 inline-flex justify-center items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             Reset Filter
@@ -364,6 +365,8 @@
         form.appendChild(input);
 
         form.submit();
+
+        form.removeChild(input);
     }
 
     function exportAll() {
@@ -376,6 +379,8 @@
         form.appendChild(input);
 
         form.submit();
+
+        form.removeChild(input);
     }
 </script>
 @endsection

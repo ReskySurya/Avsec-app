@@ -237,7 +237,7 @@ $userRole = auth()->user()->role->name;
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklist-senpi') ? 'bg-gray-700' : '' }}"><span>Checklist
                                 Senjata Api</span></a></li>
                     <li><a href="{{ route('checklist.pencatatanpi.index') }}"
-                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('form-catatan-pi') ? 'bg-gray-700' : '' }}"><span>Form
+                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklist-form-catatan-pi') ? 'bg-gray-700' : '' }}"><span>Form
                                 Pencatatan PI</span></a></li>
                     <li><a href="{{ route('checklist.manualbook.index') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('buku-pemeriksaan-manual') ? 'bg-gray-700' : '' }}"><span>Buku

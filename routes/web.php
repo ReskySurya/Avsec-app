@@ -196,7 +196,7 @@ Route::middleware(['auth', 'role:superadmin', 'password.changed'])->group(functi
     Route::delete('/equipment-location/destroy/{id}', [MasterDataController::class, 'destroyEquipmentLocation'])->name('equipment-location.destroy');
 
     //Route untuk UserManagement
-    Route::get('/users-management', [MasterDataController::class, 'indexUserManagement'])->name('users-management.index');
+    Route::get('/master-data/users-management', [MasterDataController::class, 'indexUserManagement'])->name('users-management.index');
     Route::post('/users-management/tambah', [MasterDataController::class, 'storeUserManagement'])->name('users-management.store');
     Route::get('/users-management/update/{id}', [MasterDataController::class, 'getUserManagement'])->name('users-management.get');
     Route::put('/users-management/update/{id}', [MasterDataController::class, 'updateUserManagement'])->name('users-management.update');
@@ -204,7 +204,7 @@ Route::middleware(['auth', 'role:superadmin', 'password.changed'])->group(functi
     Route::post('/users-management/reset/{id}', [MasterDataController::class, 'resetPassword'])->name('users-management.reset');
 
     // Route untuk Tenant Management
-    Route::get('/tenant-management', [MasterDataController::class, 'indexTenantManagement'])->name('tenant-management.index');
+    Route::get('/master-data/tenant-management', [MasterDataController::class, 'indexTenantManagement'])->name('tenant-management.index');
     Route::post('/tenant-management/store', [MasterDataController::class, 'storeTenant'])->name('tenant.store');
     Route::post('/tenant-management/update/{tenantID}', [MasterDataController::class, 'updateTenant'])->name('tenant.update');
     Route::delete('/tenant-management/destroy/{id}', [MasterDataController::class, 'destroyTenant'])->name('tenant.destroy');
@@ -217,7 +217,7 @@ Route::middleware(['auth', 'role:superadmin', 'password.changed'])->group(functi
 
     //Route untuk Checklist Items
     //Kendaraan
-    Route::get('/checklist-items', [MasterDataController::class, 'indexChecklistItems'])->name('checklist-items.index');
+    Route::get('/master-data/checklist-items', [MasterDataController::class, 'indexChecklistItems'])->name('checklist-items.index');
     Route::post('/checklist-items/store', [MasterDataController::class, 'storeChecklistItems'])->name('checklist-items.store');
     Route::post('/checklist-items/update/{id}', [MasterDataController::class, 'updateChecklistItems'])->name('checklist-items.update');
     Route::delete('/checklist-items/destroy/{id}', [MasterDataController::class, 'destroyChecklistItems'])->name('checklist-items.destroy');
@@ -283,7 +283,7 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
     Route::get('/checklist-kendaraan-patroli/detail/{checklist}', [ChecklistKendaraanController::class, 'show'])->name('supervisor.checklist-kendaraan.detail');
     Route::get('/checklist-penyisiran-ruang-tunggu/list', [DashboardController::class, 'showDataChecklistPenyisiran'])->name('supervisor.checklist-penyisiran.list');
     Route::get('/checklist-penyisiran-ruang-tunggu/detail/{checklist}', [ChecklistPenyisiranController::class, 'showDetailPenyisiran'])->name('supervisor.checklist-penyisiran.detail');
-    Route::get('/form-pencatatan-pi/list', [DashboardController::class, 'showDataFormPencatatanPI'])->name('supervisor.form-pencatatan-pi.list');
+    Route::get('/checklist/form-pencatatan-pi/list', [DashboardController::class, 'showDataFormPencatatanPI'])->name('supervisor.form-pencatatan-pi.list');
     Route::get('/form-pencatatan-pi/detail/{checklist}', [FormPencatatanPIController::class, 'showDetailPencatatanPI'])->name('supervisor.form-pencatatan-pi.detail');
     Route::get('/checklist-manual-book/list', [DashboardController::class, 'showDataManualBook'])->name('supervisor.checklist-manualbook.list');
     Route::get('/checklist-manual-book/detail/{manualBook}', [ManualBookController::class, 'show'])->name('supervisor.checklist-manualbook.detail');
@@ -314,7 +314,7 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
     Route::delete('/checklist-senpi/destroy/{id}', [ChecklistSenpiController::class, 'destroyChecklistSenpi'])->name('checklist.senpi.destroy');
 
     // Checklist Pencatatan PI Routes
-    Route::get('/form-pencatatan-pi', [FormPencatatanPIController::class, 'indexChecklistPencatatanPI'])->name('checklist.pencatatanpi.index');
+    Route::get('/checklist/form-pencatatan-pi', [FormPencatatanPIController::class, 'indexChecklistPencatatanPI'])->name('checklist.pencatatanpi.index');
     Route::post('/form-pencatatan-pi/store', [FormPencatatanPIController::class, 'storeChecklistPencatatanPI'])->name('checklist.pencatatanpi.store');
     Route::get('/form-pencatatan-pi/{id}/edit', [FormPencatatanPIController::class, 'editChecklistPencatatanPI'])->name('checklist.pencatatanpi.edit');
     Route::put('/form-pencatatan-pi/{id}', [FormPencatatanPIController::class, 'updateChecklistPencatatanPI'])->name('checklist.pencatatanpi.update');
