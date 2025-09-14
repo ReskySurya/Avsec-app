@@ -147,9 +147,9 @@
                                         width="300" height="150"></canvas>
                                     <div class="mt-2 flex justify-start space-x-2">
                                         <button type="button" id="clearSignature"
-                                            class="bg-slate-200 border border-black text-black px-2 py-1 sm:px-4 sm:py-2 rounded text-xs sm:text-base">Clear</button>
+                                            class="bg-slate-200 border border-black text-black px-2 py-1 sm:px-4 sm:py-2 rounded text-xs sm:text-base">Hapus</button>
                                         <button type="button" id="saveSupervisorSignature"
-                                            class="bg-slate-200 border border-black text-black px-2 py-1 sm:px-4 sm:py-2 rounded text-xs sm:text-base">Save</button>
+                                            class="bg-slate-200 border border-black text-black px-2 py-1 sm:px-4 sm:py-2 rounded text-xs sm:text-base">Simpan</button>
                                     </div>
                                 </div>
                                 @endif

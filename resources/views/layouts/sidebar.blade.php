@@ -111,7 +111,7 @@ $userRole = auth()->user()->role->name;
                     </li>
                 </ul>
             </li>
-            @elseif($userRole === 'supervisor')
+            @elseif($userRole === 'supervisor' || $userRole === 'superadmin')
             <li>
                 <a href="{{ route('supervisor.dailytest-form') }}"
                     class="flex items-center justify-between w-full py-2 px-2 rounded hover:bg-gray-700">
