@@ -289,13 +289,10 @@
                     <li>• Tulis hasil temuan pada kolom CATATAN</li>
                 </ul>
             </div>
+            
 
             {{-- Submit Buttons - Mobile Responsive --}}
             <div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4 mt-6 sm:mt-8">
-                <button type="button" onclick="history.back()"
-                    class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm sm:text-base order-2 sm:order-1">
-                    Kembali
-                </button>
 
                 <button type="button" @click="openFinishDialog = true"
                     class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg text-sm sm:text-base order-1 sm:order-2">

@@ -62,7 +62,6 @@
                                 <th class="border border-black px-2 py-1 w-10">No</th>
                                 <th class="border border-black px-2 py-1">Jumlah Personil</th>
                                 <th class="border border-black px-2 py-1">Jumlah Hadir</th>
-                                <th class="border border-black px-2 py-1">Jumlah Kekuatan</th>
                                 <th class="border border-black px-2 py-1">Materi Apel</th>
                                 <th class="border border-black px-2 py-1">Keterangan</th>
                             </tr>
@@ -73,7 +72,6 @@
                                 <td class="border border-black px-2 py-1 text-center">{{ $index + 1 }}</td>
                                 <td class="border border-black px-2 py-1">{{ $kemajuan->jml_personil ?? 'N/A' }}</td>
                                 <td class="border border-black px-2 py-1">{{ $kemajuan->jml_hadir ?? 'N/A' }}</td>
-                                <td class="border border-black px-2 py-1 text-center">{{ $kemajuan->jml_kekuatan ?? 'N/A' }}</td>
                                 <td class="border border-black px-2 py-1 text-center">{{ $kemajuan->materi ?? 'N/A' }}</td>
                                 <td class="border border-black px-2 py-1 text-center">{{ $kemajuan->keterangan ?? 'N/A' }}</td>
                             </tr>
@@ -206,15 +204,6 @@
                                 <p class="font-semibold mt-1">( Nama Supervisor )</p>
                             </div>
                         </div>
-
-                        <!-- {{-- Bawah Tengah: Mengetahui --}}
-                        <div class="mt-6">
-                            <p>Mengetahui,</p>
-                            <div class="h-16 flex items-center justify-center">
-                                <span class="italic text-gray-400">Belum tanda tangan</span>
-                            </div>
-                            <p class="font-semibold mt-1">( Nama Manager )</p>
-                        </div> -->
                     </div>
                 </div>
             </div>

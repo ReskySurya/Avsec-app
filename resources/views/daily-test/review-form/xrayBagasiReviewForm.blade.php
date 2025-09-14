@@ -723,7 +723,7 @@
                                     @endif
                                 </div>
                                 @if(!$form->approverSignature)
-                                <div class="flex flex-col items-center mt-2 sm:mt-4" id="signatureContainer">
+                                <div class="flex flex-col items-center w-full mt-2 sm:mt-4" id="signatureContainer">
                                     <h3 class="text-xs sm:text-sm font-bold mb-2">Tanda Tangan Supervisor</h3>
                                     <canvas id="signatureCanvas" class="border border-black rounded-md w-full"
                                         width="300" height="150"></canvas>
@@ -795,7 +795,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('xrayCabinForm');
+        const form = document.getElementById('xrayForm');
         const submitButton = document.getElementById('updateStatusButton');
         const statusSelect = document.getElementById('status_id');
         const rejectionNoteContainer = document.getElementById('rejectionNoteContainer');

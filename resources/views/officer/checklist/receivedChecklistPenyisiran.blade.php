@@ -1,4 +1,5 @@
 @extends('layouts.app')
+
 @section('title', 'Detail Checklist Penyisiran')
 
 @section('content')
@@ -19,7 +20,7 @@
     </div>
     @endif
 
-    <div class="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200" id="printable-area">
+    <div class="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200 pb-4" id="printable-area">
         {{-- Header Section - Responsive --}}
         <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-3 sm:px-6 py-4 sm:py-6 text-white">
             <div class="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0">
@@ -46,7 +47,8 @@
                 <div class="space-y-1">
                     <p class="block text-xs sm:text-sm font-semibold text-gray-700">Jam:</p>
                     <p class="text-sm sm:text-base text-gray-900">{{
-                        \Carbon\Carbon::parse($checklist->time)->format('H:i') }}</p>
+                        \Carbon\Carbon::parse($checklist->time)->format('H:i') }}
+                    </p>
                 </div>
                 <div class="space-y-1">
                     <p class="block text-xs sm:text-sm font-semibold text-gray-700">Grup:</p>
@@ -75,10 +77,11 @@
                         <div class="flex space-x-6 mt-1">
                             <div class="flex items-center">
                                 @if($detail->isfindings === true)
-                                <span class="text-blue-600 font-bold text-lg">✓</span>
+                                <span class="text-green-600 font-bold text-lg">✓</span>
                                 <span class="ml-1 text-sm">Ya</span>
                                 @elseif($detail->isfindings === false)
-                                <span class="text-gray-400 text-sm">Tidak</span>
+                                <span class="text-red-600 font-bold text-lg">✓</span>
+                                <span class="ml-1 text-sm">Tidak</span>
                                 @else
                                 <span class="text-gray-400 text-sm">-</span>
                                 @endif
@@ -103,12 +106,6 @@
                             </div>
                         </div>
                     </div>
-
-                    {{-- Catatan --}}
-                    <div>
-                        <label class="text-xs font-semibold text-gray-700">Catatan:</label>
-                        <p class="text-sm mt-1">{{ $detail->notes ?? '-' }}</p>
-                    </div>
                 </div>
                 @endforeach
                 @empty
@@ -122,26 +119,35 @@
                     <thead class="bg-blue-600 text-white">
                         <tr>
                             <th
-                                class="border-2 border-gray-400 px-2 sm:px-4 py-2 sm:py-3 text-center font-bold w-10 sm:w-12 text-sm">
+                                class="border-2 border-gray-400 px-2 sm:px-4 py-2 sm:py-3 text-center font-bold w-10 sm:w-12 text-sm"
+                                rowspan="2">
                                 NO</th>
                             <th
-                                class="border-2 border-gray-400 px-2 sm:px-4 py-2 sm:py-3 text-center font-bold min-w-[150px] text-sm">
+                                class="border-2 border-gray-400 px-2 sm:px-4 py-2 sm:py-3 text-center font-bold min-w-[150px] text-sm"
+                                rowspan="2">
                                 KETERANGAN</th>
                             <th
-                                class="border-2 border-gray-400 px-2 sm:px-4 py-2 sm:py-3 text-center font-bold text-xs sm:text-sm">
-                                TEMUAN: YA</th>
+                                class="border-2 border-gray-400 px-2 sm:px-4 py-2 sm:py-3 text-center font-bold text-xs sm:text-sm"
+                                colspan="2">
+                                TEMUAN</th>
                             <th
-                                class="border-2 border-gray-400 px-2 sm:px-4 py-2 sm:py-3 text-center font-bold text-xs sm:text-sm">
-                                TEMUAN: TIDAK</th>
+                                class="border-2 border-gray-400 px-2 sm:px-4 py-2 sm:py-3 text-center font-bold text-xs sm:text-sm"
+                                colspan="2">
+                                KONDISI</th>
+                        </tr>
+                        <tr>
                             <th
-                                class="border-2 border-gray-400 px-2 sm:px-4 py-2 sm:py-3 text-center font-bold text-xs sm:text-sm">
-                                KONDISI: BAIK</th>
+                                class="border-2 border-gray-400 px-2 sm:px-4 py-2 sm:py-3 text-center font-bold w-10 sm:w-12 text-sm">
+                                YA</th>
                             <th
-                                class="border-2 border-gray-400 px-2 sm:px-4 py-2 sm:py-3 text-center font-bold text-xs sm:text-sm">
-                                KONDISI: RUSAK</th>
+                                class="border-2 border-gray-400 px-2 sm:px-4 py-2 sm:py-3 text-center font-bold w-10 sm:w-12 text-sm">
+                                TIDAK</th>
                             <th
-                                class="border-2 border-gray-400 px-2 sm:px-4 py-2 sm:py-3 text-center font-bold min-w-[120px] text-sm">
-                                Catatan</th>
+                                class="border-2 border-gray-400 px-2 sm:px-4 py-2 sm:py-3 text-center font-bold w-10 sm:w-12 text-sm">
+                                BAIK</th>
+                            <th
+                                class="border-2 border-gray-400 px-2 sm:px-4 py-2 sm:py-3 text-center font-bold w-10 sm:w-12 text-sm">
+                                RUSAK</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -159,14 +165,14 @@
                             <td class="border-2 border-gray-400 p-2 font-medium text-sm">{{ $detail->item->name }}</td>
                             <td class="border-2 border-gray-400 p-2 text-center">
                                 @if($detail->isfindings === true)
-                                <span class="text-blue-600 font-bold text-lg">✓</span>
+                                <span class="text-green-600 font-bold text-lg">✓</span>
                                 @else
                                 <span class="text-gray-400">-</span>
                                 @endif
                             </td>
                             <td class="border-2 border-gray-400 p-2 text-center">
                                 @if($detail->isfindings === false)
-                                <span class="text-blue-600 font-bold text-lg">✓</span>
+                                <span class="text-red-600 font-bold text-lg">✓</span>
                                 @else
                                 <span class="text-gray-400">-</span>
                                 @endif
@@ -185,9 +191,6 @@
                                 <span class="text-gray-400">-</span>
                                 @endif
                             </td>
-                            <td class="border-2 border-gray-400 p-2 font-medium text-xs sm:text-sm">
-                                {{ $detail->notes ?? '-' }}
-                            </td>
                         </tr>
                         @endforeach
                         @empty
@@ -197,64 +200,107 @@
                         @endforelse
                     </tbody>
                 </table>
+
             </div>
-
-            {{-- Signature Section --}}
-            <div class="pt-6 sm:pt-8">
-                <form id="signatureForm" action="{{ route('checklist.receivedSignature.penyisiran', $checklist->id) }}"
-                    method="POST">
-                    @csrf
-                    <div class="flex flex-col sm:flex-row justify-around text-center space-y-6 sm:space-y-0">
-                        <div class="mb-2">
-                            @php
-                            $bulan = [
-                            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-                            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-                            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
-                            ];
-                            @endphp
-                            <p class="text-xs sm:text-sm">Yogyakarta,
-                                @if(isset($checklist))
-                                {{ $checklist->created_at->format('d') }} {{
-                                $bulan[(int)$checklist->created_at->format('n')] }} {{
-                                $checklist->created_at->format('Y')
-                                }}
-                                @else
-                                {{ date('d') }} {{ $bulan[(int)date('n')] }} {{ date('Y') }}
-                                @endif
-                            </p>
-                            <p class="font-semibold text-sm sm:text-base">Diserahkan oleh:</p>
-                            @if($checklist->senderSignature)
-                            <img src="data:image/png;base64,{{ $checklist->senderSignature }}" alt="TTD Pengirim"
-                                class="mx-auto mt-2 h-16 sm:h-24 border rounded">
-                            @else
-                            <div
-                                class="mx-auto mt-2 h-16 sm:h-24 w-24 sm:w-32 border rounded flex items-center justify-center text-xs sm:text-sm text-gray-500">
-                                No Signature</div>
-                            @endif
-                            <p class="mt-2 font-medium text-sm">{{ $checklist->sender->name ?? 'N/A' }}</p>
-                            <p class="text-xs text-gray-500">Petugas</p>
+            {{-- Keterangan Section --}}
+            <div>
+                <div class="p-4">
+                    <div class="mb-6">
+                        <h3 class="font-bold text-sm mb-2">KETERANGAN :</h3>
+                        <div class="space-y-1 text-sm">
+                            <li>No. 1, 2 dan 3 di isi tanda centang pada kolom TEMUAN</li>
+                            <li>No. 4 di isi tanda centang pada kolom KONDISI</li>
+                            <li>Tulis hasil temuan pada kolom CATATAN</li>
                         </div>
+                    </div>
 
-                        {{-- Disetujui oleh --}}
+                    {{-- CATATAN Section - Final Version --}}
+                    <div class="mb-6">
+                        <h3 class="font-bold text-sm mb-2">CATATAN :</h3>
+                        <div class="space-y-1">
+                            @php
+                            // Kumpulkan semua notes dari checklist kendaraan details yang tidak kosong
+                            $allNotes = [];
+
+                            // Loop melalui semua detail checklist untuk mengambil notes
+                            if(isset($checklist) && $checklist->details) {
+                            foreach ($checklist->details as $detail) {
+                            if (!empty($detail->notes) && !is_null($detail->notes)) {
+                            $allNotes[] = [
+                            'item_name' => $detail->item->name ?? 'Item tidak ditemukan',
+                            'notes' => $detail->notes,
+                            'category' => $detail->item->category ?? 'lainlain'
+                            ];
+                            }
+                            }
+                            }
+                            @endphp
+
+                            @forelse($allNotes as $index => $noteData)
+                            <div class="flex">
+                                <span class="w-4 text-sm">{{ $index + 1 }}</span>
+                                <div class="border-b border-dotted border-black flex-1 min-h-[20px] flex items-end pb-1">
+                                    <span class="text-sm">
+                                        <strong>{{ $noteData['item_name'] }}:</strong> {{ $noteData['notes'] }}
+                                    </span>
+                                </div>
+                            </div>
+                            @empty
+                            {{-- Jika tidak ada notes, tampilkan satu baris kosong --}}
+                            <div class="flex">
+                                <span class="w-4 text-sm">1</span>
+                                <div class="border-b border-dotted border-black flex-1 min-h-[20px]">
+                                    {{-- Baris kosong --}}
+                                </div>
+                            </div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Signature Section --}}
+        <div class="pt-6 sm:pt-8">
+            <form id="signatureForm" action="{{ route('checklist.receivedSignature.penyisiran', $checklist->id) }}"
+                method="POST">
+                @csrf
+
+                <div class="pt-6 sm:pt-8">
+                    @php
+                    $bulan = [
+                    1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+                    5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+                    9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                    ];
+                    @endphp
+                    <p class="text-center text-xs sm:text-sm mb-6">Yogyakarta,
+                        @if(isset($checklist))
+                        {{ $checklist->created_at->format('d') }} {{ $bulan[(int)$checklist->created_at->format('n')] }} {{
+                                $checklist->created_at->format('Y') }}
+                        @else
+                        {{ date('d') }} {{ $bulan[(int)date('n')] }} {{ date('Y') }}
+                        @endif
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row justify-around text-center space-y-8 sm:space-y-0">
+                        {{-- Yang Menyerahkan --}}
                         <div>
-                            <br>
-                            <p class="font-semibold text-sm sm:text-base">Disetujui oleh:</p>
-                            @if($checklist->approvedSignature)
-                            <img src="data:image/png;base64,{{ $checklist->approvedSignature }}" alt="TTD Supervisor"
-                                class="mx-auto mt-2 h-16 sm:h-24 border rounded">
-                            @else
-                            <div
-                                class="mx-auto mt-2 h-16 sm:h-24 w-24 sm:w-32 border rounded flex items-center justify-center text-xs sm:text-sm text-gray-500">
-                                Belum TTD</div>
-                            @endif
-                            <p class="mt-2 font-medium text-sm">{{ $checklist->approver->name ?? 'N/A' }}</p>
-                            <p class="text-xs text-gray-500">Supervisor</p>
+                            <p class="font-semibold text-sm sm:text-base">Diserahkan oleh:</p>
+                            <div class="w-48 mx-auto my-2 h-28 flex items-center justify-center">
+                                @if($checklist->senderSignature)
+                                <img src="data:image/png;base64,{{ $checklist->senderSignature }}" alt="TTD Pengirim"
+                                    class="max-h-24 max-w-full object-contain">
+                                @else
+                                <div class="w-full h-full flex items-center justify-center text-xs text-gray-500">No Signature</div>
+                                @endif
+                            </div>
+                            <p class="text-sm font-semibold h-4">({{ $checklist->sender->name ?? 'Belum TTD' }})</p>
+                            <p class="text-xs text-gray-600">Petugas</p>
                         </div>
 
                         {{-- Diterima oleh --}}
                         <div>
-                            <br>
                             <p class="font-semibold text-sm sm:text-base">Diterima oleh:</p>
                             @if($checklist->receivedSignature)
                             <img src="data:image/png;base64,{{ $checklist->receivedSignature }}" alt="TTD Penerima"
@@ -279,28 +325,45 @@
                         </div>
                     </div>
 
-                    {{-- Tombol Simpan TTD --}}
-                    @if(!$checklist->receivedSignature && Auth::id() == $checklist->received_id)
-                    <div class="mt-6 text-center no-print">
-                        <input type="hidden" name="receivedSignature" id="receivedSignature">
-                        <button type="submit"
-                            class="w-full sm:w-auto px-6 sm:px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-lg text-sm sm:text-base">
-                            Simpan Tanda Tangan Penerima
-                        </button>
+                    {{-- Disetujui oleh --}}
+                    <div class=" text-center">
+                        <br>
+                        <p class="font-semibold text-sm sm:text-base">Disetujui oleh:</p>
+                        @if($checklist->approvedSignature)
+                        <img src="data:image/png;base64,{{ $checklist->approvedSignature }}" alt="TTD Supervisor"
+                            class="mx-auto mt-2 h-16 sm:h-24 border rounded">
+                        @else
+                        <div
+                            class="mx-auto mt-2 h-16 sm:h-24 w-24 sm:w-32 border rounded flex items-center justify-center text-xs sm:text-sm text-gray-500">
+                            Belum TTD</div>
+                        @endif
+                        <p class="mt-2 font-medium text-sm">{{ $checklist->approver->name ?? 'N/A' }}</p>
+                        <p class="text-xs text-gray-500">Supervisor</p>
                     </div>
-                    @endif
-                </form>
-            </div>
+                </div>
+
+                {{-- Tombol Simpan TTD --}}
+                @if(!$checklist->receivedSignature && Auth::id() == $checklist->received_id)
+                <div class="mt-6 text-center no-print">
+                    <input type="hidden" name="receivedSignature" id="receivedSignature">
+                    <button type="submit"
+                        class="w-full sm:w-auto px-6 sm:px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-lg text-sm sm:text-base">
+                        Simpan Tanda Tangan Penerima
+                    </button>
+                </div>
+                @endif
+            </form>
         </div>
     </div>
+</div>
 
-    {{-- Action Buttons --}}
-    <div class="mt-4 sm:mt-6 flex flex-col sm:flex-row justify-center space-y-2 sm:space-y-0 sm:space-x-4 no-print">
-        <a href="{{ route('dashboard.officer') }}"
-            class="px-6 sm:px-8 py-3 bg-gray-600 text-white text-center rounded-lg hover:bg-gray-700 transition-colors shadow-lg text-sm sm:text-base">
-            Kembali ke Dashboard
-        </a>
-    </div>
+{{-- Action Buttons --}}
+<div class="mt-4 sm:mt-6 flex flex-col sm:flex-row justify-center space-y-2 sm:space-y-0 sm:space-x-4 no-print">
+    <a href="{{ route('dashboard.officer') }}"
+        class="px-6 sm:px-8 py-3 bg-gray-600 text-white text-center rounded-lg hover:bg-gray-700 transition-colors shadow-lg text-sm sm:text-base">
+        Kembali ke Dashboard
+    </a>
+</div>
 </div>
 
 {{-- Signature Pad Library --}}

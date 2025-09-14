@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ChecklistKendaraan;
 use App\Models\ChecklistPenyisiran;
 use App\Models\FormPencatatanPI;
+use App\Models\EquipmentLocation;
 use App\Models\Location;
 use App\Models\Report;
 use App\Models\Logbook;
@@ -352,6 +353,10 @@ class DashboardController extends Controller
         $approvedStatusId = $approvedStatus ? $approvedStatus->id : null;
 
         foreach ($equipmentTypes as $type) {
+            $totalLocationsForType = \App\Models\EquipmentLocation::whereHas('equipment', function ($query) use ($type) {
+                $query->where('name', $type);
+            })->count();
+
             $reportsToday = Report::with('equipmentLocation.location')
                 ->whereHas('equipmentLocation.equipment', function ($query) use ($type) {
                     $query->where('name', $type);
@@ -369,16 +374,15 @@ class DashboardController extends Controller
                 ];
             }
 
-            $totalReports = $reportsToday->count();
-            $totalApproved = $approvedStatusId ? $reportsToday->where('statusID', $approvedStatusId)->count() : 0;
+            $submittedReports = $reportsToday->count();
 
             $key = ucwords(str_replace(['xraycabin', 'xraybagasi'], ['X-Ray Cabin', 'X-Ray Bagasi'], $type));
             if ($type === 'hhmd' || $type === 'wtmd') $key = strtoupper($type);
 
             $dailyTestStats[$key] = [
-                'total' => $totalReports,
-                'approved' => $totalApproved,
-                'percentage' => ($totalReports > 0) ? round(($totalApproved / $totalReports) * 100) : 0,
+                'total' => $totalLocationsForType,
+                'approved' => $submittedReports,
+                'percentage' => ($totalLocationsForType > 0) ? round(($submittedReports / $totalLocationsForType) * 100) : 0,
                 'breakdown' => $locationDetails,
                 'breakdownTitle' => 'Lokasi'
             ];
@@ -387,15 +391,21 @@ class DashboardController extends Controller
         // Logbook Stats
         $logbookStats = [];
 
+        $totalLocations = Location::count();
         $logbooksToday = Logbook::with('locationArea')->whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
         $logbooksByLocation = $logbooksToday->groupBy('locationArea.name');
         $locationDetailsPosJaga = [];
         foreach ($logbooksByLocation as $locationName => $logbooks) {
             $locationDetailsPosJaga[$locationName ?: 'Tanpa Lokasi'] = ['total' => $logbooks->count(), 'approved' => $logbooks->where('status', 'approved')->count()];
         }
-        $totalPosJaga = $logbooksToday->count();
-        $approvedPosJaga = $logbooksToday->where('status', 'approved')->count();
-        $logbookStats['Pos Jaga'] = ['total' => $totalPosJaga, 'approved' => $approvedPosJaga, 'percentage' => ($totalPosJaga > 0) ? round(($approvedPosJaga / $totalPosJaga) * 100) : 0, 'breakdown' => $locationDetailsPosJaga, 'breakdownTitle' => 'Lokasi'];
+        $submittedPosJaga = $logbooksToday->count();
+        $logbookStats['Pos Jaga'] = [
+            'total' => $totalLocations,
+            'approved' => $submittedPosJaga,
+            'percentage' => ($totalLocations > 0) ? round(($submittedPosJaga / $totalLocations) * 100) : 0,
+            'breakdown' => $locationDetailsPosJaga,
+            'breakdownTitle' => 'Lokasi'
+        ];
 
         $rotasiToday = LogbookRotasi::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
         $rotasiByType = $rotasiToday->groupBy('type');

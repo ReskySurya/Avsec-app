@@ -201,10 +201,6 @@
                     class="w-full sm:w-auto px-4 sm:px-8 py-2 sm:py-3 text-white rounded-lg transition duration-200 font-medium shadow-lg text-sm sm:text-base bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800">
                     Simpan Checklist
                 </button>
-                <button type="button" onclick="window.history.back()"
-                    class="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-200 font-medium text-sm sm:text-base">
-                    Kembali
-                </button>
             </div>
         </form>
     </div>
