@@ -1,13 +1,13 @@
 @push('styles')
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 @endpush
 
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endpush
 
 <div class="bg-white p-4 mt-10 w-full max-w-full"
-     x-data="{
+    x-data="{
         hhmdLocations: {{ Js::from($hhmdLocations) }},
         selectedLocationId: '',
         deviceInfo: '',
@@ -27,7 +27,7 @@
 
     <!-- <p>INI FORM HHMD</p> -->
     <div id="format" class="mx-auto w-full">
-        <div class="border-t-2 border-x-2 border-black bg-white shadow-md p-4">
+        <!-- <div class="border-t-2 border-x-2 border-black bg-white shadow-md p-4">
             <div class="flex flex-col sm:flex-row items-center justify-between">
                 <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo" class="w-20 h-20 mb-2 sm:mb-0">
                 <h1 class="text-sm sm:text-xl font-bold text-center flex-grow px-2">
@@ -37,6 +37,27 @@
                     PADA KONDISI NORMAL (HIJAU)
                 </h1>
                 <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo" class="w-20 h-20 mt-2 sm:mt-0">
+            </div>
+        </div> -->
+        <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-3 sm:px-6 py-4 sm:py-6 text-white">
+            <div class="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0">
+                {{-- Logo kiri - Hidden on mobile atau ukuran kecil --}}
+                <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo"
+                    class="w-12 h-12 sm:w-20 sm:h-20 order-first sm:order-none">
+
+                {{-- Teks tengah --}}
+                <div class="text-center flex-1 px-2">
+                    <h1 class="text-sm sm:text-xl font-bold text-center flex-grow px-2">
+                        CHECK LIST PENGUJIAN HARIAN<br>
+                        PENDETEKSI LOGAM GENGGAM<br>
+                        (HAND HELD METAL DETECTOR/HHMD)<br>
+                        PADA KONDISI NORMAL (HIJAU)
+                    </h1>
+                </div>
+
+                {{-- Logo kanan --}}
+                <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo"
+                    class="w-16 h-16 sm:w-24 sm:h-24 order-last sm:order-none">
             </div>
         </div>
 
@@ -80,11 +101,11 @@
                                     x-model="selectedLocationId" @change="updateFields">
                                     <option value="">Pilih Lokasi</option>
                                     @if(isset($hhmdLocations))
-                                        @foreach($hhmdLocations as $location)
-                                            <option value="{{ $location['location_id'] }}">
-                                                {{ $location['location_name'] }}
-                                            </option>
-                                        @endforeach
+                                    @foreach($hhmdLocations as $location)
+                                    <option value="{{ $location['location_id'] }}">
+                                        {{ $location['location_name'] }}
+                                    </option>
+                                    @endforeach
                                     @endif
                                 </select>
                             </td>
@@ -96,7 +117,7 @@
                             <td class="w-2/3 p-2">
                                 <input type="text" id="deviceInfo" name="deviceInfo"
                                     class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base"
-                                    x-model="deviceInfo" >
+                                    x-model="deviceInfo">
                             </td>
                         </tr>
                         <tr class="border-b border-black">
@@ -231,16 +252,16 @@
                     </label>
 
                     @php
-                        $supervisors = \App\Models\User::whereHas('role', function ($query) {
-                            $query->where('name', \App\Models\Role::SUPERVISOR);
-                        })->get();
+                    $supervisors = \App\Models\User::whereHas('role', function ($query) {
+                    $query->where('name', \App\Models\Role::SUPERVISOR);
+                    })->get();
                     @endphp
 
                     <select name="approvedByID" id="approvedByID"
                         class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base" required>
                         <option value="">Pilih Supervisor</option>
                         @foreach($supervisors as $supervisor)
-                            <option value="{{ $supervisor->id }}">{{ $supervisor->name }}</option>
+                        <option value="{{ $supervisor->id }}">{{ $supervisor->name }}</option>
                         @endforeach
                     </select>
                 </div>

@@ -19,7 +19,8 @@
 
                 <!-- Logo -->
                 <div class="flex-shrink-0 flex items-center">
-                    <a href="#" class="text-white font-bold text-xl">AVSEC App</a>
+                     <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo" class="w-10 h-10 mr-2">
+                    <a href="#" class="text-white font-bold text-xl">ASRS App</a>
                 </div>
 <!-- 
                 <button id="toggleSidebar" class="lg:inline-flex hidden items-center px-3 py-2 text-white  rounded">

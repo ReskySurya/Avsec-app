@@ -148,7 +148,7 @@
         </div>
 
         {{-- Bawah Tengah: Chief Screening --}}
-        <div>
+        <div class=" w-full md:w-1/2 mx-auto mt-8">
             <p>Mengetahui,</p>
             @if($logbook->approvedSignature)
             <div class="h-16 flex items-center justify-center">
@@ -161,8 +161,8 @@
                 action="{{ route('supervisor.logbook.signature', [ 'logbookID' => $logbook->logbookID]) }}"
                 method="POST" onsubmit="return handleSignatureSubmit(event)">
                 @csrf
-                <div class="border-2 border-gray-200 rounded-xl p-4 my-2">
-                    <div class="relative w-full h-32 border border-gray-300 rounded-lg bg-white">
+                <div class="border-2 border-gray-200 rounded-xl p-4 my-2 ">
+                    <div class="relative w-50 h-32 border border-gray-300 rounded-lg bg-white">
                         <canvas id="signature-canvas-receiver" class="w-full h-full"></canvas>
                     </div>
                     <input type="hidden" name="signature" id="signature-data-receiver">

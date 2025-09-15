@@ -34,12 +34,18 @@
 <body class="bg-white min-h-screen flex items-center justify-center p-4">
     <div class="relative w-full max-w-md">
         <!-- Login Card -->
-        <div class="bg-white rounded-2xl shadow-2xl p-8 space-y-6">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 ">
             <!-- Header -->
-            <div class="text-center space-y-2">
+            <div class="text-center  ">
                 <div class="mx-auto w-24 h-24  flex items-center justify-center mb-4">
                     <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo" class=" mb-2 sm:mb-0">
                 </div>
+                <span class="text-lg font-bold text-gray-800">Airport Security Reporting System</span><br>
+                <span class="text-lg font-bold text-gray-800">(ASRS)</span>
+            </div>
+
+            <!-- Welcome Message -->
+            <div class="text-center  ">
                 <h1 class="text-3xl font-bold text-gray-800">Selamat Datang</h1>
                 <p class="text-gray-500">Masuk ke akun Anda untuk melanjutkan</p>
             </div>

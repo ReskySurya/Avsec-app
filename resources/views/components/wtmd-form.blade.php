@@ -26,7 +26,7 @@
 
 
     <div id="format" class="mx-auto w-full">
-        <div class="border-t-2 border-x-2 border-black bg-white shadow-md p-4">
+        <!-- <div class="border-t-2 border-x-2 border-black bg-white shadow-md p-4">
             <div class="flex flex-col sm:flex-row items-center justify-between">
                 <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo" class="w-20 h-20 mb-2 sm:mb-0">
                 <h1 class="text-sm sm:text-xl font-bold text-center flex-grow px-2">
@@ -35,6 +35,26 @@
                     (WALK THROUGH METAL DETECTOR/WTMD)
                 </h1>
                 <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo" class="w-20 h-20 mt-2 sm:mt-0">
+            </div>
+        </div> -->
+        <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-3 sm:px-6 py-4 sm:py-6 text-white">
+            <div class="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0">
+                {{-- Logo kiri - Hidden on mobile atau ukuran kecil --}}
+                <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo"
+                    class="w-12 h-12 sm:w-20 sm:h-20 order-first sm:order-none">
+
+                {{-- Teks tengah --}}
+                <div class="text-center flex-1 px-2">
+                    <h1 class="text-sm sm:text-xl font-bold text-center flex-grow px-2">
+                        CHECK LIST PENGUJIAN HARIAN<br>
+                        GAWANG PENDETEKSI LOGAM<br>
+                        (WALK THROUGH METAL DETECTOR/WTMD)
+                    </h1>
+                </div>
+
+                {{-- Logo kanan --}}
+                <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo"
+                    class="w-16 h-16 sm:w-24 sm:h-24 order-last sm:order-none">
             </div>
         </div>
 
@@ -132,7 +152,7 @@
                             <div class="relative mx-auto w-24 h-48 sm:w-32 sm:h-64  rounded-lg mb-4 flex items-center justify-center ">
                                 <img src="{{asset('images/tampakdepan.png')}}" alt="tampakdepan"
                                     class="w-full scale-75">
-                                
+
                                 <!-- Test Points for DEPAN -->
                                 <!-- TEST 1 - Top Left -->
                                 <div class="absolute -left-4 sm:-left-20 top-8 sm:top-12">
@@ -150,7 +170,7 @@
                                             </div>
                                         </div>
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                         </svg>
                                         <span class="text-xs font-bold">TEST 1</span>
                                     </div>
@@ -172,7 +192,7 @@
                                             </div>
                                         </div>
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                         </svg>
                                         <span class="text-xs font-bold">TEST 2</span>
                                     </div>
@@ -194,7 +214,7 @@
                                             </div>
                                         </div>
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                         </svg>
                                         <span class="text-xs font-bold">TEST 4</span>
                                     </div>
@@ -209,14 +229,14 @@
                             <div class="relative mx-auto w-24 h-48 sm:w-32 sm:h-64 rounded-lg mb-4 flex items-center justify-center">
                                 <img src="{{asset('images/tampakbelakang.png')}}" alt="tampakbelakang"
                                     class="w-full scale-75">
-                                
+
                                 <!-- Test Points for BELAKANG -->
                                 <!-- TEST 3 - Middle Right -->
                                 <div class="absolute -right-10 sm:-right-20 top-20 sm:top-28">
                                     <div class="flex items-center gap-1">
                                         <span class="text-xs font-bold">TEST 3</span>
                                         <svg class="w-4 h-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                         </svg>
                                         <div class="flex flex-col gap-1">
                                             <div class="flex items-center gap-1">

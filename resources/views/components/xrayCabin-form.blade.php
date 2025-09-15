@@ -25,7 +25,7 @@
 
 
     <div id="format" class="mx-auto w-full">
-        <div class="border-t-2 border-x-2 border-black bg-white shadow-md p-4">
+        <!-- <div class="border-t-2 border-x-2 border-black bg-white shadow-md p-4">
             <div class="flex flex-col sm:flex-row items-center justify-between">
                 <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo" class="w-20 h-20 mb-2 sm:mb-0">
                 <h1 class="text-sm sm:text-xl font-bold text-center flex-grow px-2">
@@ -33,6 +33,26 @@
                     MESIN X-RAY CABIN MULTIVIEW<br>
                 </h1>
                 <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo" class="w-20 h-20 mt-2 sm:mt-0">
+            </div>
+        </div> -->
+
+        <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-3 sm:px-6 py-4 sm:py-6 text-white">
+            <div class="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0">
+                {{-- Logo kiri - Hidden on mobile atau ukuran kecil --}}
+                <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo"
+                    class="w-12 h-12 sm:w-20 sm:h-20 order-first sm:order-none">
+
+                {{-- Teks tengah --}}
+                <div class="text-center flex-1 px-2">
+                    <h1 class="text-sm sm:text-xl font-bold text-center flex-grow px-2">
+                        CHECK LIST PENGUJIAN HARIAN<br>
+                        MESIN X-RAY CABIN MULTIVIEW<br>
+                    </h1>
+                </div>
+
+                {{-- Logo kanan --}}
+                <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo"
+                    class="w-16 h-16 sm:w-24 sm:h-24 order-last sm:order-none">
             </div>
         </div>
 
@@ -611,7 +631,7 @@
                     <h3 class="text-xs sm:text-sm font-bold mb-2">Personel Pengamanan Penerbangan</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-                       <div class="grid grid-rows-2 gap-1 sm:gap-2 items-center text-center" >
+                            <div class="grid grid-rows-2 gap-1 sm:gap-2 items-center text-center">
                                 <!-- Kolom Kiri (Label 1) -->
                                 <div class="text-center self-end">
                                     <h4 class="font-bold">
