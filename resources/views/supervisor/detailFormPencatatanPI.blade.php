@@ -57,135 +57,148 @@
         </div>
 
         {{-- Body --}}
-        <div class="p-4 sm:p-6">
-            <div class="grid grid-cols-1 gap-6">
-                {{-- Kolom Kiri --}}
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs sm:text-sm font-medium text-gray-500">Tanggal</label>
-                        <p class="mt-1 text-sm sm:text-base font-semibold text-gray-900">{{
-                            \Carbon\Carbon::parse($pencatatanPI->date)->translatedFormat('d F Y') }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs sm:text-sm font-medium text-gray-500">Grup</label>
-                        <p class="mt-1 text-sm sm:text-base font-semibold text-gray-900">{{ $pencatatanPI->grup }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs sm:text-sm font-medium text-gray-500">Nama Pemilik</label>
-                        <p class="mt-1 text-sm sm:text-base font-semibold text-gray-900">{{ $pencatatanPI->name_person
-                            }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs sm:text-sm font-medium text-gray-500">Instansi</label>
-                        <p class="mt-1 text-sm sm:text-base font-semibold text-gray-900">{{ $pencatatanPI->agency }}</p>
-                    </div>
-                </div>
-
-                {{-- Kolom Kanan --}}
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs sm:text-sm font-medium text-gray-500">Jenis PI</label>
-                        <p class="mt-1 text-sm sm:text-base font-semibold text-gray-900">{{ $pencatatanPI->jenis_PI }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-xs sm:text-sm font-medium text-gray-500">Jam Masuk / Keluar</label>
-                        <p class="mt-1 text-sm sm:text-base font-semibold text-gray-900">{{ $pencatatanPI->in_time }} /
-                            {{ $pencatatanPI->out_time ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs sm:text-sm font-medium text-gray-500">Jumlah Masuk / Keluar</label>
-                        <p class="mt-1 text-sm sm:text-base font-semibold text-gray-900">{{ $pencatatanPI->in_quantity
-                            }} / {{ $pencatatanPI->out_quantity ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs sm:text-sm font-medium text-gray-500">Keterangan</label>
-                        <p class="mt-1 text-sm sm:text-base text-gray-800 rounded-lg">{{ $pencatatanPI->summary ??
-                            'Tidak ada keterangan.' }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-8 sm:mt-12">
-                {{-- Date Section --}}
-                <form id="signatureForm"
-                    action="{{ route('supervisor.form-pencatatan-pi.signature', $pencatatanPI->id) }}" method="POST">
-                    @csrf
-                    <div class="text-center mb-6">
-                        @php
-                        $bulan = [
-                        1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-                        5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-                        9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
-                        ];
-                        @endphp
-                        <p class="text-xs sm:text-sm">Yogyakarta,
-                            @if(isset($pencatatanPI))
-                            {{ $pencatatanPI->created_at->format('d') }} {{
-                            $bulan[(int)$pencatatanPI->created_at->format('n')] }} {{
-                            $pencatatanPI->created_at->format('Y') }}
-                            @else
-                            {{ date('d') }} {{ $bulan[(int)date('n')] }} {{ date('Y') }}
-                            @endif
-                        </p>
-                    </div>
-
-                    {{-- Signature Grid Layout (Sender & Receiver) --}}
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        {{-- Kolom Kiri: Yang Menyerahkan (Sender) --}}
-                        <div class="text-center">
-                            <p class="text-xs sm:text-sm font-semibold mb-3">Yang Menyerahkan</p>
-                            <div
-                                class="w-full max-w-[192px] mx-auto h-24 sm:h-28 flex flex-col items-center justify-center">
-                                @if($pencatatanPI->senderSignature)
-                                <img src="data:image/png;base64,{{ $pencatatanPI->senderSignature }}"
-                                    alt="TTD Yang Menyerahkan" class="max-h-20 sm:max-h-24 max-w-full object-contain">
-                                @else
-                                <div class="border-b border-dotted border-black w-full h-1"></div>
-                                @endif
+                <div class="p-4 sm:p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {{-- Kolom Kiri --}}
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs sm:text-sm font-medium text-gray-500">Tanggal</label>
+                                <p class="mt-1 text-sm sm:text-base font-semibold text-gray-900">{{
+                                    \Carbon\Carbon::parse($pencatatanPI->date)->translatedFormat('d F Y') }}</p>
                             </div>
-                            <p class="text-xs sm:text-sm font-semibold mt-2">
-                                ({{ $pencatatanPI->sender->name ?? '...' }})
-                            </p>
+                            <div>
+                                <label class="block text-xs sm:text-sm font-medium text-gray-500">Grup</label>
+                                <p class="mt-1 text-sm sm:text-base font-semibold text-gray-900">{{ $pencatatanPI->grup }}</p>
+                            </div>
+                            <div>
+                                <label class="block text-xs sm:text-sm font-medium text-gray-500">Nama Pemilik</label>
+                                <p class="mt-1 text-sm sm:text-base font-semibold text-gray-900">{{ $pencatatanPI->name_person
+                                    }}</p>
+                            </div>
+                            <div>
+                                <label class="block text-xs sm:text-sm font-medium text-gray-500">Instansi</label>
+                                <p class="mt-1 text-sm sm:text-base font-semibold text-gray-900">{{ $pencatatanPI->agency }}</p>
+                            </div>
                         </div>
-
-                        <div class="text-center">
-                            <p class="text-xs sm:text-sm font-semibold mb-3">Yang Mengetahui</p>
-                            @if($pencatatanPI->approvedSignature)
-                            <img src="data:image/png;base64,{{ $pencatatanPI->approvedSignature }}" alt="TTD Penerima"
-                                class="mx-auto mt-2 h-20 sm:h-24 border rounded">
-                            @else
-                            {{-- Tampilkan canvas hanya jika user yang login adalah penerima --}}
-                            @if(Auth::id() == $pencatatanPI->approved_id)
-                            <div
-                                class="w-full max-w-[192px] mx-auto mb-2 h-24 sm:h-28 flex flex-col items-center justify-center">
-                                <canvas id="signature-canvas" class="w-full h-full"></canvas>
+        
+                        {{-- Kolom Kanan --}}
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs sm:text-sm font-medium text-gray-500">Jam Masuk / Keluar</label>
+                                <p class="mt-1 text-sm sm:text-base font-semibold text-gray-900">{{ $pencatatanPI->in_time }} /
+                                    {{ $pencatatanPI->out_time ?? '-' }}</p>
                             </div>
-                            <button type="button" id="clear-signature"
-                                class="text-xs sm:text-sm text-blue-600 hover:underline mt-1 no-print">Hapus</button>
-                            @else
-                            <div
-                                class="mx-auto mt-2 h-20 sm:h-24 w-full max-w-[192px] border rounded flex items-center justify-center text-xs sm:text-sm text-gray-500">
-                                Menunggu TTD</div>
-                            @endif
-                            @endif
-                            <p class="mt-2 text-xs sm:text-sm font-semibold">({{ $pencatatanPI->approver->name ?? 'N/A'
-                                }})</p>
+                            <div>
+                                <label class="block text-xs sm:text-sm font-medium text-gray-500">Keterangan</label>
+                                <p class="mt-1 text-sm sm:text-base text-gray-800 rounded-lg">{{ $pencatatanPI->summary ??
+                                    'Tidak ada keterangan.' }}</p>
+                            </div>
                         </div>
                     </div>
-
-                    @if(!$pencatatanPI->approvedSignature && Auth::id() == $pencatatanPI->approved_id)
-                    <div class="mt-6 text-center no-print">
-                        <input type="hidden" name="approvedSignature" id="approvedSignature">
-                        <button type="submit"
-                            class="px-6 py-2.5 sm:px-8 sm:py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-lg text-sm sm:text-base">
-                            Simpan Tanda Tangan
-                        </button>
+        
+                    {{-- Prohibited Items Details --}}
+                    <div class="mt-6 pt-4 border-t border-gray-200">
+                        <h4 class="text-base font-semibold text-gray-800 mb-3">Detail Prohibited Items</h4>
+                        <div class="space-y-3">
+                            @forelse($pencatatanPI->details as $detail)
+                                <div class="p-3 bg-gray-50 rounded-lg border border-gray-200 grid grid-cols-3 gap-4 items-center">
+                                    <div class="col-span-2">
+                                        <p class="font-semibold text-gray-800">{{ $detail->jenis_pi }}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm text-gray-600">
+                                            Masuk: <span class="font-bold">{{ $detail->in_quantity }}</span>
+                                        </p>
+                                        <p class="text-sm text-gray-600">
+                                            Keluar: <span class="font-bold">{{ $detail->out_quantity ?? '-' }}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            @empty
+                                <p class="text-gray-500">Tidak ada detail item.</p>
+                            @endforelse
+                        </div>
                     </div>
-                    @endif
-                </form>
-            </div>
-        </div>
+        
+                    <div class="mt-8 sm:mt-12">
+                        {{-- Date Section --}}
+                        <form id="signatureForm"
+                            action="{{ route('supervisor.form-pencatatan-pi.signature', $pencatatanPI->id) }}" method="POST">
+                            @csrf
+                            <div class="text-center mb-6">
+                                @php
+                                $bulan = [
+                                1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+                                5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+                                9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                                ];
+                                @endphp
+                                <p class="text-xs sm:text-sm">Yogyakarta,
+                                    @if(isset($pencatatanPI))
+                                    {{ $pencatatanPI->created_at->format('d') }} {{ 
+                                    $bulan[(int)$pencatatanPI->created_at->format('n')] }} {{
+                                    $pencatatanPI->created_at->format('Y') }}
+                                    @else
+                                    {{ date('d') }} {{ $bulan[(int)date('n')] }} {{ date('Y') }}
+                                    @endif
+                                </p>
+                            </div>
+        
+                            {{-- Signature Grid Layout (Sender & Receiver) --}}
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                {{-- Kolom Kiri: Yang Menyerahkan (Sender) --}}
+                                <div class="text-center">
+                                    <p class="text-xs sm:text-sm font-semibold mb-3">Yang Menyerahkan</p>
+                                    <div
+                                        class="w-full max-w-[192px] mx-auto h-24 sm:h-28 flex flex-col items-center justify-center">
+                                        @if($pencatatanPI->senderSignature)
+                                        <img src="data:image/png;base64,{{ $pencatatanPI->senderSignature }}"
+                                            alt="TTD Yang Menyerahkan" class="max-h-20 sm:max-h-24 max-w-full object-contain">
+                                        @else
+                                        <div class="border-b border-dotted border-black w-full h-1"></div>
+                                        @endif
+                                    </div>
+                                    <p class="text-xs sm:text-sm font-semibold mt-2">
+                                        ({{ $pencatatanPI->sender->name ?? '...' }})
+                                    </p>
+                                </div>
+        
+                                <div class="text-center">
+                                    <p class="text-xs sm:text-sm font-semibold mb-3">Yang Mengetahui</p>
+                                    @if($pencatatanPI->approvedSignature)
+                                    <img src="data:image/png;base64,{{ $pencatatanPI->approvedSignature }}" alt="TTD Penerima"
+                                        class="mx-auto mt-2 h-20 sm:h-24 border rounded">
+                                    @else
+                                    {{-- Tampilkan canvas hanya jika user yang login adalah penerima --}}
+                                    @if(Auth::id() == $pencatatanPI->approved_id)
+                                    <div
+                                        class="w-full max-w-[192px] mx-auto mb-2 h-24 sm:h-28 flex flex-col items-center justify-center">
+                                        <canvas id="signature-canvas" class="w-full h-full"></canvas>
+                                    </div>
+                                    <button type="button" id="clear-signature"
+                                        class="text-xs sm:text-sm text-blue-600 hover:underline mt-1 no-print">Hapus</button>
+                                    @else
+                                    <div
+                                        class="mx-auto mt-2 h-20 sm:h-24 w-full max-w-[192px] border rounded flex items-center justify-center text-xs sm:text-sm text-gray-500">
+                                        Menunggu TTD</div>
+                                    @endif
+                                    @endif
+                                    <p class="mt-2 text-xs sm:text-sm font-semibold">({{ $pencatatanPI->approver->name ?? 'N/A'
+                                        }})</p>
+                                </div>
+                            </div>
+        
+                            @if(!$pencatatanPI->approvedSignature && Auth::id() == $pencatatanPI->approved_id)
+                            <div class="mt-6 text-center no-print">
+                                <input type="hidden" name="approvedSignature" id="approvedSignature">
+                                <button type="submit"
+                                    class="px-6 py-2.5 sm:px-8 sm:py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-lg text-sm sm:text-base">
+                                    Simpan Tanda Tangan
+                                </button>
+                            </div>
+                            @endif
+                        </form>
+                    </div>        </div>
     </div>
 
 </div>

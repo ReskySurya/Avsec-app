@@ -3,7 +3,7 @@
 @section('title', 'Detail Form Pencatatan PI')
 
 @section('content')
-<div x-data="checklistForm()" class="mx-auto p-0 sm:p-6 min-h-screen pt-5 sm:pt-20">
+<div class="mx-auto p-0 sm:p-6 min-h-screen pt-5 sm:pt-20">
     @if(session('success'))
     <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition class="bg-gradient-to-r from-blue-400 to-blue-500 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl mb-4 sm:mb-6 shadow-lg border-l-4 border-blue-600 text-sm sm:text-base">
         <div class="flex items-center">
@@ -16,7 +16,7 @@
     @endif
 
     @if(session('error'))
-    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition class="bg-gradient-to-r from-red-400 to-red-500 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl mb-4 sm:mb-6 shadow-lg border-l-4 border-red-600 text-sm sm:text-base">
+    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 5000)" x-show="show" x-transition class="bg-gradient-to-r from-red-400 to-red-500 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl mb-4 sm:mb-6 shadow-lg border-l-4 border-red-600 text-sm sm:text-base">
         <div class="flex items-center">
             <svg class="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -25,64 +25,63 @@
         </div>
     </div>
     @endif
+
     <div class="bg-white shadow-xl rounded-2xl overflow-hidden mb-8 border border-gray-100">
         <div class="bg-gradient-to-r from-blue-500 to-teal-600 px-6 py-6 text-white">
-            <h3 class="text-2xl font-bold mb-1">Edit Data Pencatatan PI</h3>
+            <div class="flex justify-between items-center">
+                <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo"
+                    class="w-20 h-20 mb-2 sm:mb-0">
+                <h1 class="text-sm sm:text-xl font-bold text-center flex-grow px-2">
+                    CHECK LIST PENGUJIAN HARIAN<br>
+                    FORM PENCATATAN <br>
+                    PROHIBITED ITEM
+                </h1>
+                <img src="{{ asset('images/injourney-API.png') }}" alt="Injourney Logo" class="w-20 h-20 mt-2 sm:mt-0">
+            </div>
         </div>
-        <form id="updateForm" action="{{ route('checklist.pencatatanpi.update', $pencatatanPI->id) }}" method="POST" class="p-6" @submit.prevent="handleFormSubmit($event)">
+        <form id="updateForm" action="{{ route('checklist.pencatatanpi.update', $pencatatanPI->id) }}" method="POST" class="p-6">
             @csrf
             @method('PUT')
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label for="date" class="block text-sm font-semibold text-gray-700 mb-2">Tanggal</label>
-                    <input type="date" id="date" name="date" value="{{ old('date', $pencatatanPI->date ? $pencatatanPI->date->format('Y-m-d') : '') }}" required class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" readonly>
+                    <input type="date" id="date" name="date" value="{{ old('date', $pencatatanPI->date ? $pencatatanPI->date->format('Y-m-d') : '') }}" required class="w-full border-2 bg-gray-100 border-gray-200 px-4 py-3 rounded-xl" readonly>
                 </div>
                 <div>
                     <label for="grup" class="block text-sm font-semibold text-gray-700 mb-2">Grup</label>
-                    <select id="grup" name="grup_disabled" required class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 bg-gray-100" disabled>
-                        <option value="">Pilih Grup</option>
-                        <option value="A" {{ old('grup', $pencatatanPI->grup) == 'A' ? 'selected' : '' }}>A</option>
-                        <option value="B" {{ old('grup', $pencatatanPI->grup) == 'B' ? 'selected' : '' }}>B</option>
-                        <option value="C" {{ old('grup', $pencatatanPI->grup) == 'C' ? 'selected' : '' }}>C</option>
-                    </select>
-                    <input type="hidden" name="grup" value="{{ $pencatatanPI->grup }}">
+                    <input type="text" name="grup" value="{{ old('grup', $pencatatanPI->grup) }}" class="w-full border-2 bg-gray-100 border-gray-200 px-4 py-3 rounded-xl" readonly>
                 </div>
                 <div>
                     <label for="name_person" class="block text-sm font-semibold text-gray-700 mb-2">Nama Pemilik</label>
-                    <input required type="text" id="name_person" name="name_person" value="{{ old('name_person', $pencatatanPI->name_person) }}" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" placeholder="nama penanggung jawab" readonly>
+                    <input required type="text" id="name_person" name="name_person" value="{{ old('name_person', $pencatatanPI->name_person) }}" class="w-full border-2 bg-gray-100 border-gray-200 px-4 py-3 rounded-xl" readonly>
                 </div>
                 <div>
                     <label for="agency" class="block text-sm font-semibold text-gray-700 mb-2">Instansi</label>
-                    <input type="text" id="agency" name="agency" value="{{ old('agency', $pencatatanPI->agency) }}" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" placeholder="nama instansi" readonly>
+                    <input type="text" id="agency" name="agency" value="{{ old('agency', $pencatatanPI->agency) }}" class="w-full border-2 bg-gray-100 border-gray-200 px-4 py-3 rounded-xl" readonly>
                 </div>
                 <div>
                     <label for="in_time" class="block text-sm font-semibold text-gray-700 mb-2">Jam Masuk</label>
-                    <input required type="time" id="in_time" name="in_time" value="{{ old('in_time', $pencatatanPI->in_time) }}" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" readonly>
+                    <input required type="time" id="in_time" name="in_time" value="{{ old('in_time', $pencatatanPI->in_time) }}" class="w-full border-2 bg-gray-100 border-gray-200 px-4 py-3 rounded-xl" readonly>
                 </div>
                 <div>
                     <label for="out_time" class="block text-sm font-semibold text-gray-700 mb-2">Jam Keluar</label>
                     <input type="time" id="out_time" name="out_time" value="{{ old('out_time', $pencatatanPI->out_time) }}" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
                 </div>
-                <div>
-                    <label for="jenis_PI" class="block text-sm font-semibold text-gray-700 mb-2">Jenis PI</label>
-                    <input required type="text" id="jenis_PI" name="jenis_PI" value="{{ old('jenis_PI', $pencatatanPI->jenis_PI) }}" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" readonly>
-                </div>
-                <div>
-                    <label for="in_quantity" class="block text-sm font-semibold text-gray-700 mb-2">Jumlah Masuk</label>
-                    <input required type="text" id="in_quantity" name="in_quantity" value="{{ old('in_quantity', $pencatatanPI->in_quantity) }}" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 " placeholder="0" readonly>
-                </div>
-                <div>
-                    <label for="out_quantity" class="block text-sm font-semibold text-gray-700 mb-2">Jumlah Keluar</label>
-                    <input type="text" id="out_quantity" name="out_quantity"
-                        value="{{ old('out_quantity', $pencatatanPI->in_quantity) }}"
-                        class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200"
-                        placeholder="0">
-                </div>
+            </div>
 
-                <div class="md:col-span-2">
-                    <label for="summary" class="block text-sm font-semibold text-gray-700 mb-2">Keterangan</label>
-                    <textarea id="summary" name="summary" rows="3" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" placeholder="Masukkan Keterangan">{{ old('summary', $pencatatanPI->summary) }}</textarea>
+            <!-- PI Items Section -->
+            <div class="mt-6 pt-4 border-t">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-md font-semibold text-gray-800">Item Prohibited</h3>
                 </div>
+                <div id="pi-items-container" class="space-y-3">
+                    {{-- JS will populate this --}}
+                </div>
+            </div>
+
+            <div class="md:col-span-2 mt-4">
+                <label for="summary" class="block text-sm font-semibold text-gray-700 mb-2">Keterangan</label>
+                <textarea id="summary" name="summary" rows="3" class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200" placeholder="Masukkan Keterangan">{{ old('summary', $pencatatanPI->summary) }}</textarea>
             </div>
 
             <!-- Hidden inputs -->
@@ -91,14 +90,14 @@
 
             <div class="flex justify-end space-x-3 mt-6">
                 <a href="{{ route('checklist.pencatatanpi.index') }}" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium">Batal</a>
-                <button type="button" @click="openFinishDialog = true" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-teal-600 text-white rounded-xl hover:from-blue-600 hover:to-teal-700 transition-all duration-200 font-medium shadow-lg">Simpan Perubahan</button>
+                <button type="button" id="open-modal-btn" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-teal-600 text-white rounded-xl hover:from-blue-600 hover:to-teal-700 transition-all duration-200 font-medium shadow-lg">Simpan Perubahan</button>
             </div>
         </form>
     </div>
 
     {{-- Modal Konfirmasi --}}
-    <div x-show="openFinishDialog" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform scale-100" x-transition:leave-end="opacity-0 transform scale-95" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
-        <div @click.away="openFinishDialog = false" class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
+    <div id="confirmation-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
             <div class="bg-gradient-to-r from-blue-500 to-teal-600 text-white p-6 rounded-t-2xl">
                 <h2 class="text-2xl font-bold">Konfirmasi Selesai</h2>
                 <p class="text-blue-100">Konfirmasi penyelesaian Catatan PI</p>
@@ -111,7 +110,7 @@
                     </div>
                     <div class="flex justify-between items-center mt-2">
                         <span id="signature-status" class="text-xs text-gray-500">Belum ada tanda tangan</span>
-                        <button type="button" @click="clearSignature()" class="text-sm text-blue-600 hover:underline">Hapus Tanda Tangan</button>
+                        <button type="button" id="clear-signature-btn" class="text-sm text-blue-600 hover:underline">Hapus Tanda Tangan</button>
                     </div>
                 </div>
 
@@ -126,8 +125,8 @@
                 </div>
 
                 <div class="flex justify-end space-x-3 mt-6">
-                    <button type="button" @click="openFinishDialog = false" class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium">Batal</button>
-                    <button type="button" @click="submitForm()" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-teal-600 text-white rounded-lg hover:from-blue-600 hover:to-teal-700 transition-colors font-medium shadow-lg">
+                    <button type="button" id="cancel-modal-btn" class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium">Batal</button>
+                    <button type="button" id="submit-form-btn" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-teal-600 text-white rounded-lg hover:from-blue-600 hover:to-teal-700 transition-colors font-medium shadow-lg">
                         Konfirmasi & Kirim
                     </button>
                 </div>
@@ -136,107 +135,121 @@
     </div>
 </div>
 
+<template id="pi-item-template">
+    <div class="flex items-start space-x-2 p-3 bg-gray-50 rounded-lg border-2 item-row">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 flex-grow">
+            <div>
+                <label class="text-xs font-medium text-gray-600" data-label="jenis_pi">Jenis PI</label>
+                <input type="text" data-name="jenis_pi" required class="w-full mt-1 p-2 bg-gray-100 border-2 border-gray-200 rounded-md shadow-sm text-sm" readonly>
+            </div>
+            <div>
+                <label class="text-xs font-medium text-gray-600" data-label="in_quantity">Jumlah Masuk</label>
+                <input type="text" data-name="in_quantity" required class="w-full mt-1 p-2 bg-gray-100 border-2 border-gray-200 rounded-md shadow-sm text-sm" readonly>
+            </div>
+            <div>
+                <label class="text-xs font-medium text-gray-600" data-label="out_quantity">Jumlah Keluar</label>
+                <input type="text" data-name="out_quantity" class="w-full mt-1 p-2 border-2 border-gray-200 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm" placeholder="0">
+            </div>
+        </div>
+    </div>
+</template>
+
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+
+@push('scripts')
 <script>
-       document.addEventListener("DOMContentLoaded", function () {
-        const inQty = document.getElementById("in_quantity");
-        const outQty = document.getElementById("out_quantity");
+document.addEventListener('DOMContentLoaded', function () {
+    // --- Dynamic Items Script ---
+    const container = document.getElementById('pi-items-container');
+    const template = document.getElementById('pi-item-template');
+    let itemIndex = 0;
 
-        outQty.value = inQty.value; // awalnya sama
-        inQty.addEventListener("input", function () {
-            outQty.value = inQty.value;
-        });
-    });
-    function checklistForm() {
-        return {
-            openFinishDialog: false,
-            signaturePad: null,
+    const addItemRow = (itemData) => {
+        const newRow = template.content.cloneNode(true);
+        const uniqueId = Date.now() + '_' + itemIndex;
 
-            init() {
-                this.$watch('openFinishDialog', (value) => {
-                    if (value) {
-                        // Inisialisasi signature pad saat modal terbuka
-                        this.$nextTick(() => this.initializeSignaturePad());
-                    }
-                });
-            },
+        const jenisPiInput = newRow.querySelector('input[data-name="jenis_pi"]');
+        jenisPiInput.name = `items[${itemIndex}][jenis_pi]`;
+        jenisPiInput.id = `items_jenis_pi_${uniqueId}`;
+        if (itemData && itemData.jenis_pi) jenisPiInput.value = itemData.jenis_pi;
 
-            initializeSignaturePad() {
-                const canvas = document.getElementById('signature-canvas');
-                if (!canvas) {
-                    console.error('Canvas element not found!');
-                    return;
-                }
+        const inQuantityInput = newRow.querySelector('input[data-name="in_quantity"]');
+        inQuantityInput.name = `items[${itemIndex}][in_quantity]`;
+        inQuantityInput.id = `items_in_quantity_${uniqueId}`;
+        if (itemData && itemData.in_quantity) inQuantityInput.value = itemData.in_quantity;
 
-                // Hindari inisialisasi ganda
-                if (this.signaturePad) {
-                    this.signaturePad.clear();
-                } else {
-                    this.signaturePad = new SignaturePad(canvas, {
-                        backgroundColor: 'rgb(255, 255, 255)'
-                    });
-                }
-
-                const statusEl = document.getElementById('signature-status');
-                this.signaturePad.addEventListener("endStroke", () => {
-                    statusEl.textContent = 'Tanda tangan tersimpan sementara';
-                    statusEl.className = 'text-xs text-green-600 font-semibold';
-                });
-
-                // Sesuaikan ukuran canvas untuk layar HiDPI
-                const ratio = Math.max(window.devicePixelRatio || 1, 1);
-                canvas.width = canvas.offsetWidth * ratio;
-                canvas.height = canvas.offsetHeight * ratio;
-                canvas.getContext("2d").scale(ratio, ratio);
-                this.signaturePad.clear(); // Hapus canvas setelah penyesuaian ukuran
-            },
-
-            clearSignature() {
-                if (this.signaturePad) {
-                    this.signaturePad.clear();
-                    const statusEl = document.getElementById('signature-status');
-                    statusEl.textContent = 'Belum ada tanda tangan';
-                    statusEl.className = 'text-xs text-gray-500';
-                }
-            },
-
-            submitForm() {
-                const approvedId = document.getElementById('supervisor_id').value;
-                const signatureDataInput = document.getElementById('senderSignature');
-                const outTime = document.getElementById('out_time').value;
-                const inTime = document.getElementById('in_time').value;
-
-                if (!outTime) {
-                    alert('Mohon isi jam keluar.');
-                    return;
-                }
-                if (!inTime) {
-                    alert('Mohon isi jam masuk.');
-                    return;
-                }
-
-                if (!approvedId) {
-                    alert('Mohon pilih supervisor yang mengetahui.');
-                    return;
-                }
-                if (!this.signaturePad || this.signaturePad.isEmpty()) {
-                    alert('Tanda tangan petugas tidak boleh kosong.');
-                    return;
-                }
-
-                // Simpan data tanda tangan ke input tersembunyi
-                signatureDataInput.value = this.signaturePad.toDataURL('image/png');
-                document.getElementById('approved_id').value = approvedId;
-
-                // Kirim form
-                document.getElementById('updateForm').submit();
-            },
-
-            handleFormSubmit(event) {
-                // Form akan disubmit melalui submitForm() method
-                event.preventDefault();
+        const outQuantityInput = newRow.querySelector('input[data-name="out_quantity"]');
+        outQuantityInput.name = `items[${itemIndex}][out_quantity]`;
+        outQuantityInput.id = `items_out_quantity_${uniqueId}`;
+        if (itemData) {
+            if (itemData.out_quantity !== null && itemData.out_quantity !== undefined && itemData.out_quantity !== '') {
+                outQuantityInput.value = itemData.out_quantity;
+            } else {
+                outQuantityInput.value = itemData.in_quantity;
             }
         }
+
+        newRow.querySelector('label[data-label="jenis_pi"]').setAttribute('for', jenisPiInput.id);
+        newRow.querySelector('label[data-label="in_quantity"]').setAttribute('for', inQuantityInput.id);
+        newRow.querySelector('label[data-label="out_quantity"]').setAttribute('for', outQuantityInput.id);
+
+        container.appendChild(newRow);
+        itemIndex++;
+    };
+
+    const existingItems = {!! json_encode(old('items', $pencatatanPI->details), JSON_UNESCAPED_SLASHES) !!};
+    if (existingItems && existingItems.length > 0) {
+        container.innerHTML = '';
+        existingItems.forEach(item => addItemRow(item));
     }
+
+    // --- Modal and Signature Script ---
+    const modal = document.getElementById('confirmation-modal');
+    const openModalBtn = document.getElementById('open-modal-btn');
+    const cancelModalBtn = document.getElementById('cancel-modal-btn');
+    const submitFormBtn = document.getElementById('submit-form-btn');
+    const clearSignatureBtn = document.getElementById('clear-signature-btn');
+    const canvas = document.getElementById('signature-canvas');
+    const signaturePad = new SignaturePad(canvas, { backgroundColor: 'rgb(255, 255, 255)' });
+
+    const resizeCanvas = () => {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext("2d").scale(ratio, ratio);
+        signaturePad.clear();
+    };
+
+    openModalBtn.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+        resizeCanvas();
+    });
+
+    cancelModalBtn.addEventListener('click', () => modal.classList.add('hidden'));
+    clearSignatureBtn.addEventListener('click', () => signaturePad.clear());
+
+    submitFormBtn.addEventListener('click', () => {
+        const approvedId = document.getElementById('supervisor_id').value;
+        const outTime = document.getElementById('out_time').value;
+
+        if (!outTime) {
+            alert('Mohon isi jam keluar.');
+            return;
+        }
+        if (!approvedId) {
+            alert('Mohon pilih supervisor yang mengetahui.');
+            return;
+        }
+        if (signaturePad.isEmpty()) {
+            alert('Tanda tangan petugas tidak boleh kosong.');
+            return;
+        }
+
+        document.getElementById('senderSignature').value = signaturePad.toDataURL('image/png');
+        document.getElementById('approved_id').value = approvedId;
+        document.getElementById('updateForm').submit();
+    });
+});
 </script>
+@endpush
 @endsection

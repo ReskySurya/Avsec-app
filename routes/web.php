@@ -315,6 +315,7 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
 
     // Checklist Pencatatan PI Routes
     Route::get('/checklist/form-pencatatan-pi', [FormPencatatanPIController::class, 'indexChecklistPencatatanPI'])->name('checklist.pencatatanpi.index');
+    Route::get('/checklist/form-pencatatan-pi/create', [FormPencatatanPIController::class, 'create'])->name('checklist.pencatatanpi.create');
     Route::post('/form-pencatatan-pi/store', [FormPencatatanPIController::class, 'storeChecklistPencatatanPI'])->name('checklist.pencatatanpi.store');
     Route::get('/form-pencatatan-pi/{id}/edit', [FormPencatatanPIController::class, 'editChecklistPencatatanPI'])->name('checklist.pencatatanpi.edit');
     Route::put('/form-pencatatan-pi/{id}', [FormPencatatanPIController::class, 'updateChecklistPencatatanPI'])->name('checklist.pencatatanpi.update');

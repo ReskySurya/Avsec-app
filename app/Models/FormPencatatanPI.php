@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class FormPencatatanPI extends Model
 {
@@ -16,9 +17,6 @@ class FormPencatatanPI extends Model
         'out_time',
         'name_person',
         'agency',
-        'jenis_PI',
-        'in_quantity',
-        'out_quantity',
         'summary',
         'status',
         'sender_id',
@@ -46,6 +44,12 @@ class FormPencatatanPI extends Model
     {
         return $this->belongsTo(User::class, 'sender_id');
     }
+
+    public function details(): HasMany
+    {
+        return $this->hasMany(FormPencatatanPIDetail::class, 'form_pencatatan_pi_id');
+    }
+
      public function scopeByDate($query, $date)
     {
         return $query->whereDate('date', $date);
