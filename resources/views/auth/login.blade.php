@@ -4,13 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Login - Masuk ke Akun Anda</title>
+    <title>Login</title>
     <meta name="description" content="Masuk ke akun Anda untuk mengakses dashboard">
 
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -33,63 +31,51 @@
 </head>
 <body class="bg-white min-h-screen flex items-center justify-center p-4">
     <div class="relative w-full max-w-md">
-        <!-- Login Card -->
         <div class="bg-white rounded-2xl shadow-2xl p-8 ">
-            <!-- Header -->
-            <div class="text-center  ">
-                <div class="mx-auto w-24 h-24  flex items-center justify-center mb-4">
+            <div class="text-center">
+                <div class="mx-auto w-24 h-24 flex items-center justify-center mb-4">
                     <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo" class=" mb-2 sm:mb-0">
                 </div>
                 <span class="text-lg font-bold text-gray-800">Airport Security Reporting System</span><br>
                 <span class="text-lg font-bold text-gray-800">(ASRS)</span>
             </div>
 
-            <!-- Welcome Message -->
-            <div class="text-center  ">
-                <h1 class="text-3xl font-bold text-gray-800">Selamat Datang</h1>
+            <div class="text-center mt-3">
                 <p class="text-gray-500">Masuk ke akun Anda untuk melanjutkan</p>
             </div>
 
-            <!-- Error Messages -->
             @if ($errors->any())
-                <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg mt-6">
                     <div class="flex items-center">
                         <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
                         <div class="text-red-700">
-                            @foreach ($errors->all() as $error)
-                                <p class="text-sm">{{ $error }}</p>
-                            @endforeach
+                             @if ($errors->has('identifier'))
+                                <p class="text-sm">{{ $errors->first('identifier') }}</p>
+                             @else
+                                <p class="text-sm">Terjadi kesalahan. Silakan coba lagi.</p>
+                             @endif
                         </div>
                     </div>
                 </div>
             @endif
 
-            <!-- Login Form -->
-            <form method="POST" action="{{ url('/login') }}" class="space-y-6" novalidate>
+
+            <form method="POST" action="{{ url('/login') }}" class="space-y-6 pt-6" novalidate>
                 @csrf
 
-                <!-- Email Field -->
                 <div class="space-y-2">
-                    <label for="email" class="block text-sm font-semibold text-gray-700">
-                        <i class="fas fa-envelope mr-2 text-gray-400"></i>Email
+                    <label for="identifier" class="block text-sm font-semibold text-gray-700">
+                        <i class="fas fa-user mr-2 text-gray-400"></i>Email atau NIP
                     </label>
                     <div class="relative">
                         <input
-                            type="email"
-                            name="email"
-                            id="email"
-                            value="{{ old('email') }}"
-                            required
+                            type="text" name="identifier" id="identifier" value="{{ old('identifier') }}" required
                             autofocus
-                            autocomplete="email"
-                            placeholder="contoh@email.com"
-                            class="input-focus w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
-                            aria-describedby="email-error">
-                        <i class="fas fa-at absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                    </div>
+                            autocomplete="username" placeholder="Masukkan Email atau NIP Anda" class="input-focus w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
+                            aria-describedby="identifier-error">
+                        <i class="fas fa-id-card absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i> </div>
                 </div>
 
-                <!-- Password Field -->
                 <div class="space-y-2">
                     <label for="password" class="block text-sm font-semibold text-gray-700">
                         <i class="fas fa-lock mr-2 text-gray-400"></i>Password
@@ -109,7 +95,6 @@
                     </div>
                 </div>
 
-                <!-- Submit Button -->
                 <button
                     type="submit"
                     class="btn-hover w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300">
@@ -135,20 +120,22 @@
             }
         }
 
-        // Form validation
+        // PERUBAHAN: Form validation
         document.querySelector('form').addEventListener('submit', function(e) {
-            const email = document.getElementById('email').value;
+            // Mengambil nilai dari input 'identifier'
+            const identifier = document.getElementById('identifier').value;
             const password = document.getElementById('password').value;
 
-            if (!email || !password) {
+            if (!identifier || !password) {
                 e.preventDefault();
-                alert('Mohon lengkapi semua field yang diperlukan');
+                alert('Mohon lengkapi Email/NIP dan Password');
             }
         });
 
-        // Auto-focus on first input
+        // PERUBAHAN: Auto-focus on first input
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('email').focus();
+            // Memberi fokus pada input 'identifier'
+            document.getElementById('identifier').focus();
         });
     </script>
 </body>

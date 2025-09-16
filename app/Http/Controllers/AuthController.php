@@ -22,21 +22,41 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        // 1. Ubah validasi. Kita gunakan nama 'identifier' yang lebih umum.
+        // Aturan 'email' dihapus agar bisa menerima NIP (yang bukan format email).
         $request->validate([
-            'email' => 'required|email',
+            'identifier' => 'required|string',
             'password' => 'required',
         ]);
 
-        $credentials = $request->only('email', 'password');
+        // 2. Ambil input dari request.
+        $identifier = $request->input('identifier');
+        $password = $request->input('password');
 
+        // 3. Tentukan nama kolom (field) berdasarkan format identifier.
+        // Jika input mengandung '@' atau merupakan email valid, kita anggap itu email.
+        // Jika tidak, kita anggap itu NIP.
+        $field = filter_var($identifier, FILTER_VALIDATE_EMAIL) ? 'email' : 'nip';
+
+        // 4. Siapkan kredensial untuk percobaan login.
+        $credentials = [
+            $field => $identifier,
+            'password' => $password,
+        ];
+
+        // 5. Coba lakukan autentikasi dengan kredensial yang sudah disiapkan.
         if (Auth::attempt($credentials)) {
+            $request->session()->regenerate(); // Regenerate session untuk keamanan
+
             return redirect($this->redirectBasedOnRole())
                 ->with('success', 'Berhasil login!');
         }
 
+        // 6. Jika gagal, kembalikan ke halaman sebelumnya dengan pesan error.
+        // Pesan error dihubungkan dengan input 'identifier'.
         return back()->withErrors([
-            'email' => 'Email atau password salah.',
-        ]);
+            'identifier' => 'Email/NIP atau password yang Anda masukkan salah.',
+        ])->onlyInput('identifier'); // Mengembalikan input 'identifier' saja
     }
 
     public function logout()
@@ -90,7 +110,7 @@ class AuthController extends Controller
 
         // Cek apakah password baru sama dengan password default "P4ssword"
         if ($request->password === 'P4ssword') {
-             return back()->withErrors(['password' => 'Password baru tidak boleh sama dengan password default.']);
+            return back()->withErrors(['password' => 'Password baru tidak boleh sama dengan password default.']);
         }
 
         $user->password = Hash::make($request->password);

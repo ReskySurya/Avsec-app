@@ -19,10 +19,10 @@
 
                 <!-- Logo -->
                 <div class="flex-shrink-0 flex items-center">
-                     <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo" class="w-10 h-10 mr-2">
-                    <a href="#" class="text-white font-bold text-xl">ASRS App</a>
+                     {{-- <img src="{{ asset('images/airport-security-logo.png') }}" alt="Logo" class="w-10 h-10 mr-2"> --}}
+                    <a href="#" class="text-white font-bold text-xl">ASRS APP</a>
                 </div>
-<!-- 
+<!--
                 <button id="toggleSidebar" class="lg:inline-flex hidden items-center px-3 py-2 text-white  rounded">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2"
                         viewBox="0 0 24 24">
@@ -44,7 +44,7 @@
                         System Settings
                     </a>
                     @endif
-                    
+
                     @if(auth()->user()->role->name === 'supervisor' || auth()->user()->role->name === 'superadmin')
                     <a href="#" class="border-transparent text-white hover:border-white hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                         Reports
@@ -53,7 +53,7 @@
                         Analytics
                     </a>
                     @endif
-                    
+
                     @if(auth()->user()->role->name === 'officer')
                     <a href="#" class="border-transparent text-white hover:border-white hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                         Submit Report

@@ -19,10 +19,10 @@
         </p>
     </div>
 
-    @include('superadmin.partials.user-info')
-    @include('superadmin.partials.dailytest-stats')
-    @include('superadmin.partials.logbook-stats')
-    @include('superadmin.partials.checklist-stats')
+    @include('partials.user-info')
+    @include('partials.dailytest-stats')
+    @include('partials.logbook-stats')
+    @include('partials.checklist-stats')
 
     <!-- Modal -->
     <div x-show="isModalOpen" x-transition class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
@@ -62,77 +62,4 @@
         </div>
     </div>
 </div>
-<style>
-    .gauge-container {
-        display: inline-block;
-        text-align: center;
-        width: 160px;
-    }
-
-    .gauge {
-        position: relative;
-        width: 140px;
-        height: 70px;
-        margin: 0 auto 10px;
-    }
-
-    .gauge-background {
-        width: 140px;
-        height: 70px;
-        background: #e0e0e0;
-        border-radius: 70px 70px 0 0;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .gauge-fill {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 140px;
-        height: 70px;
-        background: conic-gradient(from 180deg, #4ade80 0deg, #4ade80 var(--percentage), transparent var(--percentage));
-        border-radius: 70px 70px 0 0;
-        transition: all 0.8s ease-in-out;
-    }
-
-    .gauge-center {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        width: 120px;
-        height: 60px;
-        background: white;
-        border-radius: 60px 60px 0 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 2;
-    }
-
-    .gauge-percentage {
-        font-size: 28px;
-        font-weight: bold;
-        color: #333;
-        line-height: 1;
-    }
-
-    .gauge-label {
-        font-size: 11px;
-        color: #999;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .gauge-scale {
-        bottom: -5px;
-        left: 0;
-        right: 0;
-        display: flex;
-        justify-content: space-between;
-        font-size: 10px;
-        color: #999;
-    }
-</style>
 @endsection

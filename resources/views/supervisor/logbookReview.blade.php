@@ -148,7 +148,7 @@
         </div>
 
         {{-- Bawah Tengah: Chief Screening --}}
-        <div class=" w-full md:w-1/2 mx-auto mt-8">
+        <div class=" w-full md:w-1/3 mx-auto mt-8">
             <p>Mengetahui,</p>
             @if($logbook->approvedSignature)
             <div class="h-16 flex items-center justify-center">

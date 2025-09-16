@@ -10,10 +10,10 @@
     </div>
     <div class="bg-white p-6 rounded-lg shadow-lg">
         <h3 class="text-lg font-semibold text-gray-800 mb-2">Menu Cepat</h3>
-        <div class="flex flex-wrap gap-2">
-             <a href="{{ route('users-management.index') }}" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 text-sm font-medium">Manajemen Pengguna</a>
-             <a href="{{ route('equipment-locations.index') }}" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 text-sm font-medium">Manajemen Equipment</a>
-             <a href="{{ route('tenant-management.index') }}" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 text-sm font-medium">Manajemen Tenant</a>
+        <div class="flex flex-wrap gap-2 text-center">
+             <a href="{{ route('users-management.index') }}" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 text-sm font-medium w-full">Manajemen Pengguna</a>
+             <a href="{{ route('equipment-locations.index') }}" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 text-sm font-medium w-full">Manajemen Equipment</a>
+             <a href="{{ route('tenant-management.index') }}" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 text-sm font-medium w-full">Manajemen Tenant</a>
         </div>
     </div>
 </div>

@@ -341,8 +341,134 @@ class DashboardController extends Controller
             ->latest('date')
             ->paginate($perPage);
 
-        return view('supervisor.dashboardSupervisor', compact('logbooksChief'));
+
+        // Daily Test Stats
+        $dailyTestStats = [];
+        $equipmentTypes = ['hhmd', 'wtmd', 'xraycabin', 'xraybagasi'];
+        $approvedStatus = ReportStatus::where('name', 'approved')->first();
+        $approvedStatusId = $approvedStatus ? $approvedStatus->id : null;
+
+        foreach ($equipmentTypes as $type) {
+            $totalLocationsForType = EquipmentLocation::whereHas('equipment', function ($query) use ($type) {
+                $query->where('name', $type);
+            })->count();
+
+            $reportsToday = Report::with('equipmentLocation.location')
+                ->whereHas('equipmentLocation.equipment', function ($query) use ($type) {
+                    $query->where('name', $type);
+                })
+                ->whereDate('created_at', today())
+                ->get();
+
+            $reportsByLocation = $reportsToday->groupBy('equipmentLocation.location.name');
+
+            $locationDetails = [];
+            foreach ($reportsByLocation as $locationName => $reports) {
+                $locationDetails[$locationName ?: 'Tanpa Lokasi'] = [
+                    'total' => $reports->count(),
+                    'approved' => $approvedStatusId ? $reports->where('statusID', $approvedStatusId)->count() : 0,
+                ];
+            }
+
+            $submittedReports = $reportsToday->count();
+
+            $key = ucwords(str_replace(['xraycabin', 'xraybagasi'], ['X-Ray Cabin', 'X-Ray Bagasi'], $type));
+            if ($type === 'hhmd' || $type === 'wtmd') $key = strtoupper($type);
+
+            $dailyTestStats[$key] = [
+                'total' => $totalLocationsForType,
+                'approved' => $submittedReports,
+                'percentage' => ($totalLocationsForType > 0) ? round(($submittedReports / $totalLocationsForType) * 100) : 0,
+                'breakdown' => $locationDetails,
+                'breakdownTitle' => 'Lokasi'
+            ];
+        }
+
+        // Logbook Stats
+        $logbookStats = [];
+
+        $totalLocations = Location::count();
+        $logbooksToday = Logbook::with('locationArea')->whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
+        $logbooksByLocation = $logbooksToday->groupBy('locationArea.name');
+        $locationDetailsPosJaga = [];
+        foreach ($logbooksByLocation as $locationName => $logbooks) {
+            $locationDetailsPosJaga[$locationName ?: 'Tanpa Lokasi'] = ['total' => $logbooks->count(), 'approved' => $logbooks->where('status', 'approved')->count()];
+        }
+        $submittedPosJaga = $logbooksToday->count();
+        $logbookStats['Pos Jaga'] = [
+            'total' => $totalLocations,
+            'approved' => $submittedPosJaga,
+            'percentage' => ($totalLocations > 0) ? round(($submittedPosJaga / $totalLocations) * 100) : 0,
+            'breakdown' => $locationDetailsPosJaga,
+            'breakdownTitle' => 'Lokasi'
+        ];
+
+        $rotasiToday = LogbookRotasi::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
+        $rotasiByType = $rotasiToday->groupBy('type');
+        $typeDetailsRotasi = [];
+        foreach ($rotasiByType as $typeName => $logbooks) {
+            $typeDetailsRotasi[strtoupper($typeName)] = ['total' => $logbooks->count(), 'approved' => $logbooks->where('status', 'approved')->count()];
+        }
+        $totalRotasi = $rotasiToday->count();
+        $approvedRotasi = $rotasiToday->where('status', 'approved')->count();
+        $logbookStats['Rotasi'] = ['total' => $totalRotasi, 'approved' => $approvedRotasi, 'percentage' => ($totalRotasi > 0) ? round(($approvedRotasi / $totalRotasi) * 100) : 0, 'breakdown' => $typeDetailsRotasi, 'breakdownTitle' => 'Tipe'];
+
+        $totalChief = LogbookChief::whereNotNull('senderSignature')->whereDate('created_at', today())->count();
+        $approvedChief = LogbookChief::whereNotNull('approvedSignature')->whereDate('created_at', today())->count();
+        $logbookStats['Laporan Chief'] = ['total' => $totalChief, 'approved' => $approvedChief, 'percentage' => ($totalChief > 0) ? round(($approvedChief / $totalChief) * 100) : 0, 'breakdown' => [], 'breakdownTitle' => ''];
+
+        // Checklist Stats
+        $checklistStats = [];
+
+        $kendaraanToday = ChecklistKendaraan::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
+        $kendaraanByType = $kendaraanToday->groupBy('type');
+        $typeDetailsKendaraan = [];
+        foreach ($kendaraanByType as $typeName => $checklists) {
+            $typeDetailsKendaraan[ucfirst($typeName)] = ['total' => $checklists->count(), 'approved' => $checklists->where('status', 'approved')->count()];
+        }
+        $totalKendaraan = $kendaraanToday->count();
+        $approvedKendaraan = $kendaraanToday->where('status', 'approved')->count();
+        $checklistStats['Kendaraan'] = ['total' => $totalKendaraan, 'approved' => $approvedKendaraan, 'percentage' => ($totalKendaraan > 0) ? round(($approvedKendaraan / $totalKendaraan) * 100) : 0, 'breakdown' => $typeDetailsKendaraan, 'breakdownTitle' => 'Tipe Kendaraan'];
+
+        $penyisiranToday = ChecklistPenyisiran::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
+        $penyisiranByGrup = $penyisiranToday->groupBy('grup');
+        $grupDetailsPenyisiran = [];
+        foreach ($penyisiranByGrup as $grupName => $checklists) {
+            $grupDetailsPenyisiran['Grup ' . $grupName] = ['total' => $checklists->count(), 'approved' => $checklists->where('status', 'approved')->count()];
+        }
+        $totalPenyisiran = $penyisiranToday->count();
+        $approvedPenyisiran = $penyisiranToday->where('status', 'approved')->count();
+        $checklistStats['Penyisiran'] = ['total' => $totalPenyisiran, 'approved' => $approvedPenyisiran, 'percentage' => ($totalPenyisiran > 0) ? round(($approvedPenyisiran / $totalPenyisiran) * 100) : 0, 'breakdown' => $grupDetailsPenyisiran, 'breakdownTitle' => 'Grup'];
+
+        $piToday = FormPencatatanPI::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
+        $piByGrup = $piToday->groupBy('grup');
+        $grupDetailsPI = [];
+        foreach ($piByGrup as $grupName => $forms) {
+            $grupDetailsPI['Grup ' . $grupName] = ['total' => $forms->count(), 'approved' => $forms->where('status', 'approved')->count()];
+        }
+        $totalPI = $piToday->count();
+        $approvedPI = $piToday->where('status', 'approved')->count();
+        $checklistStats['Pencatatan PI'] = ['total' => $totalPI, 'approved' => $approvedPI, 'percentage' => ($totalPI > 0) ? round(($approvedPI / $totalPI) * 100) : 0, 'breakdown' => $grupDetailsPI, 'breakdownTitle' => 'Grup'];
+
+        $manualBookToday = ManualBook::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
+        $manualBookByType = $manualBookToday->groupBy('type');
+        $typeDetailsManualBook = [];
+        foreach ($manualBookByType as $typeName => $books) {
+            $typeDetailsManualBook[strtoupper($typeName)] = ['total' => $books->count(), 'approved' => $books->where('status', 'approved')->count()];
+        }
+        $totalManualBook = $manualBookToday->count();
+        $approvedManualBook = $manualBookToday->where('status', 'approved')->count();
+        $checklistStats['Manual Book'] = ['total' => $totalManualBook, 'approved' => $approvedManualBook, 'percentage' => ($totalManualBook > 0) ? round(($approvedManualBook / $totalManualBook) * 100) : 0, 'breakdown' => $typeDetailsManualBook, 'breakdownTitle' => 'Tipe'];
+
+        return view('supervisor.dashboardSupervisor', [
+            'dailyTestStats' => $dailyTestStats,
+            'logbookStats' => $logbookStats,
+            'checklistStats' => $checklistStats,
+            'logbooksChief' => $logbooksChief
+        ]);
+
     }
+
 
     public function indexSuperadmin()
     {
@@ -353,7 +479,7 @@ class DashboardController extends Controller
         $approvedStatusId = $approvedStatus ? $approvedStatus->id : null;
 
         foreach ($equipmentTypes as $type) {
-            $totalLocationsForType = \App\Models\EquipmentLocation::whereHas('equipment', function ($query) use ($type) {
+            $totalLocationsForType = EquipmentLocation::whereHas('equipment', function ($query) use ($type) {
                 $query->where('name', $type);
             })->count();
 

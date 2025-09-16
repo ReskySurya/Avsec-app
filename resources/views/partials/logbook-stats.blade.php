@@ -1,10 +1,10 @@
-<!-- Checklist Statistics -->
+<!-- Logbook Statistics -->
 <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-    <h2 class="text-xl font-bold text-gray-800 mb-1">Persentase Penyelesaian Checklist</h2>
+    <h2 class="text-xl font-bold text-gray-800 mb-1">Persentase Penyelesaian Logbook</h2>
     <p class="text-sm text-gray-500 mb-4 border-b pb-2">Statistik untuk hari ini, {{ now()->translatedFormat('l, d F Y') }}</p>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 pt-4">
-        @if(isset($checklistStats))
-        @foreach($checklistStats as $type => $stats)
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
+        @if(isset($logbookStats))
+        @foreach($logbookStats as $type => $stats)
         <div @if(!empty($stats['breakdown']))
             @click="isModalOpen = true; modalTitle = '{{ $type }}'; modalData = {{ json_encode($stats['breakdown']) }}; modalBreakdownTitle = '{{ $stats['breakdownTitle'] }}'"
             class="bg-gray-50 p-5 rounded-xl shadow-inner border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors duration-200"
@@ -13,7 +13,7 @@
             @endif>
             <h3 class="text-lg font-semibold text-gray-700">{{ $type }}</h3>
             <p class="text-gray-500 text-sm mt-1">
-                {{ $stats['approved'] }} dari {{ $stats['total'] }} checklist telah disetujui.
+                {{ $stats['approved'] }} dari {{ $stats['total'] }} logbook telah disetujui.
             </p>
             <div class="relative pt-1 mt-4">
                 <div class="gauge-container">
@@ -31,14 +31,14 @@
                         </div>
                     </div>
                 </div>
-                <p class="text-right text-sm font-semibold text-purple-700 mt-1">{{ $stats['percentage'] }}%</p>
+                <p class="text-right text-sm font-semibold text-green-700 mt-1">{{ $stats['percentage'] }}%</p>
             </div>
         </div>
         @endforeach
-        <div class="bg-gray-50 p-5 rounded-xl shadow-inner border border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-700">Senjata Api</h3>
+        {{-- <div class="bg-gray-50 p-5 rounded-xl shadow-inner border border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-700">Sweeping PI</h3>
             <p class="text-gray-500 text-sm mt-1">
-                Logika penyelesaian untuk checklist ini belum dapat ditentukan.
+                Logika penyelesaian untuk logbook ini belum dapat ditentukan.
             </p>
             <div class="relative pt-1 mt-4">
                 <div class="overflow-hidden h-4 text-xs flex rounded-full bg-gray-200">
@@ -46,9 +46,9 @@
                 </div>
                 <p class="text-right text-sm font-semibold text-gray-700 mt-1">N/A</p>
             </div>
-        </div>
+        </div> --}}
         @else
-        <p class="text-gray-500 col-span-5">Data statistik checklist tidak tersedia.</p>
+        <p class="text-gray-500 col-span-4">Data statistik logbook tidak tersedia.</p>
         @endif
     </div>
 </div>

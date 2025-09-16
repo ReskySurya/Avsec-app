@@ -25,16 +25,6 @@
                     @endif
                 </ul>
             </div>
-
-            <div class="bg-purple-50 p-4 rounded-lg">
-                <h3 class="text-lg font-semibold text-purple-800 mb-2">Statistik Tim</h3>
-                <ul class="text-purple-600">
-                    <li><strong>Total Anggota Tim:</strong> 5</li>
-                    <li><strong>Total Laporan:</strong> 15</li>
-                    <li><strong>Laporan Pending:</strong> 3</li>
-                    <li><strong>Laporan Selesai:</strong> 12</li>
-                </ul>
-            </div>
         </div>
 
         <div class="bg-green-50 p-4 rounded-lg mb-6">
@@ -121,6 +111,10 @@
             </div>
             @endif
         </div>
-    </div>
+
+        @include('partials.dailytest-stats')
+        @include('partials.logbook-stats')
+        @include('partials.checklist-stats')
+    </div>  
 </div>
 @endsection
