@@ -184,7 +184,7 @@
                         <div class="grid grid-cols-2 gap-4">
                             {{-- Kiri: Chief Security --}}
                             <div>
-                                <p>Chief Security</p>
+                                <p>Yang Menyerahkan</p>
                                 <div class="h-16 flex items-center justify-center">
                                     @if(isset($chief) && $chief->chiefSignature)
                                     <img src="data:image/png;base64,{{ $chief->chiefSignature }}" class="h-16 mt-5" alt="Tanda Tangan">
@@ -197,11 +197,15 @@
 
                             {{-- Kanan: Supervisor --}}
                             <div>
-                                <p>Supervisor</p>
+                                <p>Yang Menerima</p>
                                 <div class="h-16 flex items-center justify-center">
+                                    @if(isset($chief) && $chief->supervisorSignature)
+                                    <img src="data:image/png;base64,{{ $chief->supervisorSignature }}" class="h-16 mt-5" alt="Tanda Tangan">
+                                    @else
                                     <span class="italic text-gray-400">Belum tanda tangan</span>
+                                    @endif
                                 </div>
-                                <p class="font-semibold mt-1">( Nama Supervisor )</p>
+                                <p class="font-semibold mt-1">{{ $chief->supervisor }}</p>
                             </div>
                         </div>
                     </div>
