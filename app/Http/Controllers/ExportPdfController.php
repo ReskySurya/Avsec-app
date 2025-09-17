@@ -432,8 +432,10 @@ class ExportPdfController extends Controller
         // For template compatibility
         $form->lokasi = $logbook->grup;
         $form->chief = $logbook->createdBy->name ?? 'N/A';
+        $form->supervisor = $logbook->approvedBy->name ?? 'N/A';
         $form->notes = $logbook->notes ?? 'Tidak ada catatan khusus.';
         $form->chiefSignature = $logbook->senderSignature;
+        $form->supervisorSignature = $logbook->approvedSignature;
 
         return $form;
     }
@@ -518,6 +520,7 @@ class ExportPdfController extends Controller
                         'grup' => $item->grup,
                         'shift' => $item->shift,
                         'senderName' => $item->createdBy->name ?? 'N/A',
+                        'receiverName' => $item->approvedBy->name ?? 'N/A',
                         'status' => 'approved',
                     ];
                 });
@@ -943,9 +946,9 @@ class ExportPdfController extends Controller
         $paperSizeMapping = [
             'kendaraan' => 'A4',
             'penyisiran' => 'F4',
-            'senpi'  => 'F4', 
-            'pencatatan_pi' => 'F4', 
-            'manual_book' => 'F4', 
+            'senpi'  => 'F4',
+            'pencatatan_pi' => 'F4',
+            'manual_book' => 'F4',
         ];
 
         $viewName = $viewMapping[$formType] ?? null;

@@ -167,7 +167,8 @@
                         <div class="grid grid-cols-2 gap-4">
                             <!-- Kiri: Yang Menyerahkan -->
                             <div>
-                                <p>Dibuat Oleh</p>
+                                <p>Dibuat Oleh,</p>
+                                <p>Airport Security Officer</p>
                                 <div class="h-16 flex items-center justify-center">
                                     @if($form->submittedSignature)
                                     <img src="{{ $form->submittedSignature }}" class="h-16 mt-5" alt="Tanda Tangan">
@@ -180,7 +181,8 @@
 
                             <!-- Kanan: Yang Menyetujui -->
                             <div>
-                                <p>Disetujui Oleh</p>
+                                <p>Disetujui Oleh,</p>
+                                <p>Airport Security Supervisor</p>
                                 <div class="h-16 flex items-center justify-center">
                                     @if($form->approvedSignature)
                                     <img src="{{ $form->approvedSignature }}" class="h-16 mt-5" alt="Tanda Tangan">
