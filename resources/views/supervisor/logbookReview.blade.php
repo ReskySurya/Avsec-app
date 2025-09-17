@@ -150,41 +150,53 @@
         {{-- Bawah Tengah: Chief Screening --}}
         <div class=" w-full md:w-1/3 mx-auto mt-8">
             <p>Mengetahui,</p>
+            {{-- Cek 1: Apakah supervisor sudah ttd? --}}
             @if($logbook->approvedSignature)
-            <div class="h-16 flex items-center justify-center">
-                <img src="data:image/png;base64,{!! $logbook->approvedSignature !!}" class="h-16 mt-5"
-                    alt="Tanda Tangan Mengetahui">
-            </div>
-            <p class="font-semibold mt-1">{{ $logbook->approverBy->name ?? '-' }}</p>
+                {{-- JIKA SUDAH: Tampilkan gambar tanda tangan dan nama --}}
+                <div class="h-16 flex items-center justify-center">
+                    <img src="data:image/png;base64,{!! $logbook->approvedSignature !!}" class="h-16 mt-5"
+                        alt="Tanda Tangan Mengetahui">
+                </div>
+                <p class="font-semibold mt-1">{{ $logbook->approverBy->name ?? '-' }}</p>
+            {{-- Cek 2: Apakah petugas penerima belum ttd? --}}
+            @elseif(!$logbook->receivedSignature)
+                {{-- JIKA BELUM: Tampilkan pesan tunggu --}}
+                <div class="h-28 flex items-center justify-center">
+                    <div class="mx-auto h-24 w-32 border rounded flex items-center justify-center text-xs text-gray-500 text-center p-2">
+                        Menunggu Tanda Tangan Petugas Penerima
+                    </div>
+                </div>
+                <p class="font-semibold mt-1">{{ $logbook->approverBy->name ?? '-' }}</p>
             @else
-            <form
-                action="{{ route('supervisor.logbook.signature', [ 'logbookID' => $logbook->logbookID]) }}"
-                method="POST" onsubmit="return handleSignatureSubmit(event)">
-                @csrf
-                <div class="border-2 border-gray-200 rounded-xl p-4 my-2 ">
-                    <div class="relative w-50 h-32 border border-gray-300 rounded-lg bg-white">
-                        <canvas id="signature-canvas-receiver" class="w-full h-full"></canvas>
+                {{-- JIKA SEMUA SIAP: Tampilkan form untuk ttd supervisor --}}
+                <form
+                    action="{{ route('supervisor.logbook.signature', [ 'logbookID' => $logbook->logbookID]) }}"
+                    method="POST" onsubmit="return handleSignatureSubmit(event)">
+                    @csrf
+                    <div class="border-2 border-gray-200 rounded-xl p-4 my-2 ">
+                        <div class="relative w-50 h-32 border border-gray-300 rounded-lg bg-white">
+                            <canvas id="signature-canvas-receiver" class="w-full h-full"></canvas>
+                        </div>
+                        <input type="hidden" name="signature" id="signature-data-receiver">
+                        <div class="flex justify-between items-center mt-2">
+                            <span id="signature-status-receiver" class="text-xs text-gray-500">Belum ada tanda tangan</span>
+                            <button type="button" class="text-sm text-blue-600 hover:text-blue-800"
+                                onclick="clearSignatureReceiver()">Clear</button>
+                        </div>
                     </div>
-                    <input type="hidden" name="signature" id="signature-data-receiver">
-                    <div class="flex justify-between items-center mt-2">
-                        <span id="signature-status-receiver" class="text-xs text-gray-500">Belum ada tanda tangan</span>
-                        <button type="button" class="text-sm text-blue-600 hover:text-blue-800"
-                            onclick="clearSignatureReceiver()">Clear</button>
+                    <div class="flex gap-3">
+                        <button type="submit"
+                            class="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-semibold shadow transition">
+                            Setujui & Tanda Tangan
+                        </button>
+                        @if($logbook->status === 'submitted')
+                        <button type="button" onclick="openRejectModal()"
+                            class="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-semibold shadow transition">
+                            Tolak Logbook
+                        </button>
+                        @endif
                     </div>
-                </div>
-                <div class="flex gap-3">
-                    <button type="submit"
-                        class="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-semibold shadow transition">
-                        Setujui & Tanda Tangan
-                    </button>
-                    @if($logbook->status === 'submitted')
-                    <button type="button" onclick="openRejectModal()"
-                        class="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-semibold shadow transition">
-                        Tolak Logbook
-                    </button>
-                    @endif
-                </div>
-            </form>
+                </form>
             @endif
         </div>
     </div>

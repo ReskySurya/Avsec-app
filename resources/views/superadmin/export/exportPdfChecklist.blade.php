@@ -221,7 +221,7 @@
                                                     Petugas</th>
                                                 <th
                                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Jenis PI</th>
+                                                    Nama Pemilik</th>
                                                 <th
                                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                     Lokasi</th>
@@ -666,7 +666,7 @@
                         cells = `
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formatDate(item.date)}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.petugas?.name || 'N/A'}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.jenis_pi || 'N/A'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.name_person || 'N/A'}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.lokasi?.name || 'N/A'}</td>
                             <td class="px-6 py-4 whitespace-nowrap">${getStatusBadge(item.status)}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">${getCheckbox(id)}</td>

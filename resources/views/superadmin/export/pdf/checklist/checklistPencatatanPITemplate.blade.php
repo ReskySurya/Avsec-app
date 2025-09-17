@@ -56,14 +56,29 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="border border-black px-2 py-2">{{ $checklist->name_person }}</td>
-                                <td class="border border-black px-2 py-2">{{ $checklist->agency }}</td>
-                                <td class="border border-black px-2 py-2">{{ $checklist->jenis_PI }}</td>
-                                <td class="border border-black px-2 py-2 text-center">{{ $checklist->in_quantity }}</td>
-                                <td class="border border-black px-2 py-2 text-center">{{ $checklist->out_quantity }}</td>
-                                <td class="border border-black px-2 py-2 text-center">{{ $checklist->in_quantity - $checklist->out_quantity }}</td>
-                            </tr>
+                            @if($checklist->details->isEmpty())
+                                <tr>
+                                    <td class="border border-black px-2 py-2">{{ $checklist->name_person }}</td>
+                                    <td class="border border-black px-2 py-2">{{ $checklist->agency }}</td>
+                                    <td class="border border-black px-2 py-2 text-center" colspan="4">Tidak ada data item.</td>
+                                </tr>
+                            @else
+                                @foreach($checklist->details as $detail)
+                                    <tr>
+                                        @if($loop->first)
+                                            <td class="border border-black px-2 py-2 align-top" rowspan="{{ $checklist->details->count() }}">{{ $checklist->name_person }}</td>
+                                            <td class="border border-black px-2 py-2 align-top" rowspan="{{ $checklist->details->count() }}">{{ $checklist->agency }}</td>
+                                        @endif
+                                        <td class="border border-black px-2 py-2">{{ $detail->jenis_pi }}</td>
+                                        <td class="border border-black px-2 py-2 text-center">{{ $detail->in_quantity }}</td>
+                                        <td class="border border-black px-2 py-2 text-center">{{ $detail->out_quantity }}</td>
+                                        @php
+                                            $sisa = (int)$detail->in_quantity - (int)$detail->out_quantity;
+                                        @endphp
+                                        <td class="border border-black px-2 py-2 text-center">{{ $sisa }}</td>
+                                    </tr>
+                                @endforeach
+                            @endif
                         </tbody>
                     </table>
                     
@@ -83,7 +98,7 @@
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <p>Petugas</p>
+                                <p>Airport Security Officer</p>
                                 <div class="h-16 flex items-center justify-center">
                                     @if($checklist->senderSignature)
                                         <img src="data:image/png;base64,{{ $checklist->senderSignature }}" class="h-16 mt-5" alt="TTD Petugas">
@@ -94,7 +109,7 @@
                                 <p class="font-semibold mt-1">({{ $checklist->sender->name ?? '...' }})</p>
                             </div>
                             <div>
-                                <p>Mengetahui,</p>
+                                <p>Airport Security Supervisor,</p>
                                 <div class="h-16 flex items-center justify-center">
                                     @if($checklist->approvedSignature)
                                         <img src="data:image/png;base64,{{ $checklist->approvedSignature }}" class="h-16 mt-5" alt="TTD Supervisor">
@@ -103,7 +118,6 @@
                                     @endif
                                 </div>
                                 <p class="font-semibold mt-1">({{ $checklist->approver->name ?? '...' }})</p>
-                                <p class="text-xs text-gray-600">Supervisor</p>
                             </div>
                         </div>
                     </div>

@@ -710,7 +710,7 @@ class ExportPdfController extends Controller
 
     private function reviewFormPencatatanPI($id)
     {
-        $checklist = FormPencatatanPI::with(['sender', 'approver'])->findOrFail($id);
+        $checklist = FormPencatatanPI::with(['sender', 'approver', 'details'])->findOrFail($id);
         return view('superadmin.export.pdf.checklist.checklistPencatatanPITemplate', [
             'forms' => collect([$checklist]),
             'formType' => 'pencatatan_pi'
@@ -814,7 +814,7 @@ class ExportPdfController extends Controller
                 });
 
             case 'pencatatan_pi':
-                $query = FormPencatatanPI::with(['sender', 'approver'])
+                $query = FormPencatatanPI::with(['sender', 'approver', 'details'])
                     ->orderBy('date', 'desc');
                 if ($startDate && $endDate) {
                     $query->whereBetween('date', [$startDate, $endDate]);
@@ -824,7 +824,7 @@ class ExportPdfController extends Controller
                         'id' => $item->id,
                         'date' => $item->date,
                         'petugas' => $item->sender,
-                        'jenis_pi' => $item->jenis_PI,
+                        'name_person' => $item->name_person,
                         'lokasi' => (object)['name' => 'Area ' . $item->grup],
                         'status' => $item->status,
                     ];
@@ -902,7 +902,7 @@ class ExportPdfController extends Controller
                 $query = ChecklistSenpi::query();
                 break;
             case 'pencatatan_pi':
-                $query = FormPencatatanPI::with(['sender', 'approver']);
+                $query = FormPencatatanPI::with(['sender', 'approver', 'details']);
                 break;
             case 'manual_book':
                 $query = ManualBook::with(['creator', 'approver', 'details']);

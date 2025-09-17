@@ -232,40 +232,51 @@
         <div class="mt-8 text-center">
             <p class="text-sm font-semibold">Mengetahui,</p>
 
-            {{-- Cek apakah sudah ada tanda tangan approver --}}
+            {{-- Cek 1: Apakah supervisor sudah ttd? --}}
             @if($checklist->approvedSignature)
-            {{-- JIKA SUDAH: Tampilkan gambar tanda tangan dan nama --}}
-            <div class="w-48 mx-auto my-2 h-28 flex flex-col items-center justify-center">
-                <img src="data:image/png;base64,{{ $checklist->approvedSignature }}" alt="TTD Mengetahui"
-                    class="max-h-24 max-w-full object-contain">
-            </div>
-            <p class="text-sm font-semibold h-4">
-                ({{ $checklist->approver->name ?? '...' }})
-            </p>
+                {{-- JIKA SUDAH: Tampilkan gambar tanda tangan dan nama --}}
+                <div class="w-48 mx-auto my-2 h-28 flex flex-col items-center justify-center">
+                    <img src="data:image/png;base64,{{ $checklist->approvedSignature }}" alt="TTD Mengetahui"
+                        class="max-h-24 max-w-full object-contain">
+                </div>
+                <p class="text-sm font-semibold h-4">
+                    ({{ $checklist->approver->name ?? '...' }})
+                </p>
+            {{-- Cek 2: Apakah petugas penerima belum ttd? --}}
+            @elseif(!$checklist->receivedSignature)
+                {{-- JIKA BELUM: Tampilkan pesan tunggu --}}
+                <div class="w-48 mx-auto my-2 h-28 flex flex-col items-center justify-center">
+                    <div class="mx-auto mt-2 h-24 w-32 border rounded flex items-center justify-center text-xs text-gray-500 text-center p-2">
+                        Menunggu Tanda Tangan Petugas Penerima
+                    </div>
+                </div>
+                <p class="text-sm font-semibold h-4">
+                    ({{ $checklist->approver->name ?? '...' }})
+                </p>
             @else
-            {{-- JIKA BELUM: Tampilkan form dengan canvas untuk tanda tangan --}}
-            <form action="{{ route('supervisor.checklist-kendaraan.signature', $checklist->id) }}" method="POST"
-                onsubmit="return validateApproverSignature(event)">
-                @csrf
-                <div class="w-full max-w-sm mx-auto my-2 border-2 border-gray-300 rounded-lg bg-gray-50 p-2">
-                    {{-- Canvas untuk TTD --}}
-                    <canvas id="signature-canvas-approver" class="w-full h-28 rounded"></canvas>
-                </div>
+                {{-- JIKA SEMUA SIAP: Tampilkan form untuk ttd supervisor --}}
+                <form action="{{ route('supervisor.checklist-kendaraan.signature', $checklist->id) }}" method="POST"
+                    onsubmit="return validateApproverSignature(event)">
+                    @csrf
+                    <div class="w-full max-w-sm mx-auto my-2 border-2 border-gray-300 rounded-lg bg-gray-50 p-2">
+                        {{-- Canvas untuk TTD --}}
+                        <canvas id="signature-canvas-approver" class="w-full h-28 rounded"></canvas>
+                    </div>
 
-                {{-- Hidden input untuk menyimpan data base64 ttd --}}
-                <input type="hidden" name="approvedSignature" id="signature-data-approver">
+                    {{-- Hidden input untuk menyimpan data base64 ttd --}}
+                    <input type="hidden" name="approvedSignature" id="signature-data-approver">
 
-                <div class="flex items-center justify-center gap-4 mt-2">
-                    <button type="button" onclick="clearSignatureApprover()"
-                        class="text-sm text-blue-600 hover:text-blue-800">
-                        Clear
-                    </button>
-                    <button type="submit"
-                        class="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-2 rounded-lg">
-                        Simpan & Setujui
-                    </button>
-                </div>
-            </form>
+                    <div class="flex items-center justify-center gap-4 mt-2">
+                        <button type="button" onclick="clearSignatureApprover()"
+                            class="text-sm text-blue-600 hover:text-blue-800">
+                            Clear
+                        </button>
+                        <button type="submit"
+                            class="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-2 rounded-lg">
+                            Simpan & Setujui
+                        </button>
+                    </div>
+                </form>
             @endif
         </div>
     </div>
