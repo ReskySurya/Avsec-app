@@ -642,7 +642,14 @@ class ExportPdfController extends Controller
             }
         });
 
-        return $pdfService->generatePdfFromTemplate($viewName, $preparedData, $formType);
+        // Tentukan orientasi berdasarkan formType
+        $orientation = ($formType === 'rotasi') ? 'landscape' : 'portrait';
+
+        // Tentukan ukuran kertas (default 'A4' atau sesuai kebutuhan)
+        $paperSize = 'A4';
+
+        // Panggil service dengan parameter orientasi
+        return $pdfService->generatePdfFromTemplate($viewName, $preparedData, $formType, $paperSize, $orientation);
     }
 
 
