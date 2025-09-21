@@ -31,7 +31,7 @@
         </div>
 
         {{-- Main Table - Mobile Card Style --}}
-        <div class="block md:hidden border-2 border-t-0 border-black">
+        <div class="block md:hidden ">
             {{-- Mobile Card Layout --}}
             <div class="p-3">
                 <div class="bg-blue-50 p-2 rounded mb-3 text-center">
@@ -93,7 +93,7 @@
         </div>
 
         {{-- Desktop Table --}}
-        <div class="hidden md:block border-2 border-t-0 border-black overflow-x-auto">
+        <div class="hidden md:block  overflow-x-auto">
             <table class="w-full border-collapse">
                 <thead>
                     <tr class="bg-gray-100">
@@ -147,7 +147,7 @@
         </div>
 
         {{-- Keterangan & Catatan Section --}}
-        <div class="border-2 border-t-0 border-black">
+        <div class="">
             <div class="p-3 sm:p-4">
                 {{-- Keterangan --}}
                 <div class="mb-4 sm:mb-6">
@@ -213,10 +213,10 @@
         {{-- Signature Section --}}
         <form action="{{ route('checklist.receivedSignature', $checklist->id) }}" method="POST">
             @csrf
-            <div class="border-2 border-t-0 border-black">
+            <div class="">
                 <div class="flex flex-col sm:flex-row">
                     {{-- Petugas Dinas Pagi --}}
-                    <div class="flex-1 text-center p-4 sm:p-6 border-b sm:border-b-0 sm:border-r border-black">
+                    <div class="flex-1 text-center p-4 sm:p-6 ">
                         <div class="mb-2">
                             @php
                             $bulan = [

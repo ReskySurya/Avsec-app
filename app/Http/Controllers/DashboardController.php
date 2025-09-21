@@ -387,8 +387,25 @@ class DashboardController extends Controller
         // Logbook Stats
         $logbookStats = [];
 
-        $totalLocations = Location::count();
-        $logbooksToday = Logbook::with('locationArea')->whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
+        $allowedPosJagaLocations = [
+            'Pos Kedatangan',
+            'Pos Barat',
+            'Pos Timur',
+            'HBSCP',
+            'PSCP',
+            'CCTV',
+            'Patroli',
+            'Walking Patrol'
+        ];
+        $totalLocations = count($allowedPosJagaLocations);
+
+        $logbooksToday = Logbook::whereHas('locationArea', function ($query) use ($allowedPosJagaLocations) {
+                $query->whereIn('name', $allowedPosJagaLocations);
+            })
+            ->whereRaw('LOWER(status) IN (?, ?)', ['submitted', 'approved'])
+            ->whereBetween('date', [today()->startOfDay(), today()->endOfDay()])
+            ->get();
+
         $logbooksByLocation = $logbooksToday->groupBy('locationArea.name');
         $locationDetailsPosJaga = [];
         foreach ($logbooksByLocation as $locationName => $logbooks) {
@@ -403,15 +420,26 @@ class DashboardController extends Controller
             'breakdownTitle' => 'Lokasi'
         ];
 
-        $rotasiToday = LogbookRotasi::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
+        $totalRotasiExpected = 2; // Total expected logbooks for PSCP and HBSCP
+        $rotasiToday = LogbookRotasi::whereRaw('LOWER(status) IN (?, ?)', ['submitted', 'approved'])
+            ->whereBetween('date', [today()->startOfDay(), today()->endOfDay()])
+            ->get();
+
         $rotasiByType = $rotasiToday->groupBy('type');
         $typeDetailsRotasi = [];
         foreach ($rotasiByType as $typeName => $logbooks) {
             $typeDetailsRotasi[strtoupper($typeName)] = ['total' => $logbooks->count(), 'approved' => $logbooks->where('status', 'approved')->count()];
         }
-        $totalRotasi = $rotasiToday->count();
-        $approvedRotasi = $rotasiToday->where('status', 'approved')->count();
-        $logbookStats['Rotasi'] = ['total' => $totalRotasi, 'approved' => $approvedRotasi, 'percentage' => ($totalRotasi > 0) ? round(($approvedRotasi / $totalRotasi) * 100) : 0, 'breakdown' => $typeDetailsRotasi, 'breakdownTitle' => 'Tipe'];
+
+        $submittedOrApprovedRotasi = $rotasiToday->count();
+
+        $logbookStats['Rotasi'] = [
+            'total' => $totalRotasiExpected,
+            'approved' => $submittedOrApprovedRotasi,
+            'percentage' => ($totalRotasiExpected > 0) ? round(($submittedOrApprovedRotasi / $totalRotasiExpected) * 100) : 0,
+            'breakdown' => $typeDetailsRotasi,
+            'breakdownTitle' => 'Tipe'
+        ];
 
         $totalChief = LogbookChief::whereNotNull('senderSignature')->whereDate('created_at', today())->count();
         $approvedChief = LogbookChief::whereNotNull('approvedSignature')->whereDate('created_at', today())->count();
@@ -420,15 +448,26 @@ class DashboardController extends Controller
         // Checklist Stats
         $checklistStats = [];
 
-        $kendaraanToday = ChecklistKendaraan::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
+        $totalKendaraanExpected = 2; // mobil and motor
+        $kendaraanToday = ChecklistKendaraan::whereRaw('LOWER(status) IN (?, ?)', ['submitted', 'approved'])
+            ->whereBetween('date', [today()->startOfDay(), today()->endOfDay()])
+            ->get();
+
         $kendaraanByType = $kendaraanToday->groupBy('type');
         $typeDetailsKendaraan = [];
         foreach ($kendaraanByType as $typeName => $checklists) {
             $typeDetailsKendaraan[ucfirst($typeName)] = ['total' => $checklists->count(), 'approved' => $checklists->where('status', 'approved')->count()];
         }
-        $totalKendaraan = $kendaraanToday->count();
-        $approvedKendaraan = $kendaraanToday->where('status', 'approved')->count();
-        $checklistStats['Kendaraan'] = ['total' => $totalKendaraan, 'approved' => $approvedKendaraan, 'percentage' => ($totalKendaraan > 0) ? round(($approvedKendaraan / $totalKendaraan) * 100) : 0, 'breakdown' => $typeDetailsKendaraan, 'breakdownTitle' => 'Tipe Kendaraan'];
+
+        $submittedOrApprovedKendaraan = $kendaraanToday->count();
+
+        $checklistStats['Kendaraan'] = [
+            'total' => $totalKendaraanExpected,
+            'approved' => $submittedOrApprovedKendaraan,
+            'percentage' => ($totalKendaraanExpected > 0) ? round(($submittedOrApprovedKendaraan / $totalKendaraanExpected) * 100) : 0,
+            'breakdown' => $typeDetailsKendaraan,
+            'breakdownTitle' => 'Tipe Kendaraan'
+        ];
 
         $penyisiranToday = ChecklistPenyisiran::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
         $penyisiranByGrup = $penyisiranToday->groupBy('grup');
@@ -517,8 +556,25 @@ class DashboardController extends Controller
         // Logbook Stats
         $logbookStats = [];
 
-        $totalLocations = Location::count();
-        $logbooksToday = Logbook::with('locationArea')->whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
+        $allowedPosJagaLocations = [
+            'Pos Kedatangan',
+            'Pos Barat',
+            'Pos Timur',
+            'HBSCP',
+            'PSCP',
+            'CCTV',
+            'Patroli',
+            'Walking Patrol'
+        ];
+        $totalLocations = count($allowedPosJagaLocations);
+
+        $logbooksToday = Logbook::whereHas('locationArea', function ($query) use ($allowedPosJagaLocations) {
+                $query->whereIn('name', $allowedPosJagaLocations);
+            })
+            ->whereRaw('LOWER(status) IN (?, ?)', ['submitted', 'approved'])
+            ->whereBetween('date', [today()->startOfDay(), today()->endOfDay()])
+            ->get();
+
         $logbooksByLocation = $logbooksToday->groupBy('locationArea.name');
         $locationDetailsPosJaga = [];
         foreach ($logbooksByLocation as $locationName => $logbooks) {
@@ -533,15 +589,26 @@ class DashboardController extends Controller
             'breakdownTitle' => 'Lokasi'
         ];
 
-        $rotasiToday = LogbookRotasi::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
+        $totalRotasiExpected = 2; // Total expected logbooks for PSCP and HBSCP
+        $rotasiToday = LogbookRotasi::whereRaw('LOWER(status) IN (?, ?)', ['submitted', 'approved'])
+            ->whereBetween('date', [today()->startOfDay(), today()->endOfDay()])
+            ->get();
+
         $rotasiByType = $rotasiToday->groupBy('type');
         $typeDetailsRotasi = [];
         foreach ($rotasiByType as $typeName => $logbooks) {
             $typeDetailsRotasi[strtoupper($typeName)] = ['total' => $logbooks->count(), 'approved' => $logbooks->where('status', 'approved')->count()];
         }
-        $totalRotasi = $rotasiToday->count();
-        $approvedRotasi = $rotasiToday->where('status', 'approved')->count();
-        $logbookStats['Rotasi'] = ['total' => $totalRotasi, 'approved' => $approvedRotasi, 'percentage' => ($totalRotasi > 0) ? round(($approvedRotasi / $totalRotasi) * 100) : 0, 'breakdown' => $typeDetailsRotasi, 'breakdownTitle' => 'Tipe'];
+
+        $submittedOrApprovedRotasi = $rotasiToday->count();
+
+        $logbookStats['Rotasi'] = [
+            'total' => $totalRotasiExpected,
+            'approved' => $submittedOrApprovedRotasi,
+            'percentage' => ($totalRotasiExpected > 0) ? round(($submittedOrApprovedRotasi / $totalRotasiExpected) * 100) : 0,
+            'breakdown' => $typeDetailsRotasi,
+            'breakdownTitle' => 'Tipe'
+        ];
 
         $totalChief = LogbookChief::whereNotNull('senderSignature')->whereDate('created_at', today())->count();
         $approvedChief = LogbookChief::whereNotNull('approvedSignature')->whereDate('created_at', today())->count();
@@ -550,15 +617,26 @@ class DashboardController extends Controller
         // Checklist Stats
         $checklistStats = [];
 
-        $kendaraanToday = ChecklistKendaraan::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
+        $totalKendaraanExpected = 2; // mobil and motor
+        $kendaraanToday = ChecklistKendaraan::whereRaw('LOWER(status) IN (?, ?)', ['submitted', 'approved'])
+            ->whereBetween('date', [today()->startOfDay(), today()->endOfDay()])
+            ->get();
+
         $kendaraanByType = $kendaraanToday->groupBy('type');
         $typeDetailsKendaraan = [];
         foreach ($kendaraanByType as $typeName => $checklists) {
             $typeDetailsKendaraan[ucfirst($typeName)] = ['total' => $checklists->count(), 'approved' => $checklists->where('status', 'approved')->count()];
         }
-        $totalKendaraan = $kendaraanToday->count();
-        $approvedKendaraan = $kendaraanToday->where('status', 'approved')->count();
-        $checklistStats['Kendaraan'] = ['total' => $totalKendaraan, 'approved' => $approvedKendaraan, 'percentage' => ($totalKendaraan > 0) ? round(($approvedKendaraan / $totalKendaraan) * 100) : 0, 'breakdown' => $typeDetailsKendaraan, 'breakdownTitle' => 'Tipe Kendaraan'];
+
+        $submittedOrApprovedKendaraan = $kendaraanToday->count();
+
+        $checklistStats['Kendaraan'] = [
+            'total' => $totalKendaraanExpected,
+            'approved' => $submittedOrApprovedKendaraan,
+            'percentage' => ($totalKendaraanExpected > 0) ? round(($submittedOrApprovedKendaraan / $totalKendaraanExpected) * 100) : 0,
+            'breakdown' => $typeDetailsKendaraan,
+            'breakdownTitle' => 'Tipe Kendaraan'
+        ];
 
         $penyisiranToday = ChecklistPenyisiran::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
         $penyisiranByGrup = $penyisiranToday->groupBy('grup');

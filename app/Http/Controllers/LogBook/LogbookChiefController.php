@@ -43,9 +43,20 @@ class LogbookChiefController extends Controller
             $query->where('created_by', Auth::id());
         }
 
+        // Convert status to Indonesian
         $chiefLogbooks = $query->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($logbook) {
+            $logbook->status = match($logbook->status) {
+                'draft' => 'Draft',
+                'submitted' => 'Menunggu Persetujuan',
+                'approved' => 'Disetujui',
+                default => 'Tidak Diketahui'
+            };
+            return $logbook;
+            });
+
 
         return view('logbook.chief.logbookLaporanLeader', [
             'chiefLogbooks' => $chiefLogbooks,

@@ -95,9 +95,12 @@
                             }}</p>
                         <p><strong class="font-medium text-gray-800">Pembuat:</strong> {{ $logbook->createdBy->name ??
                             'N/A' }}</p>
+                        <p><strong class="font-medium text-gray-800">Status:</strong> {{ $logbook->status ??
+                            'N/A' }}</p>
                     </div>
                 </div>
                 <div class="bg-gray-50 px-5 py-3 flex justify-end space-x-2">
+                    @if (!in_array(strtolower($logbook->status), ['disetujui', 'approved']))
                     <button type="button"
                         class="p-2 bg-yellow-100 text-yellow-700 rounded-full hover:bg-yellow-200 transition-colors duration-200"
                         @click.stop="
@@ -127,6 +130,7 @@
                             </svg>
                         </button>
                     </form>
+                    @endif
                 </div>
             </div>
             @empty
@@ -156,6 +160,9 @@
                             Dinas/Shift</th>
                         <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             Pembuat</th>
+                        <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Status</th>
+
                         <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             Aksi</th>
                     </tr>
@@ -187,7 +194,9 @@
                             </span>
                         </td>
                         <td class="px-5 py-4 text-gray-600">{{ $logbook->createdBy->name ?? 'N/A' }}</td>
+                        <td class="px-5 py-4 text-gray-600">{{ $logbook->status ?? 'N/A' }}</td>
                         <td class="px-4 py-4 whitespace-nowrap flex space-x-2">
+                            @if (strtolower($logbook->status) == 'draft')
                             <button type="button"
                                 class="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 px-4 py-2 rounded-lg font-medium transition-colors duration-200"
                                 @click.stop="
@@ -220,6 +229,7 @@
                                     Hapus
                                 </button>
                             </form>
+                            @endif
                         </td>
                     </tr>
                     @empty

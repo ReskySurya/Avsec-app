@@ -217,12 +217,14 @@
                 <div>
                     <h3 class="text-xl sm:text-2xl font-bold mb-1">Laporan Kemajuan Personil</h3>
                 </div>
+                @if (strtolower($logbook->status) == 'draft')
                 <div class="flex flex-col gap-2 sm:flex-row sm:gap-2 w-full sm:w-auto">
                     <button @click="openAddKemajuan = true"
                         class="w-full sm:w-auto px-4 py-2 bg-blue-400 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold shadow transition">
                         + Tambah
                     </button>
                 </div>
+                @endif
             </div>
         </div>
 
@@ -334,6 +336,7 @@
                     @endif
 
                     <!-- Action Buttons -->
+                    @if (strtolower($logbook->status) == 'draft')
                     <div class="flex justify-end space-x-2">
                         <!-- Edit Button -->
                         <button type="button"
@@ -364,6 +367,7 @@
                             </button>
                         </form>
                     </div>
+                    @endif
                 </div>
             </div>
             @empty
@@ -408,6 +412,7 @@
                         <td class="px-5 py-4">{{ $items->materi ?? 'N/A' }}</td>
                         <td class="px-5 py-4">{{ $items->keterangan ?? 'N/A' }}</td>
                         <td class="px-5 py-4 flex justify-center space-x-2" @click.stop>
+                            @if (strtolower($logbook->status) == 'draft')
                             <!-- Edit button -->
                             <button type="button"
                                 class="p-2 bg-yellow-100 text-yellow-700 rounded-full hover:bg-yellow-200 transition-colors duration-200"
@@ -436,6 +441,7 @@
                                     </svg>
                                 </button>
                             </form>
+                            @endif
                         </td>
                     </tr>
                     @empty
@@ -604,12 +610,14 @@
                 <div>
                     <h3 class="text-xl sm:text-2xl font-bold mb-1">Personil</h3>
                 </div>
+                @if (strtolower($logbook->status) == 'draft')
                 <div class="flex flex-col gap-2 sm:flex-row sm:gap-2 w-full sm:w-auto">
                     <button @click="openAddPersonil = true"
                         class="w-full sm:w-auto px-4 py-2 bg-blue-400 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold shadow transition">
                         + Tambah Personil
                     </button>
                 </div>
+                @endif
             </div>
         </div>
 
@@ -649,6 +657,7 @@
                     </div>
 
                     <!-- Action Buttons -->
+                    @if (strtolower($logbook->status) == 'draft')
                     <div class="flex justify-end space-x-2">
                         <!-- Edit Button -->
                         <button type="button"
@@ -679,6 +688,7 @@
                             </button>
                         </form>
                     </div>
+                    @endif
                 </div>
             </div>
             @empty
@@ -733,6 +743,7 @@
                             </span>
                         </td>
                         <td class="px-5 py-4 flex justify-center space-x-2" @click.stop>
+                            @if (strtolower($logbook->status) == 'draft')
                             <!-- Edit button -->
                             <button type="button"
                                 class="p-2 bg-yellow-100 text-yellow-700 rounded-full hover:bg-yellow-200 transition-colors duration-200"
@@ -760,6 +771,7 @@
                                     </svg>
                                 </button>
                             </form>
+                            @endif
                         </td>
                     </tr>
                     @empty
@@ -922,12 +934,14 @@
                 <div>
                     <h3 class="text-xl sm:text-2xl font-bold mb-1">Fasilitas</h3>
                 </div>
+                @if (strtolower($logbook->status) == 'draft')
                 <div class="flex flex-col gap-2 sm:flex-row sm:gap-2 w-full sm:w-auto">
                     <button @click="openAddFasilitas = true"
                         class="w-full sm:w-auto px-4 py-2 bg-blue-400 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold shadow transition">
                         + Tambah Fasilitas
                     </button>
                 </div>
+                @endif
             </div>
         </div>
 
@@ -968,6 +982,7 @@
                     </div>
 
                     <!-- Action Buttons -->
+                    @if (strtolower($logbook->status) == 'draft')
                     <div class="flex justify-end space-x-2">
                         <!-- Edit Button -->
                         <button type="button"
@@ -998,6 +1013,7 @@
                             </button>
                         </form>
                     </div>
+                    @endif
                 </div>
             </div>
             @empty
@@ -1043,6 +1059,7 @@
                         <td class="px-5 py-4">{{ $items->quantity }}</td>
                         <td class="px-5 py-4">{{ $items->description }}</td>
                         <td class="px-5 py-4 flex justify-center space-x-2" @click.stop>
+                            @if (strtolower($logbook->status) == 'draft')
                             <!-- Edit button -->
                             <button type="button"
                                 class="p-2 bg-yellow-100 text-yellow-700 rounded-full hover:bg-yellow-200 transition-colors duration-200"
@@ -1071,6 +1088,7 @@
                                     </svg>
                                 </button>
                             </form>
+                            @endif
                         </td>
                     </tr>
                     @empty
@@ -1218,10 +1236,12 @@
                     <h3 class="text-xl sm:text-2xl font-bold mb-1">{{ 'Uraian Kegiatan'}}</h3>
                 </div>
                 <div class="flex flex-col gap-2 sm:flex-row sm:gap-2 w-full sm:w-auto">
+                    @if (strtolower($logbook->status) == 'draft')
                     <button @click="openAddDetailUraian = true"
                         class="w-full sm:w-auto px-4 py-2 bg-blue-400 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold shadow transition">
                         + Tambah Uraian Kegiatan
                     </button>
+                    @endif
                     <div class="flex items-center space-x-2">
                         <a href="{{ route('logbook.chief.review.laporan.leader', $logbook->logbookID) }}"
                             class="w-full inline-flex items-center justify-center px-3 py-1.5 border border-blue-300 text-sm font-medium rounded-xl text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors duration-200">
@@ -1234,10 +1254,12 @@
                             Preview
                         </a>
                     </div>
+                    @if (strtolower($logbook->status) == 'draft')
                     <button @click="openFinishDialog = true; $nextTick(() => initializeSignaturePad())"
                         class="w-full sm:w-auto px-4 py-2 bg-gray-200 hover:bg-gray-300 text-blue-800 rounded-xl text-sm font-semibold shadow transition text-center">
                         Selesai
                     </button>
+                    @endif
                 </div>
             </div>
         </div>
@@ -1360,6 +1382,7 @@
                     <p class="text-gray-600 text-sm mb-4">{{ $items->description }}</p>
 
                     <!-- Action Buttons -->
+                    @if (strtolower($logbook->status) == 'draft')
                     <div class="flex justify-end space-x-2">
                         <!-- Edit Button -->
                         <button type="button"
@@ -1390,6 +1413,7 @@
                             </button>
                         </form>
                     </div>
+                    @endif
                 </div>
             </div>
             @empty
@@ -1436,6 +1460,7 @@
                         <td class="px-5 py-4">{{ $items->summary }}</td>
                         <td class="px-5 py-4">{{ $items->description }}</td>
                         <td class="px-5 py-4 flex justify-center space-x-2" @click.stop>
+                            @if (strtolower($logbook->status) == 'draft')
                             <!-- Edit button -->
                             <button type="button"
                                 class="p-2 bg-yellow-100 text-yellow-700 rounded-full hover:bg-yellow-200 transition-colors duration-200"
@@ -1464,6 +1489,7 @@
                                     </svg>
                                 </button>
                             </form>
+                            @endif
                         </td>
                     </tr>
                     @empty

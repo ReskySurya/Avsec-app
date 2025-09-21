@@ -9,7 +9,7 @@
             class="bg-gray-50 p-5 rounded-xl shadow-inner border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors duration-200">
             <h3 class="text-lg font-semibold text-gray-700">{{ $type }}</h3>
             <p class="text-gray-500 text-sm mt-1">
-                {{ $stats['approved'] }} dari {{ $stats['total'] }} form telah disetujui.
+                {{ $stats['approved'] }} dari {{ $stats['total'] }} form telah diajukan.
             </p>
             <div class="relative pt-1 mt-4">
                 <div class="gauge-container">
