@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Spatie\LaravelPdf\Facades\Pdf;
+use Spatie\LaravelPdf\Enums\Orientation;
 use Illuminate\Support\Collection;
 
 class PdfService
@@ -16,7 +17,7 @@ class PdfService
      * @param string $paperSize Ukuran kertas (e.g., 'A4', 'F4').
      * @return \Illuminate\Http\Response
      */
-    public function generatePdfFromTemplate(string $viewName, Collection $forms, string $formType, string $paperSize = 'A4')
+    public function generatePdfFromTemplate(string $viewName, Collection $forms, string $formType, string $paperSize = 'A4', string $orientation = 'portrait')
     {
         $viewData = [
             'forms' => $forms,
@@ -24,8 +25,13 @@ class PdfService
 
         $fileName = strtolower($formType) . '-report-' . date('Y-m-d-His') . '.pdf';
 
+        $pdfOrientation = ($orientation === 'landscape')
+            ? Orientation::Landscape
+            : Orientation::Portrait;
+
         $pdf = Pdf::view($viewName, $viewData)
-                  ->margins(10, 10, 10, 10);
+                ->orientation($pdfOrientation)
+                ->margins(10, 10, 10, 10);
 
         // Cek apakah ukuran kertas adalah F4
         if ($paperSize === 'F4') {
