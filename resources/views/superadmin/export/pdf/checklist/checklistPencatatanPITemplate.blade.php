@@ -16,7 +16,7 @@
                         <tbody>
                             <tr>
                                 <td style="width: 20%; text-align: center; vertical-align: middle;">
-                                    <img src="{{ public_path('images/airport-security-logo.png') }}" alt="Logo"
+                                    <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('images/airport-security-logo.png'))) }}" alt="Logo"
                                         style="width: 64px; height: 64px; display: inline-block;">
                                 </td>
                                 <td style="width: 60%; text-align: center; vertical-align: middle;">
@@ -26,7 +26,7 @@
                                     </h3>
                                 </td>
                                 <td style="width: 20%; text-align: center; vertical-align: middle;">
-                                    <img src="{{ public_path('images/injourney-API.png') }}" alt="Injourney Logo"
+                                    <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('images/injourney-API.png'))) }}" alt="Injourney Logo"
                                         style="width: 100px; height: 84px; display: inline-block;">
                                 </td>
                             </tr>

@@ -292,7 +292,7 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
     Route::get('/checklist-harian-kendaraan', [ChecklistKendaraanController::class, 'indexChecklistKendaraan'])->name('checklist.kendaraan.index');
     Route::post('/checklist-kendaraan/store', [ChecklistKendaraanController::class, 'store'])->name('checklist.kendaraan.store');
     Route::get('/officer/received-checklist-kendaraan/{type}/{id}', [ChecklistKendaraanController::class, 'showReceivedChecklist'])->name('officer.receivedChecklistKendaraan.show');
-    Route::post('/checklist/received-signature/kendaraan/{checklist}', [ChecklistKendaraanController::class, 'storeSignatureReceived'])->name('checklist.receivedSignature');
+    Route::post('/checklist/received-signature/kendaraan/{checklist}', [ChecklistKendaraanController::class, 'storeSignatureReceivFed'])->name('checklist.receivedSignature');
 
     // Checklist Penyisiran Ruang Tunggu
     Route::get('/checklist-harian-penyisiran-ruang-tunggu', [ChecklistPenyisiranController::class, 'indexChecklistPenyisiran'])->name('checklist.penyisiran.index');

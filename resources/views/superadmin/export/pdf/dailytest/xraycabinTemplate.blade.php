@@ -15,12 +15,12 @@
         <div class="bg-white p-4 content" style="width: auto;">
             <div id="format" class="mx-auto">
                 <div class="flex justify-between items-center border-t-2 border-x-2 border-black p-2">
-                    <img src="{{ public_path('images/airport-security-logo.png') }}" alt="Airport Security Logo" class="w-16 h-16 object-contain">
+                    <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('images/airport-security-logo.png'))) }}" alt="Airport Security Logo" class="w-16 h-16 object-contain">
                     <h3 class="text-xl font-bold text-center flex-grow mx-4">
                         CHECK LIST PENGUJIAN HARIAN<br>
                         MESIN X-RAY CABIN MULTI VIEW
                     </h3>
-                    <img src="{{ public_path('images/injourney-API.png') }}" alt="Injourney Logo" class="w-16 h-16 object-contain">
+                    <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('images/injourney-API.png'))) }}" alt="Injourney Logo" class="w-16 h-16 object-contain">
                 </div>
 
                 <div class="flex justify-center">

@@ -79,7 +79,7 @@
                     <tbody>
                         <tr>
                             <td class="w-1/6 text-center p-2">
-                                <img src="{{ public_path('images/airport-security-logo.png') }}" alt="Logo"
+                                <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('images/airport-security-logo.png'))) }}" alt="Logo"
                                      class="w-10 h-10 mx-auto">
                             </td>
                             <td class="w-4/6 text-center p-2">
@@ -90,7 +90,7 @@
                                 </h3>
                             </td>
                             <td class="w-1/6 text-center p-2">
-                                <img src="{{ public_path('images/injourney-API.png') }}" alt="Injourney Logo"
+                                <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('images/injourney-API.png'))) }}" alt="Injourney Logo"
                                      class="w-12 h-10 mx-auto">
                             </td>
                         </tr>

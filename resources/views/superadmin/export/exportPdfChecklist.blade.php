@@ -3,7 +3,7 @@
 @section('title', 'Export PDF Checklist')
 
 @section('content')
-<div class="bg-gray-50 min-h-screen py-4 px-3 sm:px-6 lg:px-8">
+<div class="bg-gray-50 lg:my-20 py-6 px-4 sm:px-6 lg:px-8">
     <div class="max-w-7xl mx-auto">
         <!-- Back Button - Mobile Optimized -->
         <div class="mb-4">
@@ -224,7 +224,7 @@
                                                     Nama Pemilik</th>
                                                 <th
                                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Lokasi</th>
+                                                    Grup</th>
                                                 <th
                                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                     Status</th>
@@ -293,7 +293,7 @@
                     </div>
 
                     <!-- Action Buttons - Mobile Optimized -->
-                    <div class="flex flex-col gap-3 mt-6">
+                    <div class="flex flex-col sm:flex-row gap-3 sm:justify-end">
                         <!-- Primary Actions -->
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <button type="button" onclick="previewData()"
@@ -315,7 +315,7 @@
                                         d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                                     </path>
                                 </svg>
-                                Export Dipilih
+                                Export Terpilih
                             </button>
 
                             <button type="button" onclick="exportAll()"
@@ -445,7 +445,7 @@
                             <div class="flex items-center space-x-3 mb-2">
                                 <input type="checkbox" name="selected_reports[]" value="${id}"
                                     class="mobile-checkbox h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                <div class="text-sm font-medium text-gray-900 truncate">${item.jenis_pi || 'N/A'}</div>
+                                <div class="text-sm font-medium text-gray-900 truncate">${item.name_person || 'N/A'}</div>
                             </div>
                             <div class="text-sm text-gray-500 mb-1">
                                 <span class="font-medium">Tanggal:</span> ${formatDate(item.date)}
@@ -454,7 +454,7 @@
                                 <span class="font-medium">Petugas:</span> ${item.petugas?.name || 'N/A'}
                             </div>
                             <div class="text-sm text-gray-500 mb-2">
-                                <span class="font-medium">Lokasi:</span> ${item.lokasi?.name || 'N/A'}
+                                <span class="font-medium">Grup:</span> ${item.grup || 'N/A'}
                             </div>
                         </div>
                         <div class="ml-3 flex-shrink-0">
@@ -667,7 +667,7 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formatDate(item.date)}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.petugas?.name || 'N/A'}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.name_person || 'N/A'}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.lokasi?.name || 'N/A'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.grup || 'N/A'}</td>
                             <td class="px-6 py-4 whitespace-nowrap">${getStatusBadge(item.status)}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">${getCheckbox(id)}</td>
                         `;

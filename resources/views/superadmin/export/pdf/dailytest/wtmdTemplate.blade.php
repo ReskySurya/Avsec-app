@@ -15,13 +15,13 @@
             <div id="format" class="mx-auto">
                 <div class="border-t-2 border-x-2 border-black bg-white shadow-md px-4 py-2">
                     <div class="flex items-center justify-between">
-                        <img src="{{ public_path('images/airport-security-logo.png') }}" alt="Airport Security Logo" class="w-16 h-16 object-contain">
+                        <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('images/airport-security-logo.png'))) }}" alt="Airport Security Logo" class="w-16 h-16 object-contain">
                         <h1 class="text-xl font-bold text-center flex-grow px-2">
                             CHECK LIST PENGUJIAN HARIAN<br>
                             GAWANG PENDETEKSI LOGAM<br>
                             (WALK THROUGH METAL DETECTOR/WTMD)
                         </h1>
-                        <img src="{{ public_path('images/injourney-API.png') }}" alt="Injourney Logo" class="w-16 h-16 object-contain">
+                        <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('images/injourney-API.png'))) }}" alt="Injourney Logo" class="w-16 h-16 object-contain">
                     </div>
                 </div>
 
@@ -69,7 +69,7 @@
                         <div class="grid grid-cols-2 border-x-2 border-t-2 border-black text-center items-center">
                             <div class="relative">
                                 <div>
-                                    <img src="{{ public_path('images/tampakdepan.png') }}" alt="tampakdepan"
+                                    <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('images/tampakdepan.png'))) }}" alt="tampakdepan"
                                         class="w-[115px] h-auto mx-auto object-contain">
                                     <p class="text-sm font-semibold text-center mt-2">DEPAN</p>
                                 </div>
@@ -142,7 +142,7 @@
 
                             <div class="relative">
                                 <div>
-                                    <img src="{{ public_path('images/tampakbelakang.png') }}" alt="tampakbelakang"
+                                    <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('images/tampakbelakang.png'))) }}" alt="tampakbelakang"
                                         class="w-[115px] h-auto mx-auto object-contain">
                                     <p class="text-sm font-semibold text-center mt-2">BELAKANG</p>
                                 </div>

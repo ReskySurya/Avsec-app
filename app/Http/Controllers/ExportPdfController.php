@@ -835,7 +835,7 @@ class ExportPdfController extends Controller
                         'date' => $item->date,
                         'petugas' => $item->sender,
                         'name_person' => $item->name_person,
-                        'lokasi' => (object)['name' => 'Area ' . $item->grup],
+                        'grup' => $item->grup,
                         'status' => $item->status,
                     ];
                 });
