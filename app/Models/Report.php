@@ -103,10 +103,10 @@ class Report extends Model
 
         if ($lastReport) {
             // Extract the sequence number from the last report ID
-            $lastSequence = (int)substr($lastReport->reportID, -1);
-            $sequence = $lastSequence + 1;
+            $lastSequence = (int)substr($lastReport->reportID, -3);
+            $sequence = str_pad($lastSequence + 1, 3, '0', STR_PAD_LEFT);
         } else {
-            $sequence = 1;
+            $sequence = '001';
         }
 
         return $prefix . $date . $sequence;

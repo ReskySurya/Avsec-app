@@ -199,7 +199,7 @@
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                         </div>
-                                        <div class="grid grid-cols-9 gap-0">
+                                        <div class="grid grid-cols-9 gap-0 text-center p-2">
                                             <p class="text-xs -rotate-90">14</p>
                                             <p class="text-xs -rotate-90">16</p>
                                             <p class="text-xs -rotate-90">18</p>
@@ -518,7 +518,7 @@
                                                     ? 'checked' : '' }} value="1">
                                             </div>
                                         </div>
-                                        <div class="grid grid-cols-9 gap-0">
+                                        <div class="grid grid-cols-9 gap-0 text-center p-2">
                                             <p class="text-xs -rotate-90">14</p>
                                             <p class="text-xs -rotate-90">16</p>
                                             <p class="text-xs -rotate-90">18</p>
