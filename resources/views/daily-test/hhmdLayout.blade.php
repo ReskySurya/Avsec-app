@@ -67,7 +67,7 @@
                 if (!signatureData) {
                     Swal.fire({
                         title: 'Error',
-                        text: 'Silakan tambahkan tanda tangan officer',
+                        text: 'Mohon tanda tangan terlebih dahulu',
                         icon: 'error',
                         confirmButtonText: 'OK'
                     });
@@ -244,13 +244,31 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
 
+        function isCanvasBlank(canvas) {
+            const blank = document.createElement('canvas');
+            blank.width = canvas.width;
+            blank.height = canvas.height;
+            return canvas.toDataURL() === blank.toDataURL();
+        }
+
         function saveOfficerSignature() {
             try {
                 const canvas = document.getElementById('signatureCanvas');
-                const signatureData = canvas.toDataURL('image/png');
                 const signatureInput = document.getElementById('submitterSignatureData');
 
-                if (!signatureInput) {
+                if (isCanvasBlank(canvas)) {
+                    Swal.fire({
+                        title: 'Peringatan',
+                        text: 'Tanda tangan kosong. Mohon tanda tangan terlebih dahulu.',
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
+
+                const signatureData = canvas.toDataURL('image/png');
+
+                if (!signatureInput ) {
                     console.error('Element officerSignatureData tidak ditemukan');
                     return;
                 }
