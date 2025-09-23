@@ -69,7 +69,7 @@
         <!-- Mobile Card View -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6 md:hidden">
             @forelse($logbooks ?? [] as $logbook)
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200" @click="window.location.href='{{ route('logbook.detail', ['id' => $logbook->logbookID]) }}'">
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200" @click="window.location.href='{{ route('logbook.posjaga.list', ['id' => $logbook->logbookID]) }}'">
                 <div class="p-5">
                     <div class="flex items-center justify-between mb-3">
                         <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">{{ \Carbon\Carbon::parse($logbook->date)->format('d M Y') }}</span>
@@ -138,7 +138,7 @@
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     @forelse($logbooks ?? [] as $index => $logbook)
-                    <tr @click="window.location.href='{{ route('logbook.detail', ['id' => $logbook->logbookID]) }}'"
+                    <tr @click="window.location.href='{{ route('logbook.posjaga.list', ['id' => $logbook->logbookID]) }}'"
                         class="hover:bg-gray-50 transition-colors duration-200 cursor-pointer">
 
                         <td class="px-5 py-4 text-blue-600 font-bold">{{ $index + 1 }}</td>
@@ -284,8 +284,8 @@
                     <select id="shift" name="shift" required
                         class="w-full border-2 border-gray-200 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200">
                         <option value="">Pilih Dinas/Shift</option>
-                        <option value="Pagi">Pagi</option>
-                        <option value="Malam">Malam</option>
+                        <option value="pagi">Pagi</option>
+                        <option value="malam">Malam</option>
                     </select>
                     @error('shift')
                     <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>

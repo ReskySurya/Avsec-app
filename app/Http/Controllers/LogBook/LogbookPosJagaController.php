@@ -3,17 +3,20 @@
 namespace App\Http\Controllers\LogBook;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
+use Illuminate\Http\Request;
 use App\Models\Equipment;
 use App\Models\LogbookFacility;
-use Illuminate\Http\Request;
 use App\Models\Logbook;
 use App\Models\Location;
+use App\Models\LogbookRotasi;
+use App\Models\ManualBook;
 use App\Models\LogbookDetail;
 use App\Models\LogbookStaff;
 use App\Models\Role;
-use Illuminate\Support\Facades\Auth;
 use App\Models\User;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 Carbon::setLocale('id');
 
@@ -59,39 +62,32 @@ class LogbookPosJagaController extends Controller
 
     public function store(Request $request)
     {
+        // 1. Validasi Input Utama
+        $request->validate([
+            'date' => 'required|date',
+            'location_area_id' => 'required|exists:locations,id',
+            'grup' => 'required|string|max:255',
+            'shift' => 'required|in:pagi,malam',
+        ]);
 
+        // 2. Cek Duplikat Logbook Pos Jaga
         $existingLogbook = Logbook::where('date', $request->date)
             ->where('location_area_id', $request->location_area_id)
             ->where('shift', $request->shift)
             ->first();
 
         if ($existingLogbook) {
-            // Ambil nama lokasi untuk pesan error yang lebih informatif
-            $location = Location::find($existingLogbook->location_area_id);
-            $locationName = $location ? $location->name : 'area yang dipilih';
-
-            // Format tanggal agar mudah dibaca
+            $locationName = Location::find($existingLogbook->location_area_id)->name ?? 'area yang dipilih';
             $formattedDate = Carbon::parse($existingLogbook->date)->isoFormat('D MMMM YYYY');
-
-            // Buat pesan error sesuai permintaan
             $errorMessage = "Logbook untuk {$locationName} pada tanggal {$formattedDate} shift {$existingLogbook->shift} sudah ada.";
-
-            // Kembalikan ke halaman form dengan pesan error khusus untuk SweetAlert
-            return redirect()
-                ->back()
-                ->with('duplicate_error', $errorMessage)
-                ->withInput(); // withInput() agar data yang sudah diisi tidak hilang
+            return redirect()->back()->with('duplicate_error', $errorMessage)->withInput();
         }
 
-        $request->validate([
-            'date' => 'required|date',
-            'location_area_id' => 'required|exists:locations,id',
-            'grup' => 'required|string|max:255',
-            'shift' => 'required|string|max:255',
-        ]);
-
+        // Mulai Database Transaction
+        DB::beginTransaction();
         try {
-            Logbook::create([
+            // 3. Buat Logbook Pos Jaga Utama
+            $logbookPosJaga = Logbook::create([
                 'date' => $request->date,
                 'location_area_id' => $request->location_area_id,
                 'grup' => $request->grup,
@@ -99,12 +95,112 @@ class LogbookPosJagaController extends Controller
                 'senderID' => Auth::id(),
             ]);
 
-            return redirect()->back()->with([
-                'success' => 'Logbook berhasil di buat.',
-            ]);
+            // 4. Cek Lokasi dan Buat Draft Form Turunan
+            $location = Location::find($request->location_area_id);
+            $successMessage = 'Logbook Pos Jaga berhasil dibuat.';
+
+            if ($location && in_array($location->name, ['PSCP', 'HBSCP'])) {
+                // Konversi nama lokasi menjadi 'type' yang konsisten (lowercase)
+                $logbookType = strtolower($location->name);
+
+                // Buat draft Logbook Rotasi
+                $this->_createLogbookRotasiDraft($request, $logbookType);
+
+                // Buat draft Manual Book
+                $this->_createManualBookDraft($request, $logbookType);
+
+                $successMessage .= ' Draft untuk Logbook Rotasi juga telah dibuat.';
+            }
+
+            // Jika semua berhasil, commit transaction
+            DB::commit();
+
+            return redirect()->route('logbook.index')->with('success', $successMessage);
+
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal membuat logbook. ' . $e->getMessage());
+            // Jika ada error, rollback semua proses
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
         }
+    }
+
+    /**
+     * Fungsi helper untuk membuat draft Logbook Rotasi.
+     * Hanya akan membuat jika belum ada draft untuk tanggal dan tipe yang sama.
+     */
+    private function _createLogbookRotasiDraft(Request $request, string $logbookType)
+    {
+        // Cek apakah sudah ada logbook rotasi (draft atau submitted) untuk tanggal & tipe ini
+        $exists = LogbookRotasi::where('date', $request->date)
+                               ->where('type', $logbookType)
+                               ->exists();
+
+        if (!$exists) {
+            LogbookRotasi::create([
+                'id'         => $this->generateLogbookRotasiId($logbookType), // Panggil fungsi generator ID Anda
+                'date'       => $request->date,
+                'type'       => $logbookType,
+                'status'     => 'draft',
+                'created_by' => Auth::id(),
+            ]);
+        }
+    }
+
+    /**
+     * Fungsi helper untuk membuat draft Manual Book.
+     * Hanya akan membuat jika belum ada draft untuk tanggal, shift, dan tipe yang sama.
+     */
+    private function _createManualBookDraft(Request $request, string $logbookType)
+    {
+        // Cek apakah sudah ada draft manual book untuk kombinasi ini
+        $exists = ManualBook::where('date', $request->date)
+                            ->where('shift', $request->shift)
+                            ->where('type', $logbookType)
+                            ->exists();
+
+        if (!$exists) {
+            ManualBook::create([
+                'id'         => $this->generateManualBookId($logbookType, $request->date), // Panggil fungsi generator ID Anda
+                'created_by' => Auth::id(),
+                'date'       => $request->date,
+                'shift'      => $request->shift,
+                'type'       => $logbookType,
+                'status'     => 'draft',
+            ]);
+        }
+    }
+
+    private function generateLogbookRotasiId($type)
+    {
+        $prefix = ($type == 'pscp') ? 'LRP' : 'LRH';
+        $date = now()->format('ymd'); // Format: TahunBulanTanggal
+
+        $lastLogbook = LogbookRotasi::where('id', 'LIKE', $prefix . '-' . $date . '-%')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        $newNumber = 1;
+        if ($lastLogbook) {
+            $parts = explode('-', $lastLogbook->id);
+            $lastNumber = (int)end($parts);
+            $newNumber = $lastNumber + 1;
+        }
+
+        return $prefix . '-' . $date . '-' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
+    }
+
+    private function generateManualBookId(string $type, string $date): string
+    {
+        // Logika dari controller ManualBook Anda
+        $prefix = ($type === 'hbscp') ? 'MBH' : 'MBP';
+        $datePart = Carbon::parse($date)->format('ym');
+
+        $lastRecord = ManualBook::where('id', 'like', $prefix . '-' . $datePart . '-%')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        $nextSequence = $lastRecord ? ((int) substr($lastRecord->id, -4)) + 1 : 1;
+        return $prefix . '-' . $datePart . '-' . str_pad($nextSequence, 4, '0', STR_PAD_LEFT);
     }
 
     public function update(Request $request, $logbookID)
@@ -735,5 +831,37 @@ class LogbookPosJagaController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Logbook tidak ditemukan');
         }
+    }
+
+    public function showListPosJaga($id)
+    {
+        $logbook = Logbook::with('locationArea')->findOrFail($id);
+
+        // Cek apakah ada form turunan yang dibuat sebagai draft
+        $logbookRotasi = null;
+        $manualBook = null;
+        
+        if (in_array($logbook->locationArea->name, ['PSCP', 'HBSCP'])) {
+            $logbookType = strtolower($logbook->locationArea->name);
+            
+            // Query untuk LogbookRotasi
+            $logbookRotasi = LogbookRotasi::where('date', $logbook->date)
+                                        ->where('type', $logbookType)
+                                        ->where('status', 'draft')
+                                        ->first();
+
+            // Query untuk ManualBook
+            $manualBook = ManualBook::where('date', $logbook->date)
+                                  ->where('shift', $logbook->shift)
+                                  ->where('type', $logbookType)
+                                  ->where('status', 'draft')
+                                  ->first();
+        }
+
+        return view('logbook.posjaga.listPosJaga', [
+            'logbook' => $logbook,
+            'logbookRotasi' => $logbookRotasi,
+            'manualBook' => $manualBook,
+        ]);
     }
 }
