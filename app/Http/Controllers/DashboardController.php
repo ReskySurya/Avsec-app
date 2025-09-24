@@ -341,6 +341,66 @@ class DashboardController extends Controller
             ->latest('date')
             ->paginate($perPage);
 
+        $pendingHhmdReports = Report::with([
+            'submittedBy',
+            'equipmentLocation.location',
+            'equipmentLocation.equipment'
+        ])
+        ->whereHas('status', function ($query) {
+            $query->where('name', 'pending');
+        })
+        ->where('approvedByID', Auth::id())
+        ->whereHas('equipmentLocation.equipment', function ($query) {
+            $query->where('name', 'hhmd');
+        })
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        $pendingWtmdReports = Report::with([
+            'submittedBy',
+            'equipmentLocation.location',
+            'equipmentLocation.equipment'
+        ])
+        ->whereHas('status', function ($query) {
+            $query->where('name', 'pending');
+        })
+        ->where('approvedByID', Auth::id())
+        ->whereHas('equipmentLocation.equipment', function ($query) {
+            $query->where('name', 'wtmd');
+        })
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        $pendingXrayCabinReports = Report::with([
+            'submittedBy',
+            'equipmentLocation.location',
+            'equipmentLocation.equipment'
+        ])
+        ->whereHas('status', function ($query) {
+            $query->where('name', 'pending');
+        })
+        ->where('approvedByID', Auth::id())
+        ->whereHas('equipmentLocation.equipment', function ($query) {
+            $query->where('name', 'xraycabin');
+        })
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        $pendingXrayBagasiReports = Report::with([
+            'submittedBy',
+            'equipmentLocation.location',
+            'equipmentLocation.equipment'
+        ])
+        ->whereHas('status', function ($query) {
+            $query->where('name', 'pending');
+        })
+        ->where('approvedByID', Auth::id())
+        ->whereHas('equipmentLocation.equipment', function ($query) {
+            $query->where('name', 'xraybagasi');
+        })
+        ->orderBy('created_at', 'desc')
+        ->get();
+
 
         // Daily Test Stats
         $dailyTestStats = [];
@@ -503,7 +563,11 @@ class DashboardController extends Controller
             'dailyTestStats' => $dailyTestStats,
             'logbookStats' => $logbookStats,
             'checklistStats' => $checklistStats,
-            'logbooksChief' => $logbooksChief
+            'logbooksChief' => $logbooksChief,
+            'pendingHhmdReports' => $pendingHhmdReports,
+            'pendingWtmdReports' => $pendingWtmdReports,
+            'pendingXrayCabinReports' => $pendingXrayCabinReports,
+            'pendingXrayBagasiReports' => $pendingXrayBagasiReports
         ]);
 
     }

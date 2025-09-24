@@ -35,43 +35,43 @@
         <div class="bg-green-50 p-4 rounded-lg mb-6">
             <h3 class="text-lg font-semibold text-green-800 mb-2">Notifikasi Supervisor</h3>
 
-            @if($logbooksChief->count() > 0)
-            <div class="bg-green-50 p-4 rounded-lg mb-6 shadow-sm">
-                <h3 class="text-lg font-semibold text-green-800 mb-4 flex items-center">
+            @if($pendingHhmdReports->count() > 0)
+            <div class="bg-yellow-50 p-4 rounded-lg mb-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-yellow-800 mb-4 flex items-center">
                     <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
                             d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
                             clip-rule="evenodd"></path>
                     </svg>
-                    Laporan Leader yang Diterima
+                    Laporan HHMD Menunggu Persetujuan
                 </h3>
 
                 <!-- Desktop view -->
                 <div class="hidden md:block overflow-x-auto">
                     <table class="min-w-full bg-white rounded-lg shadow-sm">
                         <thead>
-                            <tr class="bg-green-100">
-                                <th class="px-4 py-3 text-left text-green-700 font-semibold">Tanggal</th>
-                                <th class="px-4 py-3 text-left text-green-700 font-semibold">Jam</th>
-                                <th class="px-4 py-3 text-left text-green-700 font-semibold">Shift</th>
-                                <th class="px-4 py-3 text-left text-green-700 font-semibold">Grup</th>
-                                <th class="px-4 py-3 text-left text-green-700 font-semibold">Pengirim</th>
+                            <tr class="bg-yellow-100">
+                                <th class="px-4 py-3 text-left text-yellow-700 font-semibold">Tanggal</th>
+                                <th class="px-4 py-3 text-left text-yellow-700 font-semibold">Waktu</th>
+                                <th class="px-4 py-3 text-left text-yellow-700 font-semibold">Lokasi</th>
+                                <th class="px-4 py-3 text-left text-yellow-700 font-semibold">Pengirim</th>
+                                <th class="px-4 py-3 text-left text-yellow-700 font-semibold">Status</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($logbooksChief as $logbook)
-                            <tr class="border-b hover:bg-green-50 transition-colors cursor-pointer"
-                                onclick="window.location.href='{{ route('logbook.chief.review.laporan.leader', ['logbookID' => $logbook->logbookID]) }}'">
-                                <td class="px-4 py-3">{{ $logbook->date->format('d/m/Y') }}</td>
-                                <td class="px-4 py-3">{{ $logbook->created_at->format('H:i') }}</td>
-                                <td class="px-4 py-3">{{ ucfirst($logbook->shift) ?? '-' }}</td>
-                                <td class="px-4 py-3">{{ ucfirst($logbook->grup) }}</td>
-                                <td class="px-4 py-3">{{ $logbook->createdBy->name ?? '-' }}</td>
+                            @forelse($pendingHhmdReports as $report)
+                            <tr class="border-b hover:bg-yellow-50 transition-colors cursor-pointer"
+                                onclick="window.location.href='{{ route('hhmd.reviewForm', ['id' => $report->reportID]) }}'">
+                                <td class="px-4 py-3">{{ \Carbon\Carbon::parse($report->testDate)->format('d/m/Y') }}</td>
+                                <td class="px-4 py-3">{{ \Carbon\Carbon::parse($report->testDate)->format('H:i') }}</td>
+                                <td class="px-4 py-3">{{ $report->equipmentLocation->location->name ?? '-' }}</td>
+                                <td class="px-4 py-3">{{ $report->submittedBy->name ?? '-' }}</td>
+                                <td class="px-4 py-3">{{ $report->status->name ?? '-' }}</td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="px-4 py-8 text-center text-gray-500">
-                                    <p>Tidak ada Laporan Leader yang perlu ditinjau.</p>
+                                <td colspan="5" class="px-4 py-8 text-center text-gray-500"> 
+                                    <p>Tidak ada Laporan HHMD yang perlu ditinjau.</p>
                                 </td>
                             </tr>
                             @endforelse
@@ -81,41 +81,283 @@
 
                 <!-- Mobile view -->
                 <div class="md:hidden space-y-4">
-                    @forelse($logbooksChief as $logbook)
-                    <div class="bg-white rounded-lg shadow-sm border-l-4 border-green-400 overflow-hidden cursor-pointer"
-                        onclick="window.location.href='{{ route('logbook.chief.review.laporan.leader', ['logbookID' => $logbook->logbookID]) }}'">
+                    @forelse($pendingHhmdReports as $report)
+                    <div class="bg-white rounded-lg shadow-sm border-l-4 border-yellow-400 overflow-hidden cursor-pointer"
+                        onclick="window.location.href='{{ route('hhmd.reviewForm', ['id' => $report->reportID]) }}'">
                         <div class="p-4">
                             <div class="flex justify-between items-start mb-2">
                                 <div class="text-sm font-medium text-gray-900">
-                                    {{ $logbook->date->format('d/m/Y') }}
-                                    <span class="text-gray-500 ml-2">{{ $logbook->created_at->format('H:i') }}</span>
+                                    {{ \Carbon\Carbon::parse($report->testDate)->format('d/m/Y') }}
+                                    <span class="text-gray-500 ml-2">{{ \Carbon\Carbon::parse($report->testDate)->format('H:i') }}</span>
                                 </div>
                             </div>
                             <div class="space-y-2">
                                 <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Shift:</span>
-                                    <span class="text-sm font-medium">{{ ucfirst($logbook->shift) ?? '-' }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Grup:</span>
-                                    <span class="text-sm font-medium">{{ ucfirst($logbook->grup) }}</span>
+                                    <span class="text-sm text-gray-600">Lokasi:</span>
+                                    <span class="text-sm font-medium">{{ $report->equipmentLocation->location->name ?? '-' }}</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-sm text-gray-600">Pengirim:</span>
-                                    <span class="text-sm font-medium">{{ $logbook->createdBy->name ?? '-' }}</span>
+                                    <span class="text-sm font-medium">{{ $report->submittedBy->name ?? '-' }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Status:</span>
+                                    <span class="text-sm font-medium">{{ $report->status->name ?? '-' }}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     @empty
                     <div class="bg-white rounded-lg shadow-sm p-6 text-center">
-                        <p class="text-gray-500">Tidak ada Laporan Leader yang perlu ditinjau.</p>
+                        <p class="text-gray-500">Tidak ada Laporan HHMD yang perlu ditinjau.</p>
                     </div>
                     @endforelse
                 </div>
             </div>
             @endif
-        </div>
+
+            @if($pendingWtmdReports->count() > 0)
+            <div class="bg-orange-50 p-4 rounded-lg mb-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-orange-800 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    Laporan WTMD Menunggu Persetujuan
+                </h3>
+
+                <!-- Desktop view -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-lg shadow-sm">
+                        <thead>
+                            <tr class="bg-orange-100">
+                                <th class="px-4 py-3 text-left text-orange-700 font-semibold">Tanggal</th>
+                                <th class="px-4 py-3 text-left text-orange-700 font-semibold">Waktu</th>
+                                <th class="px-4 py-3 text-left text-orange-700 font-semibold">Lokasi</th>
+                                <th class="px-4 py-3 text-left text-orange-700 font-semibold">Pengirim</th>
+                                <th class="px-4 py-3 text-left text-orange-700 font-semibold">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($pendingWtmdReports as $report)
+                            <tr class="border-b hover:bg-orange-50 transition-colors cursor-pointer"
+                                onclick="window.location.href='{{ route('wtmd.reviewForm', ['id' => $report->reportID]) }}'">
+                                <td class="px-4 py-3">{{ \Carbon\Carbon::parse($report->testDate)->format('d/m/Y') }}</td>
+                                <td class="px-4 py-3">{{ \Carbon\Carbon::parse($report->testDate)->format('H:i') }}</td>
+                                <td class="px-4 py-3">{{ $report->equipmentLocation->location->name ?? '-' }}</td>
+                                <td class="px-4 py-3">{{ $report->submittedBy->name ?? '-' }}</td>
+                                <td class="px-4 py-3">{{ $report->status->name ?? '-' }}</td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" class="px-4 py-8 text-center text-gray-500">
+                                    <p>Tidak ada Laporan WTMD yang perlu ditinjau.</p>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile view -->
+                <div class="md:hidden space-y-4">
+                    @forelse($pendingWtmdReports as $report)
+                    <div class="bg-white rounded-lg shadow-sm border-l-4 border-orange-400 overflow-hidden cursor-pointer"
+                        onclick="window.location.href='{{ route('wtmd.reviewForm', ['id' => $report->reportID]) }}'">
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="text-sm font-medium text-gray-900">
+                                    {{ \Carbon\Carbon::parse($report->testDate)->format('d/m/Y') }}
+                                    <span class="text-gray-500 ml-2">{{ \Carbon\Carbon::parse($report->testDate)->format('H:i') }}</span>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Lokasi:</span>
+                                    <span class="text-sm font-medium">{{ $report->equipmentLocation->location->name ?? '-' }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Pengirim:</span>
+                                    <span class="text-sm font-medium">{{ $report->submittedBy->name ?? '-' }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Status:</span>
+                                    <span class="text-sm font-medium">{{ $report->status->name ?? '-' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="bg-white rounded-lg shadow-sm p-6 text-center">
+                        <p class="text-gray-500">Tidak ada Laporan WTMD yang perlu ditinjau.</p>
+                    </div>
+                    @endforelse
+                </div>
+            </div>
+            @endif
+
+            @if($pendingXrayCabinReports->count() > 0)
+            <div class="bg-purple-50 p-4 rounded-lg mb-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-purple-800 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    Laporan X-Ray Cabin Menunggu Persetujuan
+                </h3>
+
+                <!-- Desktop view -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-lg shadow-sm">
+                        <thead>
+                            <tr class="bg-purple-100">
+                                <th class="px-4 py-3 text-left text-purple-700 font-semibold">Tanggal</th>
+                                <th class="px-4 py-3 text-left text-purple-700 font-semibold">Waktu</th>
+                                <th class="px-4 py-3 text-left text-purple-700 font-semibold">Lokasi</th>
+                                <th class="px-4 py-3 text-left text-purple-700 font-semibold">Pengirim</th>
+                                <th class="px-4 py-3 text-left text-purple-700 font-semibold">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($pendingXrayCabinReports as $report)
+                            <tr class="border-b hover:bg-purple-50 transition-colors cursor-pointer"
+                                onclick="window.location.href='{{ route('xray.reviewForm', ['id' => $report->reportID]) }}'">
+                                <td class="px-4 py-3">{{ \Carbon\Carbon::parse($report->testDate)->format('d/m/Y') }}</td>
+                                <td class="px-4 py-3">{{ \Carbon\Carbon::parse($report->testDate)->format('H:i') }}</td>
+                                <td class="px-4 py-3">{{ $report->equipmentLocation->location->name ?? '-' }}</td>
+                                <td class="px-4 py-3">{{ $report->submittedBy->name ?? '-' }}</td>
+                                <td class="px-4 py-3">{{ $report->status->name ?? '-' }}</td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" class="px-4 py-8 text-center text-gray-500">
+                                    <p>Tidak ada Laporan X-Ray Cabin yang perlu ditinjau.</p>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile view -->
+                <div class="md:hidden space-y-4">
+                    @forelse($pendingXrayCabinReports as $report)
+                    <div class="bg-white rounded-lg shadow-sm border-l-4 border-purple-400 overflow-hidden cursor-pointer"
+                        onclick="window.location.href='{{ route('xray.reviewForm', ['id' => $report->reportID]) }}'">
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="text-sm font-medium text-gray-900">
+                                    {{ \Carbon\Carbon::parse($report->testDate)->format('d/m/Y') }}
+                                    <span class="text-gray-500 ml-2">{{ \Carbon\Carbon::parse($report->testDate)->format('H:i') }}</span>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Lokasi:</span>
+                                    <span class="text-sm font-medium">{{ $report->equipmentLocation->location->name ?? '-' }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Pengirim:</span>
+                                    <span class="text-sm font-medium">{{ $report->submittedBy->name ?? '-' }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Status:</span>
+                                    <span class="text-sm font-medium">{{ $report->status->name ?? '-' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="bg-white rounded-lg shadow-sm p-6 text-center">
+                        <p class="text-gray-500">Tidak ada Laporan X-Ray Cabin yang perlu ditinjau.</p>
+                    </div>
+                    @endforelse
+                </div>
+            </div>
+            @endif
+
+            @if($pendingXrayBagasiReports->count() > 0)
+            <div class="bg-pink-50 p-4 rounded-lg mb-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-pink-800 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    Laporan X-Ray Bagasi Menunggu Persetujuan
+                </h3>
+
+                <!-- Desktop view -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-lg shadow-sm">
+                        <thead>
+                            <tr class="bg-pink-100">
+                                <th class="px-4 py-3 text-left text-pink-700 font-semibold">Tanggal</th>
+                                <th class="px-4 py-3 text-left text-pink-700 font-semibold">Waktu</th>
+                                <th class="px-4 py-3 text-left text-pink-700 font-semibold">Lokasi</th>
+                                <th class="px-4 py-3 text-left text-pink-700 font-semibold">Pengirim</th>
+                                <th class="px-4 py-3 text-left text-pink-700 font-semibold">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($pendingXrayBagasiReports as $report)
+                            <tr class="border-b hover:bg-pink-50 transition-colors cursor-pointer"
+                                onclick="window.location.href='{{ route('xray.reviewForm', ['id' => $report->reportID]) }}'">
+                                <td class="px-4 py-3">{{ \Carbon\Carbon::parse($report->testDate)->format('d/m/Y') }}</td>
+                                <td class="px-4 py-3">{{ \Carbon\Carbon::parse($report->testDate)->format('H:i') }}</td>
+                                <td class="px-4 py-3">{{ $report->equipmentLocation->location->name ?? '-' }}</td>
+                                <td class="px-4 py-3">{{ $report->submittedBy->name ?? '-' }}</td>
+                                <td class="px-4 py-3">{{ $report->status->name ?? '-' }}</td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" class="px-4 py-8 text-center text-gray-500">
+                                    <p>Tidak ada Laporan X-Ray Bagasi yang perlu ditinjau.</p>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile view -->
+                <div class="md:hidden space-y-4">
+                    @forelse($pendingXrayBagasiReports as $report)
+                    <div class="bg-white rounded-lg shadow-sm border-l-4 border-pink-400 overflow-hidden cursor-pointer"
+                        onclick="window.location.href='{{ route('xray.reviewForm', ['id' => $report->reportID]) }}'">
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="text-sm font-medium text-gray-900">
+                                    {{ \Carbon\Carbon::parse($report->testDate)->format('d/m/Y') }}
+                                    <span class="text-gray-500 ml-2">{{ \Carbon\Carbon::parse($report->testDate)->format('H:i') }}</span>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Lokasi:</span>
+                                    <span class="text-sm font-medium">{{ $report->equipmentLocation->location->name ?? '-' }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Pengirim:</span>
+                                    <span class="text-sm font-medium">{{ $report->submittedBy->name ?? '-' }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Status:</span>
+                                    <span class="text-sm font-medium">{{ $report->status->name ?? '-' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="bg-white rounded-lg shadow-sm p-6 text-center">
+                        <p class="text-gray-500">Tidak ada Laporan X-Ray Bagasi yang perlu ditinjau.</p>
+                    </div>
+                    @endforelse
+                </div>
+            </div>
+            @endif
 
         @include('partials.dailytest-stats')
         @include('partials.logbook-stats')
