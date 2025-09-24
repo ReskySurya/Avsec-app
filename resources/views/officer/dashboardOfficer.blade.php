@@ -20,6 +20,169 @@
             </ul>
         </div>
 
+        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Status Pengisian Form Harian (Daily Test)</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                {{-- Belum Diisi --}}
+                <div>
+                    <h4 class="font-semibold text-orange-700 mb-2">Belum Diisi</h4>
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        @if(count($dailyTestStatuses['not_submitted']) > 0)
+                            <ul class="space-y-2">
+                                @foreach($dailyTestStatuses['not_submitted'] as $item)
+                                    <li>
+                                        <a href="{{ $item['form_link'] }}" class="flex items-center justify-between p-2 rounded-md hover:bg-gray-100 transition-colors">
+                                            <span class="text-sm text-gray-700">
+                                                {{ strtoupper($item['equipment_name']) }} - {{ $item['location_name'] }}
+                                            </span>
+                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <div class="text-center py-4">
+                                <svg class="w-12 h-12 mx-auto text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <p class="text-sm text-gray-500 mt-2">Semua form sudah diisi. Kerja bagus!</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+        
+                {{-- Sudah Diisi --}}
+                <div>
+                    <h4 class="font-semibold text-green-700 mb-2">Sudah Diisi</h4>
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        @if(count($dailyTestStatuses['submitted']) > 0)
+                            <ul class="space-y-2">
+                                @foreach($dailyTestStatuses['submitted'] as $item)
+                                    <li class="flex items-center p-2">
+                                        <svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                        <span class="text-sm text-gray-500 line-through">
+                                            {{ strtoupper($item['equipment_name']) }} - {{ $item['location_name'] }}
+                                        </span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <div class="text-center py-4">
+                                <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                                <p class="text-sm text-gray-500 mt-2">Belum ada form yang diisi hari ini.</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+        
+            </div>
+        </div>
+
+        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Status Pengisian Form Checklist</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                {{-- Belum Diisi --}}
+                <div>
+                    <h4 class="font-semibold text-orange-700 mb-2">Belum Diisi</h4>
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        @if(count($checklistStatuses['not_submitted']) > 0)
+                            <ul class="space-y-2">
+                                @foreach($checklistStatuses['not_submitted'] as $item)
+                                    <li>
+                                        <a href="{{ $item['form_link'] }}" class="flex items-center justify-between p-2 rounded-md hover:bg-gray-100 transition-colors">
+                                            <span class="text-sm text-gray-700">{{ $item['name'] }}</span>
+                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <div class="text-center py-4">
+                                <svg class="w-12 h-12 mx-auto text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <p class="text-sm text-gray-500 mt-2">Semua form checklist sudah diisi. Kerja bagus!</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+        
+                {{-- Sudah Diisi --}}
+                <div>
+                    <h4 class="font-semibold text-green-700 mb-2">Sudah Diisi</h4>
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        @if(count($checklistStatuses['submitted']) > 0)
+                            <ul class="space-y-2">
+                                @foreach($checklistStatuses['submitted'] as $item)
+                                    <li class="flex items-center p-2">
+                                        <svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                        <span class="text-sm text-gray-500 line-through">{{ $item['name'] }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <div class="text-center py-4">
+                                <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                                <p class="text-sm text-gray-500 mt-2">Belum ada form checklist yang diisi hari ini.</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+        
+            </div>
+        </div>
+
+        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Status Logbook Sweeping PI</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                {{-- Belum Diisi --}}
+                <div>
+                    <h4 class="font-semibold text-orange-700 mb-2">Belum Diisi</h4>
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        @if(count($sweepingStatuses['not_submitted']) > 0)
+                            <ul class="space-y-2">
+                                @foreach($sweepingStatuses['not_submitted'] as $item)
+                                    <li>
+                                        <a href="{{ $item['form_link'] }}" class="flex items-center justify-between p-2 rounded-md hover:bg-gray-100 transition-colors">
+                                            <span class="text-sm text-gray-700">{{ $item['name'] }}</span>
+                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <div class="text-center py-4">
+                                <svg class="w-12 h-12 mx-auto text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <p class="text-sm text-gray-500 mt-2">Semua logbook sweeping sudah diisi. Kerja bagus!</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+        
+                {{-- Sudah Diisi --}}
+                <div>
+                    <h4 class="font-semibold text-green-700 mb-2">Sudah Diisi</h4>
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        @if(count($sweepingStatuses['submitted']) > 0)
+                            <ul class="space-y-2">
+                                @foreach($sweepingStatuses['submitted'] as $item)
+                                    <li class="flex items-center p-2">
+                                        <svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                        <span class="text-sm text-gray-500 line-through">{{ $item['name'] }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <div class="text-center py-4">
+                                <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                                <p class="text-sm text-gray-500 mt-2">Belum ada logbook sweeping yang diisi hari ini.</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+        
+            </div>
+        </div>
+
         @if($rejectedReports->count() > 0)
         <div class="bg-red-50 p-4 rounded-lg mb-6 shadow-sm">
             <h3 class="text-lg font-semibo</div>ld text-red-800 mb-4 flex items-center">
