@@ -164,9 +164,9 @@ $userRole = auth()->user()->role->name;
                     <li><a href="{{ route('logbookSweppingPI.index') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook-sweppingpi') ? 'bg-gray-700' : '' }}"><span>Logbook
                                 Sweeping PI</span></a></li>
-                    <li><a href="{{ route('logbookRotasi.index') }}"
+                    {{-- <li><a href="{{ route('logbookRotasi.index') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook-rotasi') ? 'bg-gray-700' : '' }}"><span>Logbook
-                                Rotasi</span></a></li>
+                                Rotasi</span></a></li> --}}
                     @else {{-- Supervisor & Superadmin --}}
                     <li>
                         <a href="{{ route('supervisor.logbook-form') }}"

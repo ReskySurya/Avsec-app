@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\LogBook;
 
 use App\Http\Controllers\Controller;
+use App\Models\Logbook;
 use App\Models\LogbookRotasi;
 use App\Models\LogbookRotasiDetail;
+use App\Models\LogbookStaff;
+use App\Models\Location;
 use App\Models\OfficerRotasiAssignments;
 use App\Models\Role;
 use App\Models\User;
@@ -51,22 +54,51 @@ class LogbookRotasiController extends Controller
         // 4. Ambil SATU logbook DRAFT TERAKHIR berdasarkan tipe
         $logbook = LogbookRotasi::where('type', $typeForm)
             ->where('status', 'draft')
-            ->latest('id') // Mengambil yang paling baru
-            ->first(); // Mengambil hanya 1 hasil
+            ->latest('id')
+            ->first();
 
         // 5. Inisialisasi variabel
         $details = [];
         $officerLog = [];
+        $personil = collect(); // Inisialisasi sebagai collection kosong
+
+        // =================================================================
+        // BAGIAN YANG DIPERBAIKI: Mengambil Personil dari Pos Jaga
+        // =================================================================
+
+        // Langkah A: Tentukan Tanggal Target. Default-nya hari ini.
+        $targetDate = Carbon::today()->toDateString();
+
+        // Langkah B: Jika ada draft logbook yang ditemukan, gunakan tanggal dari logbook itu.
+        if ($logbook) {
+            $targetDate = $logbook->date;
+        }
+
+        // Langkah C: Cari personil menggunakan Tanggal Target yang sudah benar.
+        $location = Location::where('name', 'LIKE', $typeForm)->first();
+        if ($location) {
+            $logbookPosJaga = Logbook::where('date', $targetDate) // <-- Menggunakan $targetDate
+                ->where('location_area_id', $location->id)
+                ->first();
+
+            if ($logbookPosJaga) {
+                // Kita ambil personil yang 'hadir' pada tanggal tersebut
+                $personil = LogbookStaff::with('user')
+                    ->where('logbookID', $logbookPosJaga->logbookID)
+                    ->where('description', 'hadir')
+                    ->get();
+            }
+        }
 
         // 6. Jika logbook dengan status draft ditemukan, ambil detailnya
         if ($logbook) {
             $details = LogbookRotasiDetail::with(array_values($roleRelationMap))
-                ->where('logbook_id', $logbook->id) // Ambil detail HANYA untuk logbook ini
+                ->where('logbook_id', $logbook->id)
                 ->latest('id')
                 ->get();
         }
 
-        // 7. Proses data dan kelompokkan berdasarkan officer (Loop ini hanya berjalan jika $details tidak kosong)
+        // 7. Proses data dan kelompokkan berdasarkan officer (Tidak ada perubahan di sini)
         foreach ($details as $detail) {
             $startTime = $detail->officerAssignment?->start_time ? Carbon::parse($detail->officerAssignment->start_time)->format('H:i') : '-';
             $endTime = $detail->officerAssignment?->end_time ? Carbon::parse($detail->officerAssignment->end_time)->format('H:i') : '-';
@@ -110,14 +142,15 @@ class LogbookRotasiController extends Controller
             $query->where('name', Role::SUPERVISOR);
         })->get();
 
-        // 8. Kirim semua data yang dibutuhkan ke view, termasuk variabel $logbook
+        // 8. Kirim semua data yang dibutuhkan ke view
         return view('logbook.rotasi.logbookRotasi', compact(
             'officerLog',
             'typeForm',
-            'logbook', // <-- MENGIRIM VARIABEL YANG BENAR
+            'logbook',
             'pscpOptions',
             'hbscpOptions',
-            'supervisors'
+            'supervisors',
+            'personil' // <-- Data personil yang benar sekarang dikirim ke view
         ));
     }
 
@@ -130,6 +163,7 @@ class LogbookRotasiController extends Controller
             'tempat_jaga' => 'required|string',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
+            'personil_id' => 'required|exists:users,id',
             'hhmd_random' => 'nullable|integer|min:0',
             'hhmd_unpredictable' => 'nullable|integer|min:0',
             'cek_random_barang' => 'nullable|integer|min:0',
@@ -143,7 +177,7 @@ class LogbookRotasiController extends Controller
         try {
             DB::beginTransaction();
 
-            $userId = Auth::id();
+            $userId = $request->input('personil_id');
             $logbookType = strtolower($request->input('type'));
             $logbookDate = $request->input('date');
             $tempatJaga = $request->input('tempat_jaga');
@@ -168,7 +202,7 @@ class LogbookRotasiController extends Controller
                     'date'       => $logbookDate,
                     'type'       => $logbookType,
                     'status'     => 'draft',
-                    'created_by' => $userId,
+                    'created_by' => Auth::id(),
                 ]);
             }
 
