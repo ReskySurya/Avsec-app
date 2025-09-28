@@ -17,12 +17,7 @@ use App\Http\Controllers\DailyTest\WtmdController;
 use App\Http\Controllers\DailyTest\XrayController;
 use App\Http\Controllers\LogBook\LogbookPosJagaController;
 use App\Http\Controllers\LogBook\LogbookRotasiController;
-use App\Http\Controllers\LogBook\LogbookRotasiHBSCPController;
-use App\Http\Controllers\LogBook\LogbookRotasiPSCPController;
 use App\Http\Controllers\PMIKController;
-use App\Models\LogbookSweepingPI;
-use App\Models\ManualBook;
-use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return view('auth.login');

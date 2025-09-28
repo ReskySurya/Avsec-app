@@ -290,10 +290,6 @@
                 </div>
                 <h3 class="text-lg font-semibold text-gray-700 mb-2">Belum Ada Personil</h3>
                 <p class="text-gray-500 mb-4">Tambahkan personil untuk logbook ini</p>
-                <!-- <button @click="openAddPersonil = true"
-                    class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-md">
-                    Tambah Personil
-                </button> -->
             </div>
             @endforelse
         </div>

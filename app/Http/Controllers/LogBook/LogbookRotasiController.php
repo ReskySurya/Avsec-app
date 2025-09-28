@@ -380,6 +380,53 @@ class LogbookRotasiController extends Controller
             return redirect()->route('logbookRotasi.index')->with('error', 'Gagal, logbook ini sudah tidak dalam status draft.');
         }
 
+        // Langkah 1: Dapatkan daftar ID personil yang WAJIB mengisi (status 'hadir')
+        $requiredStaffIds = collect();
+        $location = Location::where('name', 'LIKE', $logbook->type)->first();
+
+        if ($location) {
+            $logbookPosJaga = Logbook::where('date', $logbook->date)
+                ->where('location_area_id', $location->id)
+                ->first();
+
+            if ($logbookPosJaga) {
+                $requiredStaffIds = LogbookStaff::where('logbookID', $logbookPosJaga->logbookID)
+                    ->where('description', 'hadir')
+                    ->pluck('staffID');
+            }
+        }
+
+        // Lakukan pengecekan hanya jika ada personil yang wajib mengisi
+        if ($requiredStaffIds->isNotEmpty()) {
+            // Langkah 2: Dapatkan daftar ID personil yang SUDAH mengisi di logbook rotasi ini
+            $roleColumns = [
+                'pemeriksaan_dokumen',
+                'pengatur_flow',
+                'operator_xray',
+                'hhmd_petugas',
+                'manual_kabin_petugas',
+                'manual_bagasi_petugas',
+                'reunited'
+            ];
+            $filledInStaffIds = collect();
+
+            foreach ($logbook->details as $detail) {
+                foreach ($roleColumns as $column) {
+                    if (!empty($detail->{$column})) {
+                        $filledInStaffIds->push($detail->{$column});
+                    }
+                }
+            }
+            $uniqueFilledInStaffIds = $filledInStaffIds->unique();
+
+            // Langkah 3: Bandingkan kedua daftar tersebut
+            $missingStaff = $requiredStaffIds->diff($uniqueFilledInStaffIds);
+
+            if ($missingStaff->isNotEmpty()) {
+                return redirect()->back()->with('error', 'Gagal, masih ada petugas hadir yang belum dimasukkan ke dalam jadwal rotasi.');
+            }
+        }
+
         // 2. Simpan data baru dari modal
         $logbook->status = 'submitted';
         $logbook->submittedSignature = $request->input('signature');

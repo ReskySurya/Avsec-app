@@ -68,7 +68,7 @@
         </div>
 
         {{-- Include partial untuk menampilkan personil --}}
-        @include('logbook.rotasi.partials.personil_rotasi', ['personil' => $personil])
+        {{-- @include('logbook.rotasi.partials.personil_rotasi', ['personil' => $personil]) --}}
 
         @if ($typeForm === 'pscp')
             @include('logbook.rotasi.partials.tabel_pscp', ['logbook' => $logbook])

@@ -78,11 +78,16 @@
         {{ session('success') }}
     </div>
     @endif
-    @if($errors->any())
-    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 5000)" x-show="show" x-transition
-        class="bg-red-500 text-white p-3 sm:p-4 rounded-lg mb-4 sm:mb-6 text-sm sm:text-base">
-        <strong>Whoops!</strong> Ada beberapa masalah dengan input Anda.<br><br>
-        <ul class="list-disc list-inside">@foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach</ul>
+    @if(session('error'))
+    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition
+        class="bg-gradient-to-r from-red-400 to-red-500 text-white px-4 sm:px-6 py-4 rounded-xl mb-6 shadow-lg border-l-4 border-red-600 mx-4 sm:mx-0">
+        <div class="flex items-center">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span class="text-sm sm:text-base">{{ session('error') }}</span>
+        </div>
     </div>
     @endif
 

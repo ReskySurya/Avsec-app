@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Checklist;
 
 use App\Http\Controllers\Controller;
+use App\Models\Location;
+use App\Models\Logbook;
+use App\Models\LogbookStaff;
 use App\Models\ManualBook;
-use App\Models\ManualBookDetail;
 use App\Models\Role;
 use App\Models\User;
 use Carbon\Carbon;
@@ -13,23 +15,61 @@ use Illuminate\Support\Facades\Auth;
 
 class ManualBookController extends Controller
 {
-    /**
-     * Menampilkan halaman utama dengan daftar semua laporan manual book.
-     */
     public function index()
     {
-        $manualBooks = ManualBook::with('creator','details')
-            // ->where('created_by', Auth::id())
-            ->orderBy('date', 'desc')
-            ->latest()->paginate(10);
-
+        $currentUserId = Auth::id();
         $loggedInUserName = Auth::user()->name;
+
+        // Langkah 1: Kumpulkan semua logbookID di mana user ini terdaftar "hadir" (Tidak berubah)
+        $staffLogbookIds = LogbookStaff::where('staffID', $currentUserId)
+            ->where('description', 'hadir')
+            ->pluck('logbookID');
+
+        // Inisialisasi query ManualBook
+        $manualBooksQuery = ManualBook::query();
+
+        if ($staffLogbookIds->isNotEmpty()) {
+            // Langkah 2: Ambil properti dari logbook-logbook tersebut, TERMASUK relasi ke lokasi
+            $relevantLogbooks = Logbook::with('locationArea:id,name') // Eager load nama lokasi
+                ->whereIn('logbookID', $staffLogbookIds)
+                ->get(['date', 'shift', 'location_area_id']); // Ambil kolom yang diperlukan
+
+            // Langkah 3: Filter ManualBook berdasarkan kombinasi yang cocok
+            $manualBooksQuery->with('creator', 'details')
+                ->where('status', 'draft')
+                ->where(function ($query) use ($relevantLogbooks) {
+                    if ($relevantLogbooks->isEmpty()) {
+                        $query->whereRaw('1 = 0');
+                        return;
+                    }
+
+                    // Buat grup kondisi OR untuk setiap kombinasi yang ditemukan
+                    foreach ($relevantLogbooks as $logbook) {
+                        // Pastikan relasi locationArea ada untuk menghindari error
+                        if ($logbook->locationArea) {
+                            $query->orWhere(function ($subQuery) use ($logbook) {
+                                $subQuery->where('date', $logbook->date)
+                                    ->where('shift', 'like', $logbook->shift) // Ubah menjadi 'like'
+                                    // Cocokkan `type` di ManualBook dengan `nama lokasi` dari Logbook
+                                    ->where('type', strtolower($logbook->locationArea->name));
+                            });
+                        }
+                    }
+                });
+        } else {
+            // Jika user tidak terdaftar di logbook manapun, jangan tampilkan manual book sama sekali
+            $manualBooksQuery->whereRaw('1 = 0');
+        }
+
+        $manualBooks = $manualBooksQuery->orderBy('date', 'desc')->latest()->paginate(10);
+
         $supervisors = User::whereHas('role', fn($q) => $q->where('name', Role::SUPERVISOR))->get();
 
         return view('checklist.manualbook.manualBook', compact(
             'manualBooks',
             'loggedInUserName',
-            'supervisors'));
+            'supervisors'
+        ));
     }
 
     /**
@@ -146,34 +186,60 @@ class ManualBookController extends Controller
             ->with('success', 'Data baru berhasil ditambahkan ke laporan ' . $header->id);
     }
 
-    /**
-     * Mengubah status laporan dari 'draft' menjadi 'submitted'.
-     */
-    public function finish(Request $request, $id) // 1. Tambahkan Request $request
+    public function finish(Request $request, $id)
     {
-        // 2. Validasi input dari modal
+        // 1. Validasi input dari modal (tidak berubah)
         $request->validate([
-            'signature'   => 'required|string',
-            // 'receivedID'  => 'required|exists:users,id',
-            'approvedID'  => 'required|exists:users,id',
+            'signature'  => 'required|string',
+            'approvedID' => 'required|exists:users,id',
         ]);
 
-        $manualBook = ManualBook::findOrFail($id);
+        // Eager load details untuk pengecekan nanti
+        $manualBook = ManualBook::with('details')->findOrFail($id);
 
-        // Pastikan hanya pembuatnya yang bisa menyelesaikan
-        // if ($manualBook->created_by !== Auth::id()) {
-        //     abort(403, 'AKSES DITOLAK');
-        // }
+        // Langkah 1: Dapatkan daftar ID personil yang WAJIB mengisi (status 'hadir')
+        $requiredStaffIds = collect();
+        $location = Location::where('name', 'LIKE', $manualBook->type)->first();
 
-        // 3. Simpan data baru dari form ke model
+        if ($location) {
+            $logbookPosJaga = Logbook::where('date', $manualBook->date)
+                ->where('shift', $manualBook->shift)
+                ->where('location_area_id', $location->id)
+                ->first();
+
+            if ($logbookPosJaga) {
+                $requiredStaffIds = LogbookStaff::where('logbookID', $logbookPosJaga->logbookID)
+                    ->where('description', 'hadir')
+                    ->pluck('staffID');
+            }
+        }
+
+        // Lakukan pengecekan hanya jika ada personil yang wajib mengisi
+        if ($requiredStaffIds->isNotEmpty()) {
+            // ++++ KODE BARU ++++
+            // Langkah 2: Dapatkan daftar NAMA personil yang SUDAH mengisi di manual book ini
+            $filledInStaffNames = $manualBook->details->pluck('name')->unique();
+
+            // Langkah 3: Ubah daftar NAMA tersebut menjadi daftar ID
+            $filledInStaffIds = User::whereIn('name', $filledInStaffNames)->pluck('id');
+
+            // Langkah 4: Bandingkan kedua daftar ID tersebut
+            $missingStaff = $requiredStaffIds->diff($filledInStaffIds);
+
+            if ($missingStaff->isNotEmpty()) {
+                return redirect()->back()->with('error', 'Gagal, masih ada personil hadir yang belum mengisi laporan Manual Book.');
+            }
+        }
+
+        // Jika lolos pengecekan, lanjutkan proses submit
         $manualBook->status = 'submitted';
-        $manualBook->senderSignature = $request->signature; // Simpan tanda tangan
-        $manualBook->approved_by = $request->approvedID;    // Simpan ID supervisor
+        $manualBook->senderSignature = $request->signature;
+        $manualBook->approved_by = $request->approvedID; // Tambahkan waktu persetujuan
 
         $manualBook->save();
 
         return redirect()->route('checklist.manualbook.index')
-                         ->with('success', 'Laporan ' . $manualBook->id . ' telah berhasil diselesaikan.');
+            ->with('success', 'Laporan ' . $manualBook->id . ' telah berhasil diselesaikan.');
     }
 
     public function show(ManualBook $manualBook)
@@ -181,7 +247,6 @@ class ManualBookController extends Controller
         $manualBook->load('details');
 
         return view('supervisor.detailManualBook', compact('manualBook'));
-
     }
 
     public function approveSignature(Request $request, ManualBook $manualBook)

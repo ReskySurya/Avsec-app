@@ -92,7 +92,7 @@
 <!-- Mobile/Tablet View -->
 <div class="lg:hidden">
     @forelse($officerLog as $officerId => $data)
-    <div class="bg-white rounded-lg shadow-md border border-gray-200 mb-4 overflow-hidden">
+    <div class="bg-white shadow-md border border-gray-200 mb-4 overflow-hidden">
         <!-- Officer Header -->
         <div class="bg-gradient-to-r from-blue-500 to-teal-600 text-white p-4">
             <div class="flex justify-between items-center">
@@ -105,7 +105,7 @@
 
         <!-- Officer Activities -->
         <div class="p-4 space-y-4">
-            
+
             <!-- Pemeriksa Dokumen -->
             @php $roleData = $data['roles']['pemeriksaan_dokumen'] ?? []; @endphp
             @if (!empty($roleData))
@@ -273,7 +273,7 @@
     <div class="bg-white rounded-lg shadow-md border border-gray-200 p-8">
         <div class="text-center text-gray-500">
             <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             <p class="text-lg font-medium mb-2">Tidak ada data entri PSCP</p>
@@ -301,49 +301,49 @@
         .sticky {
             position: sticky;
         }
-        
+
         /* Animation for mobile cards */
         .bg-white.rounded-lg.shadow-md {
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        
+
         .bg-white.rounded-lg.shadow-md:active {
             transform: scale(0.98);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
-        
+
         /* Better spacing for mobile content */
         .space-y-4 > * + * {
             margin-top: 1rem;
         }
-        
+
         /* Improved gradient headers */
         .bg-gradient-to-r {
             background-image: linear-gradient(to right, var(--tw-gradient-stops));
         }
-        
+
         /* Enhanced color backgrounds for activities */
         .bg-blue-50 {
             background-color: rgba(59, 130, 246, 0.05);
         }
-        
+
         .bg-green-50 {
             background-color: rgba(34, 197, 94, 0.05);
         }
-        
+
         .bg-purple-50 {
             background-color: rgba(147, 51, 234, 0.05);
         }
-        
+
         .bg-blue-100 {
             background-color: rgba(59, 130, 246, 0.1);
         }
-        
+
         .bg-green-100 {
             background-color: rgba(34, 197, 94, 0.1);
         }
     }
-    
+
     /* Desktop table enhancements */
     @media (min-width: 1024px) {
         .scrollbar-thin {

@@ -126,7 +126,7 @@
         <div class="bg-gray-50 px-6 py-4 flex justify-end">
             <a href="{{ route('logbook.index') }}"
                 class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium">
-                Selesai & Kembali ke Daftar
+                Kembali ke Daftar
             </a>
         </div>
     </div>

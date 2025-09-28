@@ -39,21 +39,34 @@ class LogbookPosJagaController extends Controller
 
     public function index()
     {
-        // Ambil ID user yang sedang login
+        // 1. Ambil ID user yang sedang login
         $currentUserId = Auth::id();
 
+        // 2. Cari semua logbookID di mana user ini terdaftar sebagai personil "hadir"
+        $staffLogbookIds = LogbookStaff::where('staffID', $currentUserId)
+            ->where('description', 'hadir')
+            ->pluck('logbookID');
+
+        // 3. Ambil semua logbook draft yang relevan dengan user
         $logbooks = Logbook::with('locationArea')
-            ->where('senderID', $currentUserId)
-            // ->whereNull('senderSignature')
             ->where('status', 'draft') // Hanya tampilkan logbook dengan status draft
+            ->where(function ($query) use ($currentUserId, $staffLogbookIds) {
+                // Kondisi 1: Logbook dibuat oleh user ini
+                $query->where('senderID', $currentUserId)
+                    // ATAU
+                    // Kondisi 2: User ini terdaftar sebagai personil "hadir" di logbook tersebut
+                    ->orWhereIn('logbookID', $staffLogbookIds);
+            })
             ->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
+        // 4. Ambil data lokasi untuk modal (tidak berubah)
         $locations = Location::whereIn('name', $this->allowedLocations)
             ->orderBy('name', 'asc')
             ->get();
 
+        // 5. Kirim data ke view
         return view('logbook.posjaga.logbookPosJaga', [
             'logbooks' => $logbooks,
             'locations' => $locations,
@@ -116,7 +129,6 @@ class LogbookPosJagaController extends Controller
             DB::commit();
 
             return redirect()->route('logbook.index')->with('success', $successMessage);
-
         } catch (\Exception $e) {
             // Jika ada error, rollback semua proses
             DB::rollBack();
@@ -132,8 +144,8 @@ class LogbookPosJagaController extends Controller
     {
         // Cek apakah sudah ada logbook rotasi (draft atau submitted) untuk tanggal & tipe ini
         $exists = LogbookRotasi::where('date', $request->date)
-                               ->where('type', $logbookType)
-                               ->exists();
+            ->where('type', $logbookType)
+            ->exists();
 
         if (!$exists) {
             LogbookRotasi::create([
@@ -154,9 +166,9 @@ class LogbookPosJagaController extends Controller
     {
         // Cek apakah sudah ada draft manual book untuk kombinasi ini
         $exists = ManualBook::where('date', $request->date)
-                            ->where('shift', $request->shift)
-                            ->where('type', $logbookType)
-                            ->exists();
+            ->where('shift', $request->shift)
+            ->where('type', $logbookType)
+            ->exists();
 
         if (!$exists) {
             ManualBook::create([
@@ -840,22 +852,22 @@ class LogbookPosJagaController extends Controller
         // Cek apakah ada form turunan yang dibuat sebagai draft
         $logbookRotasi = null;
         $manualBook = null;
-        
+
         if (in_array($logbook->locationArea->name, ['PSCP', 'HBSCP'])) {
             $logbookType = strtolower($logbook->locationArea->name);
-            
+
             // Query untuk LogbookRotasi
             $logbookRotasi = LogbookRotasi::where('date', $logbook->date)
-                                        ->where('type', $logbookType)
-                                        ->where('status', 'draft')
-                                        ->first();
+                ->where('type', $logbookType)
+                ->where('status', 'draft')
+                ->first();
 
             // Query untuk ManualBook
             $manualBook = ManualBook::where('date', $logbook->date)
-                                  ->where('shift', $logbook->shift)
-                                  ->where('type', $logbookType)
-                                  ->where('status', 'draft')
-                                  ->first();
+                ->where('shift', $logbook->shift)
+                ->where('type', $logbookType)
+                ->where('status', 'draft')
+                ->first();
         }
 
         return view('logbook.posjaga.listPosJaga', [
