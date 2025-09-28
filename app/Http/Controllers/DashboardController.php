@@ -11,8 +11,11 @@ use App\Models\Report;
 use App\Models\Logbook;
 use App\Models\LogbookChief;
 use App\Models\LogbookRotasi;
+use App\Models\LogbookSweepingPI;
+use App\Models\LogbookSweepingPIDetail;
 use App\Models\ManualBook;
 use App\Models\ReportStatus;
+use App\Models\Tenant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -121,6 +124,136 @@ class DashboardController extends Controller
         // Ambil ID user yang sedang login
         $currentUserId = Auth::id();
 
+        // Daily Test Submission Status
+        $equipmentTypes = ['hhmd', 'wtmd', 'xraycabin', 'xraybagasi'];
+        $allDailyTestLocations = EquipmentLocation::with(['equipment', 'location'])
+            ->whereHas('equipment', function ($q) use ($equipmentTypes) {
+                $q->whereIn('name', $equipmentTypes);
+            })
+            ->get();
+
+        $submittedLocationIds = Report::whereIn('equipmentLocationID', $allDailyTestLocations->pluck('id'))
+            ->whereDate('created_at', today())
+            ->pluck('equipmentLocationID')
+            ->unique();
+
+        $dailyTestStatuses = [
+            'submitted' => [],
+            'not_submitted' => [],
+        ];
+
+        foreach ($allDailyTestLocations as $location) {
+            $equipmentName = $location->equipment->name;
+            $formLink = '#'; // Default link
+            if (in_array($equipmentName, ['hhmd', 'wtmd', 'xraycabin', 'xraybagasi'])) {
+                $formLink = route('daily-test.' . $equipmentName);
+            }
+
+            $statusData = [
+                'equipment_name' => $equipmentName,
+                'location_name' => $location->location->name,
+                'form_link' => $formLink,
+            ];
+
+            if ($submittedLocationIds->contains($location->id)) {
+                $dailyTestStatuses['submitted'][] = $statusData;
+            } else {
+                $dailyTestStatuses['not_submitted'][] = $statusData;
+            }
+        }
+
+        // Checklist Submission Status
+        $checklistStatuses = [
+            'submitted' => [],
+            'not_submitted' => [],
+        ];
+
+        // 1. Checklist Kendaraan
+        $kendaraanTasks = [
+            ['type' => 'mobil', 'shift' => 'pagi'],
+            ['type' => 'mobil', 'shift' => 'malam'],
+            ['type' => 'motor', 'shift' => 'pagi'],
+            ['type' => 'motor', 'shift' => 'malam'],
+        ];
+        $submittedKendaraan = ChecklistKendaraan::whereDate('date', today())->get()->keyBy(function($item) {
+            return $item->type . '-' . $item->shift;
+        });
+
+        foreach ($kendaraanTasks as $task) {
+            $taskKey = $task['type'] . '-' . $task['shift'];
+            $taskName = 'Checklist Kendaraan ' . ucfirst($task['type']) . ' (' . ucfirst($task['shift']) . ')';
+
+            if ($submittedKendaraan->has($taskKey)) {
+                $checklistStatuses['submitted'][] = ['name' => $taskName];
+            } else {
+                $checklistStatuses['not_submitted'][] = [
+                    'name' => $taskName,
+                    'form_link' => route('checklist.kendaraan.index')
+                ];
+            }
+        }
+
+        // 2. Checklist Penyisiran
+        $penyisiranSubmitted = ChecklistPenyisiran::whereDate('date', today())->exists();
+        $penyisiranTaskName = 'Checklist Penyisiran Ruang Tunggu';
+
+        if ($penyisiranSubmitted) {
+            $checklistStatuses['submitted'][] = ['name' => $penyisiranTaskName];
+        } else {
+            $checklistStatuses['not_submitted'][] = [
+                'name' => $penyisiranTaskName,
+                'form_link' => route('checklist.penyisiran.index')
+            ];
+        }
+
+        // 3. Form Pencatatan PI
+        $piSubmitted = FormPencatatanPI::whereDate('date', today())->exists();
+        $piTaskName = 'Form Pencatatan PI';
+
+        if ($piSubmitted) {
+            $checklistStatuses['submitted'][] = ['name' => $piTaskName];
+        } else {
+            $checklistStatuses['not_submitted'][] = [
+                'name' => $piTaskName,
+                'form_link' => route('checklist.pencatatanpi.index')
+            ];
+        }
+
+        // Logbook Sweeping PI Status
+        $sweepingStatuses = [
+            'submitted' => [],
+            'not_submitted' => [],
+        ];
+        $allTenants = Tenant::all();
+        $dayOfMonth = today()->day;
+        $dateField = 'tanggal_' . $dayOfMonth;
+
+        $logbookIdsThisMonth = LogbookSweepingPI::where('bulan', today()->month)
+            ->where('tahun', today()->year)
+            ->pluck('sweepingpiID');
+
+        $sweepingPiIdsCheckedToday = LogbookSweepingPIDetail::whereIn('sweepingpiID', $logbookIdsThisMonth)
+            ->where($dateField, 1)
+            ->pluck('sweepingpiID')
+            ->unique();
+
+        $tenantIdsCheckedToday = LogbookSweepingPI::whereIn('sweepingpiID', $sweepingPiIdsCheckedToday)
+            ->pluck('tenantID')
+            ->unique();
+
+        foreach ($allTenants as $tenant) {
+            $taskName = 'Logbook Sweeping PI - ' . $tenant->tenant_name;
+            
+            if ($tenantIdsCheckedToday->contains($tenant->tenantID)) {
+                $sweepingStatuses['submitted'][] = ['name' => $taskName];
+            } else {
+                $sweepingStatuses['not_submitted'][] = [
+                    'name' => $taskName,
+                    'form_link' => route('logbookSweppingPI.detail.index', ['tenantID' => $tenant->tenantID])
+                ];
+            }
+        }
+
         $rejectedlogbooks = Logbook::with('locationArea')
             ->where('senderID', $currentUserId)
             ->whereNotNull('senderSignature') // Changed to check if senderSignature is not null
@@ -171,6 +304,9 @@ class DashboardController extends Controller
             'logbookEntries' => $logbookEntries,
             'checklistKendaraan' => $checklistKendaraan,
             'checklistPenyisiran' => $checklistPenyisiran,
+            'dailyTestStatuses' => $dailyTestStatuses,
+            'checklistStatuses' => $checklistStatuses,
+            'sweepingStatuses' => $sweepingStatuses,
         ]);
     }
 
@@ -341,6 +477,84 @@ class DashboardController extends Controller
             ->latest('date')
             ->paginate($perPage);
 
+        $pendingHhmdReports = Report::with([
+            'submittedBy',
+            'equipmentLocation.location',
+            'equipmentLocation.equipment'
+        ])
+        ->whereHas('status', function ($query) {
+            $query->where('name', 'pending');
+        })
+        ->where('approvedByID', Auth::id())
+        ->whereHas('equipmentLocation.equipment', function ($query) {
+            $query->where('name', 'hhmd');
+        })
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        $pendingWtmdReports = Report::with([
+            'submittedBy',
+            'equipmentLocation.location',
+            'equipmentLocation.equipment'
+        ])
+        ->whereHas('status', function ($query) {
+            $query->where('name', 'pending');
+        })
+        ->where('approvedByID', Auth::id())
+        ->whereHas('equipmentLocation.equipment', function ($query) {
+            $query->where('name', 'wtmd');
+        })
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        $pendingXrayCabinReports = Report::with([
+            'submittedBy',
+            'equipmentLocation.location',
+            'equipmentLocation.equipment'
+        ])
+        ->whereHas('status', function ($query) {
+            $query->where('name', 'pending');
+        })
+        ->where('approvedByID', Auth::id())
+        ->whereHas('equipmentLocation.equipment', function ($query) {
+            $query->where('name', 'xraycabin');
+        })
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        $pendingXrayBagasiReports = Report::with([
+            'submittedBy',
+            'equipmentLocation.location',
+            'equipmentLocation.equipment'
+        ])
+        ->whereHas('status', function ($query) {
+            $query->where('name', 'pending');
+        })
+        ->where('approvedByID', Auth::id())
+        ->whereHas('equipmentLocation.equipment', function ($query) {
+            $query->where('name', 'xraybagasi');
+        })
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        $pendingKendaraanChecklists = ChecklistKendaraan::with('sender')
+            ->where('status', 'submitted')
+            ->where('approved_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $pendingPenyisiranChecklists = ChecklistPenyisiran::with('sender')
+            ->where('status', 'submitted')
+            ->where('approved_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $pendingPIChecklists = FormPencatatanPI::with('sender')
+            ->where('status', 'submitted')
+            ->where('approved_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+
 
         // Daily Test Stats
         $dailyTestStats = [];
@@ -503,7 +717,14 @@ class DashboardController extends Controller
             'dailyTestStats' => $dailyTestStats,
             'logbookStats' => $logbookStats,
             'checklistStats' => $checklistStats,
-            'logbooksChief' => $logbooksChief
+            'logbooksChief' => $logbooksChief,
+            'pendingHhmdReports' => $pendingHhmdReports,
+            'pendingWtmdReports' => $pendingWtmdReports,
+            'pendingXrayCabinReports' => $pendingXrayCabinReports,
+            'pendingXrayBagasiReports' => $pendingXrayBagasiReports,
+            'pendingKendaraanChecklists' => $pendingKendaraanChecklists,
+            'pendingPenyisiranChecklists' => $pendingPenyisiranChecklists,
+            'pendingPIChecklists' => $pendingPIChecklists
         ]);
 
     }
