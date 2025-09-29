@@ -98,7 +98,7 @@
                         <p class="text-sm text-gray-500">Formulir untuk jadwal rotasi personil di area {{
                             $logbook->locationArea->name }}.</p>
                     </div>
-                    <a href="{{ route('logbookRotasi.index', ['type' => strtolower($logbook->locationArea->name)]) }}"
+                    <a href="{{ route('logbookRotasi.index', ['type' => strtolower($logbook->locationArea->name), 'logbookID' => $logbook->logbookID]) }}"
                         class="bg-teal-500 text-white hover:bg-teal-600 px-5 py-2 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 text-sm">
                         Lengkapi Data
                     </a>

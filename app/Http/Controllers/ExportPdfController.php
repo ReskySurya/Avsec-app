@@ -517,7 +517,7 @@ class ExportPdfController extends Controller
                         'shift' => $item->shift,
                         'senderName' => $item->createdBy->name ?? 'N/A',
                         'receiverName' => $item->approvedBy->name ?? 'N/A',
-                        'status' => 'approved',
+                        'status' => $item->status,
                     ];
                 });
 
@@ -563,16 +563,16 @@ class ExportPdfController extends Controller
         $query = null;
         switch ($formType) {
             case 'pos_jaga':
-                $query = Logbook::with(['details', 'senderBy', 'receiverBy', 'approverBy', 'locationArea', 'facility', 'personil.user']);
+                $query = Logbook::with(['details', 'senderBy', 'receiverBy', 'approverBy', 'locationArea', 'facility', 'personil.user'])->where('status', 'approved');
                 break;
             case 'sweeping_pi':
                 $query = LogbookSweepingPI::with(['tenant', 'sweepingPIDetails', 'notesSweepingPI']);
                 break;
             case 'rotasi':
-                $query = LogbookRotasi::with(['creator', 'approver', 'submitter', 'details.officerAssignment.officer']);
+                $query = LogbookRotasi::with(['creator', 'approver', 'submitter', 'details.officerAssignment.officer'])->where('status', 'approved');
                 break;
             case 'chief':
-                $query = LogbookChief::with(['details', 'createdBy', 'approvedBy', 'facility', 'personil.user', 'kemajuan']);
+                $query = LogbookChief::with(['details', 'createdBy', 'approvedBy', 'facility', 'personil.user', 'kemajuan'])->where('status', 'approved');
                 break;
             default:
                 return collect();
@@ -899,19 +899,19 @@ class ExportPdfController extends Controller
         $query = null;
         switch ($formType) {
             case 'kendaraan':
-                $query = ChecklistKendaraan::with(['details.item', 'sender', 'receiver', 'approver']);
+                $query = ChecklistKendaraan::with(['details.item', 'sender', 'receiver', 'approver'])->where('status', 'approved');
                 break;
             case 'penyisiran':
-                $query = ChecklistPenyisiran::with(['details.item', 'sender', 'receiver', 'approver']);
+                $query = ChecklistPenyisiran::with(['details.item', 'sender', 'receiver', 'approver'])->where('status', 'approved');
                 break;
             case 'senpi':
                 $query = ChecklistSenpi::query();
                 break;
             case 'pencatatan_pi':
-                $query = FormPencatatanPI::with(['sender', 'approver', 'details']);
+                $query = FormPencatatanPI::with(['sender', 'approver', 'details'])->where('status', 'approved');
                 break;
             case 'manual_book':
-                $query = ManualBook::with(['creator', 'approver', 'details']);
+                $query = ManualBook::with(['creator', 'approver', 'details'])->where('status', 'approved');
                 break;
             default:
                 return collect();

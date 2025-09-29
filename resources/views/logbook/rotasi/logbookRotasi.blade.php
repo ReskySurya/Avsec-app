@@ -15,7 +15,7 @@
     }" class="mx-auto p-0 sm:p-6 min-h-screen pt-5 lg:pt-20">
 
     <div class="mb-4">
-        <a href="{{ url()->previous() }}"
+        <a href="{{route('logbook.posjaga.list', ['id' => $posjaga]) }}"
             class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-semibold rounded-lg shadow transition">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -71,9 +71,9 @@
         {{-- @include('logbook.rotasi.partials.personil_rotasi', ['personil' => $personil]) --}}
 
         @if ($typeForm === 'pscp')
-            @include('logbook.rotasi.partials.tabel_pscp', ['logbook' => $logbook])
+        @include('logbook.rotasi.partials.tabel_pscp', ['logbook' => $logbook])
         @else
-            @include('logbook.rotasi.partials.tabel_hbscp', ['logbook' => $logbook])
+        @include('logbook.rotasi.partials.tabel_hbscp', ['logbook' => $logbook])
         @endif
     </div>
 
@@ -132,13 +132,12 @@
                 {{-- Dropdown Personil --}}
                 <div x-show="selectedRotasi" x-transition>
                     <label for="personil_id" class="block text-sm font-semibold text-gray-700 mb-2">Personil</label>
-                    <select id="personil_id" name="personil_id" required
-                        class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 text-sm sm:text-base">
-                        <option value="">Pilih Personil</option>
-                        @foreach($personil as $p)
-                        <option value="{{ $p->user->id }}">{{ $p->user->name }}</option>
-                        @endforeach
-                    </select>
+                    <input type="text" id="personil_id" name="personil_id" readonly
+                        value="{{ Auth::user()->id }}" hidden>
+                    <div class="w-full border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 rounded-xl focus:border-blue-500 focus:outline-none text-sm sm:text-base">
+                        {{ Auth::user()->name }}
+                    </div>
+                    </input>
                     @error('personil_id') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                 </div>
 
@@ -542,7 +541,7 @@
     function clearSignature() {
         initializeSignaturePad();
 
-        if(signaturePadInstance){
+        if (signaturePadInstance) {
             const statusEl = document.getElementById('signature-status');
             if (statusEl) {
                 statusEl.textContent = 'Belum ada tanda tangan';

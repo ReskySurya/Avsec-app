@@ -34,7 +34,8 @@ class LogbookPosJagaController extends Controller
         'PSCP',
         'CCTV',
         'Patroli',
-        'Walking Patrol'
+        'Walking Patrol',
+        'Pos Keberangkatan'
     ];
 
     public function index()
