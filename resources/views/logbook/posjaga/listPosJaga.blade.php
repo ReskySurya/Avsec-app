@@ -109,7 +109,7 @@
                 @if($manualBook)
                 <div class="bg-white border border-gray-200 rounded-lg p-4 flex items-center justify-between">
                     <div>
-                        <h5 class="font-bold text-gray-800">3. Manual Book</h5>
+                        <h5 class="font-bold text-gray-800">3. Buku Pemeriksaan Manual</h5>
                         <p class="text-sm text-gray-500">Formulir untuk jadwal rotasi personil di area {{
                             $logbook->locationArea->name }}.</p>
                     </div>

@@ -25,7 +25,7 @@
                                 <td style="width: 60%; text-align: center; vertical-align: middle;">
                                     <h3 style="font-size: 12px; font-weight: bold; line-height: 1.3;">
                                         LOGBOOK PELAPORAN <br>
-                                        CATATAN AKTIVITAS TEAM LEADER
+                                        CATATAN AKTIVITAS CHIEF SECURITY<br>
                                     </h3>
                                 </td>
                                 <td style="width: 20%; text-align: center; vertical-align: middle;">

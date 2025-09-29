@@ -172,7 +172,7 @@
                 </path>
             </svg>
             <h3 class="text-base font-semibold text-gray-500 mb-1">Belum Ada Data</h3>
-            <p class="text-xs text-gray-400">Data manual book akan muncul di sini setelah dibuat</p>
+            <p class="text-xs text-gray-400">Data Buku Pemeriksaan Manual akan muncul di sini setelah dibuat</p>
         </div>
         @endforelse
     </div>
@@ -303,7 +303,7 @@
                             :disabled="isContinueMode">
                             <option value="">Pilih Shift</option>
                             <option value="pagi">Pagi</option>
-                            <option value="siang">Siang</option>
+                            <option value="malam">Malam</option>
                         </select>
                         <input x-if="isContinueMode" type="hidden" name="shift" :value="form.shift" />
                     </div>
@@ -444,7 +444,7 @@
                 <div class="flex justify-between items-center">
                     <div>
                         <h2 class="text-lg sm:text-2xl font-bold">Konfirmasi Selesai</h2>
-                        <p class="text-blue-100 text-xs sm:text-sm">Konfirmasi penyelesaian Manual Book</p>
+                        <p class="text-blue-100 text-xs sm:text-sm">Konfirmasi penyelesaian Buku Pemeriksaan Manual</p>
                     </div>
                     <button @click="openFinishModal = false"
                         class="text-white hover:text-gray-200 text-2xl">&times;</button>
@@ -455,7 +455,7 @@
                 @csrf
                 @method('PATCH')
                 <div class="space-y-3 sm:space-y-4">
-                    <p class="text-gray-700 text-sm sm:text-base">Apakah Anda yakin ingin menyelesaikan Manual Book ini?
+                    <p class="text-gray-700 text-sm sm:text-base">Apakah Anda yakin ingin menyelesaikan Buku Pemeriksaan Manual ini?
                         Data tidak dapat ditambahkan lagi setelahnya.</p>
 
                     <div class="border-2 border-gray-200 rounded-xl p-3 sm:p-4">

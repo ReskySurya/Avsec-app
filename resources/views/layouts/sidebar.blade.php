@@ -158,16 +158,18 @@ $userRole = auth()->user()->role->name;
 
                 <ul x-show="open" class="pl-8 mt-2 space-y-2">
                     @if($userRole === 'officer')
-                    <li><a href="{{ route('logbook.index') }}"
+                    <li>
+                        <a href="{{ route('logbook.index') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook/posjaga') ? 'bg-gray-700' : '' }}"><span>Logbook
-                                Pos Jaga</span></a></li>
-                    <li><a href="{{ route('logbookSweppingPI.index') }}"
+                                Pos Jaga</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('logbookSweppingPI.index') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook-sweppingpi') ? 'bg-gray-700' : '' }}"><span>Logbook
-                                Sweeping PI</span></a></li>
-                    {{-- <li><a href="{{ route('logbookRotasi.index') }}"
-                            class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('logbook-rotasi') ? 'bg-gray-700' : '' }}"><span>Logbook
-                                Rotasi</span></a></li> --}}
-                    @else {{-- Supervisor & Superadmin --}}
+                                Sweeping PI</span>
+                        </a>
+                    </li>
                     <li>
                         <a href="{{ route('supervisor.logbook-form') }}"
                             class="flex items-center justify-between w-full py-2 px-4 rounded hover:bg-gray-700">
@@ -239,10 +241,10 @@ $userRole = auth()->user()->role->name;
                     <li><a href="{{ route('checklist.pencatatanpi.index') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('checklist-form-catatan-pi') ? 'bg-gray-700' : '' }}"><span>Form
                                 Pencatatan PI</span></a></li>
-                    <li><a href="{{ route('checklist.manualbook.index') }}"
+                    {{-- <li><a href="{{ route('checklist.manualbook.index') }}"
                             class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->is('buku-pemeriksaan-manual') ? 'bg-gray-700' : '' }}"><span>Buku
-                                Pemeriksaan Manual</span></a></li>
-                    @else {{-- Supervisor & Superadmin --}}
+                                Pemeriksaan Manual</span></a></li> --}}
+                    @else
                     <li>
                         <a href="{{ route('supervisor.checklist-kendaraan.list') }}"
                             class="flex items-center justify-between w-full py-2 px-4 rounded hover:bg-gray-700">
@@ -293,6 +295,21 @@ $userRole = auth()->user()->role->name;
                     @endif
                 </ul>
             </li>
+
+            {{-- ==================== CHECK FORMULIR MENU ==================== --}}
+            @if($userRole === 'officer' || $userRole === 'supervisor')
+            <li>
+                <a href="{{ route('history.index') }}"
+                    class="flex items-center p-2 rounded hover:bg-gray-700 {{ request()->is('history*') ? 'bg-gray-700' : '' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Check Formulir</span>
+                </a>
+            </li>
+            @endif
 
             {{-- ==================== MENU LAINNYA ==================== --}}
             <li>

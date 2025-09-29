@@ -18,6 +18,7 @@ use App\Http\Controllers\DailyTest\XrayController;
 use App\Http\Controllers\LogBook\LogbookPosJagaController;
 use App\Http\Controllers\LogBook\LogbookRotasiController;
 use App\Http\Controllers\PMIKController;
+use App\Http\Controllers\HistoryController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -109,6 +110,13 @@ Route::middleware(['auth', 'role:supervisor', 'password.changed'])->group(functi
 
     // Review Manual Book
     Route::patch('/checklist-manual-book/approve/{manualBook}', [ManualBookController::class, 'approveSignature'])->name('supervisor.checklist-manualbook.signature');
+});
+
+// History Routes (Check Formulir)
+Route::middleware(['auth', 'role:officer,supervisor', 'password.changed'])->group(function () {
+    Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
+    Route::get('/history/{category}', [HistoryController::class, 'show'])->name('history.show');
+    Route::get('/history/preview/{category}/{id}', [HistoryController::class, 'preview'])->name('history.preview');
 });
 
 // Officer Routes

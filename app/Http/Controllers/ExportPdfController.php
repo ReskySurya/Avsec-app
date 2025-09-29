@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ChecklistItem;
 use App\Models\ChecklistKendaraan;
-use App\Models\ChecklistKendaraanDetail;
 use App\Models\ChecklistPenyisiran;
 use App\Models\ChecklistSenpi;
 use App\Models\Equipment;
@@ -14,9 +12,7 @@ use App\Models\LogbookChief;
 use App\Models\LogbookRotasi;
 use App\Models\ManualBook;
 use App\Models\Report;
-use App\Models\ReportDetail;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Location;
 use App\Models\Logbook;
 use App\Models\LogbookSweepingPI;

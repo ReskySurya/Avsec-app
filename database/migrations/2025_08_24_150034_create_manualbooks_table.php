@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('manualbooks', function (Blueprint $table) {
             $table->string('id')->primary(); // Format: MBH-00001 (HBSCP) atau MBP-00001 (PSCP)
             $table->enum('type', ['hbscp', 'pscp']); // Tipe logbook
-            $table->enum('shift', ['pagi', 'siang']);
+            $table->enum('shift', ['pagi', 'malam']);
             $table->date('date');
             $table->enum('status', ['draft', 'submitted', 'approved'])->default('draft');
             $table->unsignedBigInteger('created_by');
