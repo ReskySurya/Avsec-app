@@ -10,7 +10,6 @@
 </head>
 
 <body class="m-0 p-0">
-
     @foreach($forms as $form)
     <div class="page-break-after">
         <div class="bg-white p-4" style="width: 210mm;">

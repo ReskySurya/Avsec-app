@@ -5,10 +5,29 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-4 py-6 lg:mt-20">
     <div class="bg-white rounded-lg shadow-md p-6" x-data="{
-        isModalOpen: false,
-        modalTitle: '',
-        modalData: {},
-        modalBreakdownTitle: 'Lokasi'
+        isStatsModalOpen: false,
+        statsModalTitle: '',
+        statsModalData: {},
+        statsModalBreakdownTitle: 'Lokasi',
+        isFormTypeModalOpen: false,
+        formTypeModalTitle: '',
+        formTypeModalData: {},
+        getLinkForType(category, type) {
+            const baseRoutes = {
+                'Logbook': {
+                    'Pos Jaga': '{{ route("supervisor.logbook-form") }}',
+                    'Laporan Chief': '{{ route("logbook.chief.index") }}',
+                    'Rotasi': '{{ route("supervisor.logbook-rotasi.list") }}',
+                    'Manual Book': '{{ route("supervisor.checklist-manualbook.list") }}'
+                },
+                'Checklist': {
+                    'Kendaraan': '{{ route("supervisor.checklist-kendaraan.list") }}',
+                    'Penyisiran': '{{ route("supervisor.checklist-penyisiran.list") }}',
+                    'Pencatatan PI': '{{ route("supervisor.form-pencatatan-pi.list") }}'
+                }
+            };
+            return baseRoutes[category] ? (baseRoutes[category][type] || '#') : '#';
+        }
     }">
         <h1 class="text-3xl font-bold text-gray-900 mb-4">
             Supervisor Dashboard
@@ -33,667 +52,194 @@
         </div>
 
         <div class="bg-green-50 p-4 rounded-lg mb-6">
-            <h3 class="text-lg font-semibold text-green-800 mb-2">Notifikasi Supervisor</h3>
+            <h3 class="text-lg font-semibold text-green-800 mb-4">Notifikasi Supervisor</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Daily Test Card -->
+                <a href="{{ route('supervisor.dailytest-form') }}" class="bg-yellow-100 hover:bg-yellow-200 transition-colors p-6 rounded-lg shadow-sm flex items-center space-x-4">
+                    <div>
+                        <div class="text-yellow-800 text-4xl font-bold">{{ $pendingDailyTestCount }}</div>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-lg text-yellow-900">Daily Test</h4>
+                        <p class="text-yellow-800">Laporan menunggu persetujuan</p>
+                    </div>
+                </a>
 
-            @if($pendingHhmdReports->count() > 0)
-            <div class="bg-yellow-50 p-4 rounded-lg mb-6 shadow-sm">
-                <h3 class="text-lg font-semibold text-yellow-800 mb-4 flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                            clip-rule="evenodd"></path>
-                    </svg>
-                    Laporan HHMD Menunggu Persetujuan
-                </h3>
-
-                <!-- Desktop view -->
-                <div class="hidden md:block overflow-x-auto">
-                    <table class="min-w-full bg-white rounded-lg shadow-sm">
-                        <thead>
-                            <tr class="bg-yellow-100">
-                                <th class="px-4 py-3 text-left text-yellow-700 font-semibold">Tanggal</th>
-                                <th class="px-4 py-3 text-left text-yellow-700 font-semibold">Waktu</th>
-                                <th class="px-4 py-3 text-left text-yellow-700 font-semibold">Lokasi</th>
-                                <th class="px-4 py-3 text-left text-yellow-700 font-semibold">Pengirim</th>
-                                <th class="px-4 py-3 text-left text-yellow-700 font-semibold">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($pendingHhmdReports as $report)
-                            <tr class="border-b hover:bg-yellow-50 transition-colors cursor-pointer"
-                                onclick="window.location.href='{{ route('hhmd.reviewForm', ['id' => $report->reportID]) }}'">
-                                <td class="px-4 py-3">{{ \Carbon\Carbon::parse($report->testDate)->format('d/m/Y') }}</td>
-                                <td class="px-4 py-3">{{ \Carbon\Carbon::parse($report->testDate)->format('H:i') }}</td>
-                                <td class="px-4 py-3">{{ $report->equipmentLocation->location->name ?? '-' }}</td>
-                                <td class="px-4 py-3">{{ $report->submittedBy->name ?? '-' }}</td>
-                                <td class="px-4 py-3">{{ $report->status->name ?? '-' }}</td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="px-4 py-8 text-center text-gray-500"> 
-                                    <p>Tidak ada Laporan HHMD yang perlu ditinjau.</p>
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                <!-- Logbook Card -->
+                <div @click="isFormTypeModalOpen = true; formTypeModalTitle = 'Logbook'; formTypeModalData = {{ json_encode($pendingLogbookCounts) }}" class="bg-blue-100 hover:bg-blue-200 transition-colors p-6 rounded-lg shadow-sm flex items-center space-x-4 cursor-pointer">
+                    <div>
+                        <div class="text-blue-800 text-4xl font-bold">{{ $totalPendingLogbooks }}</div>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-lg text-blue-900">Logbook</h4>
+                        <p class="text-blue-800">Laporan menunggu persetujuan</p>
+                    </div>
                 </div>
 
-                <!-- Mobile view -->
-                <div class="md:hidden space-y-4">
-                    @forelse($pendingHhmdReports as $report)
-                    <div class="bg-white rounded-lg shadow-sm border-l-4 border-yellow-400 overflow-hidden cursor-pointer"
-                        onclick="window.location.href='{{ route('hhmd.reviewForm', ['id' => $report->reportID]) }}'">
-                        <div class="p-4">
-                            <div class="flex justify-between items-start mb-2">
-                                <div class="text-sm font-medium text-gray-900">
-                                    {{ \Carbon\Carbon::parse($report->testDate)->format('d/m/Y') }}
-                                    <span class="text-gray-500 ml-2">{{ \Carbon\Carbon::parse($report->testDate)->format('H:i') }}</span>
+                <!-- Checklist Card -->
+                <div @click="isFormTypeModalOpen = true; formTypeModalTitle = 'Checklist'; formTypeModalData = {{ json_encode($pendingChecklistCounts) }}" class="bg-teal-100 hover:bg-teal-200 transition-colors p-6 rounded-lg shadow-sm flex items-center space-x-4 cursor-pointer">
+                    <div>
+                        <div class="text-teal-800 text-4xl font-bold">{{ $totalPendingChecklists }}</div>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-lg text-teal-900">Checklist</h4>
+                        <p class="text-teal-800">Laporan menunggu persetujuan</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Test Statistics -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-1">Persentase Penyelesaian Daily Test</h2>
+            <p class="text-sm text-gray-500 mb-4 border-b pb-2">Statistik untuk hari ini, {{ now()->translatedFormat('l, d F Y') }}</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
+                @if(isset($dailyTestStats))
+                @foreach($dailyTestStats as $type => $stats)
+                <div @click="isStatsModalOpen = true; statsModalTitle = '{{ $type }}'; statsModalData = {{ json_encode($stats['breakdown']) }}; statsModalBreakdownTitle = '{{ $stats['breakdownTitle'] }}'"
+                    class="bg-gray-50 p-5 rounded-xl shadow-inner border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors duration-200">
+                    <h3 class="text-lg font-semibold text-gray-700">{{ $type }}</h3>
+                    <p class="text-gray-500 text-sm mt-1">
+                        {{ $stats['approved'] }} dari {{ $stats['total'] }} form telah diajukan.
+                    </p>
+                    <div class="relative pt-1 mt-4">
+                        <div class="gauge-container">
+                            <div class="gauge">
+                                <div class="gauge-background">
+                                    <div class="gauge-fill" style="--percentage: {{ ($stats['percentage'] / 100) * 360 }}deg;"></div>
                                 </div>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Lokasi:</span>
-                                    <span class="text-sm font-medium">{{ $report->equipmentLocation->location->name ?? '-' }}</span>
+                                <div class="gauge-center">
+                                    <div class="gauge-percentage">{{ $stats['percentage'] }}</div>
+                                    <div class="gauge-label">PERCENT</div>
                                 </div>
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Pengirim:</span>
-                                    <span class="text-sm font-medium">{{ $report->submittedBy->name ?? '-' }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Status:</span>
-                                    <span class="text-sm font-medium">{{ $report->status->name ?? '-' }}</span>
+                                <div class="gauge-scale">
+                                    <span>0</span>
+                                    <span>100</span>
                                 </div>
                             </div>
                         </div>
+                        <p class="text-right text-sm font-semibold text-blue-700 mt-1">{{ $stats['percentage'] }}%</p>
                     </div>
-                    @empty
-                    <div class="bg-white rounded-lg shadow-sm p-6 text-center">
-                        <p class="text-gray-500">Tidak ada Laporan HHMD yang perlu ditinjau.</p>
-                    </div>
-                    @endforelse
                 </div>
+                @endforeach
+                @else
+                <p class="text-gray-500 col-span-4">Data statistik Daily Test tidak tersedia.</p>
+                @endif
             </div>
-            @endif
-
-            @if($pendingWtmdReports->count() > 0)
-            <div class="bg-orange-50 p-4 rounded-lg mb-6 shadow-sm">
-                <h3 class="text-lg font-semibold text-orange-800 mb-4 flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                            clip-rule="evenodd"></path>
-                    </svg>
-                    Laporan WTMD Menunggu Persetujuan
-                </h3>
-
-                <!-- Desktop view -->
-                <div class="hidden md:block overflow-x-auto">
-                    <table class="min-w-full bg-white rounded-lg shadow-sm">
-                        <thead>
-                            <tr class="bg-orange-100">
-                                <th class="px-4 py-3 text-left text-orange-700 font-semibold">Tanggal</th>
-                                <th class="px-4 py-3 text-left text-orange-700 font-semibold">Waktu</th>
-                                <th class="px-4 py-3 text-left text-orange-700 font-semibold">Lokasi</th>
-                                <th class="px-4 py-3 text-left text-orange-700 font-semibold">Pengirim</th>
-                                <th class="px-4 py-3 text-left text-orange-700 font-semibold">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($pendingWtmdReports as $report)
-                            <tr class="border-b hover:bg-orange-50 transition-colors cursor-pointer"
-                                onclick="window.location.href='{{ route('wtmd.reviewForm', ['id' => $report->reportID]) }}'">
-                                <td class="px-4 py-3">{{ \Carbon\Carbon::parse($report->testDate)->format('d/m/Y') }}</td>
-                                <td class="px-4 py-3">{{ \Carbon\Carbon::parse($report->testDate)->format('H:i') }}</td>
-                                <td class="px-4 py-3">{{ $report->equipmentLocation->location->name ?? '-' }}</td>
-                                <td class="px-4 py-3">{{ $report->submittedBy->name ?? '-' }}</td>
-                                <td class="px-4 py-3">{{ $report->status->name ?? '-' }}</td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="px-4 py-8 text-center text-gray-500">
-                                    <p>Tidak ada Laporan WTMD yang perlu ditinjau.</p>
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Mobile view -->
-                <div class="md:hidden space-y-4">
-                    @forelse($pendingWtmdReports as $report)
-                    <div class="bg-white rounded-lg shadow-sm border-l-4 border-orange-400 overflow-hidden cursor-pointer"
-                        onclick="window.location.href='{{ route('wtmd.reviewForm', ['id' => $report->reportID]) }}'">
-                        <div class="p-4">
-                            <div class="flex justify-between items-start mb-2">
-                                <div class="text-sm font-medium text-gray-900">
-                                    {{ \Carbon\Carbon::parse($report->testDate)->format('d/m/Y') }}
-                                    <span class="text-gray-500 ml-2">{{ \Carbon\Carbon::parse($report->testDate)->format('H:i') }}</span>
+        </div>
+        <!-- Logbook Statistics -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-1">Persentase Penyelesaian Logbook</h2>
+            <p class="text-sm text-gray-500 mb-4 border-b pb-2">Statistik untuk hari ini, {{ now()->translatedFormat('l, d F Y') }}</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
+                @if(isset($logbookStats))
+                @foreach($logbookStats as $type => $stats)
+                <div @if(!empty($stats['breakdown']))
+                    @click="isStatsModalOpen = true; statsModalTitle = '{{ $type }}'; statsModalData = {{ json_encode($stats['breakdown']) }}; statsModalBreakdownTitle = '{{ $stats['breakdownTitle'] }}'"
+                    class="bg-gray-50 p-5 rounded-xl shadow-inner border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors duration-200"
+                    @else
+                    class="bg-gray-50 p-5 rounded-xl shadow-inner border border-gray-200"
+                    @endif>
+                    <h3 class="text-lg font-semibold text-gray-700">{{ $type }}</h3>
+                    <p class="text-gray-500 text-sm mt-1">
+                        {{ $stats['approved'] }} dari {{ $stats['total'] }} logbook telah diajukan.
+                    </p>
+                    <div class="relative pt-1 mt-4">
+                        <div class="gauge-container">
+                            <div class="gauge">
+                                <div class="gauge-background">
+                                    <div class="gauge-fill" style="--percentage: {{ ($stats['percentage'] / 100) * 360 }}deg;"></div>
                                 </div>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Lokasi:</span>
-                                    <span class="text-sm font-medium">{{ $report->equipmentLocation->location->name ?? '-' }}</span>
+                                <div class="gauge-center">
+                                    <div class="gauge-percentage">{{ $stats['percentage'] }}</div>
+                                    <div class="gauge-label">PERCENT</div>
                                 </div>
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Pengirim:</span>
-                                    <span class="text-sm font-medium">{{ $report->submittedBy->name ?? '-' }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Status:</span>
-                                    <span class="text-sm font-medium">{{ $report->status->name ?? '-' }}</span>
+                                <div class="gauge-scale">
+                                    <span>0</span>
+                                    <span>100</span>
                                 </div>
                             </div>
                         </div>
+                        <p class="text-right text-sm font-semibold text-green-700 mt-1">{{ $stats['percentage'] }}%</p>
                     </div>
-                    @empty
-                    <div class="bg-white rounded-lg shadow-sm p-6 text-center">
-                        <p class="text-gray-500">Tidak ada Laporan WTMD yang perlu ditinjau.</p>
-                    </div>
-                    @endforelse
                 </div>
+                @endforeach
+                @else
+                <p class="text-gray-500 col-span-4">Data statistik logbook tidak tersedia.</p>
+                @endif
             </div>
-            @endif
-
-            @if($pendingXrayCabinReports->count() > 0)
-            <div class="bg-purple-50 p-4 rounded-lg mb-6 shadow-sm">
-                <h3 class="text-lg font-semibold text-purple-800 mb-4 flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                            clip-rule="evenodd"></path>
-                    </svg>
-                    Laporan X-Ray Cabin Menunggu Persetujuan
-                </h3>
-
-                <!-- Desktop view -->
-                <div class="hidden md:block overflow-x-auto">
-                    <table class="min-w-full bg-white rounded-lg shadow-sm">
-                        <thead>
-                            <tr class="bg-purple-100">
-                                <th class="px-4 py-3 text-left text-purple-700 font-semibold">Tanggal</th>
-                                <th class="px-4 py-3 text-left text-purple-700 font-semibold">Waktu</th>
-                                <th class="px-4 py-3 text-left text-purple-700 font-semibold">Lokasi</th>
-                                <th class="px-4 py-3 text-left text-purple-700 font-semibold">Pengirim</th>
-                                <th class="px-4 py-3 text-left text-purple-700 font-semibold">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($pendingXrayCabinReports as $report)
-                            <tr class="border-b hover:bg-purple-50 transition-colors cursor-pointer"
-                                onclick="window.location.href='{{ route('xray.reviewForm', ['id' => $report->reportID]) }}'">
-                                <td class="px-4 py-3">{{ \Carbon\Carbon::parse($report->testDate)->format('d/m/Y') }}</td>
-                                <td class="px-4 py-3">{{ \Carbon\Carbon::parse($report->testDate)->format('H:i') }}</td>
-                                <td class="px-4 py-3">{{ $report->equipmentLocation->location->name ?? '-' }}</td>
-                                <td class="px-4 py-3">{{ $report->submittedBy->name ?? '-' }}</td>
-                                <td class="px-4 py-3">{{ $report->status->name ?? '-' }}</td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="px-4 py-8 text-center text-gray-500">
-                                    <p>Tidak ada Laporan X-Ray Cabin yang perlu ditinjau.</p>
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Mobile view -->
-                <div class="md:hidden space-y-4">
-                    @forelse($pendingXrayCabinReports as $report)
-                    <div class="bg-white rounded-lg shadow-sm border-l-4 border-purple-400 overflow-hidden cursor-pointer"
-                        onclick="window.location.href='{{ route('xray.reviewForm', ['id' => $report->reportID]) }}'">
-                        <div class="p-4">
-                            <div class="flex justify-between items-start mb-2">
-                                <div class="text-sm font-medium text-gray-900">
-                                    {{ \Carbon\Carbon::parse($report->testDate)->format('d/m/Y') }}
-                                    <span class="text-gray-500 ml-2">{{ \Carbon\Carbon::parse($report->testDate)->format('H:i') }}</span>
+        </div>
+        <!-- Checklist Statistics -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-1">Persentase Penyelesaian Checklist</h2>
+            <p class="text-sm text-gray-500 mb-4 border-b pb-2">Statistik untuk hari ini, {{ now()->translatedFormat('l, d F Y') }}</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
+                @if(isset($checklistStats))
+                @foreach($checklistStats as $type => $stats)
+                <div @if(!empty($stats['breakdown']))
+                    @click="isStatsModalOpen = true; statsModalTitle = '{{ $type }}'; statsModalData = {{ json_encode($stats['breakdown']) }}; statsModalBreakdownTitle = '{{ $stats['breakdownTitle'] }}'"
+                    class="bg-gray-50 p-5 rounded-xl shadow-inner border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors duration-200"
+                    @else
+                    class="bg-gray-50 p-5 rounded-xl shadow-inner border border-gray-200"
+                    @endif>
+                    <h3 class="text-lg font-semibold text-gray-700">{{ $type }}</h3>
+                    <p class="text-gray-500 text-sm mt-1">
+                        {{ $stats['approved'] }} dari {{ $stats['total'] }} checklist telah diajukan.
+                    </p>
+                    <div class="relative pt-1 mt-4">
+                        <div class="gauge-container">
+                            <div class="gauge">
+                                <div class="gauge-background">
+                                    <div class="gauge-fill" style="--percentage: {{ ($stats['percentage'] / 100) * 360 }}deg;"></div>
                                 </div>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Lokasi:</span>
-                                    <span class="text-sm font-medium">{{ $report->equipmentLocation->location->name ?? '-' }}</span>
+                                <div class="gauge-center">
+                                    <div class="gauge-percentage">{{ $stats['percentage'] }}</div>
+                                    <div class="gauge-label">PERCENT</div>
                                 </div>
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Pengirim:</span>
-                                    <span class="text-sm font-medium">{{ $report->submittedBy->name ?? '-' }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Status:</span>
-                                    <span class="text-sm font-medium">{{ $report->status->name ?? '-' }}</span>
+                                <div class="gauge-scale">
+                                    <span>0</span>
+                                    <span>100</span>
                                 </div>
                             </div>
                         </div>
+                        <p class="text-right text-sm font-semibold text-purple-700 mt-1">{{ $stats['percentage'] }}%</p>
                     </div>
-                    @empty
-                    <div class="bg-white rounded-lg shadow-sm p-6 text-center">
-                        <p class="text-gray-500">Tidak ada Laporan X-Ray Cabin yang perlu ditinjau.</p>
-                    </div>
-                    @endforelse
                 </div>
+                @endforeach
+                @else
+                <p class="text-gray-500 col-span-5">Data statistik checklist tidak tersedia.</p>
+                @endif
             </div>
-            @endif
+        </div>
 
-            @if($pendingXrayBagasiReports->count() > 0)
-            <div class="bg-pink-50 p-4 rounded-lg mb-6 shadow-sm">
-                <h3 class="text-lg font-semibold text-pink-800 mb-4 flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                            clip-rule="evenodd"></path>
-                    </svg>
-                    Laporan X-Ray Bagasi Menunggu Persetujuan
-                </h3>
-
-                <!-- Desktop view -->
-                <div class="hidden md:block overflow-x-auto">
-                    <table class="min-w-full bg-white rounded-lg shadow-sm">
-                        <thead>
-                            <tr class="bg-pink-100">
-                                <th class="px-4 py-3 text-left text-pink-700 font-semibold">Tanggal</th>
-                                <th class="px-4 py-3 text-left text-pink-700 font-semibold">Waktu</th>
-                                <th class="px-4 py-3 text-left text-pink-700 font-semibold">Lokasi</th>
-                                <th class="px-4 py-3 text-left text-pink-700 font-semibold">Pengirim</th>
-                                <th class="px-4 py-3 text-left text-pink-700 font-semibold">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($pendingXrayBagasiReports as $report)
-                            <tr class="border-b hover:bg-pink-50 transition-colors cursor-pointer"
-                                onclick="window.location.href='{{ route('xray.reviewForm', ['id' => $report->reportID]) }}'">
-                                <td class="px-4 py-3">{{ \Carbon\Carbon::parse($report->testDate)->format('d/m/Y') }}</td>
-                                <td class="px-4 py-3">{{ \Carbon\Carbon::parse($report->testDate)->format('H:i') }}</td>
-                                <td class="px-4 py-3">{{ $report->equipmentLocation->location->name ?? '-' }}</td>
-                                <td class="px-4 py-3">{{ $report->submittedBy->name ?? '-' }}</td>
-                                <td class="px-4 py-3">{{ $report->status->name ?? '-' }}</td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="px-4 py-8 text-center text-gray-500">
-                                    <p>Tidak ada Laporan X-Ray Bagasi yang perlu ditinjau.</p>
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Mobile view -->
-                <div class="md:hidden space-y-4">
-                    @forelse($pendingXrayBagasiReports as $report)
-                    <div class="bg-white rounded-lg shadow-sm border-l-4 border-pink-400 overflow-hidden cursor-pointer"
-                        onclick="window.location.href='{{ route('xray.reviewForm', ['id' => $report->reportID]) }}'">
-                        <div class="p-4">
-                            <div class="flex justify-between items-start mb-2">
-                                <div class="text-sm font-medium text-gray-900">
-                                    {{ \Carbon\Carbon::parse($report->testDate)->format('d/m/Y') }}
-                                    <span class="text-gray-500 ml-2">{{ \Carbon\Carbon::parse($report->testDate)->format('H:i') }}</span>
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Lokasi:</span>
-                                    <span class="text-sm font-medium">{{ $report->equipmentLocation->location->name ?? '-' }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Pengirim:</span>
-                                    <span class="text-sm font-medium">{{ $report->submittedBy->name ?? '-' }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Status:</span>
-                                    <span class="text-sm font-medium">{{ $report->status->name ?? '-' }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @empty
-                    <div class="bg-white rounded-lg shadow-sm p-6 text-center">
-                        <p class="text-gray-500">Tidak ada Laporan X-Ray Bagasi yang perlu ditinjau.</p>
-                    </div>
-                    @endforelse
-                </div>
-            </div>
-            @endif
-            @if($logbooksChief->count() > 0)
-            <div class="bg-green-50 p-4 rounded-lg mb-6 shadow-sm">
-                <h3 class="text-lg font-semibold text-green-800 mb-4 flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                            clip-rule="evenodd"></path>
-                    </svg>
-                    Laporan Leader yang Diterima
-                </h3>
-
-                <!-- Desktop view -->
-                <div class="hidden md:block overflow-x-auto">
-                    <table class="min-w-full bg-white rounded-lg shadow-sm">
-                        <thead>
-                            <tr class="bg-green-100">
-                                <th class="px-4 py-3 text-left text-green-700 font-semibold">Tanggal</th>
-                                <th class="px-4 py-3 text-left text-green-700 font-semibold">Jam</th>
-                                <th class="px-4 py-3 text-left text-green-700 font-semibold">Shift</th>
-                                <th class="px-4 py-3 text-left text-green-700 font-semibold">Grup</th>
-                                <th class="px-4 py-3 text-left text-green-700 font-semibold">Pengirim</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($logbooksChief as $logbook)
-                            <tr class="border-b hover:bg-green-50 transition-colors cursor-pointer"
-                                onclick="window.location.href='{{ route('logbook.chief.review.laporan.leader', ['logbookID' => $logbook->logbookID]) }}'">
-                                <td class="px-4 py-3">{{ $logbook->date->format('d/m/Y') }}</td>
-                                <td class="px-4 py-3">{{ $logbook->created_at->format('H:i') }}</td>
-                                <td class="px-4 py-3">{{ ucfirst($logbook->shift) ?? '-' }}</td>
-                                <td class="px-4 py-3">{{ ucfirst($logbook->grup) }}</td>
-                                <td class="px-4 py-3">{{ $logbook->createdBy->name ?? '-' }}</td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="px-4 py-8 text-center text-gray-500">
-                                    <p>Tidak ada Laporan Leader yang perlu ditinjau.</p>
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Mobile view -->
-                <div class="md:hidden space-y-4">
-                    @forelse($logbooksChief as $logbook)
-                    <div class="bg-white rounded-lg shadow-sm border-l-4 border-green-400 overflow-hidden cursor-pointer"
-                        onclick="window.location.href='{{ route('logbook.chief.review.laporan.leader', ['logbookID' => $logbook->logbookID]) }}'">
-                        <div class="p-4">
-                            <div class="flex justify-between items-start mb-2">
-                                <div class="text-sm font-medium text-gray-900">
-                                    {{ $logbook->date->format('d/m/Y') }}
-                                    <span class="text-gray-500 ml-2">{{ $logbook->created_at->format('H:i') }}</span>
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Shift:</span>
-                                    <span class="text-sm font-medium">{{ ucfirst($logbook->shift) ?? '-' }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Grup:</span>
-                                    <span class="text-sm font-medium">{{ ucfirst($logbook->grup) }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Pengirim:</span>
-                                    <span class="text-sm font-medium">{{ $logbook->createdBy->name ?? '-' }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @empty
-                    <div class="bg-white rounded-lg shadow-sm p-6 text-center">
-                        <p class="text-gray-500">Tidak ada Laporan Leader yang perlu ditinjau.</p>
-                    </div>
-                    @endforelse
-                </div>
-            </div>
-            @endif
-
-            @if($pendingKendaraanChecklists->count() > 0)
-            <div class="bg-teal-50 p-4 rounded-lg mb-6 shadow-sm">
-                <h3 class="text-lg font-semibold text-teal-800 mb-4 flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path></svg>
-                    Checklist Kendaraan Menunggu Persetujuan
-                </h3>
-
-                <!-- Desktop view -->
-                <div class="hidden md:block overflow-x-auto">
-                    <table class="min-w-full bg-white rounded-lg shadow-sm">
-                        <thead>
-                            <tr class="bg-teal-100">
-                                <th class="px-4 py-3 text-left text-teal-700 font-semibold">Tanggal</th>
-                                <th class="px-4 py-3 text-left text-teal-700 font-semibold">Jenis</th>
-                                <th class="px-4 py-3 text-left text-teal-700 font-semibold">Shift</th>
-                                <th class="px-4 py-3 text-left text-teal-700 font-semibold">Pengirim</th>
-                                <th class="px-4 py-3 text-left text-teal-700 font-semibold">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($pendingKendaraanChecklists as $checklist)
-                            <tr class="border-b hover:bg-teal-50 transition-colors cursor-pointer"
-                                onclick="window.location.href='{{ route('supervisor.checklist-kendaraan.detail', $checklist->id) }}'">
-                                <td class="px-4 py-3">{{ \Carbon\Carbon::parse($checklist->date)->format('d/m/Y') }}</td>
-                                <td class="px-4 py-3">{{ ucfirst($checklist->type) }}</td>
-                                <td class="px-4 py-3">{{ ucfirst($checklist->shift) }}</td>
-                                <td class="px-4 py-3">{{ $checklist->sender->name ?? '-' }}</td>
-                                <td class="px-4 py-3">{{ $checklist->status == 'submitted' ? 'Pending' : ucfirst($checklist->status) }}</td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="px-4 py-8 text-center text-gray-500">
-                                    <p>Tidak ada Checklist Kendaraan yang perlu ditinjau.</p>
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Mobile view -->
-                <div class="md:hidden space-y-4">
-                    @forelse($pendingKendaraanChecklists as $checklist)
-                    <div class="bg-white rounded-lg shadow-sm border-l-4 border-teal-400 overflow-hidden cursor-pointer"
-                        onclick="window.location.href='{{ route('supervisor.checklist-kendaraan.detail', $checklist->id) }}'">
-                        <div class="p-4">
-                            <div class="text-sm font-medium text-gray-900 mb-2">
-                                {{ \Carbon\Carbon::parse($checklist->date)->format('d/m/Y') }} - {{ ucfirst($checklist->type) }}
-                            </div>
-                            <div class="space-y-2">
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Shift:</span>
-                                    <span class="text-sm font-medium">{{ ucfirst($checklist->shift) }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Pengirim:</span>
-                                    <span class="text-sm font-medium">{{ $checklist->sender->name ?? '-' }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Status:</span>
-                                    <span class="text-sm font-medium">{{ $checklist->status == 'submitted' ? 'Pending' : ucfirst($checklist->status) }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @empty
-                    <div class="bg-white rounded-lg shadow-sm p-6 text-center">
-                        <p class="text-gray-500">Tidak ada Checklist Kendaraan yang perlu ditinjau.</p>
-                    </div>
-                    @endforelse
-                </div>
-            </div>
-            @endif
-
-            @if($pendingPenyisiranChecklists->count() > 0)
-            <div class="bg-indigo-50 p-4 rounded-lg mb-6 shadow-sm">
-                <h3 class="text-lg font-semibold text-indigo-800 mb-4 flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
-                    Checklist Penyisiran Menunggu Persetujuan
-                </h3>
-
-                <!-- Desktop view -->
-                <div class="hidden md:block overflow-x-auto">
-                    <table class="min-w-full bg-white rounded-lg shadow-sm">
-                        <thead>
-                            <tr class="bg-indigo-100">
-                                <th class="px-4 py-3 text-left text-indigo-700 font-semibold">Tanggal</th>
-                                <th class="px-4 py-3 text-left text-indigo-700 font-semibold">Jam</th>
-                                <th class="px-4 py-3 text-left text-indigo-700 font-semibold">Grup</th>
-                                <th class="px-4 py-3 text-left text-indigo-700 font-semibold">Pengirim</th>
-                                <th class="px-4 py-3 text-left text-indigo-700 font-semibold">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($pendingPenyisiranChecklists as $checklist)
-                            <tr class="border-b hover:bg-indigo-50 transition-colors cursor-pointer"
-                                onclick="window.location.href='{{ route('supervisor.checklist-penyisiran.detail', $checklist->id) }}'">
-                                <td class="px-4 py-3">{{ \Carbon\Carbon::parse($checklist->date)->format('d/m/Y') }}</td>
-                                <td class="px-4 py-3">{{ \Carbon\Carbon::parse($checklist->time)->format('H:i') }}</td>
-                                <td class="px-4 py-3">{{ $checklist->grup }}</td>
-                                <td class="px-4 py-3">{{ $checklist->sender->name ?? '-' }}</td>
-                                <td class="px-4 py-3">{{ $checklist->status == 'submitted' ? 'Pending' : ucfirst($checklist->status) }}</td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="px-4 py-8 text-center text-gray-500">
-                                    <p>Tidak ada Checklist Penyisiran yang perlu ditinjau.</p>
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Mobile view -->
-                <div class="md:hidden space-y-4">
-                    @forelse($pendingPenyisiranChecklists as $checklist)
-                    <div class="bg-white rounded-lg shadow-sm border-l-4 border-indigo-400 overflow-hidden cursor-pointer"
-                        onclick="window.location.href='{{ route('supervisor.checklist-penyisiran.detail', $checklist->id) }}'">
-                        <div class="p-4">
-                            <div class="text-sm font-medium text-gray-900 mb-2">
-                                {{ \Carbon\Carbon::parse($checklist->date)->format('d/m/Y') }} - Grup {{ $checklist->grup }}
-                            </div>
-                            <div class="space-y-2">
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Jam:</span>
-                                    <span class="text-sm font-medium">{{ \Carbon\Carbon::parse($checklist->time)->format('H:i') }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Pengirim:</span>
-                                    <span class="text-sm font-medium">{{ $checklist->sender->name ?? '-' }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Status:</span>
-                                    <span class="text-sm font-medium">{{ $checklist->status == 'submitted' ? 'Pending' : ucfirst($checklist->status) }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @empty
-                    <div class="bg-white rounded-lg shadow-sm p-6 text-center">
-                        <p class="text-gray-500">Tidak ada Checklist Penyisiran yang perlu ditinjau.</p>
-                    </div>
-                    @endforelse
-                </div>
-            </div>
-            @endif
-
-            @if($pendingPIChecklists->count() > 0)
-            <div class="bg-cyan-50 p-4 rounded-lg mb-6 shadow-sm">
-                <h3 class="text-lg font-semibold text-cyan-800 mb-4 flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path></svg>
-                    Form Pencatatan PI Menunggu Persetujuan
-                </h3>
-
-                <!-- Desktop view -->
-                <div class="hidden md:block overflow-x-auto">
-                    <table class="min-w-full bg-white rounded-lg shadow-sm">
-                        <thead>
-                            <tr class="bg-cyan-100">
-                                <th class="px-4 py-3 text-left text-cyan-700 font-semibold">Tanggal</th>
-                                <th class="px-4 py-3 text-left text-cyan-700 font-semibold">Jam Masuk</th>
-                                <th class="px-4 py-3 text-left text-cyan-700 font-semibold">Grup</th>
-                                <th class="px-4 py-3 text-left text-cyan-700 font-semibold">Nama Personil</th>
-                                <th class="px-4 py-3 text-left text-cyan-700 font-semibold">Pengirim</th>
-                                <th class="px-4 py-3 text-left text-cyan-700 font-semibold">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($pendingPIChecklists as $checklist)
-                            <tr class="border-b hover:bg-cyan-50 transition-colors cursor-pointer"
-                                onclick="window.location.href='{{ route('supervisor.form-pencatatan-pi.detail', ['checklist' => $checklist->id]) }}'">
-                                <td class="px-4 py-3">{{ \Carbon\Carbon::parse($checklist->date)->format('d/m/Y') }}</td>
-                                <td class="px-4 py-3">{{ \Carbon\Carbon::parse($checklist->in_time)->format('H:i') }}</td>
-                                <td class="px-4 py-3">{{ $checklist->grup }}</td>
-                                <td class="px-4 py-3">{{ $checklist->name_person }}</td>
-                                <td class="px-4 py-3">{{ $checklist->sender->name ?? '-' }}</td>
-                                <td class="px-4 py-3">{{ $checklist->status == 'submitted' ? 'Pending' : ucfirst($checklist->status) }}</td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="6" class="px-4 py-8 text-center text-gray-500">
-                                    <p>Tidak ada Form Pencatatan PI yang perlu ditinjau.</p>
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Mobile view -->
-                <div class="md:hidden space-y-4">
-                    @forelse($pendingPIChecklists as $checklist)
-                    <div class="bg-white rounded-lg shadow-sm border-l-4 border-cyan-400 overflow-hidden cursor-pointer"
-                        onclick="window.location.href='{{ route('supervisor.form-pencatatan-pi.detail', ['checklist' => $checklist->id]) }}'">
-                        <div class="p-4">
-                            <div class="text-sm font-medium text-gray-900 mb-2">
-                                {{ \Carbon\Carbon::parse($checklist->date)->format('d/m/Y') }} - Grup {{ $checklist->grup }}
-                            </div>
-                            <div class="space-y-2">
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Nama:</span>
-                                    <span class="text-sm font-medium">{{ $checklist->name_person }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Pengirim:</span>
-                                    <span class="text-sm font-medium">{{ $checklist->sender->name ?? '-' }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-600">Status:</span>
-                                    <span class="text-sm font-medium">{{ $checklist->status == 'submitted' ? 'Pending' : ucfirst($checklist->status) }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @empty
-                    <div class="bg-white rounded-lg shadow-sm p-6 text-center">
-                        <p class="text-gray-500">Tidak ada Form Pencatatan PI yang perlu ditinjau.</p>
-                    </div>
-                    @endforelse
-                </div>
-            </div>
-            @endif
-
-        @include('partials.dailytest-stats')
-        @include('partials.logbook-stats')
-        @include('partials.checklist-stats')
-        <!-- Modal -->
-        <div x-show="isModalOpen" x-transition class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
-            <div @click.away="isModalOpen = false" class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl">
+        <!-- Stats Modal -->
+        <div x-show="isStatsModalOpen" x-transition class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
+            <div @click.away="isStatsModalOpen = false" class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl">
                 <div class="bg-gradient-to-r from-blue-500 to-cyan-600 text-white p-6 rounded-t-2xl">
                     <div class="flex justify-between items-center">
-                        <h2 class="text-2xl font-bold" x-text="`Detail untuk ${modalTitle}`"></h2>
-                        <button @click="isModalOpen = false" class="text-blue-100 hover:text-white text-3xl leading-none">&times;</button>
+                        <h2 class="text-2xl font-bold" x-text="`Detail untuk ${statsModalTitle}`"></h2>
+                        <button @click="isStatsModalOpen = false" class="text-blue-100 hover:text-white text-3xl leading-none">&times;</button>
                     </div>
-                    <p class="text-blue-100">Rincian jumlah form per <span x-text="modalBreakdownTitle.toLowerCase()"></span> untuk hari ini.</p>
+                    <p class="text-blue-100">Rincian jumlah form per <span x-text="statsModalBreakdownTitle.toLowerCase()"></span> untuk hari ini.</p>
                 </div>
                 <div class="p-6 max-h-[60vh] overflow-y-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" x-text="modalBreakdownTitle"></th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" x-text="statsModalBreakdownTitle"></th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Form Disetujui</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Form</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <template x-for="(data, key) in modalData" :key="key">
+                            <template x-for="(data, key) in statsModalData" :key="key">
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" x-text="key"></td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" x-text="data.approved"></td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" x-text="data.total"></td>
                                 </tr>
                             </template>
-                            <template x-if="Object.keys(modalData).length === 0">
+                            <template x-if="Object.keys(statsModalData).length === 0">
                                 <tr>
                                     <td colspan="3" class="text-center py-8 text-gray-500">Tidak ada data rincian untuk ditampilkan.</td>
                                 </tr>
@@ -703,6 +249,34 @@
                 </div>
             </div>
         </div>
+
+        <!-- Form Type Modal -->
+        <div x-show="isFormTypeModalOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4" style="display: none;">
+            <div @click.away="isFormTypeModalOpen = false" class="bg-white w-full max-w-md rounded-xl shadow-2xl transform transition-all">
+                <div class="flex justify-between items-center p-4 border-b bg-gray-50 rounded-t-xl">
+                    <h2 class="text-xl font-bold text-gray-800" x-text="`Pilih Tipe Form ` + formTypeModalTitle"></h2>
+                    <button @click="isFormTypeModalOpen = false" class="text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
+                </div>
+                <div class="p-6">
+                    <ul class="space-y-3">
+                        <template x-for="(count, type) in formTypeModalData" :key="type">
+                            <li x-show="count > 0">
+                                <a :href="getLinkForType(formTypeModalTitle, type)" class="flex justify-between items-center p-4 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200">
+                                    <span class="font-semibold text-gray-700" x-text="type"></span>
+                                    <span class="bg-red-600 text-white text-sm font-bold px-3 py-1 rounded-full" x-text="count"></span>
+                                </a>
+                            </li>
+                        </template>
+                        <template x-if="Object.values(formTypeModalData).every(c => c === 0)">
+                            <li class="text-center py-8 text-gray-500">
+                                Tidak ada laporan yang menunggu persetujuan untuk kategori ini.
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 @endsection

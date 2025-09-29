@@ -469,91 +469,34 @@ class DashboardController extends Controller
 
     public function indexSupervisor()
     {
-        $perPage = 10;
+        $authId = Auth::id();
 
-        $logbooksChief = LogbookChief::with('createdBy', 'approvedBy')
-            ->where('status', 'submitted')
-            ->where('approved_by', Auth::id())
-            ->latest('date')
-            ->paginate($perPage);
+        // Daily Test
+        $pendingDailyTestCount = Report::where('approvedByID', $authId)
+            ->whereHas('status', function ($query) {
+                $query->where('name', 'pending');
+            })
+            ->whereHas('equipmentLocation.equipment', function ($query) {
+                $query->whereIn('name', ['hhmd', 'wtmd', 'xraycabin', 'xraybagasi']);
+            })
+            ->count();
 
-        $pendingHhmdReports = Report::with([
-            'submittedBy',
-            'equipmentLocation.location',
-            'equipmentLocation.equipment'
-        ])
-        ->whereHas('status', function ($query) {
-            $query->where('name', 'pending');
-        })
-        ->where('approvedByID', Auth::id())
-        ->whereHas('equipmentLocation.equipment', function ($query) {
-            $query->where('name', 'hhmd');
-        })
-        ->orderBy('created_at', 'desc')
-        ->get();
+        // Logbook with subtypes
+        $pendingLogbookCounts = [
+            'Pos Jaga' => Logbook::where('approvedID', $authId)->where('status', 'submitted')->count(),
+            'Laporan Chief' => LogbookChief::where('approved_by', $authId)->where('status', 'submitted')->count(),
+            'Rotasi' => LogbookRotasi::where('approved_by', $authId)->where('status', 'submitted')->count(),
+            'Manual Book' => ManualBook::where('approved_by', $authId)->where('status', 'submitted')->count(),
+        ];
+        $totalPendingLogbooks = array_sum($pendingLogbookCounts);
 
-        $pendingWtmdReports = Report::with([
-            'submittedBy',
-            'equipmentLocation.location',
-            'equipmentLocation.equipment'
-        ])
-        ->whereHas('status', function ($query) {
-            $query->where('name', 'pending');
-        })
-        ->where('approvedByID', Auth::id())
-        ->whereHas('equipmentLocation.equipment', function ($query) {
-            $query->where('name', 'wtmd');
-        })
-        ->orderBy('created_at', 'desc')
-        ->get();
-
-        $pendingXrayCabinReports = Report::with([
-            'submittedBy',
-            'equipmentLocation.location',
-            'equipmentLocation.equipment'
-        ])
-        ->whereHas('status', function ($query) {
-            $query->where('name', 'pending');
-        })
-        ->where('approvedByID', Auth::id())
-        ->whereHas('equipmentLocation.equipment', function ($query) {
-            $query->where('name', 'xraycabin');
-        })
-        ->orderBy('created_at', 'desc')
-        ->get();
-
-        $pendingXrayBagasiReports = Report::with([
-            'submittedBy',
-            'equipmentLocation.location',
-            'equipmentLocation.equipment'
-        ])
-        ->whereHas('status', function ($query) {
-            $query->where('name', 'pending');
-        })
-        ->where('approvedByID', Auth::id())
-        ->whereHas('equipmentLocation.equipment', function ($query) {
-            $query->where('name', 'xraybagasi');
-        })
-        ->orderBy('created_at', 'desc')
-        ->get();
-
-        $pendingKendaraanChecklists = ChecklistKendaraan::with('sender')
-            ->where('status', 'submitted')
-            ->where('approved_id', Auth::id())
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        $pendingPenyisiranChecklists = ChecklistPenyisiran::with('sender')
-            ->where('status', 'submitted')
-            ->where('approved_id', Auth::id())
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        $pendingPIChecklists = FormPencatatanPI::with('sender')
-            ->where('status', 'submitted')
-            ->where('approved_id', Auth::id())
-            ->orderBy('created_at', 'desc')
-            ->get();
+        // Checklist with subtypes
+        $pendingChecklistCounts = [
+            'Kendaraan' => ChecklistKendaraan::where('approved_id', $authId)->where('status', 'submitted')->count(),
+            'Penyisiran' => ChecklistPenyisiran::where('approved_id', $authId)->where('status', 'submitted')->count(),
+            'Pencatatan PI' => FormPencatatanPI::where('approved_id', $authId)->where('status', 'submitted')->count(),
+        ];
+        $totalPendingChecklists = array_sum($pendingChecklistCounts);
 
 
         // Daily Test Stats
@@ -717,14 +660,11 @@ class DashboardController extends Controller
             'dailyTestStats' => $dailyTestStats,
             'logbookStats' => $logbookStats,
             'checklistStats' => $checklistStats,
-            'logbooksChief' => $logbooksChief,
-            'pendingHhmdReports' => $pendingHhmdReports,
-            'pendingWtmdReports' => $pendingWtmdReports,
-            'pendingXrayCabinReports' => $pendingXrayCabinReports,
-            'pendingXrayBagasiReports' => $pendingXrayBagasiReports,
-            'pendingKendaraanChecklists' => $pendingKendaraanChecklists,
-            'pendingPenyisiranChecklists' => $pendingPenyisiranChecklists,
-            'pendingPIChecklists' => $pendingPIChecklists
+            'pendingDailyTestCount' => $pendingDailyTestCount,
+            'pendingLogbookCounts' => $pendingLogbookCounts,
+            'totalPendingLogbooks' => $totalPendingLogbooks,
+            'pendingChecklistCounts' => $pendingChecklistCounts,
+            'totalPendingChecklists' => $totalPendingChecklists
         ]);
 
     }

@@ -57,6 +57,7 @@ class LogbookRotasiController extends Controller
             ->latest('id')
             ->first();
 
+        $posjaga = $request->logbookID;
         // 5. Inisialisasi variabel
         $details = [];
         $officerLog = [];
@@ -146,6 +147,7 @@ class LogbookRotasiController extends Controller
         return view('logbook.rotasi.logbookRotasi', compact(
             'officerLog',
             'typeForm',
+            'posjaga',
             'logbook',
             'pscpOptions',
             'hbscpOptions',
@@ -242,7 +244,7 @@ class LogbookRotasiController extends Controller
 
             DB::commit();
 
-            return redirect()->route('logbookRotasi.index', ['type' => $logbookType])
+            return redirect()->back()
                 ->with('success', 'Entri logbook berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();

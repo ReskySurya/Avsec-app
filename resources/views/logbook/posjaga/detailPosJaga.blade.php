@@ -1150,9 +1150,9 @@
 
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Uraian Kegiatan</label>
-                    <input type="text" name="summary" value="{{ old('summary') }}"
+                    <textarea name="summary" value="{{ old('summary') }}"
                         class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('summary') border-red-500 @enderror"
-                        placeholder="Masukkan uraian kegiatan" required>
+                        placeholder="Masukkan uraian kegiatan" required></textarea>
                     @error('summary')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
@@ -1160,9 +1160,9 @@
 
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Keterangan</label>
-                    <textarea name="description" rows="3"
+                    <input type="text" name="description" rows="3"
                         class="w-full border-2 px-4 py-3 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 @error('description') border-red-500 @enderror"
-                        placeholder="Masukkan keterangan" required>{{ old('description') }}</textarea>
+                        placeholder="Masukkan keterangan" required>{{ old('description') }}</input>
                     @error('description')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
