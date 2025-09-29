@@ -25,30 +25,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
                 {{-- Belum Diisi --}}
-                <div>
-                    <h4 class="font-semibold text-orange-700 mb-2">Belum Diisi</h4>
-                    <div class="bg-white p-3 rounded-lg shadow-sm">
-                        @if(count($dailyTestStatuses['not_submitted']) > 0)
-                            <ul class="space-y-2">
-                                @foreach($dailyTestStatuses['not_submitted'] as $item)
-                                    <li>
-                                        <a href="{{ $item['form_link'] }}" class="flex items-center justify-between p-2 rounded-md hover:bg-gray-100 transition-colors">
-                                            <span class="text-sm text-gray-700">
-                                                {{ strtoupper($item['equipment_name']) }} - {{ $item['location_name'] }}
-                                            </span>
-                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @else
-                            <div class="text-center py-4">
-                                <svg class="w-12 h-12 mx-auto text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <p class="text-sm text-gray-500 mt-2">Semua form sudah diisi. Kerja bagus!</p>
-                            </div>
-                        @endif
-                    </div>
-                </div>
+                
         
                 {{-- Sudah Diisi --}}
                 <div>
@@ -82,28 +59,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
                 {{-- Belum Diisi --}}
-                <div>
-                    <h4 class="font-semibold text-orange-700 mb-2">Belum Diisi</h4>
-                    <div class="bg-white p-3 rounded-lg shadow-sm">
-                        @if(count($checklistStatuses['not_submitted']) > 0)
-                            <ul class="space-y-2">
-                                @foreach($checklistStatuses['not_submitted'] as $item)
-                                    <li>
-                                        <a href="{{ $item['form_link'] }}" class="flex items-center justify-between p-2 rounded-md hover:bg-gray-100 transition-colors">
-                                            <span class="text-sm text-gray-700">{{ $item['name'] }}</span>
-                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @else
-                            <div class="text-center py-4">
-                                <svg class="w-12 h-12 mx-auto text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <p class="text-sm text-gray-500 mt-2">Semua form checklist sudah diisi. Kerja bagus!</p>
-                            </div>
-                        @endif
-                    </div>
-                </div>
+               
         
                 {{-- Sudah Diisi --}}
                 <div>
@@ -135,28 +91,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
                 {{-- Belum Diisi --}}
-                <div>
-                    <h4 class="font-semibold text-orange-700 mb-2">Belum Diisi</h4>
-                    <div class="bg-white p-3 rounded-lg shadow-sm">
-                        @if(count($sweepingStatuses['not_submitted']) > 0)
-                            <ul class="space-y-2">
-                                @foreach($sweepingStatuses['not_submitted'] as $item)
-                                    <li>
-                                        <a href="{{ $item['form_link'] }}" class="flex items-center justify-between p-2 rounded-md hover:bg-gray-100 transition-colors">
-                                            <span class="text-sm text-gray-700">{{ $item['name'] }}</span>
-                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @else
-                            <div class="text-center py-4">
-                                <svg class="w-12 h-12 mx-auto text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <p class="text-sm text-gray-500 mt-2">Semua logbook sweeping sudah diisi. Kerja bagus!</p>
-                            </div>
-                        @endif
-                    </div>
-                </div>
+               
         
                 {{-- Sudah Diisi --}}
                 <div>

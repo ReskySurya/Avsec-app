@@ -170,6 +170,7 @@ $userRole = auth()->user()->role->name;
                                 Sweeping PI</span>
                         </a>
                     </li>
+                    @elseif($userRole === 'supervisor' || $userRole === 'superadmin')
                     <li>
                         <a href="{{ route('supervisor.logbook-form') }}"
                             class="flex items-center justify-between w-full py-2 px-4 rounded hover:bg-gray-700">
