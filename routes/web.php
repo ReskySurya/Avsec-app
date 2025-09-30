@@ -15,10 +15,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Checklist\ChecklistKendaraanController;
 use App\Http\Controllers\DailyTest\WtmdController;
 use App\Http\Controllers\DailyTest\XrayController;
+use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\LogBook\LogbookPosJagaController;
 use App\Http\Controllers\LogBook\LogbookRotasiController;
 use App\Http\Controllers\PMIKController;
-use App\Http\Controllers\HistoryController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -243,7 +243,7 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
     // Logbook Rotasi
     Route::get('/logbook-rotasi', [LogbookRotasiController::class, 'index'])->name('logbookRotasi.index');
     Route::post('/logbook-rotasi/store', [LogbookRotasiController::class, 'store'])->name('logbookRotasi.store');
-    Route::put('/logbook-rotasi/{id}/submit', [LogbookRotasiController::class, 'submitForm'])->name('logbookRotasi.submit');
+    Route::put('/logbook-rotasi/{id}/submit/{posjaga}', [LogbookRotasiController::class, 'submitForm'])->name('logbookRotasi.submit');
 
     // Logbook Sweeping PI
     Route::get('/logbook-sweppingpi', [LogbookSweppingPIController::class, 'index'])->name('logbookSweppingPI.index');

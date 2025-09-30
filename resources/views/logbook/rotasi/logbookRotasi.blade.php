@@ -299,7 +299,7 @@
                 <p class="text-blue-100 text-sm sm:text-base">Lengkapi data untuk menyelesaikan logbook.</p>
             </div>
 
-            <form action="{{ route('logbookRotasi.submit', $logbook->id) }}" method="POST" class="p-4 sm:p-6"
+            <form action="{{ route('logbookRotasi.submit', ['id' => $logbook->id, 'posjaga' => $posjaga]) }}" method="POST" class="p-4 sm:p-6"
                 onsubmit="return handleSignatureSubmit(event)">
                 @csrf
                 @method('PUT')

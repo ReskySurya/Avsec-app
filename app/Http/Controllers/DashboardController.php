@@ -255,9 +255,14 @@ class DashboardController extends Controller
         }
 
         $rejectedlogbooks = Logbook::with('locationArea')
-            ->where('senderID', $currentUserId)
-            ->whereNotNull('senderSignature') // Changed to check if senderSignature is not null
-            ->where('status', 'draft') // Hanya tampilkan logbook dengan status draft
+            ->where('status', 'draft') // It's a draft
+            ->whereNotNull('senderSignature') // It's a rejected one
+            ->where(function ($query) use ($currentUserId) {
+                $query->where('senderID', $currentUserId) // User is the sender
+                      ->orWhereHas('personil', function ($subQuery) use ($currentUserId) { // Or user is in the staff list
+                          $subQuery->where('staffID', $currentUserId);
+                      });
+            })
             ->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -295,7 +300,76 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $draftLogbooks = Logbook::with('locationArea')
+            ->where('status', 'draft') // It's a draft
+            ->whereNull('senderSignature') // It's a new one
+            ->where(function ($query) use ($currentUserId) {
+                $query->where('senderID', $currentUserId) // User is the sender
+                      ->orWhereHas('personil', function ($subQuery) use ($currentUserId) { // Or user is in the staff list
+                          $subQuery->where('staffID', $currentUserId);
+                      });
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
 
+        $draftLogbookRotasi = LogbookRotasi::where('created_by', $currentUserId)
+            ->where('status', 'draft')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $draftManualBooks = ManualBook::where('created_by', $currentUserId)
+            ->where('status', 'draft')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+
+
+
+        $logbookSubmissionStatuses = [
+            'submitted' => [],
+        ];
+
+        // Logbook Pos Jaga
+        $submittedLogbookPosJaga = Logbook::where(function ($query) use ($currentUserId) {
+                $query->where('senderID', $currentUserId)
+                    ->orWhereHas('personil', function ($subQuery) use ($currentUserId) {
+                        $subQuery->where('staffID', $currentUserId);
+                    });
+            })
+            ->whereIn('status', ['submitted', 'approved'])
+            ->whereDate('created_at', today())
+            ->with('locationArea')
+            ->get();
+
+        foreach ($submittedLogbookPosJaga as $logbook) {
+            $logbookSubmissionStatuses['submitted'][] = [
+                'name' => 'Logbook Pos Jaga - ' . ($logbook->locationArea->name ?? 'Tanpa Lokasi'),
+            ];
+        }
+
+        // Logbook Rotasi
+        $submittedLogbookRotasi = LogbookRotasi::where('created_by', $currentUserId)
+            ->whereIn('status', ['submitted', 'approved'])
+            ->whereDate('created_at', today())
+            ->get();
+
+        foreach ($submittedLogbookRotasi as $logbook) {
+            $logbookSubmissionStatuses['submitted'][] = [
+                'name' => 'Logbook Rotasi - ' . strtoupper($logbook->type),
+            ];
+        }
+
+        // Manual Book
+        $submittedManualBooks = ManualBook::where('created_by', $currentUserId)
+            ->whereIn('status', ['submitted', 'approved'])
+            ->whereDate('created_at', today())
+            ->get();
+
+        foreach ($submittedManualBooks as $logbook) {
+            $logbookSubmissionStatuses['submitted'][] = [
+                'name' => 'Manual Book - ' . strtoupper($logbook->type),
+            ];
+        }
 
         return view('officer.dashboardOfficer', [
             'rejectedlogbooks' => $rejectedlogbooks,
@@ -307,6 +381,10 @@ class DashboardController extends Controller
             'dailyTestStatuses' => $dailyTestStatuses,
             'checklistStatuses' => $checklistStatuses,
             'sweepingStatuses' => $sweepingStatuses,
+            'draftLogbooks' => $draftLogbooks,
+            'draftLogbookRotasi' => $draftLogbookRotasi,
+            'draftManualBooks' => $draftManualBooks,
+            'logbookSubmissionStatuses' => $logbookSubmissionStatuses,
         ]);
     }
 
@@ -652,9 +730,19 @@ class DashboardController extends Controller
         foreach ($manualBookByType as $typeName => $books) {
             $typeDetailsManualBook[strtoupper($typeName)] = ['total' => $books->count(), 'approved' => $books->where('status', 'approved')->count()];
         }
-        $totalManualBook = $manualBookToday->count();
-        $approvedManualBook = $manualBookToday->where('status', 'approved')->count();
-        $checklistStats['Manual Book'] = ['total' => $totalManualBook, 'approved' => $approvedManualBook, 'percentage' => ($totalManualBook > 0) ? round(($approvedManualBook / $totalManualBook) * 100) : 0, 'breakdown' => $typeDetailsManualBook, 'breakdownTitle' => 'Tipe'];
+        $totalManualBookExpected = 2;
+        $submittedManualBook = $manualBookToday->unique('type')->count();
+        $checklistStats['Manual Book'] = [
+            'total' => $totalManualBookExpected,
+            'approved' => $submittedManualBook,
+            'percentage' => ($totalManualBookExpected > 0) ? round(($submittedManualBook / $totalManualBookExpected) * 100) : 0,
+            'breakdown' => $typeDetailsManualBook,
+            'breakdownTitle' => 'Tipe'
+        ];
+
+        $draftLogbookChief = LogbookChief::where('status', 'draft')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('supervisor.dashboardSupervisor', [
             'dailyTestStats' => $dailyTestStats,
@@ -664,7 +752,8 @@ class DashboardController extends Controller
             'pendingLogbookCounts' => $pendingLogbookCounts,
             'totalPendingLogbooks' => $totalPendingLogbooks,
             'pendingChecklistCounts' => $pendingChecklistCounts,
-            'totalPendingChecklists' => $totalPendingChecklists
+            'totalPendingChecklists' => $totalPendingChecklists,
+            'draftLogbookChief' => $draftLogbookChief,
         ]);
 
     }
@@ -825,9 +914,15 @@ class DashboardController extends Controller
         foreach ($manualBookByType as $typeName => $books) {
             $typeDetailsManualBook[strtoupper($typeName)] = ['total' => $books->count(), 'approved' => $books->where('status', 'approved')->count()];
         }
-        $totalManualBook = $manualBookToday->count();
-        $approvedManualBook = $manualBookToday->where('status', 'approved')->count();
-        $checklistStats['Manual Book'] = ['total' => $totalManualBook, 'approved' => $approvedManualBook, 'percentage' => ($totalManualBook > 0) ? round(($approvedManualBook / $totalManualBook) * 100) : 0, 'breakdown' => $typeDetailsManualBook, 'breakdownTitle' => 'Tipe'];
+        $totalManualBookExpected = 2;
+        $submittedManualBook = $manualBookToday->unique('type')->count();
+        $checklistStats['Manual Book'] = [
+            'total' => $totalManualBookExpected,
+            'approved' => $submittedManualBook,
+            'percentage' => ($totalManualBookExpected > 0) ? round(($submittedManualBook / $totalManualBookExpected) * 100) : 0,
+            'breakdown' => $typeDetailsManualBook,
+            'breakdownTitle' => 'Tipe'
+        ];
 
         return view('superadmin.dashboardSuperadmin', [
             'dailyTestStats' => $dailyTestStats,

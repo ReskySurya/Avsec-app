@@ -89,6 +89,24 @@
             </div>
         </div>
 
+        @if (isset($draftLogbookChief) && !$draftLogbookChief->isEmpty())
+            <div class="bg-orange-50 p-4 rounded-lg mb-6">
+                <h3 class="text-lg font-semibold text-orange-800 mb-4">Laporan Chief Dalam Proses</h3>
+                <ul class="space-y-2">
+                    @foreach ($draftLogbookChief as $draft)
+                        <li>
+                            <a href="{{ route('logbook.chief.detail', $draft->logbookID) }}" class="block p-3 bg-orange-100 hover:bg-orange-200 rounded-lg transition-colors">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-semibold text-orange-900">Laporan Chief (Draft)</span>
+                                    <span class="text-sm text-orange-700">Dibuat pada {{ $draft->created_at->format('d M Y, H:i') }}</span>
+                                </div>
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <!-- Daily Test Statistics -->
         <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
             <h2 class="text-xl font-bold text-gray-800 mb-1">Persentase Penyelesaian Daily Test</h2>

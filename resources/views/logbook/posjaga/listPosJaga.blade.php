@@ -80,7 +80,12 @@
                 <!-- Card for Main Logbook -->
                 <div class="bg-white border border-gray-200 rounded-lg p-4 flex items-center justify-between">
                     <div>
-                        <h5 class="font-bold text-gray-800">1. Logbook Pos Jaga</h5>
+                        <div class="flex items-center gap-x-3">
+                            <h5 class="font-bold text-gray-800">1. Logbook Pos Jaga</h5>
+                            @if($logbook->status == 'draft')
+                                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Draft</span>
+                            @endif
+                        </div>
                         <p class="text-sm text-gray-500">Formulir utama untuk uraian kegiatan, personil, dan fasilitas.
                         </p>
                     </div>
@@ -94,7 +99,12 @@
                 @if($logbookRotasi)
                 <div class="bg-white border border-gray-200 rounded-lg p-4 flex items-center justify-between">
                     <div>
-                        <h5 class="font-bold text-gray-800">2. Logbook Rotasi Personil</h5>
+                        <div class="flex items-center gap-x-3">
+                            <h5 class="font-bold text-gray-800">2. Logbook Rotasi Personil</h5>
+                            @if($logbookRotasi->status == 'draft')
+                                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Draft</span>
+                            @endif
+                        </div>
                         <p class="text-sm text-gray-500">Formulir untuk jadwal rotasi personil di area {{
                             $logbook->locationArea->name }}.</p>
                     </div>
@@ -109,7 +119,12 @@
                 @if($manualBook)
                 <div class="bg-white border border-gray-200 rounded-lg p-4 flex items-center justify-between">
                     <div>
-                        <h5 class="font-bold text-gray-800">3. Buku Pemeriksaan Manual</h5>
+                        <div class="flex items-center gap-x-3">
+                            <h5 class="font-bold text-gray-800">3. Buku Pemeriksaan Manual</h5>
+                            @if($manualBook->status == 'draft')
+                                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Draft</span>
+                            @endif
+                        </div>
                         <p class="text-sm text-gray-500">Formulir untuk jadwal rotasi personil di area {{
                             $logbook->locationArea->name }}.</p>
                     </div>

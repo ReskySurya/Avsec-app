@@ -118,6 +118,33 @@
             </div>
         </div>
 
+        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Status Pengisian Logbook Lainnya</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {{-- Sudah Diisi --}}
+                <div>
+                    <h4 class="font-semibold text-green-700 mb-2">Sudah Diisi</h4>
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                        @if(isset($logbookSubmissionStatuses) && count($logbookSubmissionStatuses['submitted']) > 0)
+                            <ul class="space-y-2">
+                                @foreach($logbookSubmissionStatuses['submitted'] as $item)
+                                    <li class="flex items-center p-2">
+                                        <svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                        <span class="text-sm text-gray-500 line-through">{{ $item['name'] }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <div class="text-center py-4">
+                                <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                                <p class="text-sm text-gray-500 mt-2">Belum ada logbook lain yang diisi hari ini.</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
         @if($rejectedReports->count() > 0)
         <div class="bg-red-50 p-4 rounded-lg mb-6 shadow-sm">
             <h3 class="text-lg font-semibo</div>ld text-red-800 mb-4 flex items-center">
@@ -259,6 +286,33 @@
         </div>
         @endif
 
+        {{-- Section for Drafts --}}
+        @if($draftLogbooks->count() > 0 || $draftLogbookRotasi->count() > 0 || $draftManualBooks->count() > 0)
+        <div class="bg-yellow-50 p-4 rounded-lg mb-6 shadow-sm">
+            <h3 class="text-lg font-semibold text-yellow-800 mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"></path></svg>
+                Draft dalam Proses
+            </h3>
+
+            <div class="space-y-4">
+                {{-- Draft Logbook Pos Jaga --}}
+                @foreach($draftLogbooks as $logbook)
+                    <div class="bg-white p-3 rounded-lg shadow-sm border-l-4 border-yellow-400">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="font-semibold text-gray-800">Logbook Pos Jaga</p>
+                                <p class="text-sm text-gray-500">
+                                    {{ $logbook->locationArea->name ?? 'Tanpa Lokasi' }} - {{ \Carbon\Carbon::parse($logbook->date)->format('d M Y') }}
+                                </p>
+                            </div>
+                            <a href="{{ route('logbook.posjaga.list', $logbook->logbookID) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Lanjutkan</a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
         {{-- Section Logbook yang Ditolak --}}
         @if($rejectedlogbooks->count() > 0)
         <div class="bg-red-50 p-4 rounded-lg mb-6 shadow-sm">
@@ -343,7 +397,7 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <a href="{{ route('logbook.index',  $logbook->logbookID) }}"
+                                    <a href="{{ route('logbook.detail',  $logbook->logbookID) }}"
                                         class="text-blue-600 hover:text-blue-800">
                                         Lihat Detail
                                     </a>
@@ -384,7 +438,7 @@
                     @endif
 
                     <div class="flex space-x-2">
-                        <a href="{{ route('logbook.index',  $logbook->logbookID) }}"
+                        <a href="{{ route('logbook.detail',  $logbook->logbookID) }}"
                             class="flex-1 text-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors">
                             Lihat Detail
                         </a>

@@ -364,7 +364,7 @@ class LogbookRotasiController extends Controller
         }
     }
 
-    public function submitForm(Request $request, $id)
+    public function submitForm(Request $request, $id, $posjaga)
     {
         // 1. Validasi input dari modal
         $validator = Validator::make($request->all(), [
@@ -437,7 +437,7 @@ class LogbookRotasiController extends Controller
 
         $logbook->save();
 
-        return redirect()->route('logbookRotasi.index')->with('success', 'Logbook berhasil diselesaikan dan dikirim.');
+        return redirect()->route('logbook.posjaga.list', $posjaga)->with('success', 'Logbook berhasil diselesaikan dan dikirim.');
     }
 
     public function approvedForm(Request $request, $id)

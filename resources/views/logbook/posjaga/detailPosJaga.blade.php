@@ -123,7 +123,7 @@
         }
     }">
     <div class="mb-4">
-        <a href="{{ route('logbook.index',['location'=> $location])}}"
+        <a href="{{ route('logbook.posjaga.list', $logbook->logbookID) }}"
             class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-semibold rounded-lg shadow transition">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
