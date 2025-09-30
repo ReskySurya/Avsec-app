@@ -11,9 +11,9 @@
 @endpush
 
 @section('content')
-<div class="container mx-auto p-4 sm:p-8 min-h-screen">
+<div class="mx-auto p-0 sm:p-6 min-h-screen pt-5 sm:pt-20">
     <div class="text-center mb-12">
-        <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-800">Pusat Riwayat</h1>
+        <h1 class="text-2xl sm:text-2xl font-extrabold text-gray-800">Pusat Riwayat</h1>
         <p class="mt-4 text-lg text-gray-600">Akses semua arsip formulir yang telah disetujui.</p>
     </div>
 

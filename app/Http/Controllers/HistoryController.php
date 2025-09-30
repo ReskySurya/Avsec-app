@@ -206,6 +206,21 @@ class HistoryController extends Controller
     public function preview(Request $request, PreviewService $previewService, $category, $id)
     {
         $formType = $request->query('form_type');
-        return $previewService->getPreview($category, $id, $formType);
+        $preview = $previewService->getPreview($category, $id, $formType);
+
+        // Check if the preview is a View instance
+        if ($preview instanceof \Illuminate\View\View) {
+            $viewName = $preview->getName();
+            $viewData = $preview->getData();
+
+            // Return the wrapper view with the original view's name and data
+            return view('history.preview', [
+                'content_view' => $viewName,
+                'data' => $viewData
+            ]);
+        }
+
+        // Fallback for non-view responses
+        return $preview;
     }
 }
