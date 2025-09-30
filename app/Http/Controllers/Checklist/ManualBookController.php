@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ManualBookController extends Controller
 {
-    public function index()
+    public function index(request $request)
     {
         $currentUserId = Auth::id();
         $loggedInUserName = Auth::user()->name;
@@ -27,6 +27,8 @@ class ManualBookController extends Controller
 
         // Inisialisasi query ManualBook
         $manualBooksQuery = ManualBook::query();
+
+        $posjaga = $request->logbookID;
 
         if ($staffLogbookIds->isNotEmpty()) {
             // Langkah 2: Ambil properti dari logbook-logbook tersebut, TERMASUK relasi ke lokasi
@@ -68,6 +70,7 @@ class ManualBookController extends Controller
         return view('checklist.manualbook.manualBook', compact(
             'manualBooks',
             'loggedInUserName',
+            'posjaga',
             'supervisors'
         ));
     }
@@ -139,7 +142,7 @@ class ManualBookController extends Controller
             }
         }
 
-        return redirect()->route('checklist.manualbook.index')
+        return redirect()->back()
             ->with('success', 'Draft laporan baru berhasil dibuat.');
     }
 
@@ -163,7 +166,7 @@ class ManualBookController extends Controller
 
         // Pastikan laporan masih berstatus draft
         if ($header->status !== 'draft') {
-            return redirect()->route('checklist.manualbook.index')->withErrors(['general' => 'Laporan ini sudah selesai dan tidak bisa ditambahkan data lagi.']);
+            return redirect()->back()->withErrors(['general' => 'Laporan ini sudah selesai dan tidak bisa ditambahkan data lagi.']);
         }
 
         // Simpan baris-baris baru
@@ -182,7 +185,7 @@ class ManualBookController extends Controller
             }
         }
 
-        return redirect()->route('checklist.manualbook.index')
+        return redirect()->back()
             ->with('success', 'Data baru berhasil ditambahkan ke laporan ' . $header->id);
     }
 
@@ -238,7 +241,7 @@ class ManualBookController extends Controller
 
         $manualBook->save();
 
-        return redirect()->route('checklist.manualbook.index')
+        return redirect()->back()
             ->with('success', 'Laporan ' . $manualBook->id . ' telah berhasil diselesaikan.');
     }
 

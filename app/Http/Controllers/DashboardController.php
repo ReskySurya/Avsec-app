@@ -744,6 +744,12 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $pendingChiefReports = LogbookChief::with('createdBy')
+            ->where('approved_by', $authId)
+            ->where('status', 'submitted')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         return view('supervisor.dashboardSupervisor', [
             'dailyTestStats' => $dailyTestStats,
             'logbookStats' => $logbookStats,
@@ -754,6 +760,7 @@ class DashboardController extends Controller
             'pendingChecklistCounts' => $pendingChecklistCounts,
             'totalPendingChecklists' => $totalPendingChecklists,
             'draftLogbookChief' => $draftLogbookChief,
+            'pendingChiefReports' => $pendingChiefReports,
         ]);
 
     }

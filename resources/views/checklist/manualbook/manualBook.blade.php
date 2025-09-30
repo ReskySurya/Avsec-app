@@ -91,6 +91,15 @@
     </div>
     @endif
 
+    <div class="mb-4">
+        <a href="{{route('logbook.posjaga.list', ['id' => $posjaga]) }}"
+            class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-semibold rounded-lg shadow transition">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Kembali
+        </a>
+    </div>
     {{-- Mobile: Card Layout --}}
     <div class="block lg:hidden space-y-3 mb-6">
         <div class="bg-white shadow-lg rounded-xl border border-gray-200 p-3">
@@ -506,7 +515,12 @@
             formAction: '{{ route('checklist.manualbook.store') }}',
             defaultUserName: '{{ $loggedInUserName ?? '' }}',
             existingDetails: [],
-            form: { date: new Date().toISOString().slice(0, 10), shift: '', type: '', rows: [] },
+            form: {
+                date: new Date().toISOString().slice(0, 10),
+                shift: '',
+                type: '',
+                rows: []
+            },
 
             openFinishModal: false,
             finishFormAction: '',
@@ -519,7 +533,16 @@
                 this.form.date = new Date().toISOString().slice(0, 10);
                 this.form.shift = '';
                 this.form.type = '';
-                this.form.rows = [{ time: '', name: this.defaultUserName, pax: '', flight: '', orang: '', barang: '', temuan: '', keterangan: '' }];
+                this.form.rows = [{
+                    time: '',
+                    name: this.defaultUserName,
+                    pax: '',
+                    flight: '',
+                    orang: '',
+                    barang: '',
+                    temuan: '',
+                    keterangan: ''
+                }];
                 this.openManualBook = true;
             },
             openContinueModal(book) {
@@ -529,11 +552,29 @@
                 this.form.date = book.date;
                 this.form.shift = book.shift;
                 this.form.type = book.type;
-                this.form.rows = [{ time: '', name: this.defaultUserName, pax: '', flight: '', orang: '', barang: '', temuan: '', keterangan: '' }];
+                this.form.rows = [{
+                    time: '',
+                    name: this.defaultUserName,
+                    pax: '',
+                    flight: '',
+                    orang: '',
+                    barang: '',
+                    temuan: '',
+                    keterangan: ''
+                }];
                 this.openManualBook = true;
             },
             addRow() {
-                this.form.rows.push({ time: '', name: this.defaultUserName, pax: '', flight: '', orang: '', barang: '', temuan: '', keterangan: '' });
+                this.form.rows.push({
+                    time: '',
+                    name: this.defaultUserName,
+                    pax: '',
+                    flight: '',
+                    orang: '',
+                    barang: '',
+                    temuan: '',
+                    keterangan: ''
+                });
             },
             removeRow(index) {
                 if (this.form.rows.length > 1) {
@@ -545,10 +586,12 @@
                 this.openFinishModal = true;
                 this.$nextTick(() => {
                     const canvas = this.$refs.signatureCanvas;
-                    if(canvas){
+                    if (canvas) {
                         canvas.width = canvas.offsetWidth;
                         canvas.height = canvas.offsetHeight;
-                        this.signaturePad = new SignaturePad(canvas, { backgroundColor: 'rgb(255, 255, 255)' });
+                        this.signaturePad = new SignaturePad(canvas, {
+                            backgroundColor: 'rgb(255, 255, 255)'
+                        });
                     }
                 });
             },

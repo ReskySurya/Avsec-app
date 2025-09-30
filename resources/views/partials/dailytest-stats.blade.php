@@ -1,7 +1,7 @@
 <!-- Daily Test Statistics -->
 <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
     <h2 class="text-xl font-bold text-gray-800 mb-1">Persentase Penyelesaian Daily Test</h2>
-    <p class="text-sm text-gray-500 mb-4 border-b pb-2">Statistik untuk hari ini, {{ now()->translatedFormat('l, d F Y') }}</p>
+    <p class="text-sm text-gray-500 mb-4 border-b pb-2">Statistik untuk hari ini, {{ now()->locale('id')->translatedFormat('l, d F Y') }}</p>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
         @if(isset($dailyTestStats))
         @foreach($dailyTestStats as $type => $stats)

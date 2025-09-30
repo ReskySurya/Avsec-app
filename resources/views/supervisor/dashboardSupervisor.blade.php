@@ -16,7 +16,7 @@
             const baseRoutes = {
                 'Logbook': {
                     'Pos Jaga': '{{ route("supervisor.logbook-form") }}',
-                    'Laporan Chief': '{{ route("logbook.chief.index") }}',
+                    'Laporan Chief': '{{ route("dashboard.supervisor") }}',
                     'Rotasi': '{{ route("supervisor.logbook-rotasi.list") }}',
                     'Manual Book': '{{ route("supervisor.checklist-manualbook.list") }}'
                 },
@@ -35,6 +35,8 @@
         <p class="text-gray-600 mb-6">
             Selamat datang, {{ Auth::user()->name }}! Anda login sebagai Supervisor.
         </p>
+
+      
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div class="bg-blue-50 p-4 rounded-lg">
@@ -89,6 +91,25 @@
             </div>
         </div>
 
+          {{-- Notifikasi Laporan Chief --}}
+        @if (isset($pendingChiefReports) && !$pendingChiefReports->isEmpty())
+            <div class="bg-purple-50 border border-purple-200 p-4 rounded-lg mb-6">
+                <h3 class="text-lg font-semibold text-purple-800 mb-4">Laporan Chief Menunggu Persetujuan</h3>
+                <ul class="space-y-2">
+                    @foreach ($pendingChiefReports as $report)
+                        <li>
+                            <a href="{{ route('logbook.chief.review.laporan.leader', ['logbookID' => $report->logbookID]) }}" class="block p-3 bg-purple-100 hover:bg-purple-200 rounded-lg transition-colors">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-semibold text-purple-900">Laporan dari {{ $report->createdBy->name ?? 'N/A' }}</span>
+                                    <span class="text-sm text-purple-700">Dikirim pada {{ $report->created_at->format('d M Y, H:i') }}</span>
+                                </div>
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         @if (isset($draftLogbookChief) && !$draftLogbookChief->isEmpty())
             <div class="bg-orange-50 p-4 rounded-lg mb-6">
                 <h3 class="text-lg font-semibold text-orange-800 mb-4">Laporan Chief Dalam Proses</h3>
@@ -110,7 +131,7 @@
         <!-- Daily Test Statistics -->
         <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
             <h2 class="text-xl font-bold text-gray-800 mb-1">Persentase Penyelesaian Daily Test</h2>
-            <p class="text-sm text-gray-500 mb-4 border-b pb-2">Statistik untuk hari ini, {{ now()->translatedFormat('l, d F Y') }}</p>
+            <p class="text-sm text-gray-500 mb-4 border-b pb-2">Statistik untuk hari ini, {{ now()->locale('id')->translatedFormat('l, d F Y') }}</p>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
                 @if(isset($dailyTestStats))
                 @foreach($dailyTestStats as $type => $stats)
@@ -148,7 +169,7 @@
         <!-- Logbook Statistics -->
         <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
             <h2 class="text-xl font-bold text-gray-800 mb-1">Persentase Penyelesaian Logbook</h2>
-            <p class="text-sm text-gray-500 mb-4 border-b pb-2">Statistik untuk hari ini, {{ now()->translatedFormat('l, d F Y') }}</p>
+            <p class="text-sm text-gray-500 mb-4 border-b pb-2">Statistik untuk hari ini, {{ now()->locale('id')->translatedFormat('l, d F Y') }}</p>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
                 @if(isset($logbookStats))
                 @foreach($logbookStats as $type => $stats)
@@ -190,7 +211,7 @@
         <!-- Checklist Statistics -->
         <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
             <h2 class="text-xl font-bold text-gray-800 mb-1">Persentase Penyelesaian Checklist</h2>
-            <p class="text-sm text-gray-500 mb-4 border-b pb-2">Statistik untuk hari ini, {{ now()->translatedFormat('l, d F Y') }}</p>
+            <p class="text-sm text-gray-500 mb-4 border-b pb-2">Statistik untuk hari ini, {{ now()->locale('id')->translatedFormat('l, d F Y') }}</p>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
                 @if(isset($checklistStats))
                 @foreach($checklistStats as $type => $stats)

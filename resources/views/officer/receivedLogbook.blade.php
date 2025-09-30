@@ -31,7 +31,7 @@
         <div class="grid grid-cols-2 gap-y-2 text-sm text-gray-700">
             <p>HARI / TANGGAL
                 <span class="font-semibold">
-                    : {{ \Carbon\Carbon::parse($logbook->created_at)->translatedFormat('l, d F Y') }}
+                    : {{ \Carbon\Carbon::parse($logbook->created_at)->locale('id')->translatedFormat('l, d F Y') }}
                 </span>
             </p>
             <p>LOKASI <span class="font-semibold">: {{ $logbook->locationArea->name }}</span></p>

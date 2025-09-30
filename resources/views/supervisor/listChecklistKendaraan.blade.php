@@ -134,7 +134,7 @@
                                     clip-rule="evenodd"></path>
                             </svg>
                             <span class="font-semibold text-gray-900">{{
-                                \Carbon\Carbon::parse($checklist->date)->translatedFormat('l') }}</span>
+                                \Carbon\Carbon::parse($checklist->date)->locale('id')->translatedFormat('l') }}</span>
                         </div>
                         <div class="text-xs text-gray-500 ml-5">
                             {{ \Carbon\Carbon::parse($checklist->date)->translatedFormat('d F Y') }}
@@ -260,7 +260,7 @@
                             <td class="px-3 sm:px-4 py-3 sm:py-4">
                                 <div class="flex flex-col">
                                     <span class="font-semibold text-gray-900 text-sm sm:text-base">{{
-                                        \Carbon\Carbon::parse($checklist->date)->translatedFormat('l') }}</span>
+                                        \Carbon\Carbon::parse($checklist->date)->locale('id')->translatedFormat('l') }}</span>
                                     <span class="text-xs sm:text-sm text-gray-500">{{
                                         \Carbon\Carbon::parse($checklist->date)->translatedFormat('d F Y') }}</span>
                                 </div>
@@ -433,7 +433,7 @@
                                     clip-rule="evenodd"></path>
                             </svg>
                             <span class="font-semibold text-gray-900">{{
-                                \Carbon\Carbon::parse($checklist->date)->translatedFormat('l') }}</span>
+                                \Carbon\Carbon::parse($checklist->date)->locale('id')->translatedFormat('l') }}</span>
                         </div>
                         <div class="text-xs text-gray-500 ml-5">
                             {{ \Carbon\Carbon::parse($checklist->date)->translatedFormat('d F Y') }}
@@ -559,7 +559,7 @@
                             <td class="px-3 sm:px-4 py-3 sm:py-4">
                                 <div class="flex flex-col">
                                     <span class="font-semibold text-gray-900 text-sm sm:text-base">{{
-                                        \Carbon\Carbon::parse($checklist->date)->translatedFormat('l') }}</span>
+                                        \Carbon\Carbon::parse($checklist->date)->locale('id')->translatedFormat('l') }}</span>
                                     <span class="text-xs sm:text-sm text-gray-500">{{
                                         \Carbon\Carbon::parse($checklist->date)->translatedFormat('d F Y') }}</span>
                                 </div>

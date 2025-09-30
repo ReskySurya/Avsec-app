@@ -110,7 +110,7 @@ $typeForm = request('type', 'pscp'); // Default to pscp
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ \Carbon\Carbon::parse($logbook->date)->isoFormat('dddd, D MMMM Y') }}</div>
+                                <div class="text-sm text-gray-900">{{ \Carbon\Carbon::parse($logbook->date)->locale('id')->isoFormat('dddd, D MMMM Y') }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($logbook->status === 'submitted')
@@ -157,7 +157,7 @@ $typeForm = request('type', 'pscp'); // Default to pscp
                         @endif
                     </div>
                     <div class="mt-4">
-                        <p class="text-sm font-semibold text-gray-800">{{ \Carbon\Carbon::parse($logbook->date)->isoFormat('dddd, D MMMM Y') }}</p>
+                        <p class="text-sm font-semibold text-gray-800">{{ \Carbon\Carbon::parse($logbook->date)->locale('id')->isoFormat('dddd, D MMMM Y') }}</p>
                     </div>
                     <div class="mt-4 border-t pt-4">
                         <a href="{{ route('supervisor.logbook-rotasi.detail', $logbook->id) }}" class="block w-full text-center text-sm font-medium text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg">Lihat Detail</a>
@@ -197,7 +197,7 @@ $typeForm = request('type', 'pscp'); // Default to pscp
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ \Carbon\Carbon::parse($logbook->date)->isoFormat('dddd, D MMMM Y') }}</div>
+                                <div class="text-sm text-gray-900">{{ \Carbon\Carbon::parse($logbook->date)->locale('id')->isoFormat('dddd, D MMMM Y') }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($logbook->status === 'submitted')
@@ -244,7 +244,7 @@ $typeForm = request('type', 'pscp'); // Default to pscp
                         @endif
                     </div>
                     <div class="mt-4">
-                        <p class="text-sm font-semibold text-gray-800">{{ \Carbon\Carbon::parse($logbook->date)->isoFormat('dddd, D MMMM Y') }}</p>
+                        <p class="text-sm font-semibold text-gray-800">{{ \Carbon\Carbon::parse($logbook->date)->locale('id')->isoFormat('dddd, D MMMM Y') }}</p>
                     </div>
                     <div class="mt-4 border-t pt-4">
                         <a href="{{ route('supervisor.logbook-rotasi.detail', $logbook->id) }}" class="block w-full text-center text-sm font-medium text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg">Lihat Detail</a>

@@ -18,6 +18,15 @@
     </div>
     @endif
 
+    <div class="mb-4">
+        <a href="{{ route('logbook.index') }}"
+            class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-semibold rounded-lg shadow transition">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Kembali Ke Daftar
+        </a>
+    </div>
     <!-- Main Card -->
     <div class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
         <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-6">
@@ -83,7 +92,7 @@
                         <div class="flex items-center gap-x-3">
                             <h5 class="font-bold text-gray-800">1. Logbook Pos Jaga</h5>
                             @if($logbook->status == 'draft')
-                                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Draft</span>
+                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Draft</span>
                             @endif
                         </div>
                         <p class="text-sm text-gray-500">Formulir utama untuk uraian kegiatan, personil, dan fasilitas.
@@ -102,14 +111,14 @@
                         <div class="flex items-center gap-x-3">
                             <h5 class="font-bold text-gray-800">2. Logbook Rotasi Personil</h5>
                             @if($logbookRotasi->status == 'draft')
-                                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Draft</span>
+                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Draft</span>
                             @endif
                         </div>
                         <p class="text-sm text-gray-500">Formulir untuk jadwal rotasi personil di area {{
                             $logbook->locationArea->name }}.</p>
                     </div>
                     <a href="{{ route('logbookRotasi.index', ['type' => strtolower($logbook->locationArea->name), 'logbookID' => $logbook->logbookID]) }}"
-                        class="bg-teal-500 text-white hover:bg-teal-600 px-5 py-2 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 text-sm">
+                        class="bg-blue-500 text-white hover:bg-blue-600 px-5 py-2 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 text-sm">
                         Lengkapi Data
                     </a>
                 </div>
@@ -122,14 +131,14 @@
                         <div class="flex items-center gap-x-3">
                             <h5 class="font-bold text-gray-800">3. Buku Pemeriksaan Manual</h5>
                             @if($manualBook->status == 'draft')
-                                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Draft</span>
+                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Draft</span>
                             @endif
                         </div>
                         <p class="text-sm text-gray-500">Formulir untuk jadwal rotasi personil di area {{
                             $logbook->locationArea->name }}.</p>
                     </div>
-                    <a href="{{ route('checklist.manualbook.index') }}"
-                        class="bg-teal-500 text-white hover:bg-teal-600 px-5 py-2 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 text-sm">
+                    <a href="{{ route('checklist.manualbook.index',['logbookID' => $logbook->logbookID]) }}"
+                        class="bg-blue-500 text-white hover:bg-blue-600 px-5 py-2 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 text-sm">
                         Lengkapi Data
                     </a>
                 </div>
@@ -137,13 +146,6 @@
             </div>
         </div>
 
-        <!-- Footer -->
-        <div class="bg-gray-50 px-6 py-4 flex justify-end">
-            <a href="{{ route('logbook.index') }}"
-                class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium">
-                Kembali ke Daftar
-            </a>
-        </div>
     </div>
 </div>
 @endsection

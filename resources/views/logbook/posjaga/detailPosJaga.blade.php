@@ -141,7 +141,7 @@
                 <div class="p-5">
                     <div class="flex items-center justify-between mb-3">
                         <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">{{
-                            \Carbon\Carbon::parse($logbook->tanggal)->translatedFormat('l,
+                            \Carbon\Carbon::parse($logbook->tanggal)->locale('id')->translatedFormat('l,
                             d F Y') }}</span>
                         <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-teal-100 rounded-full">{{
                             $logbook->shift ?? 'N/A' }}</span>
@@ -175,7 +175,7 @@
                 <div class=" rounded-lg ">
                     <ul class="text-blue-600">
                         <li><strong>ID:</strong> {{ $logbook->logbookID ?? 'N/A' }}</li>
-                        <li><strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($logbook->tanggal)->translatedFormat('l,
+                        <li><strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($logbook->tanggal)->locale('id')->translatedFormat('l,
                             d F Y') }}</li>
                         <li><strong>Area:</strong> {{ $logbook->locationArea->name ?? 'N/A' }}</li>
                     </ul>
