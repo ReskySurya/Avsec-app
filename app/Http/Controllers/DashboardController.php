@@ -81,7 +81,7 @@ class DashboardController extends Controller
         $statusFilter = $request->query('status', ''); // Default kosong untuk menampilkan semua
 
         $logbookQuery = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy'])
-            ->whereIn('status', ['submitted', 'approved'])
+            ->whereIn('status', ['submitted', 'approved', 'draft'])
             ->orderBy('date', 'desc');
 
         // Cek jika user bukan superadmin, maka filter berdasarkan approver

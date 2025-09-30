@@ -37,10 +37,10 @@
                     <select name="status" id="status"
                         class="block w-36 py-1.5 px-3 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                         onchange="document.getElementById('filterForm').submit()">
-                        <option value="" {{ $defaultStatus=='' ? 'selected' : '' }}>-- Semua --</option>
-                        <option value="draft" {{ $defaultStatus=='draft' ? 'selected' : '' }}>Draft</option>
-                        <option value="submitted" {{ $defaultStatus=='submitted' ? 'selected' : '' }}>Menunggu Persetujuan</option>
-                        <option value="approved" {{ $defaultStatus=='approved' ? 'selected' : '' }}>Selesai</option>
+                        <option value="" {{ $defaultStatus =='' ? 'selected' : '' }}>-- Semua --</option>
+                        <option value="draft" {{ $defaultStatus =='draft' ? 'selected' : '' }}>Draft</option>
+                        <option value="submitted" {{ $defaultStatus =='submitted' ? 'selected' : '' }}>Menunggu Persetujuan</option>
+                        <option value="approved" {{ $defaultStatus =='approved' ? 'selected' : '' }}>Selesai</option>
                     </select>
 
                 </div>
