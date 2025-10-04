@@ -430,7 +430,7 @@ class DashboardController extends Controller
 
         // --- Query untuk Mobil ---
         // 2. Mulai bangun query untuk mobil
-        $queryMobil = ChecklistKendaraan::with('sender')->where('type', 'mobil');
+        $queryMobil = ChecklistKendaraan::with('sender')->where('type', 'mobil')->where('approved_id', Auth::id());
 
         // 3. Terapkan filter status jika ada
         if ($status) {
@@ -443,7 +443,7 @@ class DashboardController extends Controller
 
         // --- Query untuk Motor ---
         // 2. Mulai bangun query untuk motor
-        $queryMotor = ChecklistKendaraan::with('sender')->where('type', 'motor');
+        $queryMotor = ChecklistKendaraan::with('sender')->where('type', 'motor')->where('approved_id', Auth::id());;
 
         // 3. Terapkan filter status yang sama jika ada
         if ($status) {
@@ -467,7 +467,7 @@ class DashboardController extends Controller
         $status = $request->query('status'); // Ambil nilai 'status' dari URL
 
         // Mulai bangun query tanpa langsung mengeksekusinya
-        $query = ChecklistPenyisiran::with('sender');
+        $query = ChecklistPenyisiran::with('sender')->where('approved_id', Auth::id());
 
         // Tambahkan filter HANYA JIKA parameter 'status' ada di URL
         if ($status) {

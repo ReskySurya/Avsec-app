@@ -169,6 +169,7 @@
                 <p class="font-semibold mt-1">{{ $logbook->approverBy->name ?? '-' }}</p>
             @else
                 {{-- JIKA SEMUA SIAP: Tampilkan form untuk ttd supervisor --}}
+                <p class="font-semibold mt-1">{{ $logbook->approverBy->name ?? '-' }}</p>
                 <form
                     action="{{ route('supervisor.logbook.signature', [ 'logbookID' => $logbook->logbookID]) }}"
                     method="POST" onsubmit="return handleSignatureSubmit(event)">
@@ -197,6 +198,7 @@
                         @endif
                     </div>
                 </form>
+                
             @endif
         </div>
     </div>
