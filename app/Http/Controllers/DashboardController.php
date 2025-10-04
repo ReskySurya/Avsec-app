@@ -86,7 +86,12 @@ class DashboardController extends Controller
 
         // Cek jika user bukan superadmin, maka filter berdasarkan approver
         if (!Auth::user()->isSuperAdmin()) {
-            $logbookQuery->where('approvedID', Auth::id());
+            $currentUserId = Auth::id();
+
+            $logbookQuery->where(function ($query) use ($currentUserId) {
+                $query->where('status', 'draft')
+                    ->orWhere('approvedID', $currentUserId);
+            });
         }
 
         // Filter berdasarkan status jika dipilih
@@ -175,7 +180,7 @@ class DashboardController extends Controller
             ['type' => 'motor', 'shift' => 'pagi'],
             ['type' => 'motor', 'shift' => 'malam'],
         ];
-        $submittedKendaraan = ChecklistKendaraan::whereDate('date', today())->get()->keyBy(function($item) {
+        $submittedKendaraan = ChecklistKendaraan::whereDate('date', today())->get()->keyBy(function ($item) {
             return $item->type . '-' . $item->shift;
         });
 
@@ -243,7 +248,7 @@ class DashboardController extends Controller
 
         foreach ($allTenants as $tenant) {
             $taskName = 'Logbook Sweeping PI - ' . $tenant->tenant_name;
-            
+
             if ($tenantIdsCheckedToday->contains($tenant->tenantID)) {
                 $sweepingStatuses['submitted'][] = ['name' => $taskName];
             } else {
@@ -259,9 +264,9 @@ class DashboardController extends Controller
             ->whereNotNull('senderSignature') // It's a rejected one
             ->where(function ($query) use ($currentUserId) {
                 $query->where('senderID', $currentUserId) // User is the sender
-                      ->orWhereHas('personil', function ($subQuery) use ($currentUserId) { // Or user is in the staff list
-                          $subQuery->where('staffID', $currentUserId);
-                      });
+                    ->orWhereHas('personil', function ($subQuery) use ($currentUserId) { // Or user is in the staff list
+                        $subQuery->where('staffID', $currentUserId);
+                    });
             })
             ->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
@@ -305,9 +310,9 @@ class DashboardController extends Controller
             ->whereNull('senderSignature') // It's a new one
             ->where(function ($query) use ($currentUserId) {
                 $query->where('senderID', $currentUserId) // User is the sender
-                      ->orWhereHas('personil', function ($subQuery) use ($currentUserId) { // Or user is in the staff list
-                          $subQuery->where('staffID', $currentUserId);
-                      });
+                    ->orWhereHas('personil', function ($subQuery) use ($currentUserId) { // Or user is in the staff list
+                        $subQuery->where('staffID', $currentUserId);
+                    });
             })
             ->orderBy('created_at', 'desc')
             ->get();
@@ -321,7 +326,7 @@ class DashboardController extends Controller
             ->where('status', 'draft')
             ->orderBy('created_at', 'desc')
             ->get();
-        
+
 
 
 
@@ -331,11 +336,11 @@ class DashboardController extends Controller
 
         // Logbook Pos Jaga
         $submittedLogbookPosJaga = Logbook::where(function ($query) use ($currentUserId) {
-                $query->where('senderID', $currentUserId)
-                    ->orWhereHas('personil', function ($subQuery) use ($currentUserId) {
-                        $subQuery->where('staffID', $currentUserId);
-                    });
-            })
+            $query->where('senderID', $currentUserId)
+                ->orWhereHas('personil', function ($subQuery) use ($currentUserId) {
+                    $subQuery->where('staffID', $currentUserId);
+                });
+        })
             ->whereIn('status', ['submitted', 'approved'])
             ->whereDate('created_at', today())
             ->with('locationArea')
@@ -390,37 +395,39 @@ class DashboardController extends Controller
 
     public function showDataLogbookRotasi(Request $request)
     {
-        // 1. Tentukan jumlah item per halaman untuk pagination
-        $status = $request->get('status', ''); // Default kosong untuk menampilkan semua
-
+        // 1. Ambil filter dan siapkan pagination
+        $status = $request->get('status', '');
         $perPage = 10;
 
-        // 2. Query dasar untuk LogbookRotasi
-        $pscpQuery = LogbookRotasi::with('creator', 'approver')->where('type', 'pscp');
-        $hbscpQuery = LogbookRotasi::with('creator', 'approver')->where('type', 'hbscp');
+        // 2. Buat satu query dasar untuk semua logika yang sama
+        $baseQuery = LogbookRotasi::with('creator', 'approver')->latest('date');
 
-        // 3. Filter berdasarkan approver jika bukan superadmin
-        if (!Auth::user()->isSuperAdmin()) {
-            $pscpQuery->where('approved_by', Auth::id());
-            $hbscpQuery->where('approved_by', Auth::id());
-        }
-
-        // Filter berdasarkan status jika dipilih
+        // 3. Terapkan filter status jika ada
         if ($status) {
-            $pscpQuery->where('status', $status);
-            $hbscpQuery->where('status', $status);
+            $baseQuery->where('status', $status);
         }
 
-        // 4. Ambil data dengan pagination
-        $logbooksPSCP = $pscpQuery->latest('date')->paginate($perPage, ['*'], 'pscp_page');
-        $logbooksHBSCP = $hbscpQuery->latest('date')->paginate($perPage, ['*'], 'hbscp_page');
+        // 4. Terapkan logika filter untuk supervisor (non-superadmin)
+        if (!Auth::user()->isSuperAdmin()) {
+            $currentUserId = Auth::id();
+            $baseQuery->where(function ($query) use ($currentUserId) {
+                // Tampilkan jika status 'draft' (terbuka untuk semua supervisor)
+                $query->where('status', 'draft')
+                    // ATAU jika form ditujukan untuk supervisor ini
+                    ->orWhere('approved_by', $currentUserId);
+            });
+        }
 
-        // 5. Kirim kedua koleksi data ke view
-        return view('supervisor.listLogbookRotasi',
-        compact(
-            'logbooksPSCP',
-             'logbooksHBSCP',
-        ));
+        // 5. Duplikasi (clone) query dasar untuk masing-masing tipe
+        $pscpQuery = (clone $baseQuery)->where('type', 'pscp');
+        $hbscpQuery = (clone $baseQuery)->where('type', 'hbscp');
+
+        // 6. Ambil data dengan pagination
+        $logbooksPSCP = $pscpQuery->paginate($perPage, ['*'], 'pscp_page');
+        $logbooksHBSCP = $hbscpQuery->paginate($perPage, ['*'], 'hbscp_page');
+
+        // 7. Kirim data ke view
+        return view('supervisor.listLogbookRotasi', compact('logbooksPSCP', 'logbooksHBSCP'));
     }
 
     public function showDataChecklistKendaraan(Request $request)
@@ -486,38 +493,38 @@ class DashboardController extends Controller
 
     public function showDataManualBook(Request $request)
     {
+        // 1. Ambil filter dan siapkan pagination
         $status = $request->get('status');
-
-        // Query dasar untuk HBSCP
-        $queryHBSCP = ManualBook::with('creator', 'details')
-            ->where('approved_by', Auth::id())
-            ->where('type', 'hbscp');
-
-        // Query dasar untuk PSCP
-        $queryPSCP = ManualBook::with('creator', 'details')
-            ->where('approved_by', Auth::id())
-            ->where('type', 'pscp');
-
-        // Terapkan filter status jika ada, dengan melanjutkan query yang sudah ada
-        if ($status) {
-            $queryHBSCP->where('status', $status);
-            $queryPSCP->where('status', $status);
-        }
-
         $perPage = 10;
 
-        // Eksekusi query HBSCP yang sudah difilter (jika ada) dan tambahkan pagination
-        $manualBooksHBSCP = $queryHBSCP->latest('date')
-            ->paginate($perPage, ['*'], 'hbscp_page');
+        // 2. Buat satu query dasar untuk semua logika yang sama
+        $baseQuery = ManualBook::with('creator', 'details')->latest('date');
 
-        // Eksekusi query PSCP yang sudah difilter (jika ada) dan tambahkan pagination
-        $manualBooksPSCP = $queryPSCP->latest('date')
-            ->paginate($perPage, ['*'], 'pscp_page');
-
-        if (!Auth::user()->isSuperAdmin()) {
-            $manualBooksHBSCP->where('approved_by', Auth::id());
-            $manualBooksPSCP->where('approved_by', Auth::id());
+        // 3. Terapkan filter status jika ada
+        if ($status) {
+            $baseQuery->where('status', $status);
         }
+
+        // 4. Terapkan logika filter untuk supervisor (non-superadmin)
+        if (!Auth::user()->isSuperAdmin()) {
+            $currentUserId = Auth::id();
+            $baseQuery->where(function ($query) use ($currentUserId) {
+                // Tampilkan jika status 'draft' (terbuka untuk semua supervisor)
+                $query->where('status', 'draft')
+                    // ATAU jika form ditujukan untuk supervisor ini
+                    ->orWhere('approved_by', $currentUserId);
+            });
+        }
+
+        // 5. Duplikasi (clone) query dasar untuk masing-masing tipe
+        $queryHBSCP = (clone $baseQuery)->where('type', 'hbscp');
+        $queryPSCP = (clone $baseQuery)->where('type', 'pscp');
+
+        // 6. Eksekusi query dengan pagination
+        $manualBooksHBSCP = $queryHBSCP->paginate($perPage, ['*'], 'hbscp_page');
+        $manualBooksPSCP = $queryPSCP->paginate($perPage, ['*'], 'pscp_page');
+
+        // 7. Kirim data ke view
         return view('supervisor.listManualBook', compact('manualBooksHBSCP', 'manualBooksPSCP'));
     }
 
@@ -635,8 +642,8 @@ class DashboardController extends Controller
         $totalLocations = count($allowedPosJagaLocations);
 
         $logbooksToday = Logbook::whereHas('locationArea', function ($query) use ($allowedPosJagaLocations) {
-                $query->whereIn('name', $allowedPosJagaLocations);
-            })
+            $query->whereIn('name', $allowedPosJagaLocations);
+        })
             ->whereRaw('LOWER(status) IN (?, ?)', ['submitted', 'approved'])
             ->whereBetween('date', [today()->startOfDay(), today()->endOfDay()])
             ->get();
@@ -762,7 +769,6 @@ class DashboardController extends Controller
             'draftLogbookChief' => $draftLogbookChief,
             'pendingChiefReports' => $pendingChiefReports,
         ]);
-
     }
 
 
@@ -826,8 +832,8 @@ class DashboardController extends Controller
         $totalLocations = count($allowedPosJagaLocations);
 
         $logbooksToday = Logbook::whereHas('locationArea', function ($query) use ($allowedPosJagaLocations) {
-                $query->whereIn('name', $allowedPosJagaLocations);
-            })
+            $query->whereIn('name', $allowedPosJagaLocations);
+        })
             ->whereRaw('LOWER(status) IN (?, ?)', ['submitted', 'approved'])
             ->whereBetween('date', [today()->startOfDay(), today()->endOfDay()])
             ->get();
