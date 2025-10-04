@@ -35,7 +35,7 @@
                         {{-- Judul kolom diubah menjadi dinamis berdasarkan nilai shift --}}
                         <th class="border border-black px-1 sm:px-2 py-2 text-xs sm:text-sm font-bold text-center"
                             colspan="2">
-                           KONDISI SHIFT {{ strtoupper($checklist->shift) }}
+                            KONDISI SHIFT {{ strtoupper($checklist->shift) }}
                         </th>
                     </tr>
                     <tr class="bg-gray-100">
@@ -86,40 +86,40 @@
                     <h3 class="font-bold text-sm mb-2">CATATAN :</h3>
                     <div class="space-y-1">
                         @php
-                            // Kumpulkan semua notes dari checklist kendaraan details yang tidak kosong
-                            $allNotes = [];
-                            
-                            // Loop melalui semua detail checklist untuk mengambil notes
-                            if(isset($checklist) && $checklist->details) {
-                                foreach ($checklist->details as $detail) {
-                                    if (!empty($detail->notes) && !is_null($detail->notes)) {
-                                        $allNotes[] = [
-                                            'item_name' => $detail->item->name ?? 'Item tidak ditemukan',
-                                            'notes' => $detail->notes,
-                                            'category' => $detail->item->category ?? 'lainlain'
-                                        ];
-                                    }
-                                }
-                            }
+                        // Kumpulkan semua notes dari checklist kendaraan details yang tidak kosong
+                        $allNotes = [];
+
+                        // Loop melalui semua detail checklist untuk mengambil notes
+                        if(isset($checklist) && $checklist->details) {
+                        foreach ($checklist->details as $detail) {
+                        if (!empty($detail->notes) && !is_null($detail->notes)) {
+                        $allNotes[] = [
+                        'item_name' => $detail->item->name ?? 'Item tidak ditemukan',
+                        'notes' => $detail->notes,
+                        'category' => $detail->item->category ?? 'lainlain'
+                        ];
+                        }
+                        }
+                        }
                         @endphp
 
                         @forelse($allNotes as $index => $noteData)
-                            <div class="flex">
-                                <span class="w-4 text-sm">{{ $index + 1 }}</span>
-                                <div class="border-b border-dotted border-black flex-1 min-h-[20px] flex items-end pb-1">
-                                    <span class="text-sm">
-                                        <strong>{{ $noteData['item_name'] }}:</strong> {{ $noteData['notes'] }}
-                                    </span>
-                                </div>
+                        <div class="flex">
+                            <span class="w-4 text-sm">{{ $index + 1 }}</span>
+                            <div class="border-b border-dotted border-black flex-1 min-h-[20px] flex items-end pb-1">
+                                <span class="text-sm">
+                                    <strong>{{ $noteData['item_name'] }}:</strong> {{ $noteData['notes'] }}
+                                </span>
                             </div>
+                        </div>
                         @empty
-                            {{-- Jika tidak ada notes, tampilkan satu baris kosong --}}
-                            <div class="flex">
-                                <span class="w-4 text-sm">1</span>
-                                <div class="border-b border-dotted border-black flex-1 min-h-[20px]">
-                                    {{-- Baris kosong --}}
-                                </div>
+                        {{-- Jika tidak ada notes, tampilkan satu baris kosong --}}
+                        <div class="flex">
+                            <span class="w-4 text-sm">1</span>
+                            <div class="border-b border-dotted border-black flex-1 min-h-[20px]">
+                                {{-- Baris kosong --}}
                             </div>
+                        </div>
                         @endforelse
                     </div>
                 </div>
@@ -191,52 +191,55 @@
 
         <div class="mt-8 text-center">
             <p class="text-sm font-semibold">Mengetahui,</p>
+            <p class="text-sm font-semibold h-4 mb-2">
+                {{ $checklist->approver->name ?? '...' }}
+            </p>
 
             {{-- Cek 1: Apakah supervisor sudah ttd? --}}
             @if($checklist->approvedSignature)
-                {{-- JIKA SUDAH: Tampilkan gambar tanda tangan dan nama --}}
-                <div class="w-48 mx-auto my-2 h-28 flex flex-col items-center justify-center">
-                    <img src="data:image/png;base64,{{ $checklist->approvedSignature }}" alt="TTD Mengetahui"
-                        class="max-h-24 max-w-full object-contain">
-                </div>
-                <p class="text-sm font-semibold h-4">
-                    ({{ $checklist->approver->name ?? '...' }})
-                </p>
+            {{-- JIKA SUDAH: Tampilkan gambar tanda tangan dan nama --}}
+            <div class="w-48 mx-auto my-2 h-28 flex flex-col items-center justify-center">
+                <img src="data:image/png;base64,{{ $checklist->approvedSignature }}" alt="TTD Mengetahui"
+                    class="max-h-24 max-w-full object-contain">
+            </div>
+            <p class="text-sm font-semibold h-4">
+                ({{ $checklist->approver->name ?? '...' }})
+            </p>
             {{-- Cek 2: Apakah petugas penerima belum ttd? --}}
             @elseif(!$checklist->receivedSignature)
-                {{-- JIKA BELUM: Tampilkan pesan tunggu --}}
-                <div class="w-48 mx-auto my-2 h-28 flex flex-col items-center justify-center">
-                    <div class="mx-auto mt-2 h-24 w-32 border rounded flex items-center justify-center text-xs text-gray-500 text-center p-2">
-                        Menunggu Tanda Tangan Petugas Penerima
-                    </div>
+            {{-- JIKA BELUM: Tampilkan pesan tunggu --}}
+            <div class="w-48 mx-auto my-2 h-28 flex flex-col items-center justify-center">
+                <div class="mx-auto mt-2 h-24 w-32 border rounded flex items-center justify-center text-xs text-gray-500 text-center p-2">
+                    Menunggu Tanda Tangan Petugas Penerima
                 </div>
-                <p class="text-sm font-semibold h-4">
-                    ({{ $checklist->approver->name ?? '...' }})
-                </p>
+            </div>
+            <p class="text-sm font-semibold h-4">
+                ({{ $checklist->approver->name ?? '...' }})
+            </p>
             @else
-                {{-- JIKA SEMUA SIAP: Tampilkan form untuk ttd supervisor --}}
-                <form action="{{ route('supervisor.checklist-kendaraan.signature', $checklist->id) }}" method="POST"
-                    onsubmit="return validateApproverSignature(event)">
-                    @csrf
-                    <div class="w-48 mx-auto mb-2 h-28 flex flex-col items-center justify-center">
-                        {{-- Canvas untuk TTD --}}
-                        <canvas id="signature-canvas-approver" class="w-full h-full"></canvas>
-                    </div>
+            {{-- JIKA SEMUA SIAP: Tampilkan form untuk ttd supervisor --}}
+            <form action="{{ route('supervisor.checklist-kendaraan.signature', $checklist->id) }}" method="POST"
+                onsubmit="return validateApproverSignature(event)">
+                @csrf
+                <div class="w-48 mx-auto mb-2 h-28 flex flex-col items-center justify-center">
+                    {{-- Canvas untuk TTD --}}
+                    <canvas id="signature-canvas-approver" class="w-full h-full"></canvas>
+                </div>
 
-                    {{-- Hidden input untuk menyimpan data base64 ttd --}}
-                    <input type="hidden" name="approvedSignature" id="signature-data-approver">
+                {{-- Hidden input untuk menyimpan data base64 ttd --}}
+                <input type="hidden" name="approvedSignature" id="signature-data-approver">
 
-                    <div class="flex items-center justify-center gap-4 mt-2">
-                        <button type="button" onclick="clearSignatureApprover()"
-                            class="text-sm text-blue-600 hover:text-blue-800">
-                            Clear
-                        </button>
-                        <button type="submit"
-                            class="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-2 rounded-lg">
-                            Simpan & Setujui
-                        </button>
-                    </div>
-                </form>
+                <div class="flex items-center justify-center gap-4 mt-2">
+                    <button type="button" onclick="clearSignatureApprover()"
+                        class="text-sm text-blue-600 hover:text-blue-800">
+                        Clear
+                    </button>
+                    <button type="submit"
+                        class="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-2 rounded-lg">
+                        Simpan & Setujui
+                    </button>
+                </div>
+            </form>
             @endif
         </div>
     </div>
@@ -254,44 +257,44 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-    // Cari canvas approver di dalam dokumen
-    const canvasApprover = document.getElementById('signature-canvas-approver');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Cari canvas approver di dalam dokumen
+        const canvasApprover = document.getElementById('signature-canvas-approver');
 
-    // Hanya jalankan script jika canvas-nya ada di halaman
-    if (canvasApprover) {
-        const signaturePadApprover = new SignaturePad(canvasApprover, {
-            backgroundColor: 'rgb(249, 250, 251)', // Warna background canvas (abu-abu muda)
-            penColor: 'rgb(0, 0, 0)' // Warna tinta
-        });
+        // Hanya jalankan script jika canvas-nya ada di halaman
+        if (canvasApprover) {
+            const signaturePadApprover = new SignaturePad(canvasApprover, {
+                backgroundColor: 'rgb(249, 250, 251)', // Warna background canvas (abu-abu muda)
+                penColor: 'rgb(0, 0, 0)' // Warna tinta
+            });
 
-        // Simpan data ttd ke hidden input setiap kali selesai menulis
-        signaturePadApprover.onEnd = () => {
-            const signatureDataInput = document.getElementById('signature-data-approver');
-            if (!signaturePadApprover.isEmpty()) {
-                signatureDataInput.value = signaturePadApprover.toDataURL('image/png');
-            } else {
-                signatureDataInput.value = '';
+            // Simpan data ttd ke hidden input setiap kali selesai menulis
+            signaturePadApprover.onEnd = () => {
+                const signatureDataInput = document.getElementById('signature-data-approver');
+                if (!signaturePadApprover.isEmpty()) {
+                    signatureDataInput.value = signaturePadApprover.toDataURL('image/png');
+                } else {
+                    signatureDataInput.value = '';
+                }
+            };
+
+            // Fungsi untuk membersihkan canvas
+            window.clearSignatureApprover = function() {
+                signaturePadApprover.clear();
+                document.getElementById('signature-data-approver').value = '';
             }
-        };
 
-        // Fungsi untuk membersihkan canvas
-        window.clearSignatureApprover = function() {
-            signaturePadApprover.clear();
-            document.getElementById('signature-data-approver').value = '';
-        }
-
-        // Fungsi untuk validasi sebelum submit
-        window.validateApproverSignature = function(event) {
-            if (signaturePadApprover.isEmpty()) {
-                alert("Tanda tangan persetujuan tidak boleh kosong.");
-                event.preventDefault(); // Mencegah form dikirim
-                return false;
+            // Fungsi untuk validasi sebelum submit
+            window.validateApproverSignature = function(event) {
+                if (signaturePadApprover.isEmpty()) {
+                    alert("Tanda tangan persetujuan tidak boleh kosong.");
+                    event.preventDefault(); // Mencegah form dikirim
+                    return false;
+                }
+                return true;
             }
-            return true;
         }
-    }
-});
+    });
 </script>
 
 {{-- Print Styles --}}

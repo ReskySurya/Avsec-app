@@ -219,7 +219,7 @@
 
                 <div class="space-y-4">
                     <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide border-b pb-2">
-                        Mengetahui Supervisor
+                        Mengetahui {{ $manualBook->approver->name ?? 'Supervisor' }}
                     </h3>
 
                     {{-- Cek jika tanda tangan sudah ada --}}
@@ -304,37 +304,39 @@
 
 <script>
     document.addEventListener('alpine:init', () => {
-    Alpine.data('manualBook', () => ({
-        supervisorSignaturePad: null,
+        Alpine.data('manualBook', () => ({
+            supervisorSignaturePad: null,
 
-        initSupervisorPad() {
-            // Cek jika canvas ada di halaman
-            if (this.$refs.supervisorCanvas) {
-                const canvas = this.$refs.supervisorCanvas;
-                canvas.width = canvas.offsetWidth;
-                canvas.height = canvas.offsetHeight;
-                this.supervisorSignaturePad = new SignaturePad(canvas, { backgroundColor: 'rgb(255, 255, 255)' });
-            }
-        },
+            initSupervisorPad() {
+                // Cek jika canvas ada di halaman
+                if (this.$refs.supervisorCanvas) {
+                    const canvas = this.$refs.supervisorCanvas;
+                    canvas.width = canvas.offsetWidth;
+                    canvas.height = canvas.offsetHeight;
+                    this.supervisorSignaturePad = new SignaturePad(canvas, {
+                        backgroundColor: 'rgb(255, 255, 255)'
+                    });
+                }
+            },
 
-        clearSupervisorSignature() {
-            if (this.supervisorSignaturePad) {
-                this.supervisorSignaturePad.clear();
-            }
-        },
+            clearSupervisorSignature() {
+                if (this.supervisorSignaturePad) {
+                    this.supervisorSignaturePad.clear();
+                }
+            },
 
-        submitApprovalForm() {
-            if (this.supervisorSignaturePad && !this.supervisorSignaturePad.isEmpty()) {
-                // Ambil data base64 dan masukkan ke input hidden
-                this.$refs.supervisorSignatureData.value = this.supervisorSignaturePad.toDataURL('image/png').split(',')[1];
-                // Submit form
-                this.$refs.approvalForm.submit();
-            } else {
-                alert('Tanda tangan supervisor wajib diisi.');
+            submitApprovalForm() {
+                if (this.supervisorSignaturePad && !this.supervisorSignaturePad.isEmpty()) {
+                    // Ambil data base64 dan masukkan ke input hidden
+                    this.$refs.supervisorSignatureData.value = this.supervisorSignaturePad.toDataURL('image/png').split(',')[1];
+                    // Submit form
+                    this.$refs.approvalForm.submit();
+                } else {
+                    alert('Tanda tangan supervisor wajib diisi.');
+                }
             }
-        }
-    }));
-});
+        }));
+    });
 </script>
 
 {{-- Custom CSS untuk fine-tuning --}}

@@ -75,7 +75,7 @@
                             <span class="text-gray-400">Tidak ada Tanda Tangan</span>
                             @endif
                         </div>
-                        <p class="mt-2 text-sm text-gray-600">{{ $logbook->creator?->name ?? '-' }}</p>
+                        <p class="mt-6 text-sm text-gray-600">{{ $logbook->creator?->name ?? '-' }}</p>
                     </div>
 
                     {{-- Approved By --}}
@@ -88,7 +88,7 @@
                             {{-- Show signature pad only if submitted and user is supervisor --}}
                             <form action="{{ route('supervisor.logbook-rotasi.approved', $logbook->id) }}" method="POST" onsubmit="return validateApprovalSignature(event)" class="w-full">
                                 @csrf
-                                <div class="bg-white h-32 rounded-lg">
+                                <div class="bg-white h-32 rounded-lg mt-2">
                                     <canvas id="approvedSignatureCanvas" class="w-full h-full"></canvas>
                                 </div>
                                 <input type="hidden" name="signature" id="signature-data-approver">
@@ -101,7 +101,7 @@
                             <span class="text-gray-400">Belum Disetujui</span>
                             @endif
                         </div>
-                        <p class="mt-2 text-sm text-gray-600">{{ $logbook->approver?->name ?? '-' }}</p>
+                        <p class="mt-6 text-sm text-gray-600">{{ $logbook->approver?->name ?? '-' }}</p>
                     </div>
                 </div>
             </div>
