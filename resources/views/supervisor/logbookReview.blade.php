@@ -129,7 +129,11 @@
                     <span class="italic text-gray-400">Belum tanda tangan</span>
                     @endif
                 </div>
+                @if($logbook->status === 'draft')
+                <p class="font-semibold mt-1 italic text-gray-400">Penerima Belum Dipilih</p>
+                @else
                 <p class="font-semibold mt-1">{{ $logbook->receiverBy->name }}</p>
+                @endif
             </div>
 
             {{-- Kanan: Yang Menyerahkan --}}
