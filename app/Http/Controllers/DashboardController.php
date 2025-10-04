@@ -748,7 +748,7 @@ class DashboardController extends Controller
             ->get();
 
         foreach ($kendaraanShifts as $shift) {
-            $statName = 'Kendaraan (' . $shift . ')';
+            $statName = 'Kendaraan ' . $shift . '';
             $totalExpected = count($kendaraanTypes);
             
             $checklistsForShift = $kendaraanToday->where('shift', strtolower($shift));
