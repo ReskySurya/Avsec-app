@@ -13,12 +13,17 @@ use App\Models\ChecklistPenyisiran;
 use App\Models\ChecklistSenpi;
 use App\Models\FormPencatatanPI;
 use App\Models\ManualBook;
-use App\Models\User;
+use App\Models\Equipment;
+use App\Models\Location;
 use App\Services\PreviewService;
-use Illuminate\Support\Facades\Log;
 
 class HistoryController extends Controller
 {
+    protected $allowedPosJagaLocations = [
+        'Pos Kedatangan', 'Pos Barat', 'Pos Timur', 'HBSCP',
+        'PSCP', 'CCTV', 'Patroli', 'Walking Patrol', 'Pos Keberangkatan'
+    ];
+
     public function index()
     {
         return view('history.index');
@@ -26,9 +31,10 @@ class HistoryController extends Controller
 
     public function show(Request $request, $category)
     {
-        $filters = $request->only(['start_date', 'end_date', 'form_type', 'shift']);
+        $filters = $request->only(['start_date', 'end_date', 'form_type', 'shift', 'location_id']);
         $data = collect();
         $form_types = [];
+        $locations = collect();
         $isShiftFilterable = false;
 
         switch ($category) {
@@ -36,18 +42,30 @@ class HistoryController extends Controller
                 $form_types = ['HHMD', 'WTMD', 'XRAYCABIN', 'XRAYBAGASI'];
                 $data = $this->getDailyTestData($filters);
                 $isShiftFilterable = false; // Daily test doesn't have shift
+
+                if (!empty($filters['form_type'])) {
+                    $locations = $this->getDailyTestLocations($filters['form_type']);
+                }
                 break;
 
             case 'logbook':
                 $form_types = ['pos_jaga', 'sweeping_pi', 'rotasi', 'chief'];
                 $data = $this->getLogbookData($filters);
                 $isShiftFilterable = true;
+
+                if (!empty($filters['form_type'])) {
+                    $locations = $this->getLogbookLocations($filters['form_type']);
+                }
                 break;
 
             case 'checklist':
                 $form_types = ['kendaraan', 'penyisiran', 'senpi', 'pencatatan_pi', 'manual_book'];
                 $data = $this->getChecklistData($filters);
                 $isShiftFilterable = true;
+
+                if (!empty($filters['form_type'])) {
+                    $locations = $this->getChecklistLocations($filters['form_type']);
+                }
                 break;
 
             default:
@@ -63,9 +81,10 @@ class HistoryController extends Controller
             'data' => $data,
             'form_types' => $form_types,
             'isShiftFilterable' => $isShiftFilterable,
+            'locations' => $locations,
         ]);
     }
- 
+
     private function getDailyTestData($filters)
     {
         $query = Report::query()
@@ -85,13 +104,32 @@ class HistoryController extends Controller
             $query->whereDate('reports.testDate', '<=', $filters['end_date']);
         }
 
+        if (!empty($filters['location_id'])) {
+            $query->where('locations.id', $filters['location_id']);
+        }
+
         return $query->select('reports.reportID as id', 'reports.testDate as date', 'equipment.name as form_type', 'reports.statusID as status', 'locations.name as location_name', 'reports.submittedByID')
             ->latest('reports.created_at')->get()->map(function ($item) {
                 $item->officer = $item->submittedBy->name ?? 'N/A';
-                // $item->shift = 'N/A'; // Add a default value for shift
                 $item->location = $item->location_name ?? 'N/A';
                 return $item;
             });
+    }
+
+    private function getDailyTestLocations($formType)
+    {
+        if (empty($formType)) {
+            return collect();
+        }
+
+        $equipment = Equipment::where('name', strtolower($formType))->first();
+
+        if (!$equipment) {
+            return collect();
+        }
+
+        // Ambil lokasi dan langsung format untuk dropdown (<option value="id">name</option>)
+        return $equipment->locations()->pluck('locations.name', 'locations.id');
     }
 
     private function getLogbookData($filters = [])
@@ -112,17 +150,20 @@ class HistoryController extends Controller
         $startDate = $filters['start_date'] ?? null;
         $endDate = $filters['end_date'] ?? null;
         $shift = $filters['shift'] ?? null;
+        $locationId = $filters['location_id'] ?? null;
 
         switch ($formType) {
             case 'pos_jaga':
                 $query = Logbook::with(['locationArea', 'senderBy'])->where('status', 'approved');
                 if ($shift) $query->where('shift', $shift);
+                if ($locationId) $query->where('location_area_id', $locationId);
                 break;
             case 'sweeping_pi':
                 $query = LogbookSweepingPI::with('tenant');
                 break;
             case 'rotasi':
                 $query = LogbookRotasi::with('creator')->where('status', 'approved');
+                if ($locationId) $query->where('type', $locationId);
                 break;
             case 'chief':
                 $query = LogbookChief::with('createdBy')->where('status', 'approved');
@@ -148,6 +189,25 @@ class HistoryController extends Controller
         });
     }
 
+    private function getLogbookLocations($formType)
+    {
+        switch ($formType) {
+            case 'pos_jaga':
+                return Location::whereIn('name', $this->allowedPosJagaLocations)
+                                ->orderBy('name', 'asc')
+                                ->pluck('name', 'id');
+            case 'rotasi':
+                // Untuk rotasi, lokasinya adalah tipe statis
+                return collect([
+                    'hbscp' => 'HBSCP',
+                    'pscp' => 'PSCP',
+                ]);
+            default:
+                // Tipe logbook lain tidak memiliki filter lokasi
+                return collect();
+        }
+    }
+
     private function getChecklistData($filters = [])
     {
         $formType = $filters['form_type'] ?? null;
@@ -166,6 +226,7 @@ class HistoryController extends Controller
         $startDate = $filters['start_date'] ?? null;
         $endDate = $filters['end_date'] ?? null;
         $shift = $filters['shift'] ?? null;
+        $locationId = $filters['location_id'] ?? null;
 
         switch ($formType) {
             case 'kendaraan':
@@ -183,6 +244,8 @@ class HistoryController extends Controller
             case 'manual_book':
                 $query = ManualBook::with('creator')->where('status', 'approved');
                 if ($shift) $query->where('shift', $shift);
+
+                if ($locationId) $query->where('type', $locationId);
                 break;
             default:
                 return collect();
@@ -201,6 +264,20 @@ class HistoryController extends Controller
                 'status' => $item->status ?? 'approved',
             ];
         });
+    }
+
+    private function getChecklistLocations($formType)
+    {
+        if ($formType === 'manual_book') {
+            // Untuk manual_book, lokasinya adalah tipe statis
+            return collect([
+                'hbscp' => 'HBSCP',
+                'pscp' => 'PSCP',
+            ]);
+        }
+
+        // Tipe checklist lain tidak memiliki filter lokasi
+        return collect();
     }
 
     public function preview(Request $request, PreviewService $previewService, $category, $id)

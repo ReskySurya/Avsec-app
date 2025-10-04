@@ -123,6 +123,15 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center space-x-2">
+                                    <div class="flex flex-col">
+                                        <span class="text-sm font-medium text-gray-900">{{ $logbook['approver']
+                                            }}</span>
+                                        <span class="text-xs text-gray-500">Supervisor</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
                                 @if($logbook['status'] == 'submitted')
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                     <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -248,6 +257,15 @@
                             </svg>
                             <span class="font-medium mr-2">Penerima:</span>
                             <span class="text-gray-900">{{ $logbook['receiver'] }}</span>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-600">
+                            <svg class="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            <span class="font-medium mr-2">Supervisor:</span>
+                            <span class="text-gray-900">{{ $logbook['approver'] }}</span>
                         </div>
                     </div>
 

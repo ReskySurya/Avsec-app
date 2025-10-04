@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Equipment extends Model
 {
@@ -26,7 +27,7 @@ class Equipment extends Model
         return $this->belongsTo(User::class, 'creationID');
     }
 
- 
+
     /**
      * Relasi: Equipment has many EquipmentLocation (untuk akses langsung ke pivot)
      */
@@ -35,5 +36,15 @@ class Equipment extends Model
         return $this->hasMany(EquipmentLocation::class);
     }
 
-    
+    public function locations(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Location::class,          // Model tujuan yang ingin kita akses
+            EquipmentLocation::class, // Model perantara
+            'equipment_id',           // Foreign key di tabel equipment_locations
+            'id',                     // Foreign key di tabel locations
+            'id',                     // Local key di tabel equipment
+            'location_id'             // Local key di tabel equipment_locations
+        );
+    }
 }

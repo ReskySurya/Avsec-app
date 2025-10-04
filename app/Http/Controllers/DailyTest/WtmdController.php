@@ -5,7 +5,6 @@ namespace App\Http\Controllers\DailyTest;
 use App\Http\Controllers\Controller;
 use App\Models\Equipment;
 use App\Models\EquipmentLocation;
-use App\Models\Location;
 use App\Models\Report;
 use App\Models\ReportDetail;
 use App\Models\ReportStatus;
@@ -100,7 +99,7 @@ class WtmdController extends Controller
                     'message' => 'Anda telah mengirim formulir untuk lokasi ini. Coba lagi dalam ' . $remainingMinutes . ' menit.'
                 ], 429);
             }
-            
+
             // Ambil status 'pending_supervisor'
             $pendingStatus = ReportStatus::where('name', 'pending')->first();
 
@@ -373,8 +372,8 @@ class WtmdController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
- 
-    
+
+
     public function update(Request $request, $id)
     {
         // Validasi input
@@ -451,7 +450,7 @@ class WtmdController extends Controller
             $reportDetail->test2_in_depan = $request->boolean('test2_in_depan');
             $reportDetail->test2_out_depan = $request->boolean('test2_out_depan');
             $reportDetail->test3_in_belakang = $request->boolean('test3_in_belakang');
-            $reportDetail->test3_out_belakang = $request->boolean('test3_out_belakang');    
+            $reportDetail->test3_out_belakang = $request->boolean('test3_out_belakang');
             $reportDetail->test4_in_depan = $request->boolean('test4_in_depan');
             $reportDetail->test4_out_depan = $request->boolean('test4_out_depan');
             $reportDetail->save();
