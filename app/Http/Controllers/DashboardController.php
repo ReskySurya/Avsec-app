@@ -738,27 +738,41 @@ class DashboardController extends Controller
         // Checklist Stats
         $checklistStats = [];
 
-        $totalKendaraanExpected = 2; // mobil and motor
-        $kendaraanToday = ChecklistKendaraan::whereRaw('LOWER(status) IN (?, ?)', ['submitted', 'approved'])
-            ->whereBetween('date', [today()->startOfDay(), today()->endOfDay()])
+        // --- Checklist Kendaraan ---
+        $kendaraanShifts = ['Pagi', 'Malam'];
+        $kendaraanTypes = ['Mobil', 'Motor'];
+
+        // Fetch all relevant checklists in one query
+        $kendaraanToday = ChecklistKendaraan::whereIn('status', ['submitted', 'approved'])
+            ->whereDate('date', today())
             ->get();
 
-        $kendaraanByType = $kendaraanToday->groupBy('type');
-        $typeDetailsKendaraan = [];
-        foreach ($kendaraanByType as $typeName => $checklists) {
-            $typeDetailsKendaraan[ucfirst($typeName)] = ['total' => $checklists->count(), 'approved' => $checklists->where('status', 'approved')->count()];
+        foreach ($kendaraanShifts as $shift) {
+            $statName = 'Kendaraan (' . $shift . ')';
+            $totalExpected = count($kendaraanTypes);
+            
+            $checklistsForShift = $kendaraanToday->where('shift', strtolower($shift));
+            
+            $submittedCount = $checklistsForShift->count();
+            $approvedCount = $checklistsForShift->where('status', 'approved')->count();
+
+            $breakdown = [];
+            foreach ($kendaraanTypes as $type) {
+                $checklist = $checklistsForShift->firstWhere('type', strtolower($type));
+                $breakdown[$type] = [
+                    'total' => 1,
+                    'approved' => ($checklist && $checklist->status == 'approved') ? 1 : 0,
+                ];
+            }
+
+            $checklistStats[$statName] = [
+                'total' => $totalExpected,
+                'approved' => $submittedCount,
+                'percentage' => ($totalExpected > 0) ? round(($approvedCount / $totalExpected) * 100) : 0,
+                'breakdown' => $breakdown,
+                'breakdownTitle' => 'Tipe Kendaraan'
+            ];
         }
-
-        $submittedOrApprovedKendaraan = $kendaraanToday->count();
-        $approvedKendaraan = $kendaraanToday->where('status', 'approved')->count();
-
-        $checklistStats['Kendaraan'] = [
-            'total' => $totalKendaraanExpected,
-            'approved' => $submittedOrApprovedKendaraan,
-            'percentage' => ($totalKendaraanExpected > 0) ? round(($approvedKendaraan / $totalKendaraanExpected) * 100) : 0,
-            'breakdown' => $typeDetailsKendaraan,
-            'breakdownTitle' => 'Tipe Kendaraan'
-        ];
 
         $penyisiranToday = ChecklistPenyisiran::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
         $penyisiranByGrup = $penyisiranToday->groupBy('grup');
@@ -987,27 +1001,41 @@ class DashboardController extends Controller
         // Checklist Stats
         $checklistStats = [];
 
-        $totalKendaraanExpected = 2; // mobil and motor
-        $kendaraanToday = ChecklistKendaraan::whereRaw('LOWER(status) IN (?, ?)', ['submitted', 'approved'])
-            ->whereBetween('date', [today()->startOfDay(), today()->endOfDay()])
+        // --- Checklist Kendaraan ---
+        $kendaraanShifts = ['Pagi', 'Malam'];
+        $kendaraanTypes = ['Mobil', 'Motor'];
+
+        // Fetch all relevant checklists in one query
+        $kendaraanToday = ChecklistKendaraan::whereIn('status', ['submitted', 'approved'])
+            ->whereDate('date', today())
             ->get();
 
-        $kendaraanByType = $kendaraanToday->groupBy('type');
-        $typeDetailsKendaraan = [];
-        foreach ($kendaraanByType as $typeName => $checklists) {
-            $typeDetailsKendaraan[ucfirst($typeName)] = ['total' => $checklists->count(), 'approved' => $checklists->where('status', 'approved')->count()];
+        foreach ($kendaraanShifts as $shift) {
+            $statName = 'Kendaraan (' . $shift . ')';
+            $totalExpected = count($kendaraanTypes);
+            
+            $checklistsForShift = $kendaraanToday->where('shift', strtolower($shift));
+            
+            $submittedCount = $checklistsForShift->count();
+            $approvedCount = $checklistsForShift->where('status', 'approved')->count();
+
+            $breakdown = [];
+            foreach ($kendaraanTypes as $type) {
+                $checklist = $checklistsForShift->firstWhere('type', strtolower($type));
+                $breakdown[$type] = [
+                    'total' => 1,
+                    'approved' => ($checklist && $checklist->status == 'approved') ? 1 : 0,
+                ];
+            }
+
+            $checklistStats[$statName] = [
+                'total' => $totalExpected,
+                'approved' => $submittedCount,
+                'percentage' => ($totalExpected > 0) ? round(($approvedCount / $totalExpected) * 100) : 0,
+                'breakdown' => $breakdown,
+                'breakdownTitle' => 'Tipe Kendaraan'
+            ];
         }
-
-        $submittedOrApprovedKendaraan = $kendaraanToday->count();
-        $approvedKendaraan = $kendaraanToday->where('status', 'approved')->count();
-
-        $checklistStats['Kendaraan'] = [
-            'total' => $totalKendaraanExpected,
-            'approved' => $submittedOrApprovedKendaraan,
-            'percentage' => ($totalKendaraanExpected > 0) ? round(($approvedKendaraan / $totalKendaraanExpected) * 100) : 0,
-            'breakdown' => $typeDetailsKendaraan,
-            'breakdownTitle' => 'Tipe Kendaraan'
-        ];
 
         $penyisiranToday = ChecklistPenyisiran::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
         $penyisiranByGrup = $penyisiranToday->groupBy('grup');

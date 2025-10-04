@@ -297,7 +297,7 @@
 
             {{-- Submit Button --}}
             @if(!$checklist->receivedSignature)
-            <div class="p-3 sm:p-4 text-center border-2 border-t-0 border-black">
+            <div class="p-3 sm:p-4 text-center">
                 <input type="hidden" name="receivedSignature" id="receivedSignature">
                 <button type="submit"
                     class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 sm:px-6 py-2 rounded-lg w-full sm:w-auto text-sm">
