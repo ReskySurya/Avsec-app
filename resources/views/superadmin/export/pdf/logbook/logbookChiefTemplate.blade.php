@@ -54,7 +54,7 @@
 
                     {{-- Tabel Aktivitas Chief --}}
                     <div class="flex justify-center mb-2">
-                        <p class="font-semibold self-center">CHIEF KEMAJUAN</p>
+                        <p class="font-semibold self-center">LAPORAN KEMAJUAN PERSONIL</p>
                     </div>
                     <table class="w-full border border-black mb-6 text-sm">
                         <thead class="bg-gray-200">
