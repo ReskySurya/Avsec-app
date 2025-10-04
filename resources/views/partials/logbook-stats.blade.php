@@ -31,7 +31,7 @@
             </div>
         </div>
         @endforeach
-        <div class="bg-gray-50 p-5 rounded-xl shadow-inner border border-gray-200">
+        <!-- <div class="bg-gray-50 p-5 rounded-xl shadow-inner border border-gray-200">
             <h3 class="text-lg font-semibold text-gray-700">Sweeping PI</h3>
             <p class="text-gray-500 text-sm mt-1">
                 Logika penyelesaian untuk logbook ini belum dapat ditentukan.
@@ -42,7 +42,7 @@
                 </div>
                 <p class="text-right text-sm font-semibold text-gray-700 mt-1">N/A</p>
             </div>
-        </div>
+        </div> -->
         @else
         <p class="text-gray-500 col-span-4">Data statistik logbook tidak tersedia.</p>
         @endif
