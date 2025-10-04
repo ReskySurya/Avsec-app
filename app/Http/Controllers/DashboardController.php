@@ -301,7 +301,7 @@ class DashboardController extends Controller
             ->get();
 
         $draftLogbooks = Logbook::with('locationArea')
-            ->where('status', 'draft') // It's a draft
+            ->where('status', 'draft') // It's a new one
             ->whereNull('senderSignature') // It's a new one
             ->where(function ($query) use ($currentUserId) {
                 $query->where('senderID', $currentUserId) // User is the sender
@@ -606,6 +606,7 @@ class DashboardController extends Controller
             }
 
             $submittedReports = $reportsToday->count();
+            $approvedReportsCount = $approvedStatusId ? $reportsToday->where('statusID', $approvedStatusId)->count() : 0;
 
             $key = ucwords(str_replace(['xraycabin', 'xraybagasi'], ['X-Ray Cabin', 'X-Ray Bagasi'], $type));
             if ($type === 'hhmd' || $type === 'wtmd') $key = strtoupper($type);
@@ -613,12 +614,11 @@ class DashboardController extends Controller
             $dailyTestStats[$key] = [
                 'total' => $totalLocationsForType,
                 'approved' => $submittedReports,
-                'percentage' => ($totalLocationsForType > 0) ? round(($submittedReports / $totalLocationsForType) * 100) : 0,
+                'percentage' => ($totalLocationsForType > 0) ? round(($approvedReportsCount / $totalLocationsForType) * 100) : 0,
                 'breakdown' => $locationDetails,
                 'breakdownTitle' => 'Lokasi'
             ];
         }
-
         // Logbook Stats
         $logbookStats = [];
 
@@ -632,26 +632,55 @@ class DashboardController extends Controller
             'Patroli',
             'Walking Patrol'
         ];
-        $totalLocations = count($allowedPosJagaLocations);
+        
+        // Based on the user's request, we assume all Pos Jaga locations have a Pagi and Malam shift.
+        $totalExpectedPerShift = count($allowedPosJagaLocations);
 
-        $logbooksToday = Logbook::whereHas('locationArea', function ($query) use ($allowedPosJagaLocations) {
+        // --- Shift Pagi ---
+        $logbooksPagi = Logbook::whereHas('locationArea', function ($query) use ($allowedPosJagaLocations) {
                 $query->whereIn('name', $allowedPosJagaLocations);
             })
+            ->where('shift', 'Pagi') // Filter for Pagi
             ->whereRaw('LOWER(status) IN (?, ?)', ['submitted', 'approved'])
             ->whereBetween('date', [today()->startOfDay(), today()->endOfDay()])
             ->get();
 
-        $logbooksByLocation = $logbooksToday->groupBy('locationArea.name');
-        $locationDetailsPosJaga = [];
-        foreach ($logbooksByLocation as $locationName => $logbooks) {
-            $locationDetailsPosJaga[$locationName ?: 'Tanpa Lokasi'] = ['total' => $logbooks->count(), 'approved' => $logbooks->where('status', 'approved')->count()];
+        $logbooksByLocationPagi = $logbooksPagi->groupBy('locationArea.name');
+        $locationDetailsPagi = [];
+        foreach ($logbooksByLocationPagi as $locationName => $logbooks) {
+            $locationDetailsPagi[$locationName ?: 'Tanpa Lokasi'] = ['total' => $logbooks->count(), 'approved' => $logbooks->where('status', 'approved')->count()];
         }
-        $submittedPosJaga = $logbooksToday->count();
-        $logbookStats['Pos Jaga'] = [
-            'total' => $totalLocations,
-            'approved' => $submittedPosJaga,
-            'percentage' => ($totalLocations > 0) ? round(($submittedPosJaga / $totalLocations) * 100) : 0,
-            'breakdown' => $locationDetailsPosJaga,
+        $submittedPagi = $logbooksPagi->count();
+        $approvedPagi = $logbooksPagi->where('status', 'approved')->count();
+        $logbookStats['Pos Jaga Pagi'] = [
+            'total' => $totalExpectedPerShift,
+            'approved' => $submittedPagi,
+            'percentage' => ($totalExpectedPerShift > 0) ? round(($approvedPagi / $totalExpectedPerShift) * 100) : 0,
+            'breakdown' => $locationDetailsPagi,
+            'breakdownTitle' => 'Lokasi'
+        ];
+
+        // --- Shift Malam ---
+        $logbooksMalam = Logbook::whereHas('locationArea', function ($query) use ($allowedPosJagaLocations) {
+                $query->whereIn('name', $allowedPosJagaLocations);
+            })
+            ->where('shift', 'Malam') // Filter for Malam
+            ->whereRaw('LOWER(status) IN (?, ?)', ['submitted', 'approved'])
+            ->whereBetween('date', [today()->startOfDay(), today()->endOfDay()])
+            ->get();
+
+        $logbooksByLocationMalam = $logbooksMalam->groupBy('locationArea.name');
+        $locationDetailsMalam = [];
+        foreach ($logbooksByLocationMalam as $locationName => $logbooks) {
+            $locationDetailsMalam[$locationName ?: 'Tanpa Lokasi'] = ['total' => $logbooks->count(), 'approved' => $logbooks->where('status', 'approved')->count()];
+        }
+        $submittedMalam = $logbooksMalam->count();
+        $approvedMalam = $logbooksMalam->where('status', 'approved')->count();
+        $logbookStats['Pos Jaga Malam'] = [
+            'total' => $totalExpectedPerShift,
+            'approved' => $submittedMalam,
+            'percentage' => ($totalExpectedPerShift > 0) ? round(($approvedMalam / $totalExpectedPerShift) * 100) : 0,
+            'breakdown' => $locationDetailsMalam,
             'breakdownTitle' => 'Lokasi'
         ];
 
@@ -667,18 +696,44 @@ class DashboardController extends Controller
         }
 
         $submittedOrApprovedRotasi = $rotasiToday->count();
+        $approvedRotasi = $rotasiToday->where('status', 'approved')->count();
 
         $logbookStats['Rotasi'] = [
             'total' => $totalRotasiExpected,
             'approved' => $submittedOrApprovedRotasi,
-            'percentage' => ($totalRotasiExpected > 0) ? round(($submittedOrApprovedRotasi / $totalRotasiExpected) * 100) : 0,
+            'percentage' => ($totalRotasiExpected > 0) ? round(($approvedRotasi / $totalRotasiExpected) * 100) : 0,
             'breakdown' => $typeDetailsRotasi,
             'breakdownTitle' => 'Tipe'
         ];
 
-        $totalChief = LogbookChief::whereNotNull('senderSignature')->whereDate('created_at', today())->count();
-        $approvedChief = LogbookChief::whereNotNull('approvedSignature')->whereDate('created_at', today())->count();
-        $logbookStats['Laporan Chief'] = ['total' => $totalChief, 'approved' => $approvedChief, 'percentage' => ($totalChief > 0) ? round(($approvedChief / $totalChief) * 100) : 0, 'breakdown' => [], 'breakdownTitle' => ''];
+        // Get all submitted chief reports for today
+        $chiefReportsToday = LogbookChief::with('createdBy')
+            ->whereNotNull('senderSignature')
+            ->whereDate('created_at', today())
+            ->get();
+
+        $totalChief = $chiefReportsToday->count();
+        $approvedChief = $chiefReportsToday->whereNotNull('approvedSignature')->count();
+
+        // Create the breakdown data
+        $chiefBreakdown = [];
+        $chiefReportsByUser = $chiefReportsToday->groupBy('createdBy.name');
+
+        foreach ($chiefReportsByUser as $userName => $reports) {
+            if(empty($userName)) continue; // Skip if user name is empty
+            $chiefBreakdown[$userName] = [
+                'total' => $reports->count(),
+                'approved' => $reports->whereNotNull('approvedSignature')->count(),
+            ];
+        }
+
+        $logbookStats['Laporan Chief'] = [
+            'total' => $totalChief,
+            'approved' => $approvedChief,
+            'percentage' => ($totalChief > 0) ? round(($approvedChief / $totalChief) * 100) : 0,
+            'breakdown' => $chiefBreakdown,
+            'breakdownTitle' => 'Pembuat Laporan'
+        ];
 
         // Checklist Stats
         $checklistStats = [];
@@ -695,11 +750,12 @@ class DashboardController extends Controller
         }
 
         $submittedOrApprovedKendaraan = $kendaraanToday->count();
+        $approvedKendaraan = $kendaraanToday->where('status', 'approved')->count();
 
         $checklistStats['Kendaraan'] = [
             'total' => $totalKendaraanExpected,
             'approved' => $submittedOrApprovedKendaraan,
-            'percentage' => ($totalKendaraanExpected > 0) ? round(($submittedOrApprovedKendaraan / $totalKendaraanExpected) * 100) : 0,
+            'percentage' => ($totalKendaraanExpected > 0) ? round(($approvedKendaraan / $totalKendaraanExpected) * 100) : 0,
             'breakdown' => $typeDetailsKendaraan,
             'breakdownTitle' => 'Tipe Kendaraan'
         ];
@@ -712,7 +768,7 @@ class DashboardController extends Controller
         }
         $totalPenyisiran = $penyisiranToday->count();
         $approvedPenyisiran = $penyisiranToday->where('status', 'approved')->count();
-        $checklistStats['Penyisiran'] = ['total' => $totalPenyisiran, 'approved' => $approvedPenyisiran, 'percentage' => ($totalPenyisiran > 0) ? round(($approvedPenyisiran / $totalPenyisiran) * 100) : 0, 'breakdown' => $grupDetailsPenyisiran, 'breakdownTitle' => 'Grup'];
+        $checklistStats['Penyisiran'] = ['total' => $totalPenyisiran, 'approved' => $totalPenyisiran, 'percentage' => ($totalPenyisiran > 0) ? round(($approvedPenyisiran / $totalPenyisiran) * 100) : 0, 'breakdown' => $grupDetailsPenyisiran, 'breakdownTitle' => 'Grup'];
 
         $piToday = FormPencatatanPI::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
         $piByGrup = $piToday->groupBy('grup');
@@ -722,7 +778,7 @@ class DashboardController extends Controller
         }
         $totalPI = $piToday->count();
         $approvedPI = $piToday->where('status', 'approved')->count();
-        $checklistStats['Pencatatan PI'] = ['total' => $totalPI, 'approved' => $approvedPI, 'percentage' => ($totalPI > 0) ? round(($approvedPI / $totalPI) * 100) : 0, 'breakdown' => $grupDetailsPI, 'breakdownTitle' => 'Grup'];
+        $checklistStats['Pencatatan PI'] = ['total' => $totalPI, 'approved' => $totalPI, 'percentage' => ($totalPI > 0) ? round(($approvedPI / $totalPI) * 100) : 0, 'breakdown' => $grupDetailsPI, 'breakdownTitle' => 'Grup'];
 
         $manualBookToday = ManualBook::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
         $manualBookByType = $manualBookToday->groupBy('type');
@@ -732,10 +788,11 @@ class DashboardController extends Controller
         }
         $totalManualBookExpected = 2;
         $submittedManualBook = $manualBookToday->unique('type')->count();
+        $approvedManualBook = $manualBookToday->where('status', 'approved')->unique('type')->count();
         $checklistStats['Manual Book'] = [
             'total' => $totalManualBookExpected,
             'approved' => $submittedManualBook,
-            'percentage' => ($totalManualBookExpected > 0) ? round(($submittedManualBook / $totalManualBookExpected) * 100) : 0,
+            'percentage' => ($totalManualBookExpected > 0) ? round(($approvedManualBook / $totalManualBookExpected) * 100) : 0,
             'breakdown' => $typeDetailsManualBook,
             'breakdownTitle' => 'Tipe'
         ];
@@ -797,6 +854,7 @@ class DashboardController extends Controller
             }
 
             $submittedReports = $reportsToday->count();
+            $approvedReportsCount = $approvedStatusId ? $reportsToday->where('statusID', $approvedStatusId)->count() : 0;
 
             $key = ucwords(str_replace(['xraycabin', 'xraybagasi'], ['X-Ray Cabin', 'X-Ray Bagasi'], $type));
             if ($type === 'hhmd' || $type === 'wtmd') $key = strtoupper($type);
@@ -804,7 +862,7 @@ class DashboardController extends Controller
             $dailyTestStats[$key] = [
                 'total' => $totalLocationsForType,
                 'approved' => $submittedReports,
-                'percentage' => ($totalLocationsForType > 0) ? round(($submittedReports / $totalLocationsForType) * 100) : 0,
+                'percentage' => ($totalLocationsForType > 0) ? round(($approvedReportsCount / $totalLocationsForType) * 100) : 0,
                 'breakdown' => $locationDetails,
                 'breakdownTitle' => 'Lokasi'
             ];
@@ -823,26 +881,55 @@ class DashboardController extends Controller
             'Patroli',
             'Walking Patrol'
         ];
-        $totalLocations = count($allowedPosJagaLocations);
+        
+        // Based on the user's request, we assume all Pos Jaga locations have a Pagi and Malam shift.
+        $totalExpectedPerShift = count($allowedPosJagaLocations);
 
-        $logbooksToday = Logbook::whereHas('locationArea', function ($query) use ($allowedPosJagaLocations) {
+        // --- Shift Pagi ---
+        $logbooksPagi = Logbook::whereHas('locationArea', function ($query) use ($allowedPosJagaLocations) {
                 $query->whereIn('name', $allowedPosJagaLocations);
             })
+            ->where('shift', 'Pagi') // Filter for Pagi
             ->whereRaw('LOWER(status) IN (?, ?)', ['submitted', 'approved'])
             ->whereBetween('date', [today()->startOfDay(), today()->endOfDay()])
             ->get();
 
-        $logbooksByLocation = $logbooksToday->groupBy('locationArea.name');
-        $locationDetailsPosJaga = [];
-        foreach ($logbooksByLocation as $locationName => $logbooks) {
-            $locationDetailsPosJaga[$locationName ?: 'Tanpa Lokasi'] = ['total' => $logbooks->count(), 'approved' => $logbooks->where('status', 'approved')->count()];
+        $logbooksByLocationPagi = $logbooksPagi->groupBy('locationArea.name');
+        $locationDetailsPagi = [];
+        foreach ($logbooksByLocationPagi as $locationName => $logbooks) {
+            $locationDetailsPagi[$locationName ?: 'Tanpa Lokasi'] = ['total' => $logbooks->count(), 'approved' => $logbooks->where('status', 'approved')->count()];
         }
-        $submittedPosJaga = $logbooksToday->count();
-        $logbookStats['Pos Jaga'] = [
-            'total' => $totalLocations,
-            'approved' => $submittedPosJaga,
-            'percentage' => ($totalLocations > 0) ? round(($submittedPosJaga / $totalLocations) * 100) : 0,
-            'breakdown' => $locationDetailsPosJaga,
+        $submittedPagi = $logbooksPagi->count();
+        $approvedPagi = $logbooksPagi->where('status', 'approved')->count();
+        $logbookStats['Pos Jaga Pagi'] = [
+            'total' => $totalExpectedPerShift,
+            'approved' => $submittedPagi,
+            'percentage' => ($totalExpectedPerShift > 0) ? round(($approvedPagi / $totalExpectedPerShift) * 100) : 0,
+            'breakdown' => $locationDetailsPagi,
+            'breakdownTitle' => 'Lokasi'
+        ];
+
+        // --- Shift Malam ---
+        $logbooksMalam = Logbook::whereHas('locationArea', function ($query) use ($allowedPosJagaLocations) {
+                $query->whereIn('name', $allowedPosJagaLocations);
+            })
+            ->where('shift', 'Malam') // Filter for Malam
+            ->whereRaw('LOWER(status) IN (?, ?)', ['submitted', 'approved'])
+            ->whereBetween('date', [today()->startOfDay(), today()->endOfDay()])
+            ->get();
+
+        $logbooksByLocationMalam = $logbooksMalam->groupBy('locationArea.name');
+        $locationDetailsMalam = [];
+        foreach ($logbooksByLocationMalam as $locationName => $logbooks) {
+            $locationDetailsMalam[$locationName ?: 'Tanpa Lokasi'] = ['total' => $logbooks->count(), 'approved' => $logbooks->where('status', 'approved')->count()];
+        }
+        $submittedMalam = $logbooksMalam->count();
+        $approvedMalam = $logbooksMalam->where('status', 'approved')->count();
+        $logbookStats['Pos Jaga Malam'] = [
+            'total' => $totalExpectedPerShift,
+            'approved' => $submittedMalam,
+            'percentage' => ($totalExpectedPerShift > 0) ? round(($approvedMalam / $totalExpectedPerShift) * 100) : 0,
+            'breakdown' => $locationDetailsMalam,
             'breakdownTitle' => 'Lokasi'
         ];
 
@@ -858,18 +945,44 @@ class DashboardController extends Controller
         }
 
         $submittedOrApprovedRotasi = $rotasiToday->count();
+        $approvedRotasi = $rotasiToday->where('status', 'approved')->count();
 
         $logbookStats['Rotasi'] = [
             'total' => $totalRotasiExpected,
             'approved' => $submittedOrApprovedRotasi,
-            'percentage' => ($totalRotasiExpected > 0) ? round(($submittedOrApprovedRotasi / $totalRotasiExpected) * 100) : 0,
+            'percentage' => ($totalRotasiExpected > 0) ? round(($approvedRotasi / $totalRotasiExpected) * 100) : 0,
             'breakdown' => $typeDetailsRotasi,
             'breakdownTitle' => 'Tipe'
         ];
 
-        $totalChief = LogbookChief::whereNotNull('senderSignature')->whereDate('created_at', today())->count();
-        $approvedChief = LogbookChief::whereNotNull('approvedSignature')->whereDate('created_at', today())->count();
-        $logbookStats['Laporan Chief'] = ['total' => $totalChief, 'approved' => $approvedChief, 'percentage' => ($totalChief > 0) ? round(($approvedChief / $totalChief) * 100) : 0, 'breakdown' => [], 'breakdownTitle' => ''];
+        // Get all submitted chief reports for today
+        $chiefReportsToday = LogbookChief::with('createdBy')
+            ->whereNotNull('senderSignature')
+            ->whereDate('created_at', today())
+            ->get();
+
+        $totalChief = $chiefReportsToday->count();
+        $approvedChief = $chiefReportsToday->whereNotNull('approvedSignature')->count();
+
+        // Create the breakdown data
+        $chiefBreakdown = [];
+        $chiefReportsByUser = $chiefReportsToday->groupBy('createdBy.name');
+
+        foreach ($chiefReportsByUser as $userName => $reports) {
+            if(empty($userName)) continue; // Skip if user name is empty
+            $chiefBreakdown[$userName] = [
+                'total' => $reports->count(),
+                'approved' => $reports->whereNotNull('approvedSignature')->count(),
+            ];
+        }
+
+        $logbookStats['Laporan Chief'] = [
+            'total' => $totalChief,
+            'approved' => $approvedChief,
+            'percentage' => ($totalChief > 0) ? round(($approvedChief / $totalChief) * 100) : 0,
+            'breakdown' => $chiefBreakdown,
+            'breakdownTitle' => 'Pembuat Laporan'
+        ];
 
         // Checklist Stats
         $checklistStats = [];
@@ -886,11 +999,12 @@ class DashboardController extends Controller
         }
 
         $submittedOrApprovedKendaraan = $kendaraanToday->count();
+        $approvedKendaraan = $kendaraanToday->where('status', 'approved')->count();
 
         $checklistStats['Kendaraan'] = [
             'total' => $totalKendaraanExpected,
             'approved' => $submittedOrApprovedKendaraan,
-            'percentage' => ($totalKendaraanExpected > 0) ? round(($submittedOrApprovedKendaraan / $totalKendaraanExpected) * 100) : 0,
+            'percentage' => ($totalKendaraanExpected > 0) ? round(($approvedKendaraan / $totalKendaraanExpected) * 100) : 0,
             'breakdown' => $typeDetailsKendaraan,
             'breakdownTitle' => 'Tipe Kendaraan'
         ];
@@ -903,7 +1017,7 @@ class DashboardController extends Controller
         }
         $totalPenyisiran = $penyisiranToday->count();
         $approvedPenyisiran = $penyisiranToday->where('status', 'approved')->count();
-        $checklistStats['Penyisiran'] = ['total' => $totalPenyisiran, 'approved' => $approvedPenyisiran, 'percentage' => ($totalPenyisiran > 0) ? round(($approvedPenyisiran / $totalPenyisiran) * 100) : 0, 'breakdown' => $grupDetailsPenyisiran, 'breakdownTitle' => 'Grup'];
+        $checklistStats['Penyisiran'] = ['total' => $totalPenyisiran, 'approved' => $totalPenyisiran, 'percentage' => ($totalPenyisiran > 0) ? round(($approvedPenyisiran / $totalPenyisiran) * 100) : 0, 'breakdown' => $grupDetailsPenyisiran, 'breakdownTitle' => 'Grup'];
 
         $piToday = FormPencatatanPI::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
         $piByGrup = $piToday->groupBy('grup');
@@ -913,7 +1027,7 @@ class DashboardController extends Controller
         }
         $totalPI = $piToday->count();
         $approvedPI = $piToday->where('status', 'approved')->count();
-        $checklistStats['Pencatatan PI'] = ['total' => $totalPI, 'approved' => $approvedPI, 'percentage' => ($totalPI > 0) ? round(($approvedPI / $totalPI) * 100) : 0, 'breakdown' => $grupDetailsPI, 'breakdownTitle' => 'Grup'];
+        $checklistStats['Pencatatan PI'] = ['total' => $totalPI, 'approved' => $totalPI, 'percentage' => ($totalPI > 0) ? round(($approvedPI / $totalPI) * 100) : 0, 'breakdown' => $grupDetailsPI, 'breakdownTitle' => 'Grup'];
 
         $manualBookToday = ManualBook::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
         $manualBookByType = $manualBookToday->groupBy('type');
@@ -923,10 +1037,11 @@ class DashboardController extends Controller
         }
         $totalManualBookExpected = 2;
         $submittedManualBook = $manualBookToday->unique('type')->count();
+        $approvedManualBook = $manualBookToday->where('status', 'approved')->unique('type')->count();
         $checklistStats['Manual Book'] = [
             'total' => $totalManualBookExpected,
             'approved' => $submittedManualBook,
-            'percentage' => ($totalManualBookExpected > 0) ? round(($submittedManualBook / $totalManualBookExpected) * 100) : 0,
+            'percentage' => ($totalManualBookExpected > 0) ? round(($approvedManualBook / $totalManualBookExpected) * 100) : 0,
             'breakdown' => $typeDetailsManualBook,
             'breakdownTitle' => 'Tipe'
         ];

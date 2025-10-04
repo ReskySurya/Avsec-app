@@ -5,12 +5,8 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
         @if(isset($checklistStats))
         @foreach($checklistStats as $type => $stats)
-        <div @if(!empty($stats['breakdown']))
-            @click="isModalOpen = true; modalTitle = '{{ $type }}'; modalData = {{ json_encode($stats['breakdown']) }}; modalBreakdownTitle = '{{ $stats['breakdownTitle'] }}'"
-            class="bg-gray-50 p-5 rounded-xl shadow-inner border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors duration-200"
-            @else
-            class="bg-gray-50 p-5 rounded-xl shadow-inner border border-gray-200"
-            @endif>
+        <div @click="isModalOpen = true; modalTitle = '{{ $type }}'; modalData = {{ empty($stats['breakdown']) ? '{}' : json_encode($stats['breakdown']) }}; modalBreakdownTitle = '{{ $stats['breakdownTitle'] ?? 'Lokasi' }}'"
+            class="bg-gray-50 p-5 rounded-xl shadow-inner border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors duration-200">
             <h3 class="text-lg font-semibold text-gray-700">{{ $type }}</h3>
             <p class="text-gray-500 text-sm mt-1">
                 {{ $stats['approved'] }} dari {{ $stats['total'] }} checklist telah diajukan.

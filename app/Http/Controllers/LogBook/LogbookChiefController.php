@@ -678,7 +678,7 @@ class LogbookChiefController extends Controller
             // $logbook->approved_at = now(); // DIHAPUS: Kemungkinan kolom tidak ada di database dan menyebabkan error
             $logbook->save();
 
-            return redirect()->route('logbook.chief.index')
+            return redirect()->route('dashboard.supervisor')
                 ->with('success', 'Logbook berhasil dikonfirmasi dengan tanda tangan Anda.');
         } catch (\Exception $e) {
             Log::error('Receiver Signature Error: ' . $e->getMessage(), [
