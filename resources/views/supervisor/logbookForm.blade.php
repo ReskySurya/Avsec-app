@@ -108,28 +108,26 @@
                                     {{ $logbook['shift'] }}
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="px-6 py-4">
                                 <div class="flex items-center space-x-2">
                                     <div class="flex flex-col">
-                                        <span class="text-sm font-medium text-gray-900">{{ $logbook['sender'] }}</span>
+                                        <span class="text-sm font-medium text-gray-900 break-words">{{ $logbook['sender'] }}</span>
                                         <span class="text-xs text-gray-500">Pengirim</span>
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="px-6 py-4">
                                 <div class="flex items-center space-x-2">
                                     <div class="flex flex-col">
-                                        <span class="text-sm font-medium text-gray-900">{{ $logbook['receiver']
-                                            }}</span>
+                                        <span class="text-sm font-medium text-gray-900 break-words">{{ $logbook['receiver'] }}</span>
                                         <span class="text-xs text-gray-500">Penerima</span>
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="px-6 py-4">
                                 <div class="flex items-center space-x-2">
                                     <div class="flex flex-col">
-                                        <span class="text-sm font-medium text-gray-900">{{ $logbook['approver']
-                                            }}</span>
+                                        <span class="text-sm font-medium text-gray-900 break-words">{{ $logbook['approver'] }}</span>
                                         <span class="text-xs text-gray-500">Supervisor</span>
                                     </div>
                                 </div>
