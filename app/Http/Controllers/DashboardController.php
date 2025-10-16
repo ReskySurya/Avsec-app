@@ -624,6 +624,7 @@ class DashboardController extends Controller
 
         $allowedPosJagaLocations = [
             'Pos Kedatangan',
+            'Pos Keberangkatan',
             'Pos Barat',
             'Pos Timur',
             'HBSCP',
@@ -677,9 +678,9 @@ class DashboardController extends Controller
         $submittedMalam = $logbooksMalam->count();
         $approvedMalam = $logbooksMalam->where('status', 'approved')->count();
         $logbookStats['Pos Jaga Malam'] = [
-            'total' => $totalExpectedPerShift,
+            'total' => 3,
             'approved' => $submittedMalam,
-            'percentage' => ($totalExpectedPerShift > 0) ? round(($approvedMalam / $totalExpectedPerShift) * 100) : 0,
+            'percentage' => ($totalExpectedPerShift > 0) ? round(($approvedMalam / 3) * 100) : 0,
             'breakdown' => $locationDetailsMalam,
             'breakdownTitle' => 'Lokasi'
         ];
@@ -887,6 +888,7 @@ class DashboardController extends Controller
 
         $allowedPosJagaLocations = [
             'Pos Kedatangan',
+            'Pos Keberangkatan',
             'Pos Barat',
             'Pos Timur',
             'HBSCP',
@@ -940,9 +942,9 @@ class DashboardController extends Controller
         $submittedMalam = $logbooksMalam->count();
         $approvedMalam = $logbooksMalam->where('status', 'approved')->count();
         $logbookStats['Pos Jaga Malam'] = [
-            'total' => $totalExpectedPerShift,
+            'total' => 3,
             'approved' => $submittedMalam,
-            'percentage' => ($totalExpectedPerShift > 0) ? round(($approvedMalam / $totalExpectedPerShift) * 100) : 0,
+            'percentage' => ($totalExpectedPerShift > 0) ? round(($approvedMalam / 3) * 100) : 0,
             'breakdown' => $locationDetailsMalam,
             'breakdownTitle' => 'Lokasi'
         ];

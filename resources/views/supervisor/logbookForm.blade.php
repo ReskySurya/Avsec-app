@@ -76,10 +76,13 @@
                                 Penerima</th>
                             <th
                                 class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                Supervisor</th>
+                            <th
+                                class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                 Status</th>
                             <th
                                 class="px-6 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                Actions</th>
+                                Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
