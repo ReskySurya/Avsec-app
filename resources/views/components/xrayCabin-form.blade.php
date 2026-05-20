@@ -69,7 +69,7 @@
                             <td class="w-2/3 p-2">
                                 <input type="text" id="operatorName" name="operatorName"
                                     class="w-full border rounded px-1 py-1 sm:px-2 sm:py-1 text-xs sm:text-base"
-                                    value="Bandar Udara Adisutjipto Yogyakarta" readonly>
+                                    value="Bandar Udara International El Tari Kupang" readonly>
                             </td>
                         </tr>
                         <tr class="border-b border-black">

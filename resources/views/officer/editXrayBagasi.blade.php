@@ -46,7 +46,7 @@
                                     <th class="w-1/3 text-left p-2">Nama Operator Penerbangan:</th>
                                     <td class="w-2/3 p-2">
                                         <input type="text" name="operatorName"
-                                            value="Bandar Udara Adisutjipto Yogyakarta"
+                                            value="Bandar Udara International El Tari Kupang"
                                             class="w-full border rounded px-2 py-1" readonly>
                                     </td>
                                 </tr>

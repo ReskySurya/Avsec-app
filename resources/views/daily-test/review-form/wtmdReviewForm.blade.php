@@ -26,7 +26,7 @@
                             <tr class="border-b border-black">
                                 <th class="w-1/3 text-left p-1 sm:p-2">Nama Operator Penerbangan:</th>
                                 <td class="w-2/3 p-2">
-                                    <input type="text" value="Bandar Udara Adisutjipto Yogyakarta" readonly>
+                                    <input type="text" class="w-full" value="Bandar Udara International El Tari Kupang" readonly>
                                 </td>
                             </tr>
                             <tr class="border-b border-black">

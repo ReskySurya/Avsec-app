@@ -58,7 +58,7 @@
                 <div class="space-y-1 sm:space-y-2">
                     <label class="block text-xs sm:text-sm font-semibold text-gray-700">Nama Operator
                         Penerbangan:</label>
-                    <input type="text" name="operator_name" value="Bandar Udara Adisutjipto Yogyakarta" readonly
+                    <input type="text" name="operator_name" value="Bandar Udara International El Tari Kupang" readonly
                         class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base bg-gray-100">
                 </div>
                 <div class="space-y-1 sm:space-y-2">
