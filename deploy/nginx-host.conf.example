@@ -1,0 +1,144 @@
+# =====================================================================
+# AVSEC - HOST nginx config (reverse proxy ke PHP-FPM container)
+# Project path di server: /upt/apps
+# Letakkan di:  /etc/nginx/sites-available/avsec
+# Symlink ke:   /etc/nginx/sites-enabled/avsec
+# =====================================================================
+
+# ---------- Redirect HTTP -> HTTPS -----------------------------------
+server {
+    listen 80;
+    listen [::]:80;
+    server_name avsec.example.com;
+
+    # ACME challenge untuk certbot
+    location /.well-known/acme-challenge/ {
+        root /var/www/letsencrypt;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+# ---------- Main vhost (HTTPS) ---------------------------------------
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name avsec.example.com;
+
+    # ----- TLS (di-manage oleh certbot) -----
+    ssl_certificate     /etc/letsencrypt/live/avsec.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/avsec.example.com/privkey.pem;
+    include             /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam         /etc/letsencrypt/ssl-dhparams.pem;
+
+    # ----- Document root -----
+    # Project di-deploy di /upt/apps. Direktori `public/` di-bind-mount
+    # ke container, jadi PATH HOST harus konsisten dengan path di
+    # docker-compose.yml (./public:/var/www/html/public).
+    root /upt/apps/public;
+    index index.php index.html;
+
+    # ----- Logs -----
+    access_log /var/log/nginx/avsec.access.log;
+    error_log  /var/log/nginx/avsec.error.log warn;
+
+    # ----- Security headers -----
+    add_header X-Frame-Options          "SAMEORIGIN" always;
+    add_header X-Content-Type-Options   "nosniff" always;
+    add_header X-XSS-Protection         "1; mode=block" always;
+    add_header Referrer-Policy          "strict-origin-when-cross-origin" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    # ----- Upload limit (selaras dgn php.ini upload_max_filesize) -----
+    client_max_body_size 50M;
+    client_body_timeout  120s;
+
+    # ----- Static assets dgn cache aggresif -----
+    # Asset Vite ber-hash (manifest.json), aman untuk immutable cache.
+    location ^~ /build/ {
+        access_log off;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    location ^~ /images/ {
+        access_log off;
+        expires 30d;
+        add_header Cache-Control "public";
+        try_files $uri =404;
+    }
+
+    location ^~ /pdfjs/ {
+        access_log off;
+        expires 30d;
+        try_files $uri =404;
+    }
+
+    # ----- /storage/* (symlink ke storage/app/public) -----
+    # Symlink dibuat oleh `php artisan storage:link --relative` saat
+    # container app start. Karena public/ dan storage/ KEDUANYA bind
+    # mount dari host (/upt/apps/public dan /upt/apps/storage),
+    # symlink relative tetap valid baik di host maupun di container.
+    #
+    # PENTING: hanya storage/app/PUBLIC yang ter-serve di sini.
+    # storage/app/private (dokumen rahasia PMIK) tidak punya jalur ke
+    # nginx, hanya bisa diakses via PHP controller dengan auth check.
+    location ^~ /storage/ {
+        access_log off;
+        expires 7d;
+        add_header Cache-Control "public";
+        try_files $uri =404;
+    }
+
+    # ----- Block dotfiles & sensitive paths -----
+    location ~ /\.(?!well-known) {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+
+    location ~* \.(env|log|sql|sqlite|bak|old|swp)$ {
+        deny all;
+    }
+
+    # ----- Laravel front controller -----
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    # ----- PHP-FPM via FastCGI ke container -----
+    # PHP-FPM container listen di 127.0.0.1:9000 (host loopback).
+    location ~ \.php$ {
+        try_files $uri =404;
+
+        fastcgi_pass   127.0.0.1:9000;
+        fastcgi_index  index.php;
+
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        include        fastcgi_params;
+
+        # PENTING: SCRIPT_FILENAME memakai path DI DALAM container.
+        # PHP-FPM membaca file dari path-nya sendiri, bukan path host.
+        fastcgi_param  SCRIPT_FILENAME  /var/www/html/public$fastcgi_script_name;
+        fastcgi_param  DOCUMENT_ROOT    /var/www/html/public;
+        fastcgi_param  PATH_INFO        $fastcgi_path_info;
+        fastcgi_param  HTTPS            on;
+
+        fastcgi_buffers       16 16k;
+        fastcgi_buffer_size   32k;
+        fastcgi_read_timeout  120s;
+        fastcgi_send_timeout  120s;
+
+        fastcgi_hide_header X-Powered-By;
+    }
+
+    # ----- Laravel health endpoint (route /up dari bootstrap/app.php) -
+    location = /up {
+        access_log off;
+        try_files $uri /index.php?$query_string;
+    }
+}

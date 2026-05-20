@@ -1,0 +1,111 @@
+# =====================================================================
+# AVSEC - Production docker-compose
+# Services: app (php-fpm) | queue | scheduler
+# Database: NATIVE MySQL di host (bukan container, hemat RAM).
+# Storage : BIND MOUNT host filesystem (bukan named volume) untuk
+#           transparansi backup dan kemudahan operasi admin.
+#
+# Path project di server: /upt/apps
+# Container path        : /var/www/html
+# =====================================================================
+
+name: avsec
+
+# ---------------------------------------------------------------------
+# Common app definition (re-used by app, queue, scheduler)
+# ---------------------------------------------------------------------
+x-app-common: &app-common
+  build:
+    context: .
+    dockerfile: docker/php/Dockerfile
+  image: avsec-app:latest
+  env_file:
+    - .env.docker
+  restart: unless-stopped
+  networks:
+    - internal
+  # Container starts as root so entrypoint can fix ownership of bind
+  # mounts (host UID may differ from www-data); entrypoint then drops
+  # privileges to www-data via gosu.
+  user: "0:0"
+  # Allow container to reach native MySQL on the host. host-gateway
+  # makes 'host.docker.internal' resolve to the docker bridge gateway
+  # (typically 172.17.0.1) on Linux.
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+
+services:
+
+  # -------------------------------------------------------------------
+  # Application: php-fpm
+  # Listens on 127.0.0.1:9000 of the host. HOST nginx connects via
+  # fastcgi_pass 127.0.0.1:9000.
+  # -------------------------------------------------------------------
+  app:
+    <<: *app-common
+    container_name: avsec_app
+    ports:
+      - "127.0.0.1:9000:9000"
+    volumes:
+      # Storage: bind ke host filesystem. Berisi uploads (PMIK, dll),
+      # logs, framework cache. Aman walau container/image dihapus.
+      - ./storage:/var/www/html/storage
+      # Public: bind agar nginx host bisa serve static langsung.
+      # CATATAN: build assets (public/build) HARUS sudah ada di host
+      # sebelum `docker compose up`. Lihat deploy/README.md.
+      - ./public:/var/www/html/public
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'php-fpm: master' >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # -------------------------------------------------------------------
+  # Queue worker (database driver). Restart on exit so failures recover.
+  # -------------------------------------------------------------------
+  queue:
+    <<: *app-common
+    container_name: avsec_queue
+    command: ["php", "artisan", "queue:work", "--tries=3", "--sleep=3", "--timeout=120", "--max-jobs=1000", "--max-time=3600"]
+    environment:
+      RUN_MIGRATIONS: "false"
+      RUN_OPTIMIZE: "false"
+    volumes:
+      - ./storage:/var/www/html/storage
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'queue:work' >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # -------------------------------------------------------------------
+  # Scheduler: cron runs `php artisan schedule:run` every minute.
+  # Cron must run as root to read /etc/cron.d/avsec; SKIP_DROP_PRIVILEGES
+  # tells our entrypoint not to drop to www-data.
+  # -------------------------------------------------------------------
+  scheduler:
+    <<: *app-common
+    container_name: avsec_scheduler
+    command: ["cron", "-f", "-L", "15"]
+    environment:
+      SKIP_DROP_PRIVILEGES: "true"
+      RUN_MIGRATIONS: "false"
+      RUN_OPTIMIZE: "false"
+    volumes:
+      - ./storage:/var/www/html/storage
+      - ./docker/scheduler/crontab:/etc/cron.d/avsec:ro
+    depends_on:
+      app:
+        condition: service_healthy
+
+# ---------------------------------------------------------------------
+# Networks
+# ---------------------------------------------------------------------
+networks:
+  internal:
+    name: avsec_internal
+    driver: bridge

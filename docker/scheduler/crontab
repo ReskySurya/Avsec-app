@@ -1,0 +1,12 @@
+# =====================================================================
+# AVSEC - Cron schedule
+# Mounted to /etc/cron.d/avsec inside the scheduler container.
+# Format: m h dom mon dow user command
+# =====================================================================
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Run Laravel scheduler every minute
+* * * * * www-data cd /var/www/html && php artisan schedule:run >> /var/www/html/storage/logs/scheduler.log 2>&1
+
+# Required: file MUST end with a newline

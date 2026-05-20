@@ -1,0 +1,65 @@
+# VCS
+.git
+.gitignore
+.gitattributes
+
+# Dependencies (akan di-install ulang di container)
+node_modules
+vendor
+
+# Build artifacts (akan dibangun ulang)
+public/build
+public/storage
+public/hot
+
+# Storage runtime (akan dibuat ulang via volume)
+storage/logs/*
+!storage/logs/.gitignore
+storage/framework/cache/data/*
+!storage/framework/cache/data/.gitignore
+storage/framework/sessions/*
+!storage/framework/sessions/.gitignore
+storage/framework/views/*
+!storage/framework/views/.gitignore
+storage/framework/testing/*
+!storage/framework/testing/.gitignore
+storage/app/public/*
+!storage/app/public/.gitignore
+storage/app/private/*
+!storage/app/private/.gitignore
+
+# Env files (jangan dibawa ke image)
+.env
+.env.*
+!.env.docker.example
+
+# Editor / IDE
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Test artifacts
+.phpunit.result.cache
+.phpunit.cache
+coverage
+tests
+
+# Docs / dev tools (tidak diperlukan di runtime)
+README.md
+*.md
+.editorconfig
+.blackboxrules
+.styleci.yml
+
+# Docker meta (jangan recursive)
+docker-compose.override.yml
+.dockerignore
+Dockerfile
+
+# OS / temp
+*.log
+*.tmp
+*.bak
