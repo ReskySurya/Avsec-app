@@ -17,8 +17,8 @@ set -e
 APP_PATH="${APP_PATH:-/var/www/html}"
 DB_HOST="${DB_HOST:-host.docker.internal}"
 DB_PORT="${DB_PORT:-3306}"
-RUN_MIGRATIONS="${RUN_MIGRATIONS:-true}"
-RUN_OPTIMIZE="${RUN_OPTIMIZE:-true}"
+RUN_MIGRATIONS="${RUN_MIGRATIONS:-false}"
+RUN_OPTIMIZE="${RUN_OPTIMIZE:-false}"
 WAIT_FOR_DB="${WAIT_FOR_DB:-true}"
 
 log() {
@@ -55,10 +55,19 @@ if [ "$(id -u)" = "0" ]; then
         chmod -R 750 "$APP_PATH/storage/app/private" 2>/dev/null || true
     fi
 
-    if [ "${SKIP_DROP_PRIVILEGES:-false}" != "true" ]; then
-        log "dropping privileges to www-data..."
-        exec gosu www-data "$0" "$@"
-    fi
+    # php-fpm master harus tetap jalan sebagai root.
+    # Worker php-fpm akan berjalan sebagai www-data sesuai konfigurasi www.conf.
+    case "$1" in
+        php-fpm|php-fpm8.3)
+            log "php-fpm detected: keeping master process as root..."
+            ;;
+        *)
+            if [ "${SKIP_DROP_PRIVILEGES:-false}" != "true" ]; then
+                log "dropping privileges to www-data..."
+                exec gosu www-data "$0" "$@"
+            fi
+            ;;
+    esac
 fi
 
 # ---------------------------------------------------------------------

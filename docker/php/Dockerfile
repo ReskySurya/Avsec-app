@@ -13,14 +13,28 @@
 # ---------------------------------------------------------------------
 # Stage 1: PHP vendor (Composer)
 # ---------------------------------------------------------------------
-FROM composer:2 AS vendor
+FROM docker.io/library/php:8.3-cli-bookworm AS vendor
+
+ENV COMPOSER_ALLOW_SUPERUSER=1 \
+    COMPOSER_NO_INTERACTION=1
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        git unzip curl \
+        libpng-dev libjpeg62-turbo-dev libfreetype6-dev libwebp-dev \
+        libzip-dev libicu-dev libonig-dev libxml2-dev libgmp-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install -j"$(nproc)" \
+        pdo_mysql mbstring bcmath gd zip exif intl pcntl opcache gmp \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=docker.io/library/composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
-# Copy only manifest files first to leverage layer cache
 COPY composer.json composer.lock ./
 
-# Install production dependencies (no scripts; artisan not yet present)
 RUN composer install \
         --no-dev \
         --no-scripts \
@@ -39,7 +53,7 @@ RUN composer dump-autoload --optimize --no-dev --classmap-authoritative
 # ---------------------------------------------------------------------
 # Stage 2: Runtime (PHP-FPM + Chromium + Puppeteer for Browsershot)
 # ---------------------------------------------------------------------
-FROM php:8.3-fpm-bookworm AS runtime
+FROM docker.io/library/php:8.3-fpm-bookworm AS runtime
 
 # Tell Puppeteer to use the system-installed Chromium instead of
 # downloading its own copy (saves ~200MB and avoids sandbox issues).
@@ -78,7 +92,7 @@ RUN npm install -g puppeteer@24 \
     && npm cache clean --force
 
 # Composer binary for runtime tasks (e.g. troubleshooting in container)
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY --from=docker.io/library/composer:2 /usr/bin/composer /usr/bin/composer
 
 # ---- Application code -----------------------------------------------
 WORKDIR /var/www/html

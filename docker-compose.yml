@@ -32,7 +32,7 @@ x-app-common: &app-common
   # makes 'host.docker.internal' resolve to the docker bridge gateway
   # (typically 172.17.0.1) on Linux.
   extra_hosts:
-    - "host.docker.internal:host-gateway"
+    - "host.docker.internal:10.89.0.1"
 
 services:
 
@@ -46,6 +46,9 @@ services:
     container_name: avsec_app
     ports:
       - "127.0.0.1:9000:9000"
+    environment:
+      RUN_MIGRATIONS: "false"
+      RUN_OPTIMIZE: "false"
     volumes:
       # Storage: bind ke host filesystem. Berisi uploads (PMIK, dll),
       # logs, framework cache. Aman walau container/image dihapus.
