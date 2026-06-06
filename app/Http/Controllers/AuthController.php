@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rules\Password;
+use Inertia\Inertia;
 
 class AuthController extends Controller
 {
@@ -17,7 +18,9 @@ class AuthController extends Controller
             return redirect($this->redirectBasedOnRole());
         }
 
-        return view('auth.login');
+        return Inertia::render('Auth/Login', [
+            'identifier' => old('identifier', ''),
+        ]);
     }
 
     public function login(Request $request)
@@ -89,7 +92,7 @@ class AuthController extends Controller
      */
     public function showChangePasswordForm()
     {
-        return view('auth.change-password');
+        return Inertia::render('Auth/ChangePassword');
     }
 
     /**

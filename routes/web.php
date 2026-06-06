@@ -20,9 +20,7 @@ use App\Http\Controllers\LogBook\LogbookPosJagaController;
 use App\Http\Controllers\LogBook\LogbookRotasiController;
 use App\Http\Controllers\PMIKController;
 
-Route::get('/', function () {
-    return view('auth.login');
-});
+Route::get('/', [AuthController::class, 'showLoginForm']);
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');

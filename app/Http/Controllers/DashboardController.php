@@ -18,6 +18,7 @@ use App\Models\ReportStatus;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
@@ -371,19 +372,79 @@ class DashboardController extends Controller
             ];
         }
 
-        return view('officer.dashboardOfficer', [
-            'rejectedlogbooks' => $rejectedlogbooks,
-            'locations' => $locations,
-            'rejectedReports' => $rejectedReports,
-            'logbookEntries' => $logbookEntries,
-            'checklistKendaraan' => $checklistKendaraan,
-            'checklistPenyisiran' => $checklistPenyisiran,
+        return Inertia::render('Officer/Dashboard', [
+            'rejectedLogbooks' => $rejectedlogbooks->through(fn ($logbook) => [
+                'id' => $logbook->logbookID,
+                'location' => $logbook->locationArea->name ?? 'Tanpa Lokasi',
+                'date' => $logbook->date ? \Carbon\Carbon::parse($logbook->date)->format('d M Y') : null,
+                'shift' => $logbook->shift,
+                'reason' => $logbook->rejected_reason,
+                'detail_url' => route('logbook.detail', $logbook->logbookID),
+            ]),
+            'rejectedReports' => $rejectedReports->map(fn ($report) => [
+                'id' => $report->reportID,
+                'date' => optional($report->created_at)->format('d/m/Y'),
+                'equipment' => $report->equipmentLocation->equipment->name ?? '-',
+                'location' => $report->equipmentLocation->location->name ?? '-',
+                'reason' => $report->approvalNote,
+                'detail_url' => match ($report->equipmentLocation->equipment->name ?? null) {
+                    'hhmd' => route('officer.hhmd.editRejectedReport', $report->reportID),
+                    'wtmd' => route('officer.wtmd.editRejectedReport', $report->reportID),
+                    'xraycabin' => route('officer.xraycabin.editRejectedReport', $report->reportID),
+                    'xraybagasi' => route('officer.xraybagasi.editRejectedReport', $report->reportID),
+                    default => null,
+                },
+            ]),
+            'logbookEntries' => $logbookEntries->map(fn ($logbook) => [
+                'id' => $logbook->logbookID,
+                'date' => optional($logbook->created_at)->format('d/m/Y'),
+                'location' => $logbook->locationArea->name ?? '-',
+                'group' => $logbook->grup,
+                'shift' => $logbook->shift,
+                'sender' => $logbook->senderBy->name ?? '-',
+                'detail_url' => route('officer.received.show', [
+                    'location' => $logbook->locationArea->name ?? '-',
+                    'logbookID' => $logbook->logbookID,
+                ]),
+            ]),
+            'checklistKendaraan' => $checklistKendaraan->map(fn ($checklist) => [
+                'id' => $checklist->id,
+                'date' => optional($checklist->created_at)->format('d/m/Y'),
+                'type' => $checklist->type,
+                'shift' => $checklist->shift,
+                'sender' => $checklist->sender->name ?? '-',
+                'detail_url' => route('officer.receivedChecklistKendaraan.show', ['type' => $checklist->type, 'id' => $checklist->id]),
+            ]),
+            'checklistPenyisiran' => $checklistPenyisiran->map(fn ($checklist) => [
+                'id' => $checklist->id,
+                'date' => optional($checklist->created_at)->format('d/m/Y'),
+                'time' => optional($checklist->created_at)->format('H:i'),
+                'type' => $checklist->type,
+                'group' => $checklist->grup,
+                'sender' => $checklist->sender->name ?? '-',
+                'detail_url' => route('officer.receivedChecklistPenyisiran.show', ['id' => $checklist->id]),
+            ]),
             'dailyTestStatuses' => $dailyTestStatuses,
             'checklistStatuses' => $checklistStatuses,
             'sweepingStatuses' => $sweepingStatuses,
-            'draftLogbooks' => $draftLogbooks,
-            'draftLogbookRotasi' => $draftLogbookRotasi,
-            'draftManualBooks' => $draftManualBooks,
+            'draftLogbooks' => $draftLogbooks->map(fn ($logbook) => [
+                'id' => $logbook->logbookID,
+                'location' => $logbook->locationArea->name ?? 'Tanpa Lokasi',
+                'date' => $logbook->date ? \Carbon\Carbon::parse($logbook->date)->format('d M Y') : null,
+                'detail_url' => route('logbook.posjaga.list', $logbook->logbookID),
+            ]),
+            'draftLogbookRotasi' => $draftLogbookRotasi->map(fn ($logbook) => [
+                'id' => $logbook->id,
+                'type' => strtoupper($logbook->type),
+                'date' => optional($logbook->created_at)->format('d M Y'),
+                'detail_url' => route('logbookRotasi.index'),
+            ]),
+            'draftManualBooks' => $draftManualBooks->map(fn ($manualBook) => [
+                'id' => $manualBook->id,
+                'type' => strtoupper($manualBook->type),
+                'date' => optional($manualBook->created_at)->format('d M Y'),
+                'detail_url' => '#',
+            ]),
             'logbookSubmissionStatuses' => $logbookSubmissionStatuses,
         ]);
     }
@@ -822,7 +883,7 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('supervisor.dashboardSupervisor', [
+        return Inertia::render('Supervisor/Dashboard', [
             'dailyTestStats' => $dailyTestStats,
             'logbookStats' => $logbookStats,
             'checklistStats' => $checklistStats,
@@ -831,8 +892,28 @@ class DashboardController extends Controller
             'totalPendingLogbooks' => $totalPendingLogbooks,
             'pendingChecklistCounts' => $pendingChecklistCounts,
             'totalPendingChecklists' => $totalPendingChecklists,
-            'draftLogbookChief' => $draftLogbookChief,
-            'pendingChiefReports' => $pendingChiefReports,
+            'draftLogbookChief' => $draftLogbookChief->map(fn ($draft) => [
+                'id' => $draft->logbookID,
+                'date' => optional($draft->created_at)->format('d M Y, H:i'),
+                'detail_url' => route('logbook.chief.detail', $draft->logbookID),
+            ]),
+            'pendingChiefReports' => $pendingChiefReports->map(fn ($report) => [
+                'id' => $report->logbookID,
+                'creator' => $report->createdBy->name ?? 'N/A',
+                'date' => optional($report->created_at)->format('d M Y, H:i'),
+                'detail_url' => route('logbook.chief.review.laporan.leader', ['logbookID' => $report->logbookID]),
+            ]),
+            'approvalCounts' => [
+                'reports' => $pendingDailyTestCount,
+                'totalLogbook' => $totalPendingLogbooks,
+                'logbookPosJaga' => $pendingLogbookCounts['Pos Jaga'] ?? 0,
+                'logbookRotasi' => $pendingLogbookCounts['Rotasi'] ?? 0,
+                'totalChecklist' => $totalPendingChecklists,
+                'kendaraan' => $pendingChecklistCounts['Kendaraan'] ?? 0,
+                'penyisiran' => $pendingChecklistCounts['Penyisiran'] ?? 0,
+                'pencatatanPI' => $pendingChecklistCounts['Pencatatan PI'] ?? 0,
+                'manualBook' => $pendingLogbookCounts['Manual Book'] ?? 0,
+            ],
         ]);
 
     }
@@ -1076,7 +1157,7 @@ class DashboardController extends Controller
             'breakdownTitle' => 'Tipe'
         ];
 
-        return view('superadmin.dashboardSuperadmin', [
+        return Inertia::render('Superadmin/Dashboard', [
             'dailyTestStats' => $dailyTestStats,
             'logbookStats' => $logbookStats,
             'checklistStats' => $checklistStats
