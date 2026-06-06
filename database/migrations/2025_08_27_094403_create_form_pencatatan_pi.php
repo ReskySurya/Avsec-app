@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('form_pencatatan_pi', function (Blueprint $table) {
-            $table->id()->primary();
+            $table->id();
             $table->date('date');
             $table->string('grup')->nullable();
             $table->string('in_time')->nullable(); 
