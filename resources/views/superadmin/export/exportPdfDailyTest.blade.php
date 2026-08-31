@@ -91,7 +91,7 @@
 
                     <!-- Data Table -->
                     <div class="overflow-hidden border border-gray-200 rounded-lg mb-6">
-                        @if(count($reports) > 0)
+                        @if($reports->total() > 0)
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
@@ -152,6 +152,9 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        <div class="px-6 py-4 border-t border-gray-200">
+                            {{ $reports->withQueryString()->links() }}
+                        </div>
                         @else
                         <div class="p-8 text-center text-gray-500">
                             <p>Tidak ada data yang ditemukan untuk filter yang dipilih.</p>

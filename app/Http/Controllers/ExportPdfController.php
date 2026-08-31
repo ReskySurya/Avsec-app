@@ -166,19 +166,27 @@ class ExportPdfController extends Controller
                 if (!empty($filters['end_date'])) $exportQuery->whereDate('reports.testDate', '<=', $filters['end_date']);
             }
 
+            if ($request->input('export_type') === 'selected' && count($request->input('selected_reports', [])) > 50) {
+                return redirect()->back()->with('error', 'Maksimal 50 laporan per export.');
+            }
+
             $reportsToExport = $exportQuery->with([
                 'reportDetails',
-                'submittedBy',
-                'approvedBy',
-                'equipmentLocation.location',
-                'equipmentLocation.equipment',
-            ])->get();
+                'submittedBy:id,name',
+                'approvedBy:id,name',
+                'equipmentLocation.location:id,name',
+                'equipmentLocation.equipment:id,name',
+            ])->limit(50)->get();
 
             if ($reportsToExport->isEmpty()) {
                 $errorMessage = $request->input('export_type') === 'selected'
                     ? 'Laporan yang dipilih tidak ada yang berstatus "approved" atau tidak ditemukan.'
                     : 'Tidak ada laporan berstatus "approved" yang ditemukan untuk filter yang dipilih.';
                 return redirect()->back()->with('error', $errorMessage);
+            }
+
+            if ($reportsToExport->count() > 50) {
+                return redirect()->back()->with('error', 'Data terlalu banyak untuk di-export sekaligus. Maksimal 50 data. Gunakan filter tanggal atau lokasi.');
             }
 
             $formsForView = $reportsToExport->map(fn($report) => $this->prepareFormData($report));
@@ -202,7 +210,7 @@ class ExportPdfController extends Controller
             ->join('equipment', 'equipment_locations.equipment_id', '=', 'equipment.id')
             ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
             ->whereIn('equipment.name', $equipmentTypes)
-            ->with('status');
+            ->with('status:id,name');
 
         if (!empty($filters['form_type'])) $query->where('equipment.name', strtolower($filters['form_type']));
         if (!empty($filters['location'])) $query->where('locations.name', $filters['location']);
@@ -211,9 +219,9 @@ class ExportPdfController extends Controller
         if (!empty($filters['status'])) $query->whereHas('status', fn($q) => $q->where('name', $filters['status']));
 
         $reports = $query
-            ->select('reports.reportID as id', 'reports.testDate', 'reports.statusID', 'locations.name as location_name', 'equipment.name as equipment_name')
-            ->orderBy('reports.created_at', 'desc')->get()
-            ->map(fn($r) => [
+            ->select('reports.reportID as id', 'reports.testDate', 'reports.statusID', 'reports.created_at', 'locations.name as location_name', 'equipment.name as equipment_name')
+            ->orderBy('reports.created_at', 'desc')->paginate(20)
+            ->through(fn($r) => [
                 'id' => $r->id,
                 'date' => $r->testDate ? \Carbon\Carbon::parse($r->testDate)->format('d/m/Y') : 'N/A',
                 'test_type' => strtoupper($r->equipment_name),
