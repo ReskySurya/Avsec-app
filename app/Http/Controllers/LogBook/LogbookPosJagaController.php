@@ -290,40 +290,43 @@ class LogbookPosJagaController extends Controller
     }
     public function detail($id)
     {
-        $logbook = Logbook::with('locationArea') // Eager load relasi location
-            ->where('logbookID', $id)
-            ->first();
+        $logbook = Logbook::with([
+            'locationArea:id,name',
+            'details',
+            'personil.user:id,name',
+            'facility',
+        ])->find($id);
 
         if (!$logbook) {
             abort(404, 'Logbook tidak ditemukan.');
         }
 
-        $uraianKegiatan = LogbookDetail::where('logbookID', $id)->get();
-        $personil = LogbookStaff::with('user') // Tambahkan eager loading
-            ->where('logbookID', $id)
-            ->get();
-        $facility = LogbookFacility::where('logbookID', $id)->get();
+        $uraianKegiatan = $logbook->details;
+        $personil = $logbook->personil;
+        $facility = $logbook->facility;
 
         // Dapatkan daftar staff yang sudah terdaftar
         $existingStaffIds = $personil->pluck('staffID')->toArray();
 
-        // Dapatkan officer yang tersedia (belum ditambahkan)
-        $availableOfficers = User::whereHas('role', function ($query) {
-            $query->where('name', Role::OFFICER);
-        })
-            ->whereNotIn('id', $existingStaffIds)
+        // Dapatkan officer yang tersedia (belum ditambahkan) - select kolom seperlunya
+        $availableOfficers = User::select('id', 'name', 'nip', 'lisensi')
+            ->whereHas('role', function ($query) {
+                $query->where('name', Role::OFFICER);
+            })
+            ->when(!empty($existingStaffIds), fn($q) => $q->whereNotIn('id', $existingStaffIds))
             ->orderBy('name', 'asc')
             ->get();
 
         // Dapatkan semua officer untuk modal edit
-        $allOfficers = User::whereHas('role', function ($query) {
-            $query->where('name', Role::OFFICER);
-        })
+        $allOfficers = User::select('id', 'name', 'nip', 'lisensi')
+            ->whereHas('role', function ($query) {
+                $query->where('name', Role::OFFICER);
+            })
             ->orderBy('name', 'asc')
             ->get();
 
         // Tambahkan data equipments untuk dropdown form
-        $equipments = Equipment::orderBy('name', 'asc')->get();
+        $equipments = Equipment::select('id', 'name')->orderBy('name', 'asc')->get();
 
         return view('logbook.posjaga.detailPosJaga', [
             'logbook' => $logbook,
@@ -641,22 +644,21 @@ class LogbookPosJagaController extends Controller
     public function supervisorReviewLogbook($logbookID)
     {
         try {
-            $logbook = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy'])
-                ->where('logbookID', $logbookID)
-                ->firstOrFail();
-
-            $logbookDetails = LogbookDetail::where('logbookID', $logbookID)->get();
-
-            $personil = LogbookStaff::with('user')
-                ->where('logbookID', $logbookID)
-                ->get();
-            $facility = LogbookFacility::where('logbookID', $logbookID)->get();
+            $logbook = Logbook::with([
+                'locationArea:id,name',
+                'senderBy:id,name',
+                'receiverBy:id,name',
+                'approverBy:id,name',
+                'details',
+                'personil.user:id,name',
+                'facility',
+            ])->findOrFail($logbookID);
 
             return view('supervisor.logbookReview', [
                 'logbook' => $logbook,
-                'logbookDetails' => $logbookDetails,
-                'personil' => $personil,
-                'facility' => $facility
+                'logbookDetails' => $logbook->details,
+                'personil' => $logbook->personil,
+                'facility' => $logbook->facility,
             ]);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Logbook tidak ditemukan');
@@ -824,22 +826,21 @@ class LogbookPosJagaController extends Controller
     public function officerReviewLogbook($logbookID)
     {
         try {
-            $logbook = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy'])
-                ->where('logbookID', $logbookID)
-                ->firstOrFail();
-
-            $logbookDetails = LogbookDetail::where('logbookID', $logbookID)->get();
-
-            $personil = LogbookStaff::with('user')
-                ->where('logbookID', $logbookID)
-                ->get();
-            $facility = LogbookFacility::where('logbookID', $logbookID)->get();
+            $logbook = Logbook::with([
+                'locationArea:id,name',
+                'senderBy:id,name',
+                'receiverBy:id,name',
+                'approverBy:id,name',
+                'details',
+                'personil.user:id,name',
+                'facility',
+            ])->findOrFail($logbookID);
 
             return view('logbook.posjaga.logbookReviewPosJaga', [
                 'logbook' => $logbook,
-                'logbookDetails' => $logbookDetails,
-                'personil' => $personil,
-                'facility' => $facility
+                'logbookDetails' => $logbook->details,
+                'personil' => $logbook->personil,
+                'facility' => $logbook->facility,
             ]);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Logbook tidak ditemukan');

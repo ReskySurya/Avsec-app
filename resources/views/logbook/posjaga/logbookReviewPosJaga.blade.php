@@ -66,12 +66,12 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($personil as $index => $personil)
+            @foreach($personil as $index => $p)
             <tr>
                 <td class="border border-black px-2 py-1 text-center">{{ $index + 1 }}</td>
-                <td class="border border-black px-2 py-1">{{ $personil->user->name }}</td>
-                <td class="border border-black px-2 py-1 text-center">{{ $personil->classification }}</td>
-                <td class="border border-black px-2 py-1 text-center">{{ $personil->description }}</td>
+                <td class="border border-black px-2 py-1">{{ $p->user->name ?? 'N/A' }}</td>
+                <td class="border border-black px-2 py-1 text-center">{{ $p->classification }}</td>
+                <td class="border border-black px-2 py-1 text-center">{{ $p->description }}</td>
             </tr>
             @endforeach
         </tbody>
@@ -91,12 +91,12 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($facility as $index => $facility)
+            @foreach($facility as $index => $f)
             <tr>
                 <td class="border border-black px-2 py-1 text-center">{{ $index + 1 }}</td>
-                <td class="border border-black px-2 py-1">{{ $facility->facility }}</td>
-                <td class="border border-black px-2 py-1 text-center">{{ $facility->quantity }}</td>
-                <td class="border border-black px-2 py-1 text-center">{{ $facility->description }}</td>
+                <td class="border border-black px-2 py-1">{{ $f->facility }}</td>
+                <td class="border border-black px-2 py-1 text-center">{{ $f->quantity }}</td>
+                <td class="border border-black px-2 py-1 text-center">{{ $f->description }}</td>
             </tr>
             @endforeach
         </tbody>
