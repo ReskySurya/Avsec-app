@@ -79,39 +79,33 @@ class DashboardController extends Controller
     }
     public function showDataLogbook(Request $request)
     {
-        $statusFilter = $request->query('status', ''); // Default kosong untuk menampilkan semua
+        $statusFilter = $request->query('status', '');
 
-        $logbookQuery = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy'])
+        $logbookQuery = Logbook::with(['locationArea:id,name', 'senderBy:id,name', 'receiverBy:id,name', 'approverBy:id,name'])
+            ->select('logbookID', 'date', 'location_area_id', 'grup', 'shift', 'status', 'senderID', 'receivedID', 'approvedID')
             ->orderBy('date', 'desc');
 
-        // Cek jika user bukan superadmin, maka filter berdasarkan approver
         if (!Auth::user()->isSuperAdmin()) {
             $logbookQuery->where('approvedID', Auth::id());
         }
 
-        // Filter berdasarkan status jika dipilih
         if ($statusFilter) {
             $logbookQuery->where('status', $statusFilter);
         }
 
-
-        $logbookEntries = $logbookQuery->get()
-            ->map(function ($logbook) {
-                return [
-                    'id' => $logbook->logbookID,
-                    'date' => $logbook->date->format('d/m/Y'),
-                    'location' => $logbook->locationArea->name ?? '',
-                    'group' => $logbook->grup,
-                    'shift' => $logbook->shift,
-                    'status' => $logbook->status, // Status asli dari database
-                    'sender' => $logbook->senderBy->name ?? '',
-                    'receiver' => $logbook->receiverBy->name ?? '',
-                    'approver' => $logbook->approverBy->name ?? '',
-                    'sender_signature' => $logbook->sender_signature ?? null,
-                    'received_signature' => $logbook->received_signature ?? null,
-                    'approved_signature' => $logbook->approved_signature ?? null,
-                ];
-            });
+        $logbookEntries = $logbookQuery->paginate(20)->through(function ($logbook) {
+            return [
+                'id' => $logbook->logbookID,
+                'date' => $logbook->date->format('d/m/Y'),
+                'location' => $logbook->locationArea->name ?? '',
+                'group' => $logbook->grup,
+                'shift' => $logbook->shift,
+                'status' => $logbook->status,
+                'sender' => $logbook->senderBy->name ?? '',
+                'receiver' => $logbook->receiverBy->name ?? '',
+                'approver' => $logbook->approverBy->name ?? '',
+            ];
+        });
 
         return view('supervisor.logbookForm', [
             'logbookEntries' => $logbookEntries,

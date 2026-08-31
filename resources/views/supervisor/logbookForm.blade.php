@@ -20,7 +20,7 @@
                     </div>
                     <div class="bg-white/20 flex items-center space-x-3 rounded-full px-3 py-1">
                         <span class="text-white text-xs font-medium">
-                            {{ count($logbookEntries) }}
+                            {{ $logbookEntries->total() }}
                         </span>
                         <span class="text-white text-xs font-medium">
                             Logbook
@@ -181,6 +181,10 @@
                     </tbody>
                 </table>
             </div>
+            <!-- Pagination Desktop -->
+            <div class="hidden lg:block px-6 py-4 border-t border-gray-200">
+                {{ $logbookEntries->withQueryString()->links() }}
+            </div>
 
             <!-- Mobile Card View -->
             <div class="lg:hidden divide-y divide-gray-200">
@@ -295,6 +299,10 @@
                     <p class="mt-1 text-sm text-gray-500">Get started by creating a new test logbook.</p>
                 </div>
                 @endforelse
+            </div>
+            <!-- Pagination Mobile -->
+            <div class="lg:hidden px-4 py-4 border-t border-gray-200">
+                {{ $logbookEntries->withQueryString()->links() }}
             </div>
         </div>
     </div>

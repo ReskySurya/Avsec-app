@@ -452,11 +452,8 @@ class ExportPdfController extends Controller
         }
         $locations = $locationsQuery->orderBy('name')->get();
 
-        $initialData = $this->getLogbookData($initialFormType, $request->only(['location', 'start_date', 'end_date']));
-
         return view('superadmin.export.exportPdfLogbook', [
             'locations' => $locations,
-            'logbooks' => $initialData,
             'formType' => $initialFormType
         ]);
     }
@@ -465,64 +462,97 @@ class ExportPdfController extends Controller
     {
         $formType = $request->input('form_type', 'pos_jaga');
         $filters = $request->only(['location', 'start_date', 'end_date']);
-        $logbooks = $this->getLogbookData($formType, $filters);
+        $paginator = $this->getLogbookData($formType, $filters);
+
+        $mapped = $paginator->getCollection()->map(function ($item) use ($formType) {
+            return match ($formType) {
+                'pos_jaga' => [
+                    'logbookID' => $item->logbookID,
+                    'date' => $item->date,
+                    'location_area' => ['name' => $item->locationArea->name ?? ''],
+                    'sender_by' => ['name' => $item->senderBy->name ?? ''],
+                    'receiver_by' => ['name' => $item->receiverBy->name ?? ''],
+                    'approver_by' => ['name' => $item->approverBy->name ?? ''],
+                    'status' => $item->status,
+                ],
+                'sweeping_pi' => [
+                    'sweepingpiID' => $item->sweepingpiID,
+                    'created_at' => $item->created_at,
+                    'bulan' => $item->bulan,
+                    'tahun' => $item->tahun,
+                    'tenant' => ['tenant_name' => $item->tenant->tenant_name ?? '', 'supervisorName' => $item->tenant->supervisorName ?? ''],
+                ],
+                'rotasi' => [
+                    'id' => $item->id,
+                    'date' => $item->date,
+                    'type' => $item->type,
+                    'status' => $item->status,
+                    'creator' => ['name' => $item->creator->name ?? ''],
+                    'approver' => ['name' => $item->approver->name ?? ''],
+                ],
+                'chief' => [
+                    'logbookID' => $item->logbookID,
+                    'date' => $item->date,
+                    'grup' => $item->grup,
+                    'shift' => $item->shift,
+                    'status' => $item->status,
+                    'senderName' => $item->createdBy->name ?? '',
+                    'receiverName' => $item->approvedBy->name ?? '',
+                ],
+                default => [],
+            };
+        });
+
         return response()->json([
             'success' => true,
             'form_type' => $formType,
-            'logbooks' => $logbooks,
-            'count' => $logbooks->count()
+            'logbooks' => $mapped,
+            'count' => $paginator->total(),
         ]);
     }
 
     private function getLogbookData($formType, $filters = [])
     {
-        $query = null;
         $startDate = $filters['start_date'] ?? null;
         $endDate = $filters['end_date'] ?? null;
 
         switch ($formType) {
             case 'pos_jaga':
-                $query = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy', 'details', 'facility', 'personil.user']);
+                $query = Logbook::with(['locationArea:id,name', 'senderBy:id,name', 'receiverBy:id,name', 'approverBy:id,name'])
+                    ->select('logbookID', 'date', 'location_area_id', 'grup', 'shift', 'status', 'senderID', 'receivedID', 'approvedID');
                 if (!empty($filters['location'])) {
                     $query->whereHas('locationArea', fn($q) => $q->where('name', $filters['location']));
                 }
                 if ($startDate) $query->whereDate('date', '>=', $startDate);
                 if ($endDate) $query->whereDate('date', '<=', $endDate);
-                return $query->orderBy('date', 'desc')->get();
+                return $query->orderBy('date', 'desc')->paginate(20);
 
             case 'sweeping_pi':
-                $query = LogbookSweepingPI::with(['tenant', 'sweepingPIDetails', 'notesSweepingPI']);
+                $query = LogbookSweepingPI::with(['tenant:id,tenantID,tenant_name,supervisorName'])
+                    ->select('sweepingpiID', 'created_at', 'bulan', 'tahun', 'tenantID');
                 if ($startDate) $query->whereDate('created_at', '>=', $startDate);
                 if ($endDate) $query->whereDate('created_at', '<=', $endDate);
-                return $query->orderBy('created_at', 'desc')->get();
+                return $query->orderBy('created_at', 'desc')->paginate(20);
 
             case 'rotasi':
-                $query = LogbookRotasi::with(['creator', 'approver', 'submitter', 'details.officerAssignment.officer']);
+                $query = LogbookRotasi::with(['creator:id,name', 'approver:id,name'])
+                    ->select('id', 'date', 'type', 'status', 'created_by', 'approved_by');
                 if (!empty($filters['location'])) {
                     $query->where('type', $filters['location']);
                 }
                 if ($startDate) $query->whereDate('date', '>=', $startDate);
                 if ($endDate) $query->whereDate('date', '<=', $endDate);
-                return $query->orderBy('date', 'desc')->get();
+                return $query->orderBy('date', 'desc')->paginate(20);
 
             case 'chief':
-                $query = LogbookChief::with(['createdBy']);
+                $query = LogbookChief::with(['createdBy:id,name', 'approvedBy:id,name'])
+                    ->select('logbookID', 'date', 'grup', 'shift', 'status', 'created_by', 'approved_by');
                 if ($startDate) $query->whereDate('date', '>=', $startDate);
                 if ($endDate) $query->whereDate('date', '<=', $endDate);
-                return $query->orderBy('date', 'desc')->get()->map(function ($item) {
-                    return [
-                        'logbookID' => $item->logbookID,
-                        'date' => $item->date,
-                        'grup' => $item->grup,
-                        'shift' => $item->shift,
-                        'senderName' => $item->createdBy->name ?? 'N/A',
-                        'receiverName' => $item->approvedBy->name ?? 'N/A',
-                        'status' => $item->status,
-                    ];
-                });
+                return $query->orderBy('date', 'desc')->paginate(20);
 
             default:
-                return collect();
+                return new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
         }
     }
 
@@ -540,9 +570,15 @@ class ExportPdfController extends Controller
             if (empty($selectedIds)) {
                 return redirect()->back()->with('error', 'Pilih minimal satu data untuk diekspor!');
             }
+            if (count($selectedIds) > 50) {
+                return redirect()->back()->with('error', 'Maksimal 50 data per export. Gunakan filter untuk mempersempit data.');
+            }
             $data = $this->getLogbookDataForExport($formType, [], $selectedIds);
         } elseif ($request->input('export_type') === 'all') {
             $filters = $request->only(['location', 'start_date', 'end_date']);
+            if (empty($filters['start_date']) || empty($filters['end_date'])) {
+                return redirect()->back()->with('error', 'Filter tanggal wajib diisi untuk export semua data.');
+            }
             $data = $this->getLogbookDataForExport($formType, $filters);
         } else {
             return redirect()->back()->with('error', 'Tipe export tidak valid.');
@@ -553,6 +589,10 @@ class ExportPdfController extends Controller
                 ? 'Data yang dipilih tidak ditemukan.'
                 : 'Tidak ada data yang ditemukan untuk filter yang dipilih.';
             return redirect()->back()->with('error', $errorMessage);
+        }
+
+        if ($data->count() > 50) {
+            return redirect()->back()->with('error', 'Data terlalu banyak untuk di-export sekaligus. Maksimal 50 data. Gunakan filter tanggal atau lokasi.');
         }
 
         return $this->generateLogbookPdf($formType, $data);
@@ -603,7 +643,7 @@ class ExportPdfController extends Controller
             }
         }
 
-        return $query->orderBy($dateColumn, 'desc')->get();
+        return $query->orderBy($dateColumn, 'desc')->limit(50)->get();
     }
 
     private function generateLogbookPdf($formType, $data)
