@@ -36,7 +36,7 @@ class DashboardController extends Controller
             ->join('locations', 'equipment_locations.location_id', '=', 'locations.id')
             ->whereIn('equipment.name', $equipmentTypes)
             ->whereIn('reports.statusID', [1, 2, 3])
-            ->with(['submittedBy', 'status']);
+            ->with(['submittedBy:id,name', 'status:id,name']);
 
         // Cek jika user bukan superadmin, maka filter berdasarkan approver
         if (!Auth::user()->isSuperAdmin()) {
@@ -56,15 +56,16 @@ class DashboardController extends Controller
                 'reports.testDate',
                 'reports.submittedByID',
                 'reports.statusID',
+                'reports.created_at',
                 'locations.name as location_name',
                 'equipment.name as equipment_name'
             )
             ->orderBy('reports.created_at', 'desc')
-            ->get()
-            ->map(function ($report) {
+            ->paginate(20)
+            ->through(function ($report) {
                 return [
                     'id' => $report->id,
-                    'date' => $report->testDate->format('d/m/Y'),
+                    'date' => $report->testDate ? $report->testDate->format('d/m/Y') : 'N/A',
                     'test_type' => strtoupper($report->equipment_name),
                     'location' => $report->location_name,
                     'status' => $report->status->name ?? 'pending',
