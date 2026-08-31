@@ -10,6 +10,7 @@ use App\Models\Location;
 use App\Models\Report;
 use App\Models\Logbook;
 use App\Models\LogbookChief;
+use App\Models\LogbookStaff;
 use App\Models\LogbookRotasi;
 use App\Models\LogbookSweepingPI;
 use App\Models\LogbookSweepingPIDetail;
@@ -81,7 +82,6 @@ class DashboardController extends Controller
         $statusFilter = $request->query('status', ''); // Default kosong untuk menampilkan semua
 
         $logbookQuery = Logbook::with(['locationArea', 'senderBy', 'receiverBy', 'approverBy'])
-            ->whereIn('status', ['submitted', 'approved', 'draft'])
             ->orderBy('date', 'desc');
 
         // Cek jika user bukan superadmin, maka filter berdasarkan approver
@@ -124,6 +124,10 @@ class DashboardController extends Controller
         // Ambil ID user yang sedang login
         $currentUserId = Auth::id();
 
+        // Pre-fetch logbookID dari pivot table untuk optimasi query (mengganti orHas/EXISTS)
+        $staffLogbookIds = LogbookStaff::where('staffID', $currentUserId)
+            ->pluck('logbookID');
+
         // Daily Test Submission Status
         $equipmentTypes = ['hhmd', 'wtmd', 'xraycabin', 'xraybagasi'];
         $allDailyTestLocations = EquipmentLocation::with(['equipment', 'location'])
@@ -133,7 +137,8 @@ class DashboardController extends Controller
             ->get();
 
         $submittedLocationIds = Report::whereIn('equipmentLocationID', $allDailyTestLocations->pluck('id'))
-            ->whereDate('created_at', today())
+            ->where('created_at', '>=', today()->startOfDay())
+            ->where('created_at', '<', today()->addDay()->startOfDay())
             ->pluck('equipmentLocationID')
             ->unique();
 
@@ -175,7 +180,9 @@ class DashboardController extends Controller
             ['type' => 'motor', 'shift' => 'pagi'],
             ['type' => 'motor', 'shift' => 'malam'],
         ];
-        $submittedKendaraan = ChecklistKendaraan::whereDate('date', today())->get()->keyBy(function($item) {
+        $submittedKendaraan = ChecklistKendaraan::where('date', '>=', today()->startOfDay())
+            ->where('date', '<', today()->addDay()->startOfDay())
+            ->get()->keyBy(function($item) {
             return $item->type . '-' . $item->shift;
         });
 
@@ -194,7 +201,8 @@ class DashboardController extends Controller
         }
 
         // 2. Checklist Penyisiran
-        $penyisiranSubmitted = ChecklistPenyisiran::whereDate('date', today())->exists();
+        $penyisiranSubmitted = ChecklistPenyisiran::where('date', '>=', today()->startOfDay())
+            ->where('date', '<', today()->addDay()->startOfDay())->exists();
         $penyisiranTaskName = 'Checklist Penyisiran Ruang Tunggu';
 
         if ($penyisiranSubmitted) {
@@ -207,7 +215,8 @@ class DashboardController extends Controller
         }
 
         // 3. Form Pencatatan PI
-        $piSubmitted = FormPencatatanPI::whereDate('date', today())->exists();
+        $piSubmitted = FormPencatatanPI::where('date', '>=', today()->startOfDay())
+            ->where('date', '<', today()->addDay()->startOfDay())->exists();
         $piTaskName = 'Form Pencatatan PI';
 
         if ($piSubmitted) {
@@ -257,11 +266,9 @@ class DashboardController extends Controller
         $rejectedlogbooks = Logbook::with('locationArea')
             ->where('status', 'draft') // It's a draft
             ->whereNotNull('senderSignature') // It's a rejected one
-            ->where(function ($query) use ($currentUserId) {
-                $query->where('senderID', $currentUserId) // User is the sender
-                      ->orWhereHas('personil', function ($subQuery) use ($currentUserId) { // Or user is in the staff list
-                          $subQuery->where('staffID', $currentUserId);
-                      });
+            ->where(function ($query) use ($currentUserId, $staffLogbookIds) {
+                $query->where('senderID', $currentUserId)
+                      ->orWhereIn('logbookID', $staffLogbookIds);
             })
             ->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
@@ -303,11 +310,9 @@ class DashboardController extends Controller
         $draftLogbooks = Logbook::with('locationArea')
             ->where('status', 'draft') // It's a new one
             ->whereNull('senderSignature') // It's a new one
-            ->where(function ($query) use ($currentUserId) {
-                $query->where('senderID', $currentUserId) // User is the sender
-                      ->orWhereHas('personil', function ($subQuery) use ($currentUserId) { // Or user is in the staff list
-                          $subQuery->where('staffID', $currentUserId);
-                      });
+            ->where(function ($query) use ($currentUserId, $staffLogbookIds) {
+                $query->where('senderID', $currentUserId)
+                      ->orWhereIn('logbookID', $staffLogbookIds);
             })
             ->orderBy('created_at', 'desc')
             ->get();
@@ -330,14 +335,13 @@ class DashboardController extends Controller
         ];
 
         // Logbook Pos Jaga
-        $submittedLogbookPosJaga = Logbook::where(function ($query) use ($currentUserId) {
+        $submittedLogbookPosJaga = Logbook::where(function ($query) use ($currentUserId, $staffLogbookIds) {
                 $query->where('senderID', $currentUserId)
-                    ->orWhereHas('personil', function ($subQuery) use ($currentUserId) {
-                        $subQuery->where('staffID', $currentUserId);
-                    });
+                    ->orWhereIn('logbookID', $staffLogbookIds);
             })
             ->whereIn('status', ['submitted', 'approved'])
-            ->whereDate('created_at', today())
+            ->where('created_at', '>=', today()->startOfDay())
+            ->where('created_at', '<', today()->addDay()->startOfDay())
             ->with('locationArea')
             ->get();
 
@@ -350,7 +354,8 @@ class DashboardController extends Controller
         // Logbook Rotasi
         $submittedLogbookRotasi = LogbookRotasi::where('created_by', $currentUserId)
             ->whereIn('status', ['submitted', 'approved'])
-            ->whereDate('created_at', today())
+            ->where('created_at', '>=', today()->startOfDay())
+            ->where('created_at', '<', today()->addDay()->startOfDay())
             ->get();
 
         foreach ($submittedLogbookRotasi as $logbook) {
@@ -362,7 +367,8 @@ class DashboardController extends Controller
         // Manual Book
         $submittedManualBooks = ManualBook::where('created_by', $currentUserId)
             ->whereIn('status', ['submitted', 'approved'])
-            ->whereDate('created_at', today())
+            ->where('created_at', '>=', today()->startOfDay())
+            ->where('created_at', '<', today()->addDay()->startOfDay())
             ->get();
 
         foreach ($submittedManualBooks as $logbook) {
@@ -592,7 +598,8 @@ class DashboardController extends Controller
                 ->whereHas('equipmentLocation.equipment', function ($query) use ($type) {
                     $query->where('name', $type);
                 })
-                ->whereDate('created_at', today())
+                ->where('created_at', '>=', today()->startOfDay())
+                ->where('created_at', '<', today()->addDay()->startOfDay())
                 ->get();
 
             $reportsByLocation = $reportsToday->groupBy('equipmentLocation.location.name');
@@ -710,7 +717,8 @@ class DashboardController extends Controller
         // Get all submitted chief reports for today
         $chiefReportsToday = LogbookChief::with('createdBy')
             ->whereNotNull('senderSignature')
-            ->whereDate('created_at', today())
+            ->where('created_at', '>=', today()->startOfDay())
+            ->where('created_at', '<', today()->addDay()->startOfDay())
             ->get();
 
         $totalChief = $chiefReportsToday->count();
@@ -745,7 +753,8 @@ class DashboardController extends Controller
 
         // Fetch all relevant checklists in one query
         $kendaraanToday = ChecklistKendaraan::whereIn('status', ['submitted', 'approved'])
-            ->whereDate('date', today())
+            ->where('date', '>=', today()->startOfDay())
+            ->where('date', '<', today()->addDay()->startOfDay())
             ->get();
 
         foreach ($kendaraanShifts as $shift) {
@@ -775,7 +784,9 @@ class DashboardController extends Controller
             ];
         }
 
-        $penyisiranToday = ChecklistPenyisiran::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
+        $penyisiranToday = ChecklistPenyisiran::whereIn('status', ['submitted', 'approved'])
+            ->where('created_at', '>=', today()->startOfDay())
+            ->where('created_at', '<', today()->addDay()->startOfDay())->get();
         $penyisiranByGrup = $penyisiranToday->groupBy('grup');
         $grupDetailsPenyisiran = [];
         foreach ($penyisiranByGrup as $grupName => $checklists) {
@@ -785,7 +796,9 @@ class DashboardController extends Controller
         $approvedPenyisiran = $penyisiranToday->where('status', 'approved')->count();
         $checklistStats['Penyisiran'] = ['total' => $totalPenyisiran, 'approved' => $totalPenyisiran, 'percentage' => ($totalPenyisiran > 0) ? round(($approvedPenyisiran / $totalPenyisiran) * 100) : 0, 'breakdown' => $grupDetailsPenyisiran, 'breakdownTitle' => 'Grup'];
 
-        $piToday = FormPencatatanPI::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
+        $piToday = FormPencatatanPI::whereIn('status', ['submitted', 'approved'])
+            ->where('created_at', '>=', today()->startOfDay())
+            ->where('created_at', '<', today()->addDay()->startOfDay())->get();
         $piByGrup = $piToday->groupBy('grup');
         $grupDetailsPI = [];
         foreach ($piByGrup as $grupName => $forms) {
@@ -795,7 +808,9 @@ class DashboardController extends Controller
         $approvedPI = $piToday->where('status', 'approved')->count();
         $checklistStats['Pencatatan PI'] = ['total' => $totalPI, 'approved' => $totalPI, 'percentage' => ($totalPI > 0) ? round(($approvedPI / $totalPI) * 100) : 0, 'breakdown' => $grupDetailsPI, 'breakdownTitle' => 'Grup'];
 
-        $manualBookToday = ManualBook::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
+        $manualBookToday = ManualBook::whereIn('status', ['submitted', 'approved'])
+            ->where('created_at', '>=', today()->startOfDay())
+            ->where('created_at', '<', today()->addDay()->startOfDay())->get();
         $manualBookByType = $manualBookToday->groupBy('type');
         $typeDetailsManualBook = [];
         foreach ($manualBookByType as $typeName => $books) {
@@ -855,7 +870,8 @@ class DashboardController extends Controller
                 ->whereHas('equipmentLocation.equipment', function ($query) use ($type) {
                     $query->where('name', $type);
                 })
-                ->whereDate('created_at', today())
+                ->where('created_at', '>=', today()->startOfDay())
+                ->where('created_at', '<', today()->addDay()->startOfDay())
                 ->get();
 
             $reportsByLocation = $reportsToday->groupBy('equipmentLocation.location.name');
@@ -974,7 +990,8 @@ class DashboardController extends Controller
         // Get all submitted chief reports for today
         $chiefReportsToday = LogbookChief::with('createdBy')
             ->whereNotNull('senderSignature')
-            ->whereDate('created_at', today())
+            ->where('created_at', '>=', today()->startOfDay())
+            ->where('created_at', '<', today()->addDay()->startOfDay())
             ->get();
 
         $totalChief = $chiefReportsToday->count();
@@ -1009,7 +1026,8 @@ class DashboardController extends Controller
 
         // Fetch all relevant checklists in one query
         $kendaraanToday = ChecklistKendaraan::whereIn('status', ['submitted', 'approved'])
-            ->whereDate('date', today())
+            ->where('date', '>=', today()->startOfDay())
+            ->where('date', '<', today()->addDay()->startOfDay())
             ->get();
 
         foreach ($kendaraanShifts as $shift) {
@@ -1039,7 +1057,9 @@ class DashboardController extends Controller
             ];
         }
 
-        $penyisiranToday = ChecklistPenyisiran::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
+        $penyisiranToday = ChecklistPenyisiran::whereIn('status', ['submitted', 'approved'])
+            ->where('created_at', '>=', today()->startOfDay())
+            ->where('created_at', '<', today()->addDay()->startOfDay())->get();
         $penyisiranByGrup = $penyisiranToday->groupBy('grup');
         $grupDetailsPenyisiran = [];
         foreach ($penyisiranByGrup as $grupName => $checklists) {
@@ -1049,7 +1069,9 @@ class DashboardController extends Controller
         $approvedPenyisiran = $penyisiranToday->where('status', 'approved')->count();
         $checklistStats['Penyisiran'] = ['total' => $totalPenyisiran, 'approved' => $totalPenyisiran, 'percentage' => ($totalPenyisiran > 0) ? round(($approvedPenyisiran / $totalPenyisiran) * 100) : 0, 'breakdown' => $grupDetailsPenyisiran, 'breakdownTitle' => 'Grup'];
 
-        $piToday = FormPencatatanPI::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
+        $piToday = FormPencatatanPI::whereIn('status', ['submitted', 'approved'])
+            ->where('created_at', '>=', today()->startOfDay())
+            ->where('created_at', '<', today()->addDay()->startOfDay())->get();
         $piByGrup = $piToday->groupBy('grup');
         $grupDetailsPI = [];
         foreach ($piByGrup as $grupName => $forms) {
@@ -1059,7 +1081,9 @@ class DashboardController extends Controller
         $approvedPI = $piToday->where('status', 'approved')->count();
         $checklistStats['Pencatatan PI'] = ['total' => $totalPI, 'approved' => $totalPI, 'percentage' => ($totalPI > 0) ? round(($approvedPI / $totalPI) * 100) : 0, 'breakdown' => $grupDetailsPI, 'breakdownTitle' => 'Grup'];
 
-        $manualBookToday = ManualBook::whereIn('status', ['submitted', 'approved'])->whereDate('created_at', today())->get();
+        $manualBookToday = ManualBook::whereIn('status', ['submitted', 'approved'])
+            ->where('created_at', '>=', today()->startOfDay())
+            ->where('created_at', '<', today()->addDay()->startOfDay())->get();
         $manualBookByType = $manualBookToday->groupBy('type');
         $typeDetailsManualBook = [];
         foreach ($manualBookByType as $typeName => $books) {
