@@ -22,7 +22,7 @@
                 <div class="flex-1">
                     <h1 class="text-lg sm:text-2xl font-bold text-white mb-1">Checklist Prohibited Items</h1>
                     <p class="text-indigo-100 text-sm sm:text-base">Tenant: <span class="font-semibold text-white" id="tenant-name">{{ $tenant->tenant_name }}</span></p>
-                    <p class="text-indigo-200 text-xs sm:text-sm">ID: {{ $logbook->sweepingpiID }}</p>
+                    <p class="text-indigo-200 text-xs sm:text-sm">ID: {{ $logbook->sweepingpiID ?? 'Belum ada logbook - buat di Manage' }}</p>
                 </div>
             </div>
 
@@ -787,7 +787,7 @@
 <script>
     // Global variables
     let tenant = @json($tenant);
-    let logbookId = '{{ $logbook->sweepingpiID }}';
+    let logbookId = '{{ $logbook->sweepingpiID ?? '' }}';
     let currentMonth = '{{ $month }}';
     let currentYear = '{{ $year }}';
     let prohibitedItems = @json($prohibitedItems);

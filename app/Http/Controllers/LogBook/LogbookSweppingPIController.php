@@ -272,17 +272,19 @@ class LogbookSweppingPIController extends Controller
         }
 
         $dailyNotes = [];
-        $notesFromDB = NoteSweepingPI::where('sweepingpiID', $logbook->sweepingpiID)
-            ->orderBy('tanggal')
-            ->get();
+        if ($logbook) {
+            $notesFromDB = NoteSweepingPI::where('sweepingpiID', $logbook->sweepingpiID)
+                ->orderBy('tanggal')
+                ->get();
 
-        // Convert notes dari database ke format yang diharapkan frontend
-        foreach ($notesFromDB as $note) {
-            // Extract day dari tanggal database
-            $date = Carbon::parse($note->tanggal);
-            if ($date->month == $month && $date->year == $year) {
-                $dayIndex = $date->day - 1; // Convert ke 0-based index
-                $dailyNotes[$dayIndex] = $note->notes;
+            // Convert notes dari database ke format yang diharapkan frontend
+            foreach ($notesFromDB as $note) {
+                // Extract day dari tanggal database
+                $date = Carbon::parse($note->tanggal);
+                if ($date->month == $month && $date->year == $year) {
+                    $dayIndex = $date->day - 1; // Convert ke 0-based index
+                    $dailyNotes[$dayIndex] = $note->notes;
+                }
             }
         }
 
